@@ -14,7 +14,9 @@
     },
     "dependencies": {
         "av-ts": "^0.6.3",
-        "vue": "^2.1.0"
+        "vue": "^2.1.0",
+        "vue-material": "^0.7.1",
+        "vue-router": "^2.5.3"
     },
     "devDependencies": {
         "@types/chai": "^3.4.35",
@@ -58,7 +60,7 @@
         "shelljs": "^0.7.4",
         "style-loader": "^0.13.2",
         "ts-loader": "^2.0.3",
-        "typescript": "^2.1.4",
+        "typescript": "^2.3.4",
         "typescript-eslint-parser": "^2.0.0",
         "url-loader": "^0.5.8",
         "vue-loader": "^11.3.4",

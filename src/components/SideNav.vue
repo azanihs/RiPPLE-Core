@@ -8,7 +8,7 @@
     <ul>
         <li @click="toggleMenu">{{ showLinks ? "Hide Menu" : "Show Menu" }}
         <li v-if="showLinks" v-for="link in links">
-            <a :href="'#' + link.href">{{ link.text }}</a>
+            <router-link :to="link.href">{{ link.text }}</router-link>
         </li>
     </ul>
 </template>
@@ -19,24 +19,18 @@
     export default class SideNav extends Vue {
         links = [{
             text: "Home",
-            href: "home"
+            href: "/"
         }, {
-            text: "Other Page",
-            href: "other"
+            text: "View Questions",
+            href: "/view/questions"
         }, {
-            text: "Some Other Page",
-            href: "someother"
+            text: "View Friends",
+            href: "/view/friends"
         }];
 
         showLinks: boolean = false;
-
         toggleMenu() {
-            // Have a branch for code coverage reasons
-            if (this.showLinks) {
-                this.showLinks = false;
-            } else {
-                this.showLinks = true;
-            }
+            this.showLinks = !this.showLinks;
         }
     }
 </script>

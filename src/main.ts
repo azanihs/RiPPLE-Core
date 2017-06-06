@@ -1,14 +1,19 @@
-import * as Vue from "vue";
-import App from "./App";
+import Vue from "vue";
+import Router from "./routes";
+import VueMaterial from "vue-material";
 
-import "./styles/main.css";
+import "vue-material/dist/vue-material.css";
 
-let appContainer = document.createElement("div");
-appContainer.id = "app";
+// Global scoped addons
+Vue.use(VueMaterial);
 
+const appContainer = document.createElement("div");
+appContainer.id = "main";
+appContainer.innerHTML = "<router-view></router-view>";
 document.body.appendChild(appContainer);
+
 /* eslint-disable no-new */
 new Vue({
-    el: "#app",
-    render: h => h(App)
+    el: "#main",
+    router: Router,
 });
