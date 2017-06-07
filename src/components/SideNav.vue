@@ -19,7 +19,7 @@
 
     .profileContainer .imageContainer {
         width: 100px;
-        height: auto;
+        height: 100px;
         padding: 10px;
         margin: auto;
     }
@@ -59,11 +59,11 @@
     }
 
     /* Sets the background colour of the currently selected item */
-    .router-link-exact-active.router-link-active .linkButton {
+    .router-link-exact-active.router-link-active .linkButton,
+    .router-link-exact-active.router-link-active .linkButton:hover {
         background-color: #ffffff;
         color: #111;
     }
-
 </style>
 
 <template>
