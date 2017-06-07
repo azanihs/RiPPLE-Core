@@ -14,7 +14,7 @@
 
 <script lang="ts">
     import { Vue, Component } from "av-ts";
-    import SideNav from "./components/SideNav";
+    import SideNav from "@/components/SideNav";
 
     @Component({
         components: {

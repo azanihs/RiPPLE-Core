@@ -6,8 +6,8 @@ var webpack = require('webpack')
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var env = process.env.NODE_ENV
-// check env & config/index.js to decide weither to enable CSS Sourcemaps for the
-// various preprocessor loaders added to vue-loader at the end of this file
+    // check env & config/index.js to decide weither to enable CSS Sourcemaps for the
+    // various preprocessor loaders added to vue-loader at the end of this file
 var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
 var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
@@ -25,7 +25,7 @@ module.exports = {
         extensions: ['.js', '.vue', '.ts', '.css', '.scss'],
         alias: {
             'vue$': 'vue/dist/vue.common.js',
-            'src': path.resolve(__dirname, '../src'),
+            '@': path.resolve(__dirname, '../src'),
             'assets': path.resolve(__dirname, '../src/assets'),
             'components': path.resolve(__dirname, '../src/components')
         },
