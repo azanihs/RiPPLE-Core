@@ -1,8 +1,12 @@
 <template>
-  <div id="main">
-        <side-nav />
-		<router-view />
-  </div>
+  <md-layout>
+        <md-layout md-flex="15">
+            <side-nav />
+        </md-layout>
+        <md-layout md-flex="85">
+    		<router-view />
+        </md-layout>
+  </md-layout>
 </template>
 
 <style scoped>

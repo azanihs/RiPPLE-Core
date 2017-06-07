@@ -2,6 +2,10 @@
     ul > li:first-of-type {
         cursor: pointer;
     }
+    ul > li:not(:first-of-type) {
+        list-style: none;
+    }
+
 </style>
 
 <template>
@@ -12,23 +16,27 @@
         </li>
     </ul>
 </template>
+
 <script lang="ts">
     import { Vue, Component, Prop } from "av-ts";
 
     @Component
     export default class SideNav extends Vue {
         links = [{
-            text: "Home",
+            text: "Profile",
             href: "/"
+        }, {
+            text: "Visulisations",
+            href: "#"
         }, {
             text: "View Questions",
             href: "/view/questions"
         }, {
-            text: "View Friends",
+            text: "Find Friends",
             href: "/view/friends"
         }];
 
-        showLinks: boolean = false;
+        showLinks: boolean = true;
         toggleMenu() {
             this.showLinks = !this.showLinks;
         }
