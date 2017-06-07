@@ -12,10 +12,7 @@ export default class QuestionRepository {
     static getMany(count: number): Question[] {
         return new Array(count).fill(0).map((_, i) => {
             let questionTitle = f.company.catchPhrase();
-            //questionTitle = questionTitle.length > 33 ? questionTitle.slice(0, 30) + "..." : questionTitle;
-
             let questionContent = f.hacker.phrase();
-            //questionContent = questionContent.length > 60 ? questionContent.slice(0, 60) + "..." : questionContent;
 
             const question: Question = {
                 id: i,
