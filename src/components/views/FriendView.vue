@@ -1,7 +1,7 @@
 <template>
-<p>
-FV
-</p>
+<div>
+	<h1> Find Friends </h1>
+</div>
 </template>
 
 <style scoped>
