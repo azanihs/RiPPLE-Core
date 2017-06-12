@@ -8,6 +8,7 @@
                     {{ field.displayName }}
                 </h3>
                 <select v-if="field.displayName == 'Topic'" @change="search(field, $event)">
+                    <option value=""></option>
                     <option v-for="topic in Array.from(new Set(availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))))" :value="topic">{{ topic }}</option>
                 </select>
                 <input v-if="field.search && field.displayName != 'Topic'" @change="search(field, $event)" type="text" />
