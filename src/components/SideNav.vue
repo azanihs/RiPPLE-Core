@@ -86,7 +86,7 @@
 <script lang="ts">
     import { Vue, Component, Prop } from "av-ts";
 
-    @Component
+    @Component()
     export default class SideNav extends Vue {
         links = [{
             text: "Profile",
