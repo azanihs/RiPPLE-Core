@@ -16,14 +16,18 @@
                     </md-card-area>
                     <md-card-area md-inset>
                         <md-card-content class='actions'>
-                                <div class="placeAround">
-                                    <span class="topics">
-                                        <md-icon>school</md-icon>
-                                        <span v-for="topic in question.topics" :key="topic">{{ topic }}</span>
-                                    </span>
+                            <div class="placeAround">
+                                <span class="topics">
+                                    <md-tooltip md-direction="top">Question Topics</md-tooltip>
+                                    <md-icon>school</md-icon>
+                                    <span v-for="topic in question.topics" :key="topic">{{ topic }}</span>
+                                </span>
+                                <span>
                                     <span>{{ question.responseCount }} <md-icon>comment</md-icon></span>
-                                </div>
-                            </md-card-content>
+                                    <md-tooltip md-direction="top">Question Responses</md-tooltip>
+                                </span>
+                            </div>
+                        </md-card-content>
                     </md-card-area>
                     <md-card-actions class="actions">
                         <div>
