@@ -8,26 +8,34 @@
             <md-layout md-flex="33" v-for="question in showQuestions" :key="question.id">
                 <md-card md-with-hover class="questionCard">
                     <md-card-area md-inset>
-                        <md-card-header>
-                            <div class="md-subhead placeAround">
-                                <span>
-                                    <md-icon :style="{ color: getColourFromValue(question.quality) }">
-                                        {{ getIconFromQuality(question.quality) }}
-                                    </md-icon>
-                                </span>
-                                <span>
-                                    <md-icon v-for="star in getStarsFromDifficulty(question.difficulty)" :key="star">
-                                        {{ star }}
-                                    </md-icon>
-                                </span>
+                        <md-card-content>
+                            <div class="md-subhead truncate">
+                                <span class="truncate">{{ question.content }}</span>
                             </div>
-                        </md-card-header>
-                        <md-card-content class="truncate">{{ question.content }}</md-card-content>
+                        </md-card-content>
                     </md-card-area>
-
-                    <md-card-actions class="actions placeAround">
-                        <span><md-icon>school</md-icon> {{ question.topic }}</span>
-                        <span><md-icon>comment</md-icon> {{ question.responseCount }}</span>
+                    <md-card-area md-inset>
+                        <md-card-content class='actions'>
+                                <div class="placeAround">
+                                    <span class="topics">
+                                        <md-icon>school</md-icon>
+                                        <span v-for="topic in question.topics" :key="topic">{{ topic }}</span>
+                                    </span>
+                                    <span>{{ question.responseCount }} <md-icon>comment</md-icon></span>
+                                </div>
+                            </md-card-content>
+                    </md-card-area>
+                    <md-card-actions class="actions">
+                        <div>
+                            <md-tooltip md-direction="top">Question Quality ({{ question.quality }})</md-tooltip>
+                            <md-icon>star</md-icon>
+                            <md-progress :md-progress="question.quality * 10"></md-progress>
+                        </div>
+                        <div>
+                            <md-tooltip md-direction="bottom">Question Difficulty  ({{ question.difficulty }})</md-tooltip>
+                            <md-icon>edit</md-icon>
+                            <md-progress :md-progress="question.difficulty * 10"></md-progress>
+                        </div>
                     </md-card-actions>
 
                     <md-ink-ripple></md-ink-ripple>
@@ -38,6 +46,10 @@
 </template>
 
 <style scoped>
+    .topics span {
+        margin-right: 5px;
+    }
+
     .truncate {
         white-space: pre;
         overflow: hidden;
@@ -65,6 +77,12 @@
     .questionCard .actions {
         opacity: 0.75;
         color: #1d323a;
+        flex-wrap: wrap;
+    }
+    .questionCard .actions div {
+        display: flex;
+        flex: 100%;
+        align-items: center;
     }
     .md-card .md-subhead {
         opacity: 0.75;
@@ -96,39 +114,5 @@
         changeDisplay(searchedQuestions: Question[]) {
             this.showQuestions = searchedQuestions;
         }
-
-        getColourFromValue(value: number): string {
-            if (value < 2.5) {
-                return "#d6320e";
-            } else if (value >= 2.5 && value < 5) {
-                return "#c00d8a";
-            } else if (value >= 5 && value < 7.5) {
-                return "#3978ba";
-            } else {
-                return "#1d323a";
-            }
-        }
-
-        getIconFromQuality(quality: number): string {
-            if (quality < 2.5) {
-                return "sentiment_very_dissatisfied";
-            } else if (quality >= 2.5 && quality < 5) {
-                return "sentiment_dissatisfied";
-            } else if (quality >= 5 && quality < 7.5) {
-                return "sentiment_satisfied";
-            } else {
-                return "sentiment_very_satisfied";
-            }
-        }
-
-        getStarsFromDifficulty(difficulty: number): string[] {
-            if (difficulty % 2 == 0) {
-                return new Array(difficulty/2).fill("star");
-            } else {
-                const stars = new Array((difficulty-1)/2).fill("star");
-                return stars.concat(["star_half"]);
-            }
-        }
-
     }
 </script>

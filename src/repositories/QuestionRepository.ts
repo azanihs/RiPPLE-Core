@@ -13,6 +13,9 @@ export default class QuestionRepository {
         return new Array(count).fill(0).map((_, i) => {
             let questionContent = f.hacker.phrase() + " " + f.hacker.phrase();
 
+            const topicCount = f.random.number({min: 1, max: 4});
+            const topics = new Array(topicCount).fill(0).map(x => f.hacker.abbreviation()) as string[];
+
             const question: Question = {
                 id: i,
                 responseCount: f.random.number({min: 0, max: 1000}),
@@ -20,7 +23,7 @@ export default class QuestionRepository {
                 difficulty: f.random.number({min: 0, max: 10}),
                 quality: f.random.number({min: 0, max: 10}),
 
-                topic: f.hacker.abbreviation(),
+                topics: topics,
                 content: questionContent
             };
             return question;

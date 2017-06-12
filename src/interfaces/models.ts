@@ -5,6 +5,6 @@ export interface Question {
     difficulty: number,
     quality: number,
 
-    topic: string,
+    topics: string[],
     content: string
 }
