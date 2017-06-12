@@ -20,7 +20,7 @@
                     </md-card-area>
                     <div class="pintoBottom">
                         <md-card-area md-inset>
-                            <md-card-content class='actions'>
+                            <md-card-content>
                                 <div class="placeAround">
                                     <span class="topics">
                                         <div class="topicContainer">
@@ -37,7 +37,7 @@
                                 </div>
                             </md-card-content>
                         </md-card-area>
-                        <md-card-actions class="actions">
+                        <md-card-actions class="actions charts">
                             <div>
                                 <md-tooltip md-direction="top">Question Quality ({{ question.quality }})</md-tooltip>
                                 <md-icon>star</md-icon>
@@ -92,12 +92,17 @@
 
     .pintoBottom {
         margin-top: auto;
+        padding-bottom: 8px;
     }
     .questionCard .actions {
-        opacity: 0.75;
         color: #1d323a;
         flex-wrap: wrap;
     }
+
+    .questionCard .actions.charts {
+        padding: 16px;
+    }
+
     .questionCard .actions div {
         display: flex;
         flex: 100%;
@@ -126,7 +131,7 @@
     }
 
     .md-card .md-subhead {
-        opacity: 0.75;
+        opacity: 1;
         color: #1d323a;
     }
 
@@ -141,6 +146,10 @@
         line-height: 20px;
         overflow-wrap: break-word;
         word-wrap: break-word;
+    }
+
+    .md-card-content {
+        padding-bottom: inherit !important;
     }
 
 </style>
