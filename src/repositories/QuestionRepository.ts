@@ -11,7 +11,12 @@ export default class QuestionRepository {
      */
     static getMany(count: number): Question[] {
         return new Array(count).fill(0).map((_, i) => {
-            let questionContent = f.hacker.phrase() + " " + f.hacker.phrase();
+            const phrase = new Array(20).fill(0).map(x => f.hacker.phrase()).join(" ");
+            let questionContent = phrase;
+            let images = [];
+            if (Math.random() < 0.25) {
+                images = ['https://placebear.com/200/200'];
+            }
 
             const topicCount = f.random.number({min: 1, max: 4});
             const topics = new Array(topicCount).fill(0).map(x => f.hacker.abbreviation()) as string[];
@@ -24,6 +29,7 @@ export default class QuestionRepository {
                 quality: f.random.number({min: 0, max: 10}),
 
                 topics: topics,
+                images: images,
                 content: questionContent
             };
             return question;

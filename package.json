@@ -15,6 +15,7 @@
   "dependencies": {
     "av-ts": "^0.6.3",
     "faker": "^4.1.0",
+    "line-clamp": "0.0.4",
     "vue": "^2.1.0",
     "vue-material": "^0.7.1",
     "vue-router": "^2.5.3"

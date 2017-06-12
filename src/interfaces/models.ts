@@ -6,5 +6,6 @@ export interface Question {
     quality: number,
 
     topics: string[],
+    images?: string[],
     content: string
 }
