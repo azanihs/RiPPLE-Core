@@ -8,16 +8,23 @@
                 <md-card md-with-hover class="questionCard">
                     <md-card-area md-inset>
                         <md-card-header>
-                            <div class="md-subhead">
-                                <md-icon :style="{ color: getColourFromDifficulty(question.difficulty) }">
-                                    {{ getIconFromDifficulty(question.difficulty) }}
-                                </md-icon>
+                            <div class="md-subhead placeAround">
+                                <span>
+                                    <md-icon :style="{ color: getColourFromValue(question.quality) }">
+                                        {{ getIconFromQuality(question.quality) }}
+                                    </md-icon>
+                                </span>
+                                <span>
+                                    <md-icon v-for="star in getStarsFromDifficulty(question.difficulty)">
+                                        {{ star }}
+                                    </md-icon>
+                                </span>
                             </div>
                         </md-card-header>
                         <md-card-content class="truncate">{{ question.content }}</md-card-content>
                     </md-card-area>
 
-                    <md-card-actions class="actions">
+                    <md-card-actions class="actions placeAround">
                         <span><md-icon>school</md-icon> {{ question.topic }}</span>
                         <span><md-icon>comment</md-icon> {{ question.responseCount }}</span>
                     </md-card-actions>
@@ -49,9 +56,13 @@
         margin-top: 8px;
         margin-bottom: 8px;
     }
+    .placeAround {
+        justify-content: space-between !important;
+        display: flex;
+    }
+
     .questionCard .actions {
         opacity: 0.75;
-        justify-content: space-between;
         color: #1d323a;
     }
     .md-card .md-subhead {
@@ -73,28 +84,38 @@
             this.questions = QuestionRepository.getMany(10);
         }
 
-        getColourFromDifficulty(difficulty: number): string {
-            if (difficulty < 2.5) {
+        getColourFromValue(value: number): string {
+            if (value < 2.5) {
                 return "#d6320e";
-            } else if (difficulty >= 2.5 && difficulty < 5) {
+            } else if (value >= 2.5 && value < 5) {
                 return "#c00d8a";
-            } else if (difficulty >= 5 && difficulty < 7.5) {
+            } else if (value >= 5 && value < 7.5) {
                 return "#3978ba";
             } else {
                 return "#1d323a";
             }
         }
 
-        getIconFromDifficulty(difficulty: number): string {
-            if (difficulty < 2.5) {
+        getIconFromQuality(quality: number): string {
+            if (quality < 2.5) {
                 return "sentiment_very_dissatisfied";
-            } else if (difficulty >= 2.5 && difficulty < 5) {
+            } else if (quality >= 2.5 && quality < 5) {
                 return "sentiment_dissatisfied";
-            } else if (difficulty >= 5 && difficulty < 7.5) {
+            } else if (quality >= 5 && quality < 7.5) {
                 return "sentiment_satisfied";
             } else {
                 return "sentiment_very_satisfied";
             }
         }
+
+        getStarsFromDifficulty(difficulty: number): string[] {
+            if (difficulty % 2 == 0) {
+                return new Array(difficulty/2).fill("star");
+            } else {
+                const stars = new Array((difficulty-1)/2).fill("star");
+                return stars.concat(["star_half"]);
+            }
+        }
+
     }
 </script>
