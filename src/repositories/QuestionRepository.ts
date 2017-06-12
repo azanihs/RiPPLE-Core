@@ -14,8 +14,13 @@ export default class QuestionRepository {
             const phrase = new Array(20).fill(0).map(x => f.hacker.phrase()).join(" ");
             let questionContent = phrase;
             let images = [];
-            if (Math.random() < 0.25) {
-                images = ['https://placebear.com/200/200'];
+            if (Math.random() < 0.5) {
+                if (Math.random() < 0.5) {
+                    images = ['https://user-images.githubusercontent.com/16090868/27058555-56d1fa2a-5015-11e7-9d2c-6c38939afda4.png'];
+                } else {
+                    images = ['https://user-images.githubusercontent.com/16090868/27058529-3592fd64-5015-11e7-8d53-e1457ade0f6f.png'];
+
+                }
             }
 
             const topicCount = f.random.number({min: 1, max: 4});
