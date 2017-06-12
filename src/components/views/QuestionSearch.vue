@@ -7,7 +7,10 @@
                     <md-icon v-if="field.sort">{{field.reverse ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
                     {{ field.displayName }}
                 </h3>
-                <input v-if="field.search" @change="search(field, $event)" type="text" />
+                <select v-if="field.displayName == 'Topic'" @change="search(field, $event)">
+                    <option v-for="topic in Array.from(new Set(availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))))" :value="topic">{{ topic }}</option>
+                </select>
+                <input v-if="field.search && field.displayName != 'Topic'" @change="search(field, $event)" type="text" />
             </md-layout>
         </md-layout>
     </md-layout>
