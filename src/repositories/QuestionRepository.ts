@@ -23,7 +23,7 @@ export default class QuestionRepository {
                 }
             }
 
-            const topicCount = f.random.number({min: 1, max: 4});
+            const topicCount = f.random.number({min: 2, max: 4});
             const topics = new Array(topicCount).fill(0).map(x => f.hacker.abbreviation()) as string[];
 
             const question: Question = {
