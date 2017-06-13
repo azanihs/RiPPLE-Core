@@ -9,12 +9,12 @@
                 <md-card class="questionCard">
                     <md-card-area md-inset class="fullHeight">
                         <md-card-content class="fullHeight">
-                            <div v-if="question.images.length > 0" class="md-subhead cardPreview cardPreviewImg fullHeight">
-                                <div ref="clamp_img" class="clamp">
+                            <div v-if="question.images.length > 0" class="cardPreview fullHeight">
+                                <div ref="clamp" class="clamp">
                                     <img  :src="question.images[0]" />{{ question.content }}
                                 </div>
                             </div>
-                            <div v-else class="md-subhead cardPreview fullHeight">
+                            <div v-else class="cardPreview fullHeight">
                                 <div ref="clamp" class="clamp">{{ question.content }}</div>
                             </div>
                         </md-card-content>
@@ -29,7 +29,7 @@
                                     </span>
                                     <span>
                                         <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
-                                        <span class="difficulty">{{ getDifficultyText(question.difficulty) }} <md-icon>school</md-icon></span>
+                                        <span>{{ getDifficultyText(question.difficulty) }} <md-icon>school</md-icon></span>
                                     </span>
                                 </div>
                                 <hr />
@@ -38,12 +38,10 @@
                                         <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
                                         <md-icon v-for="star in getStarIcons(question.quality)">{{ star }}</md-icon>
                                     </span>
-                                    <span class="topics">
-                                        <div class="topicContainer">
-                                            <router-link v-for="topic in question.topics" :key="topic" to="/view/questions" class="topicChipLink">
-                                                <md-chip class="topicChip">{{ topic }}</md-chip>
-                                            </router-link>
-                                        </div>
+                                    <span>
+                                        <router-link v-for="topic in question.topics" :key="topic" to="/view/questions" class="topicChipLink">
+                                            <md-chip class="topicChip">{{ topic }}</md-chip>
+                                        </router-link>
                                     </span>
                                 </div>
                             </md-card-content>
@@ -56,55 +54,36 @@
 </template>
 
 <style scoped>
-
-    hr {
-        border: none;
-        border-bottom: 1px solid #ccc;
-    }
-    .md-card .md-card-area:after {
-        background: none !important;
-    }
-
-    .quality {
-        background-color: transparent !important;
-        box-shadow: 0px 0px 0px 2px red;
-        width: 22px;
-        height: 22px;
-        border-radius: 100%;
-        padding: 4px 0px;
-        font-size: 13px;
-        line-height: 16px;
-
-        text-align: center;
-    }
-
-    .placeAround > span {
-        cursor: pointer;
-    }
-
-    .fullHeight {
-        height: 100%;
-    }
-
-    .truncate {
-        white-space: pre;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-    }
     .headingContainer {
         border-bottom: 1px solid #222;
         margin: 8px;
-    }
-
-    .cardContainer {
-        margin: 8px;
-        flex: 1;
     }
     .questionCard {
         min-width: 100%;
         margin-top: 8px;
         margin-bottom: 8px;
+    }
+    .fullHeight {
+        height: 100%;
+    }
+    .cardPreview img {
+        width: 50%;
+        height: auto;
+        float: left;
+        border: 1px solid #bbb;
+        padding-right: 10px;
+        padding-bottom: 10px;
+        margin-right: 10px;
+    }
+    .clamp {
+        line-height: 20px;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+
+    .pintoBottom {
+        margin-top: auto;
+        padding-bottom: 8px;
     }
     .placeAround {
         justify-content: space-between !important;
@@ -112,35 +91,8 @@
         padding-bottom: 0px;
         align-items: center;
     }
-
-    .pintoBottom {
-        margin-top: auto;
-        padding-bottom: 8px;
-    }
-
-    .questionCard .actions {
-        color: #1d323a;
-        flex-wrap: wrap;
-    }
-
-    .questionCard .actions.charts {
-        padding: 16px;
-    }
-
-    .questionCard .actions > div {
-        display: flex;
-        flex: 100%;
-        align-items: center;
-    }
-
-    .questionCard .topicChip {
-        margin-left: 5px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        transition: 500ms ease background-color;
-    }
-    .topicChip:hover {
-        background-color: #333;
+    .placeAround > span {
+        cursor: pointer;
     }
 
     .questionCard a.topicChipLink,
@@ -153,26 +105,30 @@
         color: #bbb;
         text-decoration: none;
     }
-
-    .md-card .md-subhead {
-        opacity: 1;
-        color: #1d323a;
+    .questionCard .topicChip {
+        margin-left: 5px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        transition: 500ms ease background-color;
+    }
+    .topicChip:hover {
+        background-color: #333;
     }
 
-    .cardPreview img {
-        width: 50%;
-        height: auto;
-        float: left;
-        border: 1px solid #bbb;
-        padding-right: 10px;
-        padding-bottom: 10px;
-        margin-right: 10px;
 
+    /* Remove bottom border added by vue-material */
+    .md-card .md-card-area:after {
+        background: none !important;
     }
-    .clamp {
-        line-height: 20px;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
+    hr {
+        border: none;
+        border-bottom: 1px solid #ccc;
+    }
+    .truncate {
+        white-space: pre;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
     }
     .md-card .md-card-content:last-child {
         padding-bottom: 0px;
@@ -241,9 +197,6 @@
         @Lifecycle
         updated() {
             (this.$refs["clamp"] as HTMLElement[]).forEach(element => {
-                lineClamp(element.childNodes[0].parentElement, { lineCount: 10 });
-            });
-            (this.$refs["clamp_img"] as HTMLElement[]).forEach(element => {
                 lineClamp(element.childNodes[0].parentElement, { lineCount: 10 });
             });
         }
