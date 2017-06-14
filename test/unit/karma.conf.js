@@ -12,9 +12,9 @@ module.exports = function(config) {
         //    http://karma-runner.github.io/0.13/config/browsers.html
         // 2. add it to the `browsers` array below.
         browsers: ["PhantomJS"],
-        frameworks: ["mocha", "chai"],
+        frameworks: ["phantomjs-shim", "mocha", "chai"],
         reporters: ["spec", "coverage-istanbul"],
-        files: ["spec/**/*.ts"],
+        files: ['../../node_modules/babel-polyfill/dist/polyfill.js', "spec/**/*.ts"],
         preprocessors: {
             "spec/**/*.ts": ["webpack"]
         },

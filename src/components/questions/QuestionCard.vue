@@ -1,5 +1,5 @@
 <template>
-<md-card>
+<md-card v-if="data">
     <md-card-area md-inset class="fullHeight">
         <md-card-content class="fullHeight">
             <div v-if="data.images.length > 0" class="cardPreview fullHeight">
@@ -20,14 +20,14 @@
                         <span>{{ data.responseCount }} <md-icon>reply</md-icon></span>
                         <md-tooltip md-direction="top">Question Responses</md-tooltip>
                     </span>
-                    <span>
+                    <span class="difficulty">
                         <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
                         <span>{{ getDifficultyText(data.difficulty) }} <md-icon>school</md-icon></span>
                     </span>
                 </div>
                 <hr />
                 <div class="placeAround">
-                    <span>
+                    <span class="quality">
                         <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
                         <md-icon :key="star" v-for="star in getStarIcons(data.quality)">{{ star }}</md-icon>
                     </span>
@@ -161,7 +161,9 @@
 
         clampLines = () => {
             const element = this.$refs["clamp"] as HTMLElement;
-            lineClamp(element.childNodes[0].parentElement, { lineCount: 5 });
+            if (element) {
+                lineClamp(element.childNodes[0].parentElement, { lineCount: 5 });
+            }
         }
 
         @Lifecycle

@@ -4,8 +4,10 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
-# Vuejs build result and test
+# Vuejs build result and test reports
 dist/
+test/unit/coverage
+test/e2e/coverage
 
 # Editor Files #
 *~
