@@ -25,6 +25,9 @@ pids
 *.seed
 *.pid.lock
 
+# Temporary image ignore
+*.jpg
+*.png
 
 # Dependency directories
 node_modules

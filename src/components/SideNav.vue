@@ -100,6 +100,9 @@
         }, {
             text: "Find Friends",
             href: "/view/friends"
+        }, {
+            text: "Connect with Peers",
+            href: "/view/peers"
         }];
     }
 </script>

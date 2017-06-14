@@ -5,6 +5,8 @@ import Main from "../main";
 import DefaultView from "@/components/views/DefaultView";
 import FriendView from "@/components/views/FriendView";
 import QuestionView from "@/components/views/QuestionView";
+import PeerView from "@/components/views/PeerView";
+
 
 
 Vue.use(VueRouter);
@@ -24,6 +26,10 @@ const routes = [{
 		path: "/view/friends",
 		name: "friends",
 		component: FriendView
+	}, {
+		path: "/view/peers",
+		name: "peers",
+		component: PeerView
 	}]
 }];
 
