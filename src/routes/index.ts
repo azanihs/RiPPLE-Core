@@ -3,8 +3,8 @@ import VueRouter from "vue-router";
 import Main from "../main";
 
 import DefaultView from "@/components/views/DefaultView";
-import FriendView from "@/components/views/FriendView";
-import QuestionView from "@/components/views/QuestionView";
+import FriendView from "@/components/friends/FriendView";
+import QuestionView from "@/components/questions/QuestionView";
 
 
 Vue.use(VueRouter);
