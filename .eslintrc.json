@@ -50,7 +50,7 @@
         "require-jsdoc": "off",
         "max-len": [
             "error",
-            80,
+            120,
             {
                 "ignoreComments": true
             }
