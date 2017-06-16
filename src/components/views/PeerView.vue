@@ -2,7 +2,7 @@
     <md-layout md-flex="95">
         <md-layout md-flex="100" class="headingContainer">
             <h1>Connect With Peers</h1>
-            <availability-selector />
+            <availability-selector @change="shuffleData" />
         </md-layout>
         <md-layout class="headingContainer">
             <h1>Review Recommendations</h1>
@@ -46,19 +46,31 @@
         }
     })
     export default class PeerView extends Vue {
-        peersToMentor = {
-            recommendations: PeerRepository.getMulti(3),
-            requests: PeerRepository.getMulti(3)
-        };
 
-        peersToBeMentored = {
-            recommendations: PeerRepository.getMulti(3),
-            requests: PeerRepository.getMulti(3)
-        };
+        peersToMentor = {};
+        peersToBeMentored = {};
+        peersToStudy = {};
 
-        peersToStudy = {
-            recommendations: PeerRepository.getMulti(3),
-            requests: PeerRepository.getMulti(3)
-        };
+        @Lifecycle
+        created() {
+            this.shuffleData();
+        }
+
+        shuffleData() {
+            this.peersToMentor = {
+                recommendations: PeerRepository.getMulti(3),
+                requests: PeerRepository.getMulti(3)
+            };
+
+            this.peersToBeMentored = {
+                recommendations: PeerRepository.getMulti(3),
+                requests: PeerRepository.getMulti(3)
+            };
+
+            this.peersToStudy = {
+                recommendations: PeerRepository.getMulti(3),
+                requests: PeerRepository.getMulti(3)
+            };
+        }
     }
 </script>

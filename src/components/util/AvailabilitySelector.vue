@@ -17,7 +17,7 @@
                         {{ activity }}
                     </md-table-cell>
                     <md-table-cell v-for="time in preferenceTimes" :key="time">
-                        <md-checkbox :id="`${activity}_${time}`" :name="`${activity}_${time}`"></md-checkbox>
+                        <md-checkbox @change="checkboxChange" :id="`${activity}_${time}`" :name="`${activity}_${time}`"></md-checkbox>
                     </md-table-cell>
                 </md-table-row>
             </md-table-body>
@@ -53,6 +53,9 @@
         preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
 
 
+        checkboxChange() {
+            this.$emit("change");
+        }
         addNewRow() {
 
         }
