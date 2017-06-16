@@ -1,40 +1,34 @@
 <template>
-<md-list md-expand-multiple>
-    <md-list-item>
-        <md-icon>school</md-icon>
-        <span>COMPETENCIES</span>
-        <md-list-expand>
-            <md-layout md-gutter="16" md-flex="100">
-                No Data yet
+<md-layout>
+    <md-layout>
+        <h2><md-icon>school</md-icon> {{ tabName }}</h2>
+        <md-layout md-flex="100">
+            No Data yet
+        </md-layout>
+    </md-layout>
+    <md-layout md-flex="100">
+        <h2><md-icon>people</md-icon> Recommendations</h2>
+        <md-layout md-flex="100">
+            <md-layout v-for="peer in peers.recommendations" :key="peer.id">
+                <recommendation-card class="gutter" :data="peer" action="Request"/>
             </md-layout>
-        </md-list-expand>
-    </md-list-item>
-    <md-list-item>
-        <md-icon>people</md-icon>
-        <span>RECOMMENDATIONS</span>
-        <md-list-expand>
-            <md-layout md-flex="100">
-                <md-layout v-for="peer in peers.recommendations" :key="peer.id">
-                    <recommendation-card :data="peer"/>
-                </md-layout>
+        </md-layout>
+    </md-layout>
+    <md-layout md-flex="100">
+        <h2><md-icon>person_add</md-icon> Requests</h2>
+        <md-layout md-flex="100">
+            <md-layout v-for="peer in peers.requests" :key="peer.id">
+                <recommendation-card class="gutter" :data="peer" action="Accept" />
             </md-layout>
-        </md-list-expand>
-    </md-list-item>
-    <md-list-item>
-        <md-icon>person_add</md-icon>
-        <span>REQUESTS</span>
-        <md-list-expand>
-            <md-layout md-gutter="16" md-flex="100">
-                <md-layout v-for="peer in peers.requests" :key="peer.id">
-                    <recommendation-card :data="peer" />
-                </md-layout>
-            </md-layout>
-        </md-list-expand>
-    </md-list-item>
-</md-list>
+        </md-layout>
+    </md-layout>
+</md-layout>
 </template>
 
 <style scoped>
+.gutter {
+    margin: 8px;
+}
 </style>
 
 <script lang="ts">
@@ -48,6 +42,7 @@
     })
     export default class Recommendations extends Vue {
         @Prop peers;
+        @Prop tabName: string;
     }
 </script>
 

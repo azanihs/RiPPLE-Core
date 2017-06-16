@@ -27,7 +27,6 @@
         width: 100%;
         height: auto;
         border-radius: 100%;
-        box-shadow: 2px 2px 2px #999;
     }
 
     .profileContainer h5 {
@@ -64,15 +63,23 @@
         background-color: #ffffff;
         color: #111;
     }
+
+    h4 {
+        font-size: 1em;
+        margin: 0px;
+        padding: 0px;
+        color: #aaa;
+    }
 </style>
 
 <template>
     <div class="navbarContainer">
         <div class="profileContainer">
             <div class="imageContainer">
-                <img src="https://placebear.com/200/200" />
+                <img :src="personalAvatar" />
             </div>
             <h5>Nicholas Achilles</h5>
+            <h4>(ENGG1200)</h4>
             <hr />
         </div>
         <ul>
@@ -85,23 +92,20 @@
 
 <script lang="ts">
     import { Vue, Component, Prop } from "av-ts";
+    import PeerRepository from "../repositories/PeerRepository";
 
     @Component()
     export default class SideNav extends Vue {
+        personalAvatar = PeerRepository.getMulti(1)[0].image;
+
         links = [{
             text: "Profile",
             href: "/"
         }, {
-            text: "Visulisations",
-            href: "#"
-        }, {
             text: "View Questions",
             href: "/view/questions"
         }, {
-            text: "Find Friends",
-            href: "/view/friends"
-        }, {
-            text: "Connect with Peers",
+            text: "Connect To Peers",
             href: "/view/peers"
         }];
     }

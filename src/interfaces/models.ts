@@ -17,5 +17,5 @@ export interface Peer {
 
     proficiencies: string[],
     image: string,
-    time: Date
+    availableTimes: string[]
 }

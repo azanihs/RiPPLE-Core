@@ -14,13 +14,26 @@ export default class QuestionRepository {
             const proficiencies = new Array(f.random.number({min: 1, max: 4}))
                 .fill(0).map(x => f.hacker.abbreviation()) as string[];
 
+            let availableTimes = new Array(f.random.number({min: 1, max: 4}))
+                .fill(0).map((_, i) => {
+                    const time = f.date.recent();
+                    let hours = time.getHours() + 1;
+                    if (hours == 12) {
+                        return "12 PM";
+                    } else if (hours < 12) {
+                        return `${hours} AM`;
+                    } else {
+                        return `${(hours - 12)} PM`;
+                    }
+                });
+
             const peers: Peer = {
                 id: i,
                 name: f.name.findName(),
                 bio: f.hacker.phrase() + " " + f.hacker.phrase(),
                 proficiencies: proficiencies,
                 image: f.image.avatar(),
-                time: f.date.recent()
+                availableTimes: availableTimes
             };
 
             return peers;

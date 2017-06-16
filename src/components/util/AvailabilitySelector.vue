@@ -6,7 +6,7 @@
         <md-table v-once class="table">
             <md-table-header>
                 <md-table-row>
-                    <md-table-head>Activity</md-table-head>
+                    <md-table-head>Day</md-table-head>
                     <md-table-head v-for="time in preferenceTimes" :key="time">{{ time == 12 ? `${time}pm` : (time < 12 ? `${time}am` : `${time-12}pm`) }}</md-table-head>
                 </md-table-row>
             </md-table-header>
@@ -49,7 +49,7 @@
 
     @Component()
     export default class AvailabilitySelector extends Vue {
-        preferenceActivities: string[] = ["Be A Mentor", "Need a mentor", "Study with peer"];
+        preferenceActivities: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
         preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
 
 
