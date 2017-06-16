@@ -2,7 +2,10 @@
 <md-layout>
     <md-layout>
         <h2><md-icon>school</md-icon> {{ tabName }}</h2>
-        <md-layout md-flex="100" md-column>
+        <md-layout md-flex="100" md-column class="positionRelative">
+            <div v-if="+threshold > 0" class="thresholdWrapper" v-bind:style="{marginLeft: threshold + '%'}">
+                <md-tooltip md-direction="top">Required Score To Mentor: {{ threshold }}</md-tooltip>
+            </div>
             <md-layout v-for="(topicScore, topicName) in topics" @click.native="selectTopic(topicName)" class="alignMiddle mentorshipWrapper" v-bind:class="{selected: selectedTopics.indexOf(topicName) >= 0, fade: +topicScore < +threshold}">
                 <md-layout>{{ topicName }}</md-layout>
                 <md-layout md-flex="95">
@@ -58,6 +61,19 @@
 </style>
 
 <style scoped>
+.thresholdWrapper {
+    cursor: pointer;
+    width: 5px;
+    height: 100%;
+    background-color: #ccc;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 1000;
+}
+.positionRelative {
+    position: relative;
+}
 .gutter {
     margin: 8px;
 }
