@@ -1,13 +1,11 @@
 <template>
-<md-list>
+<md-list md-expand-multiple>
     <md-list-item>
         <md-icon>school</md-icon>
         <span>COMPETENCIES</span>
         <md-list-expand>
             <md-layout md-gutter="16" md-flex="100">
-                <md-layout md-gutter v-for="peer in peers.recommendations" :key="peer.id">
-                    <recommendation-card :data="peer"/>
-                </md-layout>
+                No Data yet
             </md-layout>
         </md-list-expand>
     </md-list-item>
@@ -15,7 +13,7 @@
         <md-icon>people</md-icon>
         <span>RECOMMENDATIONS</span>
         <md-list-expand>
-            <md-layout md-gutter="16" md-flex="100">
+            <md-layout md-flex="100">
                 <md-layout v-for="peer in peers.recommendations" :key="peer.id">
                     <recommendation-card :data="peer"/>
                 </md-layout>
