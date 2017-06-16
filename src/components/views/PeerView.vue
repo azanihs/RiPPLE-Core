@@ -10,13 +10,13 @@
         <md-layout class="fullHeight" md-flex="100">
             <md-tabs md-fixed class="md-transparent">
                 <md-tab md-label="Provide Mentorship">
-                    <recommendations tabName="Provide Mentorship In" :peers="peersToMentor" />
+                    <recommendations @change="shuffleData" tabName="Provide Mentorship In" :peers="peersToMentor" :threshold="75" />
                 </md-tab>
                 <md-tab md-label="Seek Mentorship">
-                    <recommendations tabName="Seek Mentorship In" :peers="peersToBeMentored" />
+                    <recommendations @change="shuffleData" tabName="Seek Mentorship In" :peers="peersToBeMentored" />
                 </md-tab>
                 <md-tab md-label="Find Study Partners">
-                    <recommendations tabName="Find Study Partners In" :peers="peersToStudy" />
+                    <recommendations @change="shuffleData" tabName="Find Study Partners In" :peers="peersToStudy" />
                 </md-tab>
             </md-tabs>
         </md-layout>

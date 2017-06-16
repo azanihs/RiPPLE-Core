@@ -28,7 +28,7 @@ export default class QuestionRepository {
                 });
 
             const peers: Peer = {
-                id: i,
+                id: performance.now(),
                 name: f.name.findName(),
                 bio: f.hacker.phrase() + " " + f.hacker.phrase(),
                 proficiencies: proficiencies,
