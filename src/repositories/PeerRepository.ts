@@ -3,24 +3,25 @@ import faker from "faker";
 
 const f = faker as any;
 export default class QuestionRepository {
+
     /**
-     * Returns a
+     * Returns an array of Peer objects
      * @param peerCount The number of peers to return
      * @return Peer[]
      */
-
-    static getMulti(peerCount:number):Peer[] {
+    static getMulti(peerCount: number): Peer[] {
         return new Array(peerCount).fill(0).map((_, i) => {
-            let peerTitle = f.company.catchPhrase(); /* generate a random name here */
+            let peerTitle = f.name.findName(); /* generate a random name here */
             let peerContent = f.hacker.phrase();
 
+            const proficiencies = new Array(f.random.number({min: 1, max: 4})).fill(0).map(x => f.hacker.abbreviation()) as string[];
             const peers: Peer = {
                 id: i,
-                rating: f.random.number({min: 0, max: 200}),
-
-                title: peerTitle,
-                topic: f.hacker.abbreviation(),
-                content: peerContent
+                name: f.name.findName(),
+                bio: f.hacker.phrase() + " " + f.hacker.phrase(),
+                proficiencies: proficiencies,
+                image: GetRandomProfileImage(),
+                time: f.date.recent()
             };
         return peers;
         });

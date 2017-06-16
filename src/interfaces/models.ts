@@ -9,11 +9,13 @@ export interface Question {
     images?: string[],
     content: string
 }
+
 export interface Peer {
     id: number,
-    rating: number,
+    name: number,
+    bio: string,
 
-    title: string,
-    content: string,
-    topic: string 
+    proficiencies: string[],
+    image: string,
+    time: Date
 }
