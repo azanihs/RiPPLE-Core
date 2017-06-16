@@ -6,7 +6,7 @@
             <div v-if="+threshold > 0" class="thresholdWrapper" v-bind:style="{marginLeft: threshold + '%'}">
                 <md-tooltip md-direction="top">Required Score To Mentor: {{ threshold }}</md-tooltip>
             </div>
-            <md-layout v-for="(topicScore, topicName) in topics" @click.native="selectTopic(topicName)" class="alignMiddle mentorshipWrapper" v-bind:class="{selected: selectedTopics.indexOf(topicName) >= 0, fade: +topicScore < +threshold}">
+            <md-layout v-for="(topicScore, topicName) in topics" @click.native="selectTopic(topicName)" class="alignMiddle mentorshipWrapper" v-bind:class="{selected: selectedTopics.indexOf(topicName) >= 0, fade: +topicScore < +threshold}" :key="topicName">
                 <md-layout>{{ topicName }}</md-layout>
                 <md-layout md-flex="95">
                     <md-progress :md-progress="topicScore"></md-progress>
