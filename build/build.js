@@ -1,6 +1,7 @@
 // https://github.com/shelljs/shelljs
 require('./check-versions')()
 var shell = require('shelljs')
+process.env.NODE_ENV = 'production';
 
 var path = require('path')
 var config = require('../config')
@@ -18,6 +19,7 @@ var spinner = ora('building for production...')
 spinner.start()
 
 var assetsPath = path.join(config.build.assetsRoot, config.build.assetsSubDirectory)
+
 shell.rm('-rf', assetsPath)
 shell.mkdir('-p', assetsPath)
 
