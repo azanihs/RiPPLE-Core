@@ -1,7 +1,7 @@
 <template>
 <md-layout>
     <md-layout>
-        <h2><md-icon>school</md-icon> {{ tabName }}</h2>
+        <h2><md-icon>school</md-icon>  Select topics that you would like to {{ tabName }}</h2>
         <md-layout md-flex="100" md-column class="positionRelative">
             <div v-if="+threshold > 0" class="thresholdWrapper" v-bind:style="{marginLeft: threshold + '%'}">
                 <md-tooltip md-direction="top">Required Score To Mentor: {{ threshold }}</md-tooltip>
@@ -15,7 +15,7 @@
         </md-layout>
     </md-layout>
     <md-layout md-flex="100">
-        <h2><md-icon>people</md-icon> Recommendations</h2>
+        <h2><md-icon>people</md-icon> Review recommendations</h2>
         <md-layout md-flex="100">
             <md-layout v-for="peer in peers.recommendations" :key="peer.id">
                 <recommendation-card class="gutter" :data="peer" action="Request"/>
@@ -23,7 +23,7 @@
         </md-layout>
     </md-layout>
     <md-layout md-flex="100">
-        <h2><md-icon>person_add</md-icon> Requests</h2>
+        <h2><md-icon>person_add</md-icon> Respond to requests</h2>
         <md-layout md-flex="100">
             <md-layout v-for="peer in peers.requests" :key="peer.id">
                 <recommendation-card class="gutter" :data="peer" action="Accept" />
