@@ -1,7 +1,6 @@
 <template>
     <md-layout>
-        <h2>
-            We would like to know when you are available so that we can match you up with people who have similar schedules
+        <h2> <md-icon>access_time </md-icon> Select your weekly availability so that we can match you up with people who have similar schedules
         </h2>
         <md-table v-once class="table">
             <md-table-header>
@@ -26,12 +25,7 @@
 </template>
 
 <style scoped>
-    h2 {
-        color: #999;
-        font-size: 1em;
-        margin: 0px;
-        padding: 0px;
-    }
+
 
     .md-checkbox {
         margin: 0px auto;
