@@ -28,7 +28,7 @@
                                    :key="time"> {{ time }}</md-button>
                     </md-button-toggle>
                     <span>
-                        <router-link v-for="prof in data.proficiencies"
+                       <router-link v-for="prof in data.proficiencies"
                                      :key="prof"
                                      to="/view/peers"
                                      class="topicChipLink">
@@ -52,19 +52,19 @@
         text-decoration: none;
         transition: 500ms ease background-color, 500ms ease color;
     }
-    
+
     .recommendationCard a.topicChipLink:hover {
         color: #bbb;
         text-decoration: none;
     }
-    
+
     .recommendationCard .topicChip {
         margin-left: 5px;
         background-color: #fff;
         border: 1px solid #ccc;
         transition: 500ms ease background-color;
     }
-    
+
     .topicChip:hover {
         background-color: #333;
     }

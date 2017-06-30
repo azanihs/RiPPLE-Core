@@ -151,7 +151,6 @@
             } else {
                 this.selectedTopics.splice(topicIndex, 1);
             }
-
             this.$emit("change");
         }
     }

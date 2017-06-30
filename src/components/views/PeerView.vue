@@ -3,7 +3,7 @@
         <md-layout md-flex="100"
                    class="headingContainer">
             <h1>Availability</h1>
-            <availability-selector @change="shuffleData"></availability-selector>
+            <availability-selector @change="shuffleData(null)"></availability-selector>
         </md-layout>
         <md-layout class="headingContainer">
             <h1>Connect To Peers</h1>
@@ -11,22 +11,15 @@
         <md-layout class="fullHeight"
                    md-flex="100">
             <md-tabs md-fixed
-                     class="md-transparent">
-                <md-tab md-label="Provide Mentorship">
-                    <recommendations @change="shuffleData"
-                                     tabName="Provide Mentorship In"
-                                     :peers="peersToMentor"
+                     class="md-transparent"
+                     @change="tabChange">
+                <md-tab v-for="tab in tabLookup"
+                        :key="tab.id"
+                        :md-label="tab.name">
+                    <recommendations @change="shuffleData(tab.id)"
+                                     :tabName="tab.heading"
+                                     :peers="tab.data"
                                      :threshold="75"></recommendations>
-                </md-tab>
-                <md-tab md-label="Seek Mentorship">
-                    <recommendations @change="shuffleData"
-                                     tabName="Seek Mentorship In"
-                                     :peers="peersToBeMentored"></recommendations>
-                </md-tab>
-                <md-tab md-label="Find Study Partners">
-                    <recommendations @change="shuffleData"
-                                     tabName="Find Study Partners In"
-                                     :peers="peersToStudy"></recommendations>
                 </md-tab>
             </md-tabs>
         </md-layout>
@@ -57,30 +50,39 @@
     })
     export default class PeerView extends Vue {
 
-        peersToMentor = {};
-        peersToBeMentored = {};
-        peersToStudy = {};
+        tabID = 0;
+        tabLookup = [{
+            name: "Provide Mentorship",
+            heading: "provide mentorship in",
+            data: {},
+            id: "peersToMentor"
+        }, {
+            name: "Seek Mentorship",
+            heading: "seek mentorship in",
+            data: {},
+            id: "peersToBeMentored"
+        }, {
+            name: "Find Study Partners",
+            heading: "find study partners In",
+            data: {},
+            id: "peersToStudy"
+        }];
 
         @Lifecycle
         created() {
-            this.shuffleData();
+            this.shuffleData("all");
         }
 
-        shuffleData() {
-            this.peersToMentor = {
-                recommendations: PeerRepository.getMany(3),
-                requests: PeerRepository.getMany(3)
-            };
+        tabChange(newTabIndex: number) {
+            this.tabID = newTabIndex;
+            this.shuffleData(this.tabLookup[this.tabID].id);
+        }
 
-            this.peersToBeMentored = {
+        shuffleData(type: string) {
+            this.tabLookup[this.tabID].data = Object.assign({}, {
                 recommendations: PeerRepository.getMany(3),
                 requests: PeerRepository.getMany(3)
-            };
-
-            this.peersToStudy = {
-                recommendations: PeerRepository.getMany(3),
-                requests: PeerRepository.getMany(3)
-            };
+            });
         }
     }
 </script>
