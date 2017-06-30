@@ -72,11 +72,11 @@
         }
 
         addNewRow() {
-            throw "addNewRow not implemented";
+            throw new Error("addNewRow not implemented");
         }
 
         deleteRow() {
-            throw "deleteRow not implemented";
+            throw new Error("deleteRow not implemented");
         }
 
     }

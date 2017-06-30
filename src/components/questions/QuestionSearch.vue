@@ -57,7 +57,7 @@
         searchableFields: Object[] = [];
 
         get uniqueQuestionTopics() {
-            return Array.from(new Set(this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))))
+            return Array.from(new Set(this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))));
         }
 
         @Lifecycle
