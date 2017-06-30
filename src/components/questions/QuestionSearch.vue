@@ -1,17 +1,24 @@
 <template>
     <md-layout md-flex="100">
         <h2>Search </h2>
-        <md-layout md-flex="100" class="header">
-            <md-layout v-for="field in searchableFields" :key="field.displayName">
+        <md-layout md-flex="100"
+                   class="header">
+            <md-layout v-for="field in searchableFields"
+                       :key="field.displayName">
                 <h3 @click="sortOrder(field, $event)">
                     <md-icon v-if="field.sort">{{field.reverse ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
                     {{ field.displayName }}
                 </h3>
-                <select v-if="field.displayName == 'Topic'" @change="search(field, $event)">
+                <select v-if="field.displayName == 'Topic'"
+                        @change="search(field, $event)">
                     <option value=""></option>
-                    <option v-for="topic in Array.from(new Set(availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))))" :value="topic">{{ topic }}</option>
+                    <option v-for="topic in uniqueQuestionTopics"
+                            :key="topic"
+                            :value="topic">{{ topic }}</option>
                 </select>
-                <input v-if="field.search && field.displayName != 'Topic'" @change="search(field, $event)" type="text" />
+                <input v-if="field.search && field.displayName != 'Topic'"
+                       @change="search(field, $event)"
+                       type="text"></input>
             </md-layout>
         </md-layout>
     </md-layout>
@@ -21,12 +28,14 @@
     .header {
         margin: 15px 0px;
     }
+    
     h3 {
         cursor: pointer;
         display: inline-block;
         vertical-align: middle;
         margin: 0px 10px 0px 0px;
     }
+    
     input {
         width: 150px;
         height: 25px;
@@ -47,6 +56,10 @@
         reverseSortOrder: boolean = false;
         searchableFields: Object[] = [];
 
+        get uniqueQuestionTopics() {
+            return Array.from(new Set(this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))))
+        }
+
         @Lifecycle
         created() {
             const numberSort = (a, b) => a - b;
@@ -60,8 +73,8 @@
 
             const arraySearch = field => val => this.availableQuestions
                 .filter(question => question[field]
-                        .filter(x => x.toLowerCase()
-                            .indexOf(`${val}`.toLowerCase()) >= 0).length > 0);
+                    .filter(x => x.toLowerCase()
+                        .indexOf(`${val}`.toLowerCase()) >= 0).length > 0);
 
 
             this.searchableFields = [{

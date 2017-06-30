@@ -1,3 +1,21 @@
+<template>
+    <div class="navbarContainer">
+        <div class="profileContainer">
+            <div class="imageContainer">
+                <img :src="personalAvatar" />
+            </div>
+            <h5>Nicholas Achilles</h5>
+            <h4>(ENGG1200)</h4>
+            <hr />
+        </div>
+        <ul>
+            <li v-for="link in links" :key="link.href">
+                <router-link :to="link.href"><md-button class="linkButton">{{ link.text }}</md-button></router-link>
+            </li>
+        </ul>
+    </div>
+</template>
+
 <style scoped>
     .navbarContainer {
         position: absolute;
@@ -72,31 +90,13 @@
     }
 </style>
 
-<template>
-    <div class="navbarContainer">
-        <div class="profileContainer">
-            <div class="imageContainer">
-                <img :src="personalAvatar" />
-            </div>
-            <h5>Nicholas Achilles</h5>
-            <h4>(ENGG1200)</h4>
-            <hr />
-        </div>
-        <ul>
-            <li v-for="link in links">
-                <router-link :to="link.href"><md-button class="linkButton">{{ link.text }}</md-button></router-link>
-            </li>
-        </ul>
-    </div>
-</template>
-
 <script lang="ts">
     import { Vue, Component, Prop } from "av-ts";
     import PeerRepository from "../repositories/PeerRepository";
 
     @Component()
     export default class SideNav extends Vue {
-        personalAvatar = PeerRepository.getMulti(1)[0].image;
+        personalAvatar = PeerRepository.getMany(1)[0].image;
 
         links = [{
             text: "Profile",

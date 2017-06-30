@@ -1,22 +1,17 @@
 import { Question } from "../interfaces/models";
-import faker from "faker";
+import f from "faker";
 
-const f = faker as any;
 export default class QuestionRepository {
 
     /**
-     * Returns a
-     * @param count The number of questions to return
-     * @return Question[]
+     * Returns a collection of questions
+     * @param {number} count The number of questions to return
+     * @return {Question[]} An array of questions with length equal to count
      */
     static getMany(count: number): Question[] {
         return new Array(count).fill(0).map((_, i) => {
-            const phrase = new Array(20).fill(0).map(x => f.hacker.phrase()).join(" ");
-            let questionContent = phrase;
-            let images = [];
-            if (Math.random() < 0.5) {
-                images = [f.image.image()];
-            }
+            const questionContent = new Array(20).fill(0).map(x => f.hacker.phrase()).join(" ");
+            const images = Math.random() < 0.5 ? [f.image.image()] : []
 
             const topicCount = f.random.number({min: 2, max: 4});
             const topics = new Array(topicCount).fill(0).map(x => f.hacker.abbreviation()) as string[];

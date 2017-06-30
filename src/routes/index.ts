@@ -2,10 +2,10 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Main from "../main";
 
-import DefaultView from "@/components/views/DefaultView";
-import FriendView from "@/components/friends/FriendView";
-import QuestionView from "@/components/questions/QuestionView";
-import PeerView from "@/components/views/PeerView";
+import DefaultView from "../components/views/DefaultView.vue";
+import FriendView from "../components/friends/FriendView.vue";
+import QuestionView from "../components/questions/QuestionView.vue";
+import PeerView from "../components/views/PeerView.vue";
 
 Vue.use(VueRouter);
 

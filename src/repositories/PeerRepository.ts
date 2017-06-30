@@ -1,20 +1,19 @@
 import { Peer } from "../interfaces/models";
-import faker from "faker";
+import f from "faker";
 
-const f = faker as any;
 export default class QuestionRepository {
 
     /**
      * Returns an array of Peer objects
-     * @param peerCount The number of peers to return
-     * @return Peer[]
+     * @param {number} peerCount The number of peers to return
+     * @return {Peer[]} An array of Peers with length peerCount
      */
-    static getMulti(peerCount: number): Peer[] {
+    static getMany(peerCount: number): Peer[] {
         return new Array(peerCount).fill(0).map((_, i) => {
             const proficiencies = new Array(f.random.number({min: 1, max: 4}))
                 .fill(0).map(x => f.hacker.abbreviation()) as string[];
 
-            let availableTimes = new Array(f.random.number({min: 1, max: 4}))
+            const availableTimes = new Array(f.random.number({min: 1, max: 4}))
                 .fill(0).map((_, i) => {
                     const time = f.date.recent();
                     let hours = time.getHours() + 1;
