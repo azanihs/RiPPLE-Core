@@ -19,3 +19,15 @@ export interface Peer {
     image: string,
     availableTimes: string[]
 }
+
+export interface User {
+    id: number,
+    self: Peer,
+
+    connections: {
+        id: number,
+        type: string,
+        topic: string,
+        weight: number
+    }[]
+}
