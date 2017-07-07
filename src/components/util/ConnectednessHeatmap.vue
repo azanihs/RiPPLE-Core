@@ -2,7 +2,7 @@
     <md-table v-once>
         <md-table-header>
             <md-table-row>
-                <md-table-head>Head</md-table-head>
+                <md-table-head></md-table-head>
                 <md-table-head v-for="topic in topics"
                                :key="topic">
                     {{topic}}
