@@ -20,7 +20,7 @@ export default class UserRepository {
      */
     static getLoggedInUser(): User {
         const peer: Peer = PeerRepository.getMany(1)[0];
-        const connections = new Array(f.random.number({ min: 2, max: 20 })).fill(0).map(x => {
+        const connections = new Array(f.random.number({ min: 2, max: 10 })).fill(0).map(x => {
             const connection = {
                 id: IDCounter++,
                 type: categories[f.random.number({ min: 0, max: 2 })],
