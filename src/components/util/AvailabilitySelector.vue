@@ -33,6 +33,10 @@
 </template>
 
 <style scoped>
+    h2 {
+        width: 100%;
+    }
+    
     .md-checkbox {
         margin: 0px auto;
     }

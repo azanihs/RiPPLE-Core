@@ -27,6 +27,10 @@
 </template>
 
 <style scoped>
+    h1 {
+        width: 100%;
+    }
+    
     .headingContainer {
         margin: 8px 0px 0px 0px;
     }
