@@ -24,7 +24,7 @@ export interface User {
     id: number,
     self: Peer,
 
-    connections: {
+    connections: { // Should be replaced with PeerConnection[]
         id: number,
         type: string,
         topic: string,
@@ -37,7 +37,17 @@ export interface Badge {
     name: string,
     description: string
 }
+
 export interface AcquiredBadge {
     badgeId: number,
     dateAcquired: Date
+}
+
+export interface PeerConnection {
+    edgeStart: number, // ID of edge start. Corresponds to a User ID
+    edgeEnd: number, // ID of edge end. Corresponds to a User ID
+    type: "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner",
+    topic: string,
+    weight: number,
+    date: Date, // Date the connection was made
 }
