@@ -31,3 +31,13 @@ export interface User {
         weight: number
     }[]
 }
+
+export interface Badge {
+    id: number,
+    name: string,
+    description: string
+}
+export interface AcquiredBadge {
+    badgeId: number,
+    dateAcquired: Date
+}

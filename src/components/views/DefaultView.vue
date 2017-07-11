@@ -1,8 +1,11 @@
 <template>
-    <connectedness-heatmap :data="profileData"
-                           :topics="topics"
-                           :categories="categories">
-    </connectedness-heatmap>
+    <div>
+        <connectedness-heatmap :data="profileData"
+                               :topics="topics"
+                               :categories="categories">
+        </connectedness-heatmap>
+        <collected-badges></collected-badges>
+    </div>
 </template>
 
 <style scoped>
@@ -13,10 +16,12 @@
     import { Vue, Component } from "av-ts";
     import UserRepository from "../../repositories/UserRepository";
     import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+    import CollectedBadges from "../util/CollectedBadges.vue";
 
     @Component({
         components: {
-            "connectedness-heatmap": ConnectednessHeatmap
+            "connectedness-heatmap": ConnectednessHeatmap,
+            "collected-badges": CollectedBadges
         }
     })
     export default class DefaultView extends Vue {
