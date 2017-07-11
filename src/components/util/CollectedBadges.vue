@@ -7,7 +7,9 @@
                    :class="{'obtained': userBadges.find(x => x.badgeId == badge.id)}">
             <md-icon>{{getBadgeIcon(badge)}}</md-icon>
             <md-tooltip md-delay="50"
-                        md-direction="top">{{badge.description}}</md-tooltip>
+                        md-direction="top">
+                <span>{{badge.description}}</span>
+            </md-tooltip>
         </md-button>
     </md-layout>
 </template>
@@ -24,7 +26,12 @@
     }
     
     .obtained {
-        color: #256;
+        color: #f2f2f2;
+        background-color: #256;
+    }
+    
+    .obtained:hover {
+        background-color: #7397a2 !important;
     }
 </style>
 

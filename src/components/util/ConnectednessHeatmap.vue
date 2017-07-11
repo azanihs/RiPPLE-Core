@@ -1,29 +1,36 @@
 <template>
-    <md-table v-once>
-        <md-table-header>
-            <md-table-row>
-                <md-table-head></md-table-head>
-                <md-table-head v-for="topic in topics"
-                               :key="topic">
-                    {{topic}}
-                </md-table-head>
-            </md-table-row>
-        </md-table-header>
-        <md-table-body>
-            <md-table-row v-for="mentorType in categories"
-                          :key="mentorType">
-                <md-table-cell>{{mentorType}}</md-table-cell>
-                <md-table-cell v-for="topic in topics"
-                               :key="topic"
-                               :style="renderColor(mentorType, topic)">
-                    {{renderWeights[mentorType][topic] || 0}}
-                </md-table-cell>
-            </md-table-row>
-        </md-table-body>
-    </md-table>
+    <md-layout>
+        <h1>Social Connectedness</h1>
+        <md-table v-once>
+            <md-table-header>
+                <md-table-row>
+                    <md-table-head></md-table-head>
+                    <md-table-head v-for="topic in topics"
+                                   :key="topic">
+                        {{topic}}
+                    </md-table-head>
+                </md-table-row>
+            </md-table-header>
+            <md-table-body>
+                <md-table-row v-for="mentorType in categories"
+                              :key="mentorType">
+                    <md-table-cell>{{mentorType}}</md-table-cell>
+                    <md-table-cell v-for="topic in topics"
+                                   :key="topic"
+                                   :style="renderColor(mentorType, topic)">
+                        {{renderWeights[mentorType][topic] || 0}}
+                    </md-table-cell>
+                </md-table-row>
+            </md-table-body>
+        </md-table>
+    </md-layout>
 </template>
 
 <style scoped>
+    h1 {
+        width: 100%;
+    }
+    
     td,
     th {
         border: 1px solid #eee !important;
