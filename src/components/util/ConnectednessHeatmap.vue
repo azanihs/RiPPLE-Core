@@ -73,11 +73,8 @@
 
         @Lifecycle
         created() {
-            const renderWeights = {};
-
-            // Sum up connections
             this.categories.forEach(category => {
-                renderWeights[category] = this.data.connections
+                this.renderWeights[category] = this.data.connections
                     .filter(x => x.type == category)
                     .reduce((categoryWeight, connection) => {
                         if (categoryWeight[connection.topic] === undefined) {
@@ -88,7 +85,6 @@
                         return categoryWeight;
                     }, {});
             });
-            this.renderWeights = renderWeights;
         }
     }
 </script>
