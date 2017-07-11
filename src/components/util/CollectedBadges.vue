@@ -17,7 +17,7 @@
 <style scoped>
     h2 {
         width: 100%;
-        padding-top: 0.5em;
+        padding-top: 0.75em;
         border-top: 1px solid #ccc
     }
     
