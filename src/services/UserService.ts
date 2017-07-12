@@ -51,7 +51,7 @@ export default class UserService {
                 labels: topics,
                 datasets: [{
                     data: ownScore,
-                    label: "Progress",
+                    label: "Own Score",
                     backgroundColor: [
                         "rgba(255, 99, 132, 0.2)"
                     ],
@@ -60,7 +60,7 @@ export default class UserService {
                     ]
                 }, {
                     data: classAverage,
-                    label: "Goal",
+                    label: "Class Average",
                     backgroundColor: [
                         "rgba(54, 162, 235, 0.2)"
                     ],

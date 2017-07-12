@@ -1,7 +1,8 @@
 <template>
     <md-layout md-gutter="16">
-        <h2>Goal Overview</h2>
+        <h2>Competency Overview</h2>
         <md-layout md-flex="50">
+            <h3>Goal Overview</h3>
             <chart :type="'bar'"
                    :data="competencies.data"
                    :options="competencies.options"></chart>

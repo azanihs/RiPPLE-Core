@@ -1,7 +1,7 @@
 <template>
     <div class="badgeContainer">
         <div class="badgeProgress"
-             :class="{obtained: userHasBadge}">
+             :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
             <md-icon>{{badgeIcon}}</md-icon>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         class="badgeSpinner"
@@ -67,6 +67,10 @@
     .obtained {
         color: #256;
     }
+    
+    .badgeProgress:not(.obtained).progress {
+        color: #98afb7;
+    }
 </style>
 
 <script lang="ts">
@@ -100,6 +104,18 @@
             }
             // User has the badge and it does not have a progress
             return true;
+        }
+
+        get userHasStartedBadge(): boolean {
+            const badge = this.userBadge;
+            if (badge === undefined) {
+                return false;
+            }
+
+            // User only has the badge if they have met all criteria
+            if (badge.progress >= 0) {
+                return true;
+            }
         }
     }
 </script>
