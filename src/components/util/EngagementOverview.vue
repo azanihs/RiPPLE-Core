@@ -4,18 +4,11 @@
     
         <md-layout md-gutter
                    md-flex="50">
-            <h3>Social Overview</h3>
+            <h3>Activity Breakdown</h3>
             <chart :type="'pie'"
                    :data="pieChart.data"
                    :options="pieChart.options">
             </chart>
-        </md-layout>
-        <md-layout md-gutter
-                   md-flex="50">
-            <h3>Results Overview</h3>
-            <chart :type="'radar'"
-                   :data="lineChart.data"
-                   :options="lineChart.options"></chart>
         </md-layout>
     </md-layout>
 </template>
@@ -41,8 +34,6 @@
         get pieChart() {
             return UserService.getEngagementBreakdown();
         }
-        get lineChart() {
-            return UserService.getComparativeEngagementBreakdown();
-        }
+
     }
 </script>

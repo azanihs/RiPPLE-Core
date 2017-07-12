@@ -1,10 +1,16 @@
 <template>
     <md-layout md-gutter="16">
-        <h2>Competency Overview</h2>
+        <h2>Goal Overview</h2>
         <md-layout md-flex="50">
             <chart :type="'bar'"
                    :data="competencies.data"
                    :options="competencies.options"></chart>
+        </md-layout>
+        <md-layout md-flex="50">
+            <h3>Results Overview</h3>
+            <chart :type="'radar'"
+                   :data="lineChart.data"
+                   :options="lineChart.options"></chart>
         </md-layout>
     </md-layout>
 </template>
@@ -29,6 +35,9 @@
 
         get competencies() {
             return UserService.userCompetencies();
+        }
+        get lineChart() {
+            return UserService.getComparativeEngagementBreakdown();
         }
     }
 </script>
