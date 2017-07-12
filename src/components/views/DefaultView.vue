@@ -4,8 +4,10 @@
         <md-tabs md-fixed
                  class="md-transparent">
             <md-tab md-label="Engagement">
+                Engagement information
             </md-tab>
             <md-tab md-label="Competencies">
+                Competencies information
             </md-tab>
             <md-tab md-label="Connections">
                 <connectedness-heatmap :data="profileData"

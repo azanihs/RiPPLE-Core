@@ -36,6 +36,10 @@
     }
 </style>
 <style scoped>
+    .connectedContainer {
+        width: 100%;
+    }
+    
     h2 {
         width: 100%;
         padding-top: 0.75em;
