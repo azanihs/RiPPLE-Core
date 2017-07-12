@@ -3,13 +3,29 @@ import PeerRepository from "./PeerRepository";
 import f from "faker";
 
 let IDCounter = 0;
-const categories = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
+const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
+const getCategory: any = i => {
+    return ["connections", "engagement", "competencies"][i];
+}
+
 const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
 const badges = new Array(10).fill(0).map((x, i) => ({
     id: i,
+    category: getCategory(f.random.number({ min: 0, max: 2 })),
     name: f.company.bsBuzz(),
     description: f.company.catchPhrase()
 }));
+
+const userBadges = badges
+    .filter((_, i) => Math.random() < 0.5)
+    .map((x: Badge) => {
+        const acquiredBadge: AcquiredBadge = {
+            badgeId: x.id,
+            progress: Math.random() < 0.5 ? (Math.random() * 100) : -1,
+            dateAcquired: new Date()
+        };
+        return acquiredBadge;
+    });
 
 export default class UserRepository {
 
@@ -23,7 +39,7 @@ export default class UserRepository {
         const connections = new Array(f.random.number({ min: 2, max: 10 })).fill(0).map(x => {
             const connection = {
                 id: IDCounter++,
-                type: categories[f.random.number({ min: 0, max: 2 })],
+                type: types[f.random.number({ min: 0, max: 2 })],
                 topic: topics[f.random.number({ min: 0, max: 10 })],
                 weight: f.random.number({ min: 0, max: 10 })
             }
@@ -43,20 +59,11 @@ export default class UserRepository {
         return badges.slice()
     }
     static getAllUserBadges(): AcquiredBadge[] {
-        return badges
-            .filter((_, i) => Math.random() < 0.5)
-            .map((x: Badge) => {
-                const acquiredBadge: AcquiredBadge = {
-                    badgeId: x.id,
-                    progress: Math.random() < 0.5 ? (Math.random() * 100) : -1,
-                    dateAcquired: new Date()
-                };
-                return acquiredBadge;
-            });
+        return userBadges.slice();
     }
 
     static getAllAvailableCategories(): string[] {
-        return categories.slice()
+        return types.slice()
     }
     static getAllAvailableTopics(): string[] {
         return topics.slice();

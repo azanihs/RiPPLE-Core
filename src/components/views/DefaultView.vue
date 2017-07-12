@@ -5,19 +5,21 @@
                  class="md-transparent">
             <md-tab md-label="Engagement">
                 Engagement information
+                <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
                 Competencies information
+                <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
                 <connectedness-heatmap :data="profileData"
                                        :topics="topics"
                                        :categories="categories">
                 </connectedness-heatmap>
-    
+                <collected-badges topic='connections'></collected-badges>
             </md-tab>
             <md-tab md-label="Achievements">
-                <collected-badges></collected-badges>
+                <collected-badges topic='all'></collected-badges>
             </md-tab>
         </md-tabs>
     </md-layout>
