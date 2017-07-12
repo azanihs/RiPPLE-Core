@@ -1,19 +1,25 @@
 <template>
-    <md-layout class="half">
+    <md-layout md-gutter="16">
         <h2>Engagement Overview</h2>
-        <chart :type="'pie'"
-               :data="data"
-               :options="options"></chart>
+        <md-layout md-gutter
+                   md-flex="50">
+            <chart :type="'pie'"
+                   :data="data"
+                   :options="options">
+            </chart>
+        </md-layout>
+        <md-layout md-gutter
+                   md-flex="50">
+            <chart :type="'radar'"
+                   :data="data"
+                   :options="options"></chart>
+        </md-layout>
     </md-layout>
 </template>
 <style scoped>
     h2 {
         width: 100%;
         padding-top: 0.75em;
-    }
-    
-    .half {
-        width: 50%;
     }
 </style>
 
@@ -28,21 +34,37 @@
     })
     export default class EngagementOverview extends Vue {
         data = {
-            labels: ["Sleeping", "Designing", "Coding", "Cycling"],
+            labels: ["Running", "Swimming", "Eating", "Cycling"],
             datasets: [{
-                data: [20, 40, 5, 35],
+                data: [20, 10, 40, 10],
+                label: "Your Score",
                 backgroundColor: [
-                    "#1fc8db",
-                    "#fce473",
-                    "#42afe3",
-                    "#ed6c63",
-                    "#97cd76"
+                    "rgba(255, 99, 132, 0.2)",
+                    "rgba(54, 162, 235, 0.2)",
+                    "rgba(255, 206, 86, 0.2)",
+                    "rgba(75, 192, 192, 0.2)",
+                    "rgba(153, 102, 255, 0.2)",
+                    "rgba(255, 159, 64, 0.2)"
+                ],
+                borderColor: [
+                    "rgba(255,99,132,1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)"
                 ]
             }]
         };
         options = {
-            segmentShowStroke: false
+            scale: {
+                ticks: {
+                    beginAtZero: true
+                }
+            },
+            animation: {
+                animateRotate: true
+            }
         };
-
     }
 </script>

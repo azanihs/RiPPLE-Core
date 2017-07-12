@@ -48,6 +48,9 @@
                 data: this.data,
                 options: this.options
             });
+            setTimeout(() => {
+                this.resetChart();
+            }, 10);
         }
 
         resetChart() {
