@@ -4,7 +4,6 @@
         <md-tabs md-fixed
                  class="md-transparent">
             <md-tab md-label="Engagement">
-                Engagement information
                 <engagement-overview></engagement-overview>
             </md-tab>
             <md-tab md-label="Competencies">

@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Router from "./routes";
 import VueMaterial from "vue-material";
-
 import "vue-material/dist/vue-material.css";
 
 // Global scoped addons
