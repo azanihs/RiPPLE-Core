@@ -1,6 +1,6 @@
 <template>
     <md-layout>
-        <h1>Social Connectedness</h1>
+        <h2>Social Connectedness</h2>
         <md-table v-once
                   class="connectedContainer">
             <md-table-header>
@@ -36,8 +36,13 @@
     }
 </style>
 <style scoped>
-    h1 {
+    .connectedContainer {
         width: 100%;
+    }
+    
+    h2 {
+        width: 100%;
+        padding-top: 0.75em;
     }
     
     td,

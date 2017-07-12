@@ -15,7 +15,6 @@
     h2 {
         width: 100%;
         padding-top: 0.75em;
-        border-top: 1px solid #ccc
     }
     
     .badgeGutter:nth-of-type(3n + 1) {

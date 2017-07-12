@@ -4,8 +4,8 @@
             <div class="imageContainer">
                 <img :src="personalAvatar" />
             </div>
-            <h5>Nicholas Achilles</h5>
-            <h4>(ENGG1200)</h4>
+            <h5>Your Name</h5>
+            <h4>Course Name</h4>
             <hr />
         </div>
         <ul>
@@ -79,14 +79,9 @@
         border-radius: 0px;
     }
     
-    
-    
-    
-    
-    /* Sets the background colour of the currently selected item */
-    
     .router-link-exact-active.router-link-active .linkButton,
     .router-link-exact-active.router-link-active .linkButton:hover {
+        /* Sets the background colour of the currently selected item */
         background-color: #ffffff;
         color: #111;
     }
