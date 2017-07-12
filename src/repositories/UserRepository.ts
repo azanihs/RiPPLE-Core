@@ -44,10 +44,11 @@ export default class UserRepository {
     }
     static getAllUserBadges(): AcquiredBadge[] {
         return badges
-            .filter((_, i) => i % 2 == 0)
+            .filter((_, i) => Math.random() < 0.5)
             .map((x: Badge) => {
                 const acquiredBadge: AcquiredBadge = {
                     badgeId: x.id,
+                    progress: Math.random() < 0.5 ? (Math.random() * 100) : -1,
                     dateAcquired: new Date()
                 };
                 return acquiredBadge;

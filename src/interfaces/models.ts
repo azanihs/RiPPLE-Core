@@ -40,6 +40,7 @@ export interface Badge {
 
 export interface AcquiredBadge {
     badgeId: number,
+    progress: number,
     dateAcquired: Date
 }
 

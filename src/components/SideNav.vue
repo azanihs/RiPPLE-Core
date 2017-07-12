@@ -9,8 +9,11 @@
             <hr />
         </div>
         <ul>
-            <li v-for="link in links" :key="link.href">
-                <router-link :to="link.href"><md-button class="linkButton">{{ link.text }}</md-button></router-link>
+            <li v-for="link in links"
+                :key="link.href">
+                <router-link :to="link.href">
+                    <md-button class="linkButton">{{ link.text }}</md-button>
+                </router-link>
             </li>
         </ul>
     </div>
@@ -20,52 +23,53 @@
     .navbarContainer {
         position: absolute;
         height: 100%;
+        width: 12.5%;
         background-color: #1d323a;
         color: #f2f2f2;
     }
-
+    
     .profileContainer hr {
         width: 75%;
         border: none;
         border-bottom: 1px solid #274550;
         margin: 1em auto;
     }
-
+    
     .profileContainer {
         text-align: center;
     }
-
+    
     .profileContainer .imageContainer {
         width: 100px;
         height: 100px;
         padding: 10px;
         margin: auto;
     }
+    
     .imageContainer img {
         width: 100%;
         height: auto;
         border-radius: 100%;
     }
-
+    
     .profileContainer h5 {
         font-weight: normal;
         font-size: 1em;
         margin: 0px auto;
     }
-
+    
     ul {
         margin: 0px;
         padding: 0px;
         padding: 0px;
     }
-
-    ul > li {
+    
+    ul>li {
         list-style: none;
         padding: 0px;
         margin: 0px;
-
     }
-
+    
     .linkButton {
         width: 100%;
         box-sizing: border-box;
@@ -74,14 +78,19 @@
         text-align: left;
         border-radius: 0px;
     }
-
+    
+    
+    
+    
+    
     /* Sets the background colour of the currently selected item */
+    
     .router-link-exact-active.router-link-active .linkButton,
     .router-link-exact-active.router-link-active .linkButton:hover {
         background-color: #ffffff;
         color: #111;
     }
-
+    
     h4 {
         font-size: 1em;
         margin: 0px;
