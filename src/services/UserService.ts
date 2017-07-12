@@ -1,9 +1,13 @@
 import { User, Peer, Badge, AcquiredBadge } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
-import f from "faker";
-
+import PeerRepository from "../repositories/PeerRepository";
 
 export default class UserService {
+
+    static getUserPeers() {
+        return PeerRepository.getMany(20 + Math.round(Math.random() * 100))
+    }
+
     static getEngagementBreakdown() {
         return {
             data: {

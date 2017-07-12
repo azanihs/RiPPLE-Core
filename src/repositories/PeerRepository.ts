@@ -26,7 +26,7 @@ export default class PeerRepository {
                     }
                 });
 
-            const peers: Peer = {
+            const peer: Peer = {
                 id: f.random.number(),
                 name: f.name.findName(),
                 bio: f.hacker.phrase() + " " + f.hacker.phrase(),
@@ -35,7 +35,7 @@ export default class PeerRepository {
                 availableTimes: availableTimes
             };
 
-            return peers;
+            return peer;
         });
     }
 }

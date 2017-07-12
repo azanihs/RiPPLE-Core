@@ -10,11 +10,7 @@
                 <competency-overview></competency-overview>
             </md-tab>
             <md-tab md-label="Connections">
-                <connectedness-heatmap :data="profileData"
-                                       :topics="topics"
-                                       :categories="categories">
-                </connectedness-heatmap>
-    
+                <connection-overview></connection-overview>
             </md-tab>
             <md-tab md-label="Achievements">
                 <collected-badges></collected-badges>
@@ -31,29 +27,19 @@
 
 <script lang="ts">
     import { Vue, Component } from "av-ts";
-    import UserRepository from "../../repositories/UserRepository";
     import EngagementOverview from "../util/EngagementOverview.vue";
     import CompetencyOverview from "../util/CompetencyOverview.vue";
-    import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+    import ConnectionOverview from "../util/ConnectionOverview.vue";
     import CollectedBadges from "../util/CollectedBadges.vue";
 
     @Component({
         components: {
             "engagement-overview": EngagementOverview,
             "competency-overview": CompetencyOverview,
-            "connectedness-heatmap": ConnectednessHeatmap,
+            "connection-overview": ConnectionOverview,
             "collected-badges": CollectedBadges
         }
     })
     export default class DefaultView extends Vue {
-        profileData = UserRepository.getLoggedInUser();
-
-        get topics() {
-            return UserRepository.getAllAvailableTopics();
-        }
-
-        get categories() {
-            return UserRepository.getAllAvailableCategories();
-        }
     }
 </script>
