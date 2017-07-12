@@ -5,15 +5,18 @@
                  class="md-transparent">
             <md-tab md-label="Engagement">
                 <engagement-overview></engagement-overview>
+                <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
                 <competency-overview></competency-overview>
+                <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
                 <connection-overview></connection-overview>
+                <collected-badges topic='connections'></collected-badges>
             </md-tab>
             <md-tab md-label="Achievements">
-                <collected-badges></collected-badges>
+                <collected-badges topic='all'></collected-badges>
             </md-tab>
         </md-tabs>
     </md-layout>
