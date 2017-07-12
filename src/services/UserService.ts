@@ -72,4 +72,50 @@ export default class UserService {
             }
         }
     }
+
+    static userCompetencies() {
+        const topics = UserRepository.getAllAvailableTopics();
+        const ownScore = topics.map(x => Math.round(Math.random() * 100));
+        const classAverage = topics.map(x => Math.round(Math.random() * 100));
+        return {
+            data: {
+                labels: topics,
+                datasets: [{
+                    data: ownScore,
+                    label: "Your Results",
+                    backgroundColor: [
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)",
+                        "rgb(31, 119, 180)"
+                    ]
+                }, {
+                    data: classAverage,
+                    label: "Class  Average"
+                }]
+            },
+            options: {
+                scale: {
+                    ticks: {
+                        beginAtZero: true
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        stacked: true
+                    }],
+                    yAxes: [{
+                        stacked: true
+                    }]
+                }
+            }
+        }
+
+    }
 }

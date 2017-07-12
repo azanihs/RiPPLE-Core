@@ -7,7 +7,7 @@
                 <engagement-overview></engagement-overview>
             </md-tab>
             <md-tab md-label="Competencies">
-                Competencies information
+                <competency-overview></competency-overview>
             </md-tab>
             <md-tab md-label="Connections">
                 <connectedness-heatmap :data="profileData"
@@ -33,12 +33,14 @@
     import { Vue, Component } from "av-ts";
     import UserRepository from "../../repositories/UserRepository";
     import EngagementOverview from "../util/EngagementOverview.vue";
+    import CompetencyOverview from "../util/CompetencyOverview.vue";
     import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
     import CollectedBadges from "../util/CollectedBadges.vue";
 
     @Component({
         components: {
             "engagement-overview": EngagementOverview,
+            "competency-overview": CompetencyOverview,
             "connectedness-heatmap": ConnectednessHeatmap,
             "collected-badges": CollectedBadges
         }
