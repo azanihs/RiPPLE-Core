@@ -112,6 +112,7 @@
         }
 
         getUserBadge(badge) {
+            // TODO: This lookup is very slow, a hashmap or similar would be better.
             return this.userBadges.find(x => x.badgeId == badge.id);
         }
     }

@@ -1,10 +1,11 @@
 <template>
     <md-layout>
         <h1>Social Connectedness</h1>
-        <md-table v-once>
+        <md-table v-once
+                  class="connectedContainer">
             <md-table-header>
                 <md-table-row>
-                    <md-table-head></md-table-head>
+                    <md-table-head class="tableHead"></md-table-head>
                     <md-table-head v-for="topic in topics"
                                    :key="topic">
                         {{topic}}
@@ -14,7 +15,7 @@
             <md-table-body>
                 <md-table-row v-for="mentorType in categories"
                               :key="mentorType">
-                    <md-table-cell>{{mentorType}}</md-table-cell>
+                    <md-table-cell class="tableCell">{{mentorType}}</md-table-cell>
                     <md-table-cell v-for="topic in topics"
                                    :key="topic"
                                    :style="renderColor(mentorType, topic)">
@@ -26,6 +27,14 @@
     </md-layout>
 </template>
 
+<style>
+    .connectedContainer .md-table-head-container {
+        /*TODO: Move out of global scope */
+        padding: 0px !important;
+        display: flex;
+        height: auto !important;
+    }
+</style>
 <style scoped>
     h1 {
         width: 100%;
@@ -34,6 +43,7 @@
     td,
     th {
         border: 1px solid #eee !important;
+        height: auto !important;
     }
     
     tr:hover td:first-child {
@@ -67,7 +77,7 @@
             const max = this.data.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
             const weight = (this.renderWeights[category] && this.renderWeights[category][topic]) || 0;
             return {
-                background: `rgba(0, 138, 0, ${weight / max})`
+                background: `rgba(34, 85, 102, ${weight / max})`
             };
         }
 
