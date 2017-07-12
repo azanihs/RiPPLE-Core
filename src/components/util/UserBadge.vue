@@ -1,7 +1,7 @@
 <template>
     <div class="badgeContainer">
         <div class="badgeProgress"
-             :class="{obtained: !!userBadge}">
+             :class="{obtained: userHasBadge}">
             <md-icon>{{badgeIcon}}</md-icon>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         class="badgeSpinner"
@@ -86,6 +86,20 @@
         get userBadge(): AcquiredBadge {
             // TODO: This lookup is very slow, a hashmap or similar would be better.
             return UserRepository.getAllUserBadges().find(x => x.badgeId == this.badge.id);
+        }
+
+        get userHasBadge(): boolean {
+            const badge = this.userBadge;
+            if (badge === undefined) {
+                return false;
+            }
+
+            // User only has the badge if they have met all criteria
+            if (badge.progress >= 0) {
+                return badge.progress == 100;
+            }
+            // User has the badge and it does not have a progress
+            return true;
         }
     }
 </script>

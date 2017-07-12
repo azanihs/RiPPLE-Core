@@ -1,15 +1,30 @@
 <template>
-    <div>
-        <connectedness-heatmap :data="profileData"
-                               :topics="topics"
-                               :categories="categories">
-        </connectedness-heatmap>
-        <collected-badges></collected-badges>
-    </div>
+    <md-layout>
+        <h1>Profile</h1>
+        <md-tabs md-fixed
+                 class="md-transparent">
+            <md-tab md-label="Engagement">
+            </md-tab>
+            <md-tab md-label="Competencies">
+            </md-tab>
+            <md-tab md-label="Connections">
+                <connectedness-heatmap :data="profileData"
+                                       :topics="topics"
+                                       :categories="categories">
+                </connectedness-heatmap>
+    
+            </md-tab>
+            <md-tab md-label="Achievements">
+                <collected-badges></collected-badges>
+            </md-tab>
+        </md-tabs>
+    </md-layout>
 </template>
 
 <style scoped>
-    
+    h1 {
+        width: 100%;
+    }
 </style>
 
 <script lang="ts">
