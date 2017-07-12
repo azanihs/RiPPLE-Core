@@ -14,12 +14,12 @@
                      class="md-transparent"
                      @change="tabChange">
                 <md-tab v-for="tab in tabLookup"
-                        :key="tab.id"
+                        :key="tab.name"
                         :md-label="tab.name">
-                    <recommendations @change="shuffleData(tab.id)"
+                    <recommendations @change="shuffleData(tab.name)"
                                      :tabName="tab.heading"
                                      :peers="tab.data"
-                                     :threshold="75"></recommendations>
+                                     :threshold="tab.name == 'Provide Mentorship' ? 75 : 0"></recommendations>
                 </md-tab>
             </md-tabs>
         </md-layout>
@@ -27,6 +27,10 @@
 </template>
 
 <style scoped>
+    h1 {
+        width: 100%;
+    }
+    
     .headingContainer {
         margin: 8px 0px 0px 0px;
     }
@@ -54,18 +58,15 @@
         tabLookup = [{
             name: "Provide Mentorship",
             heading: "provide mentorship in",
-            data: {},
-            id: "peersToMentor"
+            data: {}
         }, {
             name: "Seek Mentorship",
             heading: "seek mentorship in",
-            data: {},
-            id: "peersToBeMentored"
+            data: {}
         }, {
             name: "Find Study Partners",
             heading: "find study partners In",
-            data: {},
-            id: "peersToStudy"
+            data: {}
         }];
 
         @Lifecycle
@@ -75,7 +76,7 @@
 
         tabChange(newTabIndex: number) {
             this.tabID = newTabIndex;
-            this.shuffleData(this.tabLookup[this.tabID].id);
+            this.shuffleData(this.tabLookup[this.tabID].name);
         }
 
         shuffleData(type: string) {
