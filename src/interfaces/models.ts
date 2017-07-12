@@ -35,6 +35,7 @@ export interface User {
 export interface Badge {
     id: number,
     name: string,
+    category: "engagement" | "competencies" | "connections",
     description: string
 }
 

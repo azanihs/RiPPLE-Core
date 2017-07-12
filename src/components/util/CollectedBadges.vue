@@ -1,6 +1,6 @@
 <template>
     <md-layout md-gutter="16">
-        <h2>Available Badges</h2>
+        <h2>{{topic}} Badges</h2>
         <md-layout v-for="badge in availableBadges"
                    :key="badge.id"
                    md-flex="33"
@@ -15,6 +15,7 @@
     h2 {
         width: 100%;
         padding-top: 0.75em;
+        text-transform: capitalize;
     }
     
     .badgeGutter:nth-of-type(3n + 1) {
@@ -27,7 +28,7 @@
 </style>
 
 <script lang="ts">
-    import { Vue, Prop, Lifecycle, Component } from "av-ts";
+    import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
     import UserBadge from "../util/UserBadge.vue";
     import BadgeService from "../../services/BadgeService";
     import UserRepository from "../../repositories/UserRepository";
@@ -38,8 +39,14 @@
         }
     })
     export default class CollectedBadges extends Vue {
+        @Prop topic = p(String);
+
         get availableBadges() {
-            return UserRepository.getAllAvailableBadges();
+            const badges = UserRepository.getAllAvailableBadges();
+            if (this.topic != "all") {
+                return badges.filter(x => x.category == this.topic);
+            }
+            return badges;
         }
     }
 </script>
