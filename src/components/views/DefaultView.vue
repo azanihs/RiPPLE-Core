@@ -16,6 +16,7 @@
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
             <md-tab md-label="Achievements">
+                <h1>Achievement Overview</h1>
                 <collected-badges topic='engagement'></collected-badges>
                 <collected-badges topic='competencies'></collected-badges>
                 <collected-badges topic='connections'></collected-badges>
