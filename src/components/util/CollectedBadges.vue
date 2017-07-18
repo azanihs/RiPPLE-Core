@@ -1,6 +1,6 @@
 <template>
-    <md-layout md-gutter="16">
-        <h2>{{topic}} Badges</h2>
+    <md-layout>
+        <h3>{{topic}} Badges</h3>
         <md-layout v-for="badge in availableBadges"
                    :key="badge.id"
                    md-flex="33"
@@ -12,11 +12,10 @@
 </template>
 
 <style scoped>
-    h2 {
+    h3 {
         width: 100%;
         padding-top: 0.75em;
         text-transform: capitalize;
-        border-top: 1px solid #ccc;
     }
     
     .badgeGutter:nth-of-type(3n + 1) {

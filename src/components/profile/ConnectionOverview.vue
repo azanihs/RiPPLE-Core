@@ -18,6 +18,10 @@
     </md-layout>
 </template>
 <style scoped>
+    h2 {
+        width: 100%;
+    }
+    
     .connectionImage {
         width: 50px;
         height: 50px;

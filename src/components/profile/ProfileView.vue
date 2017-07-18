@@ -16,7 +16,11 @@
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
             <md-tab md-label="Achievements">
-                <h1>Achievement Overview</h1>
+                <overview-description>
+                    <h2>Achievement Overview</h2>
+                    <p>The achievement overview tracks noteable feats you have accomplished in Ripple, and shows you your progress towards those you have not yet achieved.</p>
+                </overview-description>
+                <!-- TODO: Align properly -->
                 <collected-badges topic='engagement'></collected-badges>
                 <collected-badges topic='competencies'></collected-badges>
                 <collected-badges topic='connections'></collected-badges>
@@ -26,9 +30,7 @@
 </template>
 
 <style scoped>
-    h1 {
-        width: 100%;
-    }
+    
 </style>
 
 <script lang="ts">
@@ -36,6 +38,7 @@
     import EngagementOverview from "./EngagementOverview.vue";
     import CompetencyOverview from "./CompetencyOverview.vue";
     import ConnectionOverview from "./ConnectionOverview.vue";
+    import OverviewDescription from "./OverviewDescription.vue";
     import CollectedBadges from "../util/CollectedBadges.vue";
 
     @Component({
@@ -43,6 +46,7 @@
             "engagement-overview": EngagementOverview,
             "competency-overview": CompetencyOverview,
             "connection-overview": ConnectionOverview,
+            "overview-description": OverviewDescription,
             "collected-badges": CollectedBadges
         }
     })
