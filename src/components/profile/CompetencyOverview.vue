@@ -1,6 +1,9 @@
 <template>
     <md-layout md-gutter="16">
-        <h2>Competency Overview</h2>
+        <overview-description>
+            <h2>Competency Overview</h2>
+            <p>The competency overview will show how your are progressing towards your goals</p>
+        </overview-description>
         <md-layout md-flex="50">
             <h3>Goal Overview</h3>
             <chart :type="'bar'"
@@ -16,20 +19,19 @@
     </md-layout>
 </template>
 <style scoped>
-    h2 {
-        width: 100%;
-        padding-top: 0.75em;
-    }
+    
 </style>
 
 <script lang="ts">
     import { Vue, Component, Prop } from "av-ts";
     import Chart from "../charts/Chart.vue";
     import UserService from "../../services/UserService";
+    import OverviewDescription from "./OverviewDescription.vue";
 
     @Component({
         components: {
-            "chart": Chart
+            "chart": Chart,
+            "overview-description": OverviewDescription
         }
     })
     export default class CompetencyOverview extends Vue {

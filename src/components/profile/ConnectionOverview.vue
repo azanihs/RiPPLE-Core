@@ -1,7 +1,9 @@
 <template>
     <md-layout>
-        <h2>Connection Overview</h2>
-        <p>The connections overview will show you how you have connected to peers through Ripple.</p>
+        <overview-description>
+            <h2>Connection Overview</h2>
+            <p>The connections overview will show you how you have connected to peers through Ripple.</p>
+        </overview-description>
         <connectedness-heatmap :data="profileData"
                                :topics="topics"
                                :categories="categories">
@@ -16,15 +18,6 @@
     </md-layout>
 </template>
 <style scoped>
-    h2 {
-        width: 100%;
-        padding-top: 0.75em;
-    }
-    
-    p {
-        margin-top: 0px;
-    }
-    
     .connectionImage {
         width: 50px;
         height: 50px;
@@ -45,10 +38,12 @@
     import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
     import UserRepository from "../../repositories/UserRepository";
     import UserService from "../../services/UserService";
+    import OverviewDescription from "./OverviewDescription.vue";
 
     @Component({
         components: {
-            "connectedness-heatmap": ConnectednessHeatmap
+            "connectedness-heatmap": ConnectednessHeatmap,
+            "overview-description": OverviewDescription
         }
     })
     export default class ConnectionOverview extends Vue {
