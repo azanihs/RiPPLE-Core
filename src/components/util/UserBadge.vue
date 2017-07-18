@@ -1,8 +1,15 @@
 <template>
     <div class="badgeContainer">
         <div class="badgeProgress"
-             :class="{obtained: userHasBadge}">
-            <md-icon>{{badgeIcon}}</md-icon>
+             :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+            <div class="badge">
+                <md-icon>{{badgeIcon}}</md-icon>
+            </div>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0"
+                        md-theme="spinner"
+                        class="badgeSpinner"
+                        :md-stroke="2"
+                        :md-progress="100"></md-spinner>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         class="badgeSpinner"
                         :md-stroke="2"
@@ -16,10 +23,7 @@
 </template>
 
 <style>
-    .badgeProgress svg circle {
-        /* TODO: Move to theme */
-        stroke: #1d323a !important;
-    }
+    
 </style>
 <style scoped>
     .badgeContainer {
@@ -64,7 +68,14 @@
         color: #ddd;
     }
     
-    .obtained {
+    .obtained .badge {
+        color: #f2f2f2;
+        background-color: #256;
+        border-radius: 50%;
+        padding: 0.5em;
+    }
+    
+    .badgeProgress:not(.obtained).progress {
         color: #256;
     }
 </style>
@@ -100,6 +111,18 @@
             }
             // User has the badge and it does not have a progress
             return true;
+        }
+
+        get userHasStartedBadge(): boolean {
+            const badge = this.userBadge;
+            if (badge === undefined) {
+                return false;
+            }
+
+            // User only has the badge if they have met all criteria
+            if (badge.progress >= 0) {
+                return true;
+            }
         }
     }
 </script>
