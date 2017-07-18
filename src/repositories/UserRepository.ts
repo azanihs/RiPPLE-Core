@@ -9,7 +9,7 @@ const getCategory: any = i => {
 }
 
 const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
-const badges = new Array(10).fill(0).map((x, i) => ({
+const badges = new Array(30).fill(0).map((x, i) => ({
     id: i,
     category: getCategory(f.random.number({ min: 0, max: 2 })),
     name: f.company.bsBuzz(),
