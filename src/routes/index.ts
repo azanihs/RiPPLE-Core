@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Main from "../main";
 
-import DefaultView from "../components/views/DefaultView.vue";
+import ProfileView from "../components/profile/ProfileView.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionView from "../components/questions/QuestionView.vue";
 import PeerView from "../components/views/PeerView.vue";
@@ -15,7 +15,7 @@ const routes = [{
 	children: [{
 		path: "",
 		name: "main",
-		component: DefaultView
+		component: ProfileView
 	}, {
 		path: "/view/questions",
 		name: "questions",

@@ -1,6 +1,7 @@
 <template>
     <md-layout>
         <h2>Connection Overview</h2>
+        <p>The connections overview will show you how you have connected to peers through Ripple.</p>
         <connectedness-heatmap :data="profileData"
                                :topics="topics"
                                :categories="categories">
@@ -20,6 +21,10 @@
         padding-top: 0.75em;
     }
     
+    p {
+        margin-top: 0px;
+    }
+    
     .connectionImage {
         width: 50px;
         height: 50px;
@@ -37,7 +42,7 @@
 <script lang="ts">
     import { Vue, Component, Prop } from "av-ts";
     import Chart from "../charts/Chart.vue";
-    import ConnectednessHeatmap from "./ConnectednessHeatmap.vue";
+    import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
     import UserRepository from "../../repositories/UserRepository";
     import UserService from "../../services/UserService";
 

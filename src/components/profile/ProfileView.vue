@@ -33,9 +33,9 @@
 
 <script lang="ts">
     import { Vue, Component } from "av-ts";
-    import EngagementOverview from "../util/EngagementOverview.vue";
-    import CompetencyOverview from "../util/CompetencyOverview.vue";
-    import ConnectionOverview from "../util/ConnectionOverview.vue";
+    import EngagementOverview from "./EngagementOverview.vue";
+    import CompetencyOverview from "./CompetencyOverview.vue";
+    import ConnectionOverview from "./ConnectionOverview.vue";
     import CollectedBadges from "../util/CollectedBadges.vue";
 
     @Component({
