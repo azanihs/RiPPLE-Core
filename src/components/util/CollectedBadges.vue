@@ -18,6 +18,11 @@
         text-transform: capitalize;
     }
     
+    .badgeGutter {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    
     .badgeGutter:nth-of-type(3n + 1) {
         padding-left: 0px !important;
     }
