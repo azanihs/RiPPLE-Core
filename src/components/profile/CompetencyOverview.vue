@@ -6,20 +6,30 @@
         </overview-description>
         <md-layout md-flex="50">
             <h3>Goal Overview</h3>
-            <chart :type="'bar'"
-                   :data="competencies.data"
-                   :options="competencies.options"></chart>
+            <div class="chartContainer">
+                <chart :type="'bar'"
+                       :data="competencies.data"
+                       :options="competencies.options"></chart>
+            </div>
         </md-layout>
         <md-layout md-flex="50">
             <h3>Results Overview</h3>
-            <chart :type="'radar'"
-                   :data="lineChart.data"
-                   :options="lineChart.options"></chart>
+            <div class="chartContainer">
+                <chart :type="'radar'"
+                       :data="lineChart.data"
+                       :options="lineChart.options"></chart>
+            </div>
         </md-layout>
     </md-layout>
 </template>
 <style scoped>
+    h3 {
+        width: 100%;
+    }
     
+    .chartContainer {
+        width: 75%;
+    }
 </style>
 
 <script lang="ts">

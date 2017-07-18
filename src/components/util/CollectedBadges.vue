@@ -1,6 +1,6 @@
 <template>
     <md-layout>
-        <h3>{{topic}} Badges</h3>
+        <h3 :class="{'borderTop': separator}">{{topic}} Badges</h3>
         <md-layout v-for="badge in availableBadges"
                    :key="badge.id"
                    md-flex="33"
@@ -14,8 +14,17 @@
 <style scoped>
     h3 {
         width: 100%;
-        padding-top: 0.75em;
         text-transform: capitalize;
+    }
+    
+    h3:not(.borderTop) {
+        padding-top: 0em;
+        margin-top: 0em;
+    }
+    
+    h3.borderTop {
+        padding-top: 0.75em;
+        border-top: 1px solid #ddd;
     }
     
     .badgeGutter {
@@ -45,6 +54,10 @@
     })
     export default class CollectedBadges extends Vue {
         @Prop topic = p(String);
+        @Prop separator = p({
+            type: Boolean,
+            default: true
+        });
 
         get availableBadges() {
             const badges = UserRepository.getAllAvailableBadges();
