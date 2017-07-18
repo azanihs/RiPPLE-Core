@@ -2,7 +2,14 @@
     <div class="badgeContainer">
         <div class="badgeProgress"
              :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
-            <md-icon>{{badgeIcon}}</md-icon>
+            <div class="badge">
+                <md-icon>{{badgeIcon}}</md-icon>
+            </div>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0"
+                        md-theme="spinner"
+                        class="badgeSpinner"
+                        :md-stroke="2"
+                        :md-progress="100"></md-spinner>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         class="badgeSpinner"
                         :md-stroke="2"
@@ -16,10 +23,7 @@
 </template>
 
 <style>
-    .badgeProgress svg circle {
-        /* TODO: Move to theme */
-        stroke: #1d323a !important;
-    }
+    
 </style>
 <style scoped>
     .badgeContainer {
@@ -64,12 +68,15 @@
         color: #ddd;
     }
     
-    .obtained {
-        color: #256;
+    .obtained .badge {
+        color: #f2f2f2;
+        background-color: #256;
+        border-radius: 50%;
+        padding: 0.5em;
     }
     
     .badgeProgress:not(.obtained).progress {
-        color: #98afb7;
+        color: #256;
     }
 </style>
 

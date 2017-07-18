@@ -29,16 +29,7 @@ export default class UserService {
                     ]
                 }]
             },
-            options: {
-                scale: {
-                    ticks: {
-                        beginAtZero: true
-                    }
-                },
-                animation: {
-                    animateRotate: true
-                }
-            }
+            options: {}
         }
     }
 
@@ -122,6 +113,18 @@ export default class UserService {
                 }
             }
         }
+    }
 
+
+    static getEngagementScores() {
+
+        return ["Engagement Score", "Overall Grade", "Goal Progress", "Achievements", "Recommendations Accepted", "Social Connections", "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"].map(x => {
+            const item = {
+                name: x,
+                score: Math.floor(Math.random() * 100)
+            }
+
+            return item;
+        })
     }
 }
