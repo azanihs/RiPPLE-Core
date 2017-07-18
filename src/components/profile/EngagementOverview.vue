@@ -1,11 +1,10 @@
 <template>
-    <md-layout md-gutter="16">
+    <md-layout>
         <overview-description>
             <h2>Engagement Overview</h2>
             <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
         </overview-description>
-        <md-layout md-gutter
-                   md-flex="50">
+        <md-layout md-flex="50">
             <h3>Activity Breakdown</h3>
             <div class="pieChart">
                 <chart :type="'pie'"
@@ -14,8 +13,7 @@
                 </chart>
             </div>
         </md-layout>
-        <md-layout md-gutter
-                   md-flex="50">
+        <md-layout md-flex="50">
             <div class="engagementScoreContainer">
                 <div v-for="item in engagementItems"
                      :key="item.name"
@@ -43,12 +41,11 @@
         width: 100%;
         display: flex;
         flex-flow: row wrap;
-        padding-right: 25px;
     }
     
     .engagementItem {
         flex-grow: 1;
-        width: 45%;
+        width: 47.5%;
         padding: 1em;
         display: flex;
         align-items: center;
@@ -60,8 +57,13 @@
     }
     
     .engagementItem:nth-child(odd) {
-        margin-right: 5%;
+        margin-right: 2.5%;
     }
+    
+    .engagementItem:nth-child(even) {
+        margin-left: 2.5%;
+    }
+    
     
     h3 {
         width: 100%;
