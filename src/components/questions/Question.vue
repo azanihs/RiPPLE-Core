@@ -7,6 +7,7 @@
         </h2>
         <md-layout md-flex="65">
             <p>{{question.content}}</p>
+    
         </md-layout>
         <md-layout md-flex="10"></md-layout>
         <md-layout class="questionInfo"

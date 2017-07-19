@@ -4,9 +4,11 @@
                    :key="i"
                    class="md-icon-button"
                    @click.native="changeRating"
+                   @mouseover.native="previewRating"
+                   @mouseout.native="mouseOut"
                    ref="icons">
             <md-icon class="halfSize"
-                     v-bind:class="{'md-primary': (i-1) <= selectedIndex}">{{icon}}</md-icon>
+                     v-bind:class="{'md-primary': (i-1) <= previewIndex}">{{icon}}</md-icon>
         </md-button>
     </div>
 </template>
@@ -15,6 +17,10 @@
         width: 100%;
         display: flex;
         justify-content: space-between;
+    }
+    
+    .md-icon {
+        transition: 500ms color ease;
     }
     
     .md-icon:not(.md-primary) {
@@ -35,6 +41,9 @@
         padding: 8px;
         border-radius: 50%;
         line-height: 20px;
+    
+        flex: 1;
+        margin-left: 0px !important;
     }
     
     .halfSize {
@@ -61,14 +70,18 @@
             default: -1
         }) as number;
 
+        // Current start selection
+        selectedIndex = -1;
+        previewIndex = -1;
+
         @Lifecycle
         created() {
             this.selectedIndex = this.defaultIndex;
+            this.previewIndex = this.defaultIndex;
         }
 
-        // Current start selection
-        selectedIndex = -1;
-        changeRating(e: Event) {
+
+        changeRating(e: MouseEvent) {
             // Check if the user clicked on child. If so, select the parent button
             let target = e.target as HTMLElement;
             if (target.tagName == "I") {
@@ -77,6 +90,20 @@
             const icons = this.$refs["icons"] as Array<Vue>;
             this.selectedIndex = icons.findIndex((x: Vue) => x.$el == target);
             this.$emit("input", this.selectedIndex);
+        }
+
+        previewRating(e: MouseEvent) {
+            // Check if the user clicked on child. If so, select the parent button
+            let target = e.target as HTMLElement;
+            if (target.tagName == "I") {
+                target = target.parentElement;
+            }
+            const icons = this.$refs["icons"] as Array<Vue>;
+            this.previewIndex = icons.findIndex((x: Vue) => x.$el == target);
+        }
+
+        mouseOut(e: MouseEvent) {
+            this.previewIndex = this.selectedIndex;
         }
     }
 </script>
