@@ -6,13 +6,9 @@
         </overview-description>
         <md-layout md-flex="100"
                    class="competencyContainer">
-            <div v-for="chart in competencies"
-                 :key="chart"
-                 class="chart">
-                <chart type="bar"
-                       :data="chart.data"
-                       :options="chart.options"></chart>
-            </div>
+            <chart type="bar"
+                   :data="competencies.data"
+                   :options="competencies.options"></chart>
         </md-layout>
     </md-layout>
 </template>
@@ -20,6 +16,7 @@
 <style scoped>
     .competencyContainer {
         margin-top: 1em;
+        height: 75%;
     }
     
     .chart {
@@ -42,7 +39,7 @@
     })
     export default class Question extends Vue {
 
-        getBackgroundColor(value): Object {
+        getBackgroundColor(value): ({ borderColor: string, backgroundColor: string }) {
             if (value <= 25) {
                 return {
                     backgroundColor: "rgba(208, 82, 82, 0.5)",
@@ -66,36 +63,30 @@
         }
 
         get competencies() {
-            const data = UserService.userCompetencies().data;
-            const options = UserService.userCompetencies().options;
-
-            const userScores = data.datasets[1].data;
-
-            return userScores.map((x, i) => ({
-                data: {
-                    labels: [data.labels[i]],
-                    datasets: [{
-                        data: [x],
-                        label: "Your Qualification",
-                        borderWidth: 1,
-                        ...this.getBackgroundColor(x)
-                    }]
+            const competencies = UserService.userCompetenciesOverview();
+            competencies.options = {
+                maintainAspectRatio: false,
+                legend: {
+                    display: false
                 },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                min: 0,
-                                max: 100,
-                                maxTicksLimit: 5
-                            }
-                        }]
-                    },
-                    legend: {
-                        display: false
-                    }
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            min: 0,
+                            max: 100,
+                            stacked: true
+                        }
+                    }]
                 }
-            }));
+            };
+            const dataset = competencies.data.datasets[0];
+            dataset.data.forEach(x => {
+                const colourProperties = this.getBackgroundColor(x);
+                dataset.backgroundColor.push(colourProperties.backgroundColor);
+                dataset.borderColor.push(colourProperties.borderColor);
+            });
+
+            return competencies;
         }
     }
 </script>

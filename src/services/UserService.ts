@@ -113,6 +113,26 @@ export default class UserService {
         }
     }
 
+    static userCompetenciesOverview() {
+        const topics = UserRepository.getAllAvailableTopics();
+        const ownScore = topics.map(x => Math.round(Math.random() * 100));
+        const userGoal = topics.map(x => Math.round(Math.random() * 100));
+
+        return {
+            data: {
+                labels: topics,
+                datasets: [{
+                    data: ownScore,
+                    label: "Your Qualification",
+                    borderWidth: 1,
+                    backgroundColor: [],
+                    borderColor: []
+                }]
+            },
+            options: {}
+        }
+    }
+
 
     static getEngagementScores() {
 
