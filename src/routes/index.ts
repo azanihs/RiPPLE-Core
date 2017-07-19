@@ -4,8 +4,8 @@ import Main from "../main";
 
 import ProfileView from "../components/profile/ProfileView.vue";
 import FriendView from "../components/friends/FriendView.vue";
-import QuestionView from "../components/questions/QuestionView.vue";
-import Question from "../components/questions/Question.vue";
+import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
+import QuestionRecommender from "../components/questions/QuestionRecommender.vue";
 import PeerView from "../components/views/PeerView.vue";
 
 Vue.use(VueRouter);
@@ -20,7 +20,7 @@ const routes = [{
 	}, {
 		path: "/view/questions",
 		name: "questions",
-		component: QuestionView
+		component: QuestionBrowser
 	}, {
 		path: "/view/friends",
 		name: "friends",
@@ -32,7 +32,7 @@ const routes = [{
 	}, {
 		path: "/view/question/:id",
 		name: "question",
-		component: Question
+		component: QuestionRecommender
 	}]
 }];
 

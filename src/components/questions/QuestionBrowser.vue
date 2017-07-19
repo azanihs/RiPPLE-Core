@@ -10,8 +10,8 @@
             <md-layout md-flex="33"
                        v-for="question in showQuestions"
                        :key="question.id">
-                <question-card class="questionCard"
-                               :data="question"></question-card>
+                <question-preview class="questionCard"
+                                  :data="question"></question-preview>
             </md-layout>
         </md-layout>
     </md-layout>
@@ -33,7 +33,7 @@
 <script lang="ts">
     import { Vue, Component, Lifecycle } from "av-ts";
     import QuestionSearch from "./QuestionSearch.vue";
-    import QuestionCard from "./QuestionCard.vue";
+    import QuestionPreview from "./QuestionPreview.vue";
 
     import { Question } from "../../interfaces/models";
     import QuestionRepository from "../../repositories/QuestionRepository";
@@ -41,10 +41,10 @@
     @Component({
         components: {
             QuestionSearch,
-            QuestionCard
+            QuestionPreview
         }
     })
-    export default class QuestionView extends Vue {
+    export default class QuestionBrowser extends Vue {
         questions: Question[] = [];
 
         showQuestions: Question[] = [];

@@ -117,6 +117,7 @@
     }
     
     
+    
     /* Remove bottom border added by vue-material */
     
     .md-card .md-card-area:after {
@@ -147,9 +148,8 @@
     import lineClamp from "line-clamp";
 
     @Component()
-    export default class QuestionCard extends Vue {
-        @Prop
-        data: Question;
+    export default class QuestionPreview extends Vue {
+        @Prop data: Question;
 
         getDifficultyText(difficulty: number): string {
             if (difficulty <= 3.3) {
