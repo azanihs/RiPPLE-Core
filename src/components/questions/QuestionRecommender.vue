@@ -4,13 +4,14 @@
             <h2>Question Recommendations</h2>
             <p>Have resources and exercises recommended to you in order to improve your course competencies</p>
         </overview-description>
+        <h3>Current Competency Scores</h3>
         <md-layout md-flex="100"
                    class="competencyContainer">
-            <h3>Current Competency Scores</h3>
             <chart type="bar"
                    :data="competencies.data"
                    :options="competencies.options"></chart>
         </md-layout>
+        <question type="random"></question>
     </md-layout>
 </template>
 
@@ -32,13 +33,15 @@
 <script lang="ts">
     import { Vue, Component, Lifecycle, Prop } from "av-ts";
     import Chart from "../charts/Chart.vue";
+    import Question from "../questions/Question.vue";
     import OverviewDescription from "../profile/OverviewDescription.vue";
     import UserService from "../../services/UserService";
 
     @Component({
         components: {
             "chart": Chart,
-            "overview-description": OverviewDescription
+            "overview-description": OverviewDescription,
+            "question": Question
         }
     })
     export default class QuestionRecommender extends Vue {

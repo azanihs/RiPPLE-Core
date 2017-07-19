@@ -7,7 +7,13 @@ export interface Question {
 
     topics: string[],
     images?: string[],
-    content: string
+    content: string,
+
+    solution: number,
+    possibleAnswers: {
+        id: number,
+        content: string
+    }[],
 }
 
 export interface Peer {
