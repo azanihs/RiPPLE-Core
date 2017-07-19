@@ -46,11 +46,32 @@
                 </md-card-actions>
             </md-card>
         </md-layout>
+    
+        <md-layout>
+            <h3>Question Responses</h3>
+            <ul class="questionResponse">
+                <li v-for="(response, index) in question.possibleAnswers"
+                    :key="response.id">
+                    <md-checkbox v-if="Array.isArray(question.solution)"
+                                 :name="index"
+                                 :id="response.id">{{index}}</md-checkbox>
+                    <md-radio v-else
+                              class="responseOption"
+                              :md-value="index"
+                              v-model="questionResponse"
+                              name="response"
+                              @click.native="clickedResponse"
+                              :id="'' + response.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{response.content}}
+                    </md-radio>
+                </li>
+            </ul>
+        </md-layout>
     </md-layout>
 </template>
 
 <style scoped>
-    h2 {
+    h2,
+    h3 {
         width: 100%;
     }
     
@@ -91,7 +112,27 @@
     .cardAction {
         justify-content: flex-start !important;
     }
+    
+    .questionResponse {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+    }
+    
+    .questionResponse li {
+        list-style: none;
+        cursor: pointer;
+    }
+    
+    .responseOption {
+        width: 100%;
+        cursor: pointer;
+        padding: 2em;
+        background-color: #fefefe;
+        border: 1px solid #ddd;
+    }
 </style>
+
 
 <script lang="ts">
     import { Vue, Component, Prop, p } from "av-ts";
@@ -110,6 +151,7 @@
         }) as string;
 
         userQualityRating: string = null;
+        questionResponse: number = -1;
 
         changeQualityRating(newRating: string) {
             this.userQualityRating = newRating;
@@ -119,35 +161,14 @@
             return QuestionService.getQuestion(this.type);
         }
 
-        getStarIcons(value: number): string[] {
-            let stars = [];
-            let numberStars;
-
-            if (value % 2 == 0) {
-                numberStars = value / 2;
-                stars = new Array(numberStars).fill("star");
-                stars = stars.concat(
-                    new Array(5 - numberStars).fill("star_border")
-                );
-            } else {
-                numberStars = (value - 1) / 2;
-                stars = new Array(numberStars).fill("star");
-                stars.push("star_half");
-                stars = stars.concat(
-                    new Array(4 - numberStars).fill("star_border")
-                );
-            }
-
-            return stars;
-        }
-
-        getDifficultyText(difficulty: number): string {
-            if (difficulty <= 3.3) {
-                return "Easy";
-            } else if (difficulty > 3.3 && difficulty <= 6.6) {
-                return "Medium";
-            } else {
-                return "Hard";
+        clickedResponse(e: MouseEvent) {
+            const target = e.target as HTMLElement;
+            if (target.tagName != "LABEL" && target.tagName != "INPUT") {
+                const input = target.querySelector("input");
+                const event = new MouseEvent("click", {
+                    bubbles: true
+                });
+                input.dispatchEvent(event);
             }
         }
     }
