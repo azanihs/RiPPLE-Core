@@ -1,6 +1,11 @@
 export interface Question {
     id: number,
-    responseCount: number,
+    responses: {
+        author: Peer,
+        upVotes: number,
+        solution: number,
+        content: string
+    }[],
 
     difficulty: number,
     quality: number,
@@ -14,6 +19,7 @@ export interface Question {
         id: number,
         content: string
     }[],
+    explanation: string
 }
 
 export interface Peer {

@@ -24,7 +24,7 @@
         "phantomjs-shim": "^0.1.0",
         "vue": "^2.1.0",
         "vue-bulma-chartjs": "^1.0.4",
-        "vue-material": "^0.7.1",
+        "vue-material": "^0.7.4",
         "vue-router": "^2.5.3"
     },
     "devDependencies": {

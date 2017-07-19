@@ -1,4 +1,5 @@
 import { Question } from "../interfaces/models";
+import PeerRepository from "./PeerRepository";
 import f from "faker";
 
 export default class QuestionRepository {
@@ -18,8 +19,12 @@ export default class QuestionRepository {
 
             const question: Question = {
                 id: i,
-                responseCount: f.random.number({ min: 0, max: 1000 }),
-
+                responses: new Array(Math.floor(Math.random() * 500)).fill(0).map(x => ({
+                    author: PeerRepository.getMany(1)[0],
+                    upVotes: Math.floor(Math.random() * 100),
+                    solution: Math.floor(Math.random() * 4),
+                    content: new Array(10).fill(0).map(x => f.hacker.phrase()).join(" ")
+                })),
                 difficulty: f.random.number({ min: 0, max: 10 }),
                 quality: f.random.number({ min: 0, max: 10 }),
 
@@ -31,7 +36,8 @@ export default class QuestionRepository {
                     id: i,
                     content: new Array(2).fill(0).map(x => f.hacker.phrase()).join(" ")
                 })),
-                solution: Math.floor(Math.random() * 4)
+                solution: Math.floor(Math.random() * 4),
+                explanation: new Array(10).fill(0).map(x => f.hacker.phrase()).join(" ")
             };
             return question;
         });
