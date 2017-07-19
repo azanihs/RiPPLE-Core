@@ -1,6 +1,6 @@
 <template>
     <md-layout md-gutter>
-        <md-card class="card">
+        <md-card>
             <md-card-header>
                 <md-avatar>
                     <img :src="comment.author.image"
@@ -11,7 +11,7 @@
                 <div class="md-subhead">{{String.fromCharCode('A'.charCodeAt(0) + comment.solution)}}</div>
     
                 <div class="cardActions">
-                    <md-button>
+                    <md-button class="upvote">
                         <span>{{comment.upVotes}}</span>
                         <md-icon>thumb_up</md-icon>
                     </md-button>
@@ -26,8 +26,6 @@
 </template>
 
 <style scoped>
-    .card {}
-    
     .cardActions {
         position: absolute;
         top: 16px;

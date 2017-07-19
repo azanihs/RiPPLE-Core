@@ -83,8 +83,8 @@
     }
     
     .commentCard {
-        width: 20%;
-        flex-shrink: 0;
+        flex-basis: 25%;
+        margin-bottom: 16px;
     }
 </style>
 <style>
