@@ -9,7 +9,8 @@
         <md-layout class="questionInfo"
                    md-flex="25"
                    md-column>
-            <md-card class="card">
+            <md-card class="card"
+                     :style="{left: this.userIsFinishedWithQuestion ? '0px' : '1000px'}">
                 <md-card-header class="cardHeader">
                     <md-card-header-text>
                         <div class="md-title">Question Difficulty</div>
@@ -26,7 +27,8 @@
                             :defaultIndex="question.difficulty"></rating>
                 </md-card-actions>
             </md-card>
-            <md-card class="card">
+            <md-card class="card"
+                     :style="{left: this.userIsFinishedWithQuestion ? '0px' : '1000px'}">
                 <md-card-header class="cardHeader">
                     <md-card-header-text>
                         <div class="md-title">Question Quality</div>
@@ -42,7 +44,8 @@
                 </md-card-actions>
             </md-card>
         </md-layout>
-        <question-response :question="question"></question-response>
+        <question-response :question="question"
+                           @userAnswer="updateUserAnswer"></question-response>
     </md-layout>
 </template>
 
@@ -75,6 +78,12 @@
     
     .questionInfo {
         align-items: stretch;
+    }
+    
+    .card {
+        position: relative;
+        left: 0px;
+        transition: left 500ms ease;
     }
     
     .card:not(:first-of-type) {
@@ -118,11 +127,17 @@
             default: "random"
         }) as string;
 
+
         question = QuestionService.getQuestion(this.type);
         userQualityRating: string = null;
+        userIsFinishedWithQuestion: boolean = false;
 
         changeQualityRating(newRating: string) {
             this.userQualityRating = newRating;
+        }
+
+        updateUserAnswer(n: boolean) {
+            this.userIsFinishedWithQuestion = n;
         }
 
     }

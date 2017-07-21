@@ -3,25 +3,10 @@
              class="md-transparent responseSection">
         <md-tab md-label="Respond To Question">
             <h3>Question Responses: </h3>
-            <md-card v-if="userHasAnsweredQuestion"
-                     class="md-primary questionExplanation">
-                <md-card-header>
-                    <div class="md-title">Title goes here</div>
-                    <div class="md-subhead">Subtitle here</div>
-                </md-card-header>
-    
-                <md-card-content>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio itaque ea, nostrum odio. Dolores, sed accusantium quasi non, voluptas eius illo quas, saepe voluptate pariatur in deleniti minus sint. Excepturi.
-                </md-card-content>
-                <md-card-actions class="cardAction"
-                                 v-if="!userHasCorrectAnswer">
-                    <md-button @click="resetAnswer">Try Again</md-button>
-                    <md-button @click="hasGivenUp = true">Show Answer</md-button>
-                </md-card-actions>
-            </md-card>
             <ul class="questionResponse">
                 <li v-for="(answer, index) in question.possibleAnswers"
-                    :key="answer">
+                    :key="answer"
+                    :class="{answered: bluredItems.find(x => x == answer) || userIsFinishedAnswering, incorrect: optionIcon(answer) != 'done', correct: optionIcon(answer) == 'done'}">
                     <div v-if="bluredItems.find(x => x == answer) || userIsFinishedAnswering"
                          class="answerOption">
                         <div class="answerIcon">
@@ -46,10 +31,24 @@
                          :style="answerOptionFill(answer)"></div>
                 </li>
             </ul>
-            <div class="questionReview">
-                <h4>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h4>
-                <p>{{ question.explanation }}</p>
-            </div>
+            <md-card v-if="userHasAnsweredQuestion"
+                     class="md-primary questionExplanation">
+                <md-card-header>
+                    <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
+                </md-card-header>
+    
+                <md-card-content>
+                    <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
+                    <p v-else>
+                        How about a slice of quiche?
+                    </p>
+                </md-card-content>
+                <md-card-actions class="cardAction"
+                                 v-if="!userHasCorrectAnswer">
+                    <md-button @click="resetAnswer">Try Again</md-button>
+                    <md-button @click="userGiveUp">Show Answer</md-button>
+                </md-card-actions>
+            </md-card>
         </md-tab>
         <md-tab md-label="Discussion">
             <h3>Question Discussion</h3>
@@ -74,6 +73,7 @@
     
     .md-card.md-primary {
         background-color: #256 !important;
+        margin-top: 2em;
     }
     
     .questionResponse {
@@ -86,6 +86,7 @@
         list-style: none;
         cursor: pointer;
         position: relative;
+        transition: background-color 500ms ease;
     }
     
     .answerOption {
@@ -94,7 +95,6 @@
         padding: 2em;
         display: flex;
         align-items: center;
-        background-color: #fefefe;
         border: 1px solid #ddd;
     }
     
@@ -130,6 +130,14 @@
     
     .answerIcon {
         margin-right: 4px;
+    }
+    
+    .answered.incorrect {
+        background-color: rgba(255, 0, 0, 0.2);
+    }
+    
+    .answered.correct {
+        background-color: rgba(34, 85, 102, 0.2);
     }
 </style>
 <style>
@@ -167,6 +175,12 @@
         set questionResponse(newValue) {
             this.bluredItems.push(this.question.possibleAnswers[newValue]);
             this.userAnswer = newValue;
+
+            this.$emit("userAnswer", this.userIsFinishedAnswering);
+        }
+        userGiveUp() {
+            this.hasGivenUp = true;
+            this.$emit("userAnswer", this.userIsFinishedAnswering);
         }
 
         get questionResponse() {
@@ -221,5 +235,7 @@
                 input.dispatchEvent(event);
             }
         }
+
+
     }
 </script>
