@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "./routes";
 import VueMaterial from "vue-material";
 import "vue-material/dist/vue-material.css";
+import "vue2-animate/dist/vue2-animate.min.css";
 
 // Global scoped addons
 Vue.use(VueMaterial);
