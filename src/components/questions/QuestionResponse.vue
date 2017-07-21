@@ -19,9 +19,6 @@
                     </md-radio>
                 </li>
             </ul>
-        </md-tab>
-        <md-tab md-label="Review Response">
-            <h3>Question Review</h3>
             <div class="questionReview">
                 <h4>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h4>
                 <p>{{ question.explanation }}</p>
@@ -29,13 +26,14 @@
             <div>
                 Breakdown/Pie chart Answer distribution
             </div>
+        </md-tab>
+        <md-tab md-label="Discussion">
+            <h3>Question Discussion</h3>
             <div class="questionComments">
-                <md-layout md-gutter="16">
-                    <comment v-for="response in question.responses.slice(0, 10)"
-                             class="commentCard"
-                             :key="response"
-                             :comment="response"></comment>
-                </md-layout>
+                <comment v-for="response in question.responses.slice(0, 10)"
+                         class="commentCard"
+                         :key="response"
+                         :comment="response"></comment>
             </div>
         </md-tab>
     </md-tabs>
@@ -78,12 +76,11 @@
     }
     
     .questionComments {
-        display: flex;
-        flex-flow: row wrap;
+        width: 100%;
     }
     
     .commentCard {
-        flex-basis: 25%;
+        width: 100%;
         margin-bottom: 16px;
     }
 </style>

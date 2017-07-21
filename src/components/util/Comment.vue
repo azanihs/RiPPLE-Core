@@ -1,37 +1,46 @@
 <template>
-    <md-layout md-gutter>
-        <md-card>
-            <md-card-header>
-                <md-avatar>
-                    <img :src="comment.author.image"
-                         :alt="comment.author.name">
-                </md-avatar>
+    <md-card>
+        <md-card-header>
+            <md-avatar>
+                <img :src="comment.author.image"
+                     :alt="comment.author.name">
+            </md-avatar>
+            <div class="md-title">{{comment.author.name}}</div>
+            <div class="cardActions">
+                <md-button class="upvote">
+                    <span>{{comment.upVotes}}</span>
+                    <md-icon>thumb_up</md-icon>
+                </md-button>
+            </div>
+        </md-card-header>
     
-                <div class="md-title">{{comment.author.name}}</div>
-                <div class="md-subhead">{{String.fromCharCode('A'.charCodeAt(0) + comment.solution)}}</div>
-    
-                <div class="cardActions">
-                    <md-button class="upvote">
-                        <span>{{comment.upVotes}}</span>
-                        <md-icon>thumb_up</md-icon>
-                    </md-button>
-                </div>
-            </md-card-header>
-    
-            <md-card-content>
-                {{comment.content}}
-            </md-card-content>
-        </md-card>
-    </md-layout>
+        <md-card-content>
+            {{comment.content}}
+        </md-card-content>
+    </md-card>
 </template>
 
 <style scoped>
+    .upvote span,
+    .upvote i {
+        display: inline-block;
+        vertical-align: middle;
+        width: auto;
+        height: auto;
+        min-width: auto;
+        min-height: auto;
+        font-size: 16px;
+    }
+    
+    .upvote span {
+        font-size: 14px;
+    }
+    
     .cardActions {
         position: absolute;
         top: 16px;
         right: 16px;
-        display: flex;
-        align-items: center;
+        color: #256;
     }
 </style>
 

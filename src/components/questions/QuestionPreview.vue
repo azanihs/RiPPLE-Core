@@ -22,7 +22,7 @@
                 <md-card-content>
                     <div class="placeAround">
                         <span>
-                            <span>{{ data.responseCount }}
+                            <span>{{ data.responses.length }}
                                 <md-icon>reply</md-icon>
                             </span>
                             <md-tooltip md-direction="top">Question Responses</md-tooltip>
@@ -115,6 +115,7 @@
     .topicChip:hover {
         background-color: #333;
     }
+    
     
     
     

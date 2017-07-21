@@ -1,14 +1,11 @@
 <template>
-    <md-layout>
-        <h3>Recommended Question for topic
-            <md-chip v-for="topic in question.topics"
-                     :key="topic"
-                     class="topicChip">{{topic}}</md-chip>
-        </h3>
+    <md-layout class="container">
         <md-layout md-flex="65">
+            <h3>Recommended Question</h3>
             <p>{{question.content}}</p>
         </md-layout>
         <md-layout md-flex="10"></md-layout>
+    
         <md-layout class="questionInfo"
                    md-flex="25"
                    md-column>
@@ -45,7 +42,6 @@
                 </md-card-actions>
             </md-card>
         </md-layout>
-    
         <question-response :question="question"></question-response>
     </md-layout>
 </template>
@@ -54,6 +50,14 @@
     h2,
     h3 {
         width: 100%;
+    }
+    
+    h3 {
+        margin-top: 0px;
+    }
+    
+    .container {
+        margin-top: 2em;
     }
     
     .md-chip.topicChip {
