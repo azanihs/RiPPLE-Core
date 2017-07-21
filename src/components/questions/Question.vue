@@ -9,8 +9,7 @@
         <md-layout class="questionInfo"
                    md-flex="25"
                    md-column>
-            <md-card class="card"
-                     :style="{left: this.userIsFinishedWithQuestion ? '0px' : '1000px'}">
+            <md-card class="card">
                 <md-card-header class="cardHeader">
                     <md-card-header-text>
                         <div class="md-title">Question Difficulty</div>
@@ -23,12 +22,12 @@
     
                 <md-card-actions class="cardAction">
                     <rating :max="10"
+                            :disabled="!userIsFinishedWithQuestion"
                             icon="school"
                             :defaultIndex="question.difficulty"></rating>
                 </md-card-actions>
             </md-card>
-            <md-card class="card"
-                     :style="{left: this.userIsFinishedWithQuestion ? '0px' : '1000px'}">
+            <md-card class="card">
                 <md-card-header class="cardHeader">
                     <md-card-header-text>
                         <div class="md-title">Question Quality</div>
@@ -40,6 +39,7 @@
                 </md-card-header>
                 <md-card-actions class="cardAction">
                     <rating :max="10"
+                            :disabled="!userIsFinishedWithQuestion"
                             :defaultIndex="question.quality"></rating>
                 </md-card-actions>
             </md-card>

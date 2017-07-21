@@ -1,6 +1,11 @@
 <template>
-    <div class="iconContainer">
+    <div class="iconContainer"
+         :class="{disabled: disabled}">
+        <md-tooltip v-if="disabled">
+            You must attempt the question before you can rate it
+        </md-tooltip>
         <md-button v-for="i in +max"
+                   :disabled="disabled"
                    :key="i"
                    class="md-icon-button"
                    @click.native="changeRating"
@@ -29,6 +34,10 @@
     
     .md-primary {
         color: #256 !important;
+    }
+    
+    .iconContainer.disabled {
+        cursor: not-allowed
     }
     
     .md-button.md-icon-button {
@@ -60,6 +69,11 @@
     export default class Rating extends Vue {
         // Max number of starts
         @Prop max;
+        @Prop disabled = p({
+            type: Boolean,
+            default: false
+        });
+
         @Prop icon = p({
             type: String,
             default: "star"
@@ -82,6 +96,8 @@
 
 
         changeRating(e: MouseEvent) {
+            if (this.disabled) return;
+
             // Check if the user clicked on child. If so, select the parent button
             let target = e.target as HTMLElement;
             if (target.tagName == "I") {
@@ -93,6 +109,8 @@
         }
 
         previewRating(e: MouseEvent) {
+            if (this.disabled) return;
+
             // Check if the user clicked on child. If so, select the parent button
             let target = e.target as HTMLElement;
             if (target.tagName == "I") {
@@ -103,6 +121,8 @@
         }
 
         mouseOut(e: MouseEvent) {
+            if (this.disabled) return;
+
             this.previewIndex = this.selectedIndex;
         }
     }

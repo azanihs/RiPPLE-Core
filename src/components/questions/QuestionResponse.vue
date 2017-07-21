@@ -2,7 +2,6 @@
     <md-tabs md-fixed
              class="md-transparent responseSection">
         <md-tab md-label="Respond To Question">
-            <h3>Question Responses: </h3>
             <ul class="questionResponse">
                 <li v-for="(answer, index) in question.possibleAnswers"
                     :key="answer"
