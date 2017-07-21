@@ -97,13 +97,20 @@
         border: 1px solid #ddd;
     }
     
+    .incorrect .distributionOverlay {
+        background-color: rgba(255, 0, 0, 0.2);
+    }
+    
+    .correct .distributionOverlay {
+        background-color: rgba(34, 85, 102, 0.4);
+    }
+    
     .distributionOverlay {
         height: 100%;
         width: 0px;
         position: absolute;
         top: 0px;
         left: 0px;
-        background-color: rgba(34, 85, 102, 0.4);
         transition: width 750ms ease;
         pointer-events: none;
     }
@@ -129,14 +136,6 @@
     
     .answerIcon {
         margin-right: 4px;
-    }
-    
-    .answered.incorrect {
-        background-color: rgba(255, 0, 0, 0.2);
-    }
-    
-    .answered.correct {
-        background-color: rgba(34, 85, 102, 0.2);
     }
 </style>
 <style>
