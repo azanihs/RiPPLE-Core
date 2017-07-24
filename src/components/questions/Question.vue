@@ -1,13 +1,9 @@
 <template>
     <md-layout class="container">
         <md-layout md-flex="65">
-            <h3>Recommended Question</h3>
-            <p>{{question.content}}</p>
+            <p class="questionContent">{{question.content}}</p>
         </md-layout>
-        <md-layout md-flex="10"></md-layout>
-    
         <md-layout class="questionInfo"
-                   md-flex="25"
                    md-column>
             <md-card class="card">
                 <md-card-header class="cardHeader">
@@ -59,8 +55,10 @@
         margin-top: 0px;
     }
     
-    .container {
-        margin-top: 2em;
+    .container {}
+    
+    .questionContent {
+        margin-top: 0px;
     }
     
     .md-chip.topicChip {
@@ -78,6 +76,9 @@
     
     .questionInfo {
         align-items: stretch;
+        margin-left: 2.5%;
+        min-width: 32.5%;
+        flex: 0 1 32.5%;
     }
     
     .card {
@@ -110,6 +111,8 @@
 
 <script lang="ts">
     import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+    import { Question as QuestionModel } from "../../interfaces/models";
+
     import Rating from "./Rating.vue";
     import QuestionResponse from "./QuestionResponse.vue";
 
@@ -122,13 +125,11 @@
         }
     })
     export default class Question extends Vue {
-        @Prop type = p({
-            type: String,
-            default: "random"
-        }) as string;
+        @Prop question = p({
+            required: true
+        }) as QuestionModel;
 
-
-        question = QuestionService.getQuestion(this.type);
+        // question = QuestionService.getQuestion(this.type);
         userQualityRating: string = null;
         userIsFinishedWithQuestion: boolean = false;
 

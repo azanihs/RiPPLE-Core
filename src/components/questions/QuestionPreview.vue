@@ -53,6 +53,7 @@
                 </md-card-content>
             </md-card-area>
         </div>
+        <md-ink-ripple></md-ink-ripple>
     </md-card>
 </template>
 
@@ -115,6 +116,11 @@
     .topicChip:hover {
         background-color: #333;
     }
+    
+    
+    
+    
+    
     
     
     

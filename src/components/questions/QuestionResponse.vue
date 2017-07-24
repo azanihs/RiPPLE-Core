@@ -2,6 +2,29 @@
     <md-tabs md-fixed
              class="md-transparent responseSection">
         <md-tab md-label="Respond To Question">
+            <transition name="feedbackGroup"
+                        @enter="feedbackEnter"
+                        @leave="feedbackLeave"
+                        :css="false">
+                <md-card v-if="userHasAnsweredQuestion"
+                         class="md-primary questionExplanation">
+                    <md-card-header>
+                        <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
+                    </md-card-header>
+    
+                    <md-card-content>
+                        <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
+                        <p v-else>
+                            How about a slice of quiche?
+                        </p>
+                    </md-card-content>
+                    <md-card-actions class="cardAction"
+                                     v-if="!userHasCorrectAnswer">
+                        <md-button @click="resetAnswer">Try Again</md-button>
+                        <md-button @click="userGiveUp">Show Answer</md-button>
+                    </md-card-actions>
+                </md-card>
+            </transition>
             <ul class="questionResponse">
                 <li v-for="(answer, index) in question.possibleAnswers"
                     :key="answer"
@@ -30,24 +53,6 @@
                          :style="answerOptionFill(answer)"></div>
                 </li>
             </ul>
-            <md-card v-if="userHasAnsweredQuestion"
-                     class="md-primary questionExplanation">
-                <md-card-header>
-                    <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
-                </md-card-header>
-    
-                <md-card-content>
-                    <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
-                    <p v-else>
-                        How about a slice of quiche?
-                    </p>
-                </md-card-content>
-                <md-card-actions class="cardAction"
-                                 v-if="!userHasCorrectAnswer">
-                    <md-button @click="resetAnswer">Try Again</md-button>
-                    <md-button @click="userGiveUp">Show Answer</md-button>
-                </md-card-actions>
-            </md-card>
         </md-tab>
         <md-tab md-label="Discussion">
             <h3>Question Discussion</h3>
@@ -62,6 +67,12 @@
 </template>
 
 <style scoped>
+    .questionExplanation {
+        height: 0px;
+        opacity: 0;
+        overflow: hidden;
+    }
+    
     .md-tabs {
         border-top: 1px solid rgba(0, 0, 0, .12);
     }
@@ -72,7 +83,7 @@
     
     .md-card.md-primary {
         background-color: #256 !important;
-        margin-top: 2em;
+        margin-bottom: 1em;
     }
     
     .questionResponse {
@@ -156,6 +167,7 @@
     import { Question } from "../../interfaces/models";
     import Comment from "../util/Comment.vue";
     import QuestionService from "../../services/QuestionService";
+    import * as d3 from "d3";
 
     @Component({
         components: {
@@ -168,6 +180,28 @@
         userAnswer: number = -1;
         hasGivenUp = false;
         bluredItems = [];
+
+
+        feedbackEnter(el: HTMLElement, done) {
+            el.style.height = "auto";
+            const actualHeight = el.clientHeight;
+            el.style.height = "0px";
+            d3.select(el)
+                .transition()
+                .style("height", actualHeight + "px")
+                .style("opacity", 1)
+                .duration(500);
+            setTimeout(() => done(), 500);
+        }
+
+        feedbackLeave(el: HTMLElement, done) {
+            d3.select(el)
+                .transition()
+                .style("height", "0px")
+                .style("opacity", 0)
+                .duration(500);
+            setTimeout(() => done(), 500);
+        }
 
 
         set questionResponse(newValue) {
