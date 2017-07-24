@@ -7,6 +7,7 @@
                         @leave="feedbackLeave"
                         :css="false">
                 <md-card v-if="userHasAnsweredQuestion"
+                         :key="userIsFinishedAnswering"
                          class="md-primary questionExplanation">
                     <md-card-header>
                         <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
@@ -150,13 +151,13 @@
     }
 </style>
 <style>
-    .responseOption .md-radio-label {
+    .answerOption .md-radio-label {
         height: auto !important;
         padding-left: 0px;
         margin-left: 0.5em;
     }
     
-    .responseOption .md-radio-container {
+    .answerOption .md-radio-container {
         min-width: 20px;
         min-height: 20px;
     }
@@ -203,6 +204,10 @@
             setTimeout(() => done(), 500);
         }
 
+        @Watch("userAnswer")
+        handleResponseChange() {
+
+        }
 
         set questionResponse(newValue) {
             this.bluredItems.push(this.question.possibleAnswers[newValue]);
