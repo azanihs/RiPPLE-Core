@@ -28,7 +28,7 @@
             </transition>
             <ul class="questionResponse">
                 <li v-for="(answer, index) in question.possibleAnswers"
-                    :key="answer"
+                    :key="index"
                     :class="{answered: bluredItems.find(x => x == answer) || userIsFinishedAnswering, incorrect: optionIcon(answer) != 'done', correct: optionIcon(answer) == 'done'}">
                     <div v-if="bluredItems.find(x => x == answer) || userIsFinishedAnswering"
                          class="answerOption">
@@ -60,7 +60,7 @@
             <div class="questionComments">
                 <comment v-for="response in question.responses.slice(0, 10)"
                          class="commentCard"
-                         :key="response"
+                         :key="response.id"
                          :comment="response"></comment>
             </div>
         </md-tab>
