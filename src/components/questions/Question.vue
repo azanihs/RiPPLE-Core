@@ -116,7 +116,7 @@
     .md-chip.topicChip {
         margin-left: 10px;
         cursor: pointer;
-        background-color: #fefefe;
+        background-color: #ffffff;
         border: 1px solid #ccc;
         transition: 500ms ease background-color;
     }
@@ -138,7 +138,7 @@
         left: 0px;
         transition: left 500ms ease;
         width: 100%;
-        background-color: transparent !important;;
+        background-color:  rgba(50, 85, 102, 0.2) !important;;
     }
     
     .card:not(:first-of-type) {
