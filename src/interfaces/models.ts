@@ -8,6 +8,7 @@ export interface Question {
     }[],
 
     difficulty: number,
+    difficultyRepresentation: string,
     quality: number,
 
     topics: string[],

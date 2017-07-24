@@ -29,7 +29,7 @@
     }
     
     .md-icon:not(.md-primary) {
-        color: #ccc !important;
+        color: #fefefe !important;
     }
     
     .md-primary {

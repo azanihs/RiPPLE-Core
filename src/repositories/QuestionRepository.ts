@@ -16,7 +16,8 @@ export default class QuestionRepository {
 
             const topicCount = f.random.number({ min: 2, max: 4 });
             const topics = new Array(topicCount).fill(0).map(x => f.hacker.abbreviation()) as string[];
-
+			const difficulty = f.random.number({ min: 0, max: 10 });
+			
             const question: Question = {
                 id: i,
                 responses: new Array(Math.floor(Math.random() * 500)).fill(0).map(x => ({
@@ -25,7 +26,8 @@ export default class QuestionRepository {
                     solution: Math.floor(Math.random() * 4),
                     content: new Array(10).fill(0).map(x => f.hacker.phrase()).join(" ")
                 })),
-                difficulty: f.random.number({ min: 0, max: 10 }),
+                difficulty: difficulty,
+				difficultyRepresentation: this.getDifficultyText(difficulty),
                 quality: f.random.number({ min: 0, max: 10 }),
 
                 topics: topics,
@@ -42,4 +44,14 @@ export default class QuestionRepository {
             return question;
         });
     }
+    
+    static getDifficultyText(difficulty: number): string {
+            if (difficulty <= 3.3) {
+                return "Easy";
+            } else if (difficulty > 3.3 && difficulty <= 6.6) {
+                return "Medium";
+            } else {
+                return "Hard";
+            }
+        }
 }

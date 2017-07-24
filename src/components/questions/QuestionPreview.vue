@@ -29,7 +29,7 @@
                         </span>
                         <span class="difficulty">
                             <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
-                            <span>{{ getDifficultyText(data.difficulty) }}
+                            <span>{{ data.difficultyRepresentation }}
                                 <md-icon>school</md-icon>
                             </span>
                         </span>
@@ -157,16 +157,6 @@
     @Component()
     export default class QuestionPreview extends Vue {
         @Prop data: Question;
-
-        getDifficultyText(difficulty: number): string {
-            if (difficulty <= 3.3) {
-                return "Easy";
-            } else if (difficulty > 3.3 && difficulty <= 6.6) {
-                return "Medium";
-            } else {
-                return "Hard";
-            }
-        }
 
         getStarIcons(value: number): string[] {
             let stars = [];

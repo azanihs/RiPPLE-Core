@@ -2,30 +2,7 @@
     <md-tabs md-fixed
              class="md-transparent responseSection">
         <md-tab md-label="Respond To Question">
-            <transition name="feedbackGroup"
-                        @enter="feedbackEnter"
-                        @leave="feedbackLeave"
-                        :css="false">
-                <md-card v-if="userHasAnsweredQuestion"
-                         :key="userIsFinishedAnswering"
-                         class="md-primary questionExplanation">
-                    <md-card-header>
-                        <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
-                    </md-card-header>
-    
-                    <md-card-content>
-                        <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
-                        <p v-else>
-                            How about a slice of quiche?
-                        </p>
-                    </md-card-content>
-                    <md-card-actions class="cardAction"
-                                     v-if="!userHasCorrectAnswer">
-                        <md-button @click="resetAnswer">Try Again</md-button>
-                        <md-button @click="userGiveUp">Show Answer</md-button>
-                    </md-card-actions>
-                </md-card>
-            </transition>
+            
             <ul class="questionResponse">
                 <li v-for="(answer, index) in question.possibleAnswers"
                     :key="index"
@@ -54,6 +31,32 @@
                          :style="answerOptionFill(answer)"></div>
                 </li>
             </ul>
+            
+            <transition name="feedbackGroup"
+                        @enter="feedbackEnter"
+                        @leave="feedbackLeave"
+                        :css="false">
+                <md-card v-if="userHasAnsweredQuestion"
+                         :key="userIsFinishedAnswering"
+                         class="questionExplanation">
+                    
+                    <div class="placeBetween">
+                	<md-layout md-flex="65">
+                    <md-card-header>
+                        <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
+                    </md-card-header>
+                    <md-card-content>
+                    <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
+                    </md-card-content>
+                    </md-layout>
+                    <md-layout md-flex-offset="10" md-flex="25">
+                    	<md-card-content>
+                        	<slot></slot>
+                        </md-card-content>
+                    </md-layout>
+                    </div>
+                </md-card>
+            </transition>
         </md-tab>
         <md-tab md-label="Discussion">
             <h3>Question Discussion</h3>
@@ -68,10 +71,19 @@
 </template>
 
 <style scoped>
+
+.placeBetween {
+       justify-content: space-between;
+        display: flex;
+        padding-bottom: 0px;
+        align-items: flex-start;
+        width: 100%;
+}
     .questionExplanation {
         height: 0px;
         opacity: 0;
-        overflow: hidden;
+        margin-top: 2em;
+        background-color: rgba(34, 85, 102, 0.2) !important;
     }
     
     .md-tabs {
@@ -83,8 +95,7 @@
     }
     
     .md-card.md-primary {
-        background-color: #256 !important;
-        margin-bottom: 1em;
+        margin-top: 1em;
     }
     
     .questionResponse {
@@ -242,11 +253,11 @@
         }
 
         get userHasAnsweredQuestion() {
-            return this.hasGivenUp || this.questionResponse != -1;
+            return this.userHasCorrectAnswer;
         }
 
         get userIsFinishedAnswering() {
-            return this.hasGivenUp || this.userHasCorrectAnswer;
+            return this.userHasCorrectAnswer;
         }
 
         get userHasCorrectAnswer() {

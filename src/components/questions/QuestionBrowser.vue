@@ -1,13 +1,45 @@
 <template>
     <md-layout class="viewContainer">
-        <md-layout class="headingContainer"
+        <md-layout v-if="selectedQuestion" md-flex="100" class="buttonContainer">
+            <md-button @click="() => selectedQuestion = null">
+            	Return to Questions
+            </md-button>
+            <md-button>
+            	Go To Random Question
+            </md-button>
+            <md-button>
+            	Go to Recommendations
+            </md-button>
+        </md-layout>
+        <md-layout v-else class="headingContainer"
                    md-flex="100">
             <h1>Questions</h1>
-            <question-search :availableQuestions="questions"
+            <question-search v-if="!selectedQuestion" :availableQuestions="questions"
                              @searched="changeDisplay"></question-search>
         </md-layout>
-        <md-layout :md-gutter="this.selectedQuestion ? 0 : 16"
-                   :md-flex="this.selectedQuestion ? 25 : 100">
+        
+        <div v-if="selectedQuestion"
+             class="questionContainer">
+            <question @userAnswer="() => userIsFinished = true" 
+            		class="question"
+                      ref="question"
+                      :question="selectedQuestion"></question>
+            <md-layout v-if="userIsFinished" class="buttonContainer">
+            <md-button @click="() => selectedQuestion = null">
+            	Return to Questions
+            </md-button>
+            <md-button>
+            	Go To Random Question
+            </md-button>
+            <md-button>
+            	Go to Recommendations
+            </md-button>
+            </md-layout>
+            
+        </div>
+        <md-layout v-else 
+        			:md-gutter="this.selectedQuestion ? 0 : 16"
+                   :md-flex="this.selectedQuestion ? 100 : 100">
             <md-layout v-for="question in showQuestions"
                        :key="question.id"
                        class="questionPreview"
@@ -17,18 +49,17 @@
                                   :data="question"></question-preview>
             </md-layout>
         </md-layout>
-        <div v-if="selectedQuestion"
-             class="questionContainer">
-            <question class="question"
-                      ref="question"
-                      :question="selectedQuestion"></question>
-        </div>
+
     </md-layout>
 </template>
 
 <style scoped>
     .viewContainer {
         position: relative;
+    }
+    
+    .buttonContainer {
+    	justify-content: space-between;
     }
     
     .questionOverlay {
@@ -84,9 +115,8 @@
     }
     
     .questionContainer {
-        margin-left: 2.5%;
-        min-width: 72.5%;
-        flex: 0 1 72.5%;
+        min-width: 100%;
+        flex: 0 1 100%;
     }
 </style>
 
@@ -112,7 +142,8 @@
         showQuestions: QuestionModel[] = [];
 
         selectedQuestion: QuestionModel = null;
-
+        userIsFinished: boolean = false;
+        
         @Lifecycle
         created() {
             this.questions = QuestionRepository.getMany(25);
