@@ -3,31 +3,31 @@
              class="md-transparent responseSection">
         <md-tab md-label="Respond To Question">
             <ul class="questionResponse">
-                <li v-for="(answer, index) in question.possibleAnswers"
+                <li v-for="(possibleAnswer, index) in question.possibleAnswers"
                     :key="index"
-                    :class="{ answered: bluredItems.find(x => x == answer) || userIsFinishedAnswering, incorrect: optionIcon(answer) != 'done', correct: optionIcon(answer) == 'done'}">
-                    <div v-if="bluredItems.find(x => x == answer) || userIsFinishedAnswering"
+                    :class="getResponseStyles(possibleAnswer)">
+                    <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer"
                          class="answerOption">
                         <div class="answerIcon">
-                            <md-icon>{{ optionIcon(answer) }}</md-icon>
+                            <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
                         </div>
-                        <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{answer.content}}</span>
+                        <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
                     </div>
                     <md-checkbox v-else-if="Array.isArray(question.solution)"
-                                 :disabled="!!bluredItems.find(x => x == answer)"
+                                 :disabled="!!disabledResponses.find(x => x == answer)"
                                  :name="index"
-                                 :id="answer.id">{{index}}</md-checkbox>
+                                 :id="possibleAnswer.id">{{index}}</md-checkbox>
                     <md-radio v-else
                               class="answerOption"
-                              :disabled="!!bluredItems.find(x => x == answer)"
+                              :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
                               :md-value="index"
                               v-model="questionResponse"
                               name="answer"
                               @click.native="clickedResponse"
-                              :id="'' + answer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{answer.content}}
+                              :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
                     </md-radio>
                     <div class="distributionOverlay"
-                         :style="answerOptionFill(answer)"></div>
+                         :style="answerOptionFill(possibleAnswer)"></div>
                 </li>
             </ul>
     
@@ -35,8 +35,8 @@
                         @enter="feedbackEnter"
                         @leave="feedbackLeave"
                         :css="false">
-                <md-card v-if="userHasAnsweredQuestion"
-                         :key="userIsFinishedAnswering"
+                <md-card v-if="userHasCorrectAnswer"
+                         :key="userHasCorrectAnswer"
                          class="questionExplanation">
                     <div class="placeBetween">
                         <md-layout md-flex="65">
@@ -44,7 +44,7 @@
                                 <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
                             </md-card-header>
                             <md-card-content>
-                                <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
+                                <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
                             </md-card-content>
                         </md-layout>
                         <md-layout md-flex-offset="10"
@@ -190,8 +190,7 @@
 
         userAnswer: number = -1;
         hasGivenUp = false;
-        bluredItems = [];
-
+        disabledResponses = [];
 
         feedbackEnter(el: HTMLElement, done) {
             el.style.height = "auto";
@@ -214,33 +213,32 @@
             setTimeout(() => done(), 500);
         }
 
-        @Watch("userAnswer")
-        handleResponseChange() {
-
+        getResponseStyles(answer) {
+            const answerIcon = this.optionIcon(answer);
+            return {
+                answered: this.disabledResponses.find(x => x == answer) || this.userHasCorrectAnswer,
+                correct: answerIcon == "done",
+                incorrect: answerIcon != "done"
+            };
         }
 
-        set questionResponse(newValue) {
-            this.bluredItems.push(this.question.possibleAnswers[newValue]);
-            this.userAnswer = newValue;
-
-            this.$emit("userAnswer", this.userIsFinishedAnswering);
-        }
-        userGiveUp() {
-            this.hasGivenUp = true;
-            this.$emit("userAnswer", this.userIsFinishedAnswering);
-        }
-
+        // Getter/Setter for radio buttons
         get questionResponse() {
             return this.userAnswer;
         }
 
+        set questionResponse(newValue) {
+            this.disabledResponses.push(this.question.possibleAnswers[newValue]);
+            this.userAnswer = newValue;
+            this.$emit("userAnswer", this.userHasCorrectAnswer);
+        }
+
         answerOptionFill(response) {
-            if (this.userIsFinishedAnswering) {
+            if (this.userHasCorrectAnswer) {
                 return {
                     width: (QuestionService.distributionForQuestion(this.question).get(response) * 100) + "%"
                 };
             }
-
             return {};
         }
 
@@ -251,27 +249,16 @@
             return this.question.solution == solution.id ? "done" : "clear";
         }
 
-        get userHasAnsweredQuestion() {
-            return this.userHasCorrectAnswer;
-        }
-
-        get userIsFinishedAnswering() {
-            return this.userHasCorrectAnswer;
-        }
-
         get userHasCorrectAnswer() {
             return this.question.solution == this.questionResponse;
         }
 
-        get userFrustration() {
-            return this.hasGivenUp;
-        }
-
         resetAnswer() {
-            this.bluredItems.push(this.question.possibleAnswers[this.questionResponse]);
+            this.disabledResponses.push(this.question.possibleAnswers[this.questionResponse]);
             this.questionResponse = -1;
         }
 
+        // Bubble event down to radio button
         clickedResponse(e: MouseEvent) {
             const target = e.target as HTMLElement;
             if (target.tagName != "LABEL" && target.tagName != "INPUT") {
