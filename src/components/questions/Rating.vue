@@ -29,7 +29,7 @@
     }
     
     .md-icon:not(.md-primary) {
-        color: #fefefe !important;
+        color: #ccc !important;
     }
     
     .md-primary {
@@ -38,29 +38,6 @@
     
     .iconContainer.disabled {
         cursor: not-allowed
-    }
-    
-    .md-button.md-icon-button {
-        width: 27.5px;
-        min-width: 27.5px;
-        height: 27.5px;
-        min-height: 27.5px;
-    
-        margin: 0 6px;
-        padding: 8px;
-        border-radius: 50%;
-        line-height: 20px;
-    
-        flex: 1;
-        margin-left: 0px !important;
-    }
-    
-    .halfSize {
-        width: 20px;
-        min-width: 20px;
-        font-size: 20px;
-        height: 20px;
-        min-height: 20px;
     }
 </style>
 <script lang="ts">

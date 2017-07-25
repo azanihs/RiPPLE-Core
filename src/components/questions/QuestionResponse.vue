@@ -35,26 +35,22 @@
                         @enter="feedbackEnter"
                         @leave="feedbackLeave"
                         :css="false">
-                <md-card v-if="userHasCorrectAnswer"
-                         :key="userHasCorrectAnswer"
-                         class="questionExplanation">
+                <md-layout v-if="userHasCorrectAnswer"
+                           class="questionExplanation">
                     <div class="placeBetween">
                         <md-layout md-flex="65">
-                            <md-card-header>
-                                <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
-                            </md-card-header>
-                            <md-card-content>
-                                <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
-                            </md-card-content>
+                            <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
+                            <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
                         </md-layout>
                         <md-layout md-flex-offset="10"
                                    md-flex="25">
-                            <md-card-content>
-                                <slot></slot>
-                            </md-card-content>
+                            <question-rater icon="school"
+                                            :defaultValue="question.difficulty">Difficulty</question-rater>
+                            <question-rater class="ratingCard"
+                                            :defaultValue="question.quality">Quality</question-rater>
                         </md-layout>
                     </div>
-                </md-card>
+                </md-layout>
             </transition>
         </md-tab>
         <md-tab md-label="Discussion">
@@ -82,8 +78,14 @@
         height: 0px;
         opacity: 0;
         margin-top: 2em;
-        background-color: rgba(34, 85, 102, 0.2) !important;
+        padding: 1em;
+        background-color: #fff !important;
+        border: 1px solid #ddd;
     }
+    
+    .questionExplanation h3 {}
+    
+    .questionExplanation p {}
     
     .md-tabs {
         border-top: 1px solid rgba(0, 0, 0, .12);
@@ -177,11 +179,13 @@
     import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
     import { Question } from "../../interfaces/models";
     import Comment from "../util/Comment.vue";
+    import QuestionRater from "./QuestionRater.vue";
     import QuestionService from "../../services/QuestionService";
     import * as d3 from "d3";
 
     @Component({
         components: {
+            "question-rater": QuestionRater,
             "comment": Comment
         }
     })
@@ -194,14 +198,17 @@
 
         feedbackEnter(el: HTMLElement, done) {
             el.style.height = "auto";
-            const actualHeight = el.clientHeight;
+            const actualHeight = el.clientHeight + 20;
             el.style.height = "0px";
             d3.select(el)
                 .transition()
                 .style("height", actualHeight + "px")
                 .style("opacity", 1)
-                .duration(500);
-            setTimeout(() => done(), 500);
+                .duration(2000)
+                .on("end", () => {
+                    el.style.height = "auto";
+                    done();
+                });
         }
 
         feedbackLeave(el: HTMLElement, done) {
@@ -209,8 +216,10 @@
                 .transition()
                 .style("height", "0px")
                 .style("opacity", 0)
-                .duration(500);
-            setTimeout(() => done(), 500);
+                .duration(500)
+                .on("end", () => {
+                    done();
+                });
         }
 
         getResponseStyles(answer) {

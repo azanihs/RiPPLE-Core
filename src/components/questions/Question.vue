@@ -35,40 +35,6 @@
         </md-layout>
         <question-response :question="question"
                            @userAnswer="updateUserAnswer">
-            <md-card class="card">
-                <md-card-header class="cardHeader">
-                    <md-card-header-text>
-                        <div class="md-title">Question Difficulty</div>
-                    </md-card-header-text>
-    
-                    <md-card-media class="cardIcon">
-                        <md-icon>school</md-icon>
-                    </md-card-media>
-                </md-card-header>
-    
-                <md-card-actions class="cardAction">
-                    <rating :max="10"
-                            :disabled="!userIsFinishedWithQuestion"
-                            icon="school"
-                            :defaultIndex="question.difficulty"></rating>
-                </md-card-actions>
-            </md-card>
-            <md-card class="card">
-                <md-card-header class="cardHeader">
-                    <md-card-header-text>
-                        <div class="md-title">Question Quality</div>
-                    </md-card-header-text>
-    
-                    <md-card-media class="cardIcon">
-                        <md-icon>star</md-icon>
-                    </md-card-media>
-                </md-card-header>
-                <md-card-actions class="cardAction">
-                    <rating :max="10"
-                            :disabled="!userIsFinishedWithQuestion"
-                            :defaultIndex="question.quality"></rating>
-                </md-card-actions>
-            </md-card>
         </question-response>
     
     </md-layout>
@@ -118,46 +84,11 @@
         transition: 500ms ease background-color;
     }
     
-    .md-primary {
-        background-color: #256;
-        color: #fff;
-    }
-    
     .questionInfo {
         align-items: stretch;
         margin-left: 2.5%;
         min-width: 32.5%;
         flex: 0 1 32.5%;
-    }
-    
-    .card {
-        position: relative;
-        left: 0px;
-        transition: left 500ms ease;
-        width: 100%;
-        background-color: rgba(50, 85, 102, 0.2) !important;
-        ;
-    }
-    
-    .card:not(:first-of-type) {
-        margin-top: 2em;
-    }
-    
-    .cardIcon {
-        text-align: right;
-        height: auto !important;
-    }
-    
-    .cardHeader {
-        align-items: center;
-    }
-    
-    .md-title {
-        margin-top: 0px !important;
-    }
-    
-    .cardAction {
-        justify-content: flex-start !important;
     }
 </style>
 
@@ -165,14 +96,11 @@
     import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
     import { Question as QuestionModel } from "../../interfaces/models";
 
-    import Rating from "./Rating.vue";
     import QuestionResponse from "./QuestionResponse.vue";
-
     import QuestionService from "../../services/QuestionService";
 
     @Component({
         components: {
-            "rating": Rating,
             "question-response": QuestionResponse
         }
     })
