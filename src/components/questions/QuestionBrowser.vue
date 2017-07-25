@@ -1,65 +1,65 @@
 <template>
-    <md-layout class="viewContainer">
-        <md-layout v-if="selectedQuestion" md-flex="100" class="buttonContainer">
-            <md-button @click="() => selectedQuestion = null">
-            	Return to Questions
-            </md-button>
-            <md-button>
-            	Go To Random Question
-            </md-button>
-            <md-button>
-            	Go to Recommendations
-            </md-button>
-        </md-layout>
-        <md-layout v-else class="headingContainer"
-                   md-flex="100">
-            <h1>Questions</h1>
-            <question-search v-if="!selectedQuestion" :availableQuestions="questions"
-                             @searched="changeDisplay"></question-search>
-        </md-layout>
-        
-        <div v-if="selectedQuestion"
-             class="questionContainer">
-            <question @userAnswer="() => userIsFinished = true" 
-            		class="question"
-                      ref="question"
-                      :question="selectedQuestion"></question>
-            <md-layout v-if="userIsFinished" class="buttonContainer">
-            <md-button @click="() => selectedQuestion = null">
-            	Return to Questions
-            </md-button>
-            <md-button>
-            	Go To Random Question
-            </md-button>
-            <md-button>
-            	Go to Recommendations
-            </md-button>
+    <div>
+        <transition name="fade">
+            <md-layout v-if="selectedQuestion"
+                       key="1"
+                       class="viewContainer">
+                <!-- Header -->
+                <action-buttons @back="selectedQuestion = null"></action-buttons>
+    
+                <md-layout class="questionContainer">
+                    <question @userAnswer="() => userIsFinished = true"
+                              class="question"
+                              ref="question"
+                              :question="selectedQuestion"></question>
+                    <action-buttons @back="selectedQuestion = null"></action-buttons>
+                </md-layout>
             </md-layout>
-            
-        </div>
-        <md-layout v-else 
-        			:md-gutter="this.selectedQuestion ? 0 : 16"
-                   :md-flex="this.selectedQuestion ? 100 : 100">
-            <md-layout v-for="question in showQuestions"
-                       :key="question.id"
-                       class="questionPreview"
-                       :class="{selected: question == selectedQuestion,}"
-                       @click.native="openQuestionPreview(question)">
-                <question-preview class="questionCard"
-                                  :data="question"></question-preview>
+        </transition>
+        <md-layout :class="{hidden: selectedQuestion}"
+                   key="2"
+                   class="viewContainer">
+            <!-- Header -->
+            <md-layout class="headingContainer"
+                       md-flex="100">
+                <h1>Questions</h1>
+                <question-search :availableQuestions="questions"
+                                 @searched="changeDisplay"></question-search>
+            </md-layout>
+            <md-layout md-gutter="16">
+                <md-layout v-for="question in showQuestions"
+                           md-gutter
+                           :key="question.id"
+                           class="questionPreview"
+                           :class="{selected: question == selectedQuestion,}"
+                           @click.native="openQuestionPreview(question)">
+                    <question-preview class="questionCard"
+                                      :data="question"></question-preview>
+                </md-layout>
             </md-layout>
         </md-layout>
-
-    </md-layout>
+    </div>
 </template>
 
 <style scoped>
+    .hidden {
+        visibility: hidden;
+        height: 0px;
+        overflow: hidden;
+    }
+    
     .viewContainer {
         position: relative;
     }
     
-    .buttonContainer {
-    	justify-content: space-between;
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity .3s ease;
+    }
+    
+    .fade-enter,
+    .fade-leave-to {
+        opacity: 0;
     }
     
     .questionOverlay {
@@ -104,24 +104,20 @@
         min-width: 33%;
     }
     
-    .questionPreview.selected {
-        min-width: 100%;
-    }
     
     .question {
-        margin-top: 8px;
-        position: relative;
-        top: 0px;
+        width: 100%;
+        flex-basis: 100%;
     }
     
     .questionContainer {
         min-width: 100%;
-        flex: 0 1 100%;
     }
 </style>
 
 <script lang="ts">
     import { Vue, Component, Lifecycle } from "av-ts";
+    import ActionButtons from "../util/ActionButtons.vue";
     import QuestionSearch from "./QuestionSearch.vue";
     import QuestionPreview from "./QuestionPreview.vue";
     import Question from "./Question.vue";
@@ -131,6 +127,7 @@
 
     @Component({
         components: {
+            ActionButtons,
             QuestionSearch,
             QuestionPreview,
             Question
@@ -143,7 +140,7 @@
 
         selectedQuestion: QuestionModel = null;
         userIsFinished: boolean = false;
-        
+
         @Lifecycle
         created() {
             this.questions = QuestionRepository.getMany(25);

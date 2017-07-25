@@ -2,11 +2,10 @@
     <md-tabs md-fixed
              class="md-transparent responseSection">
         <md-tab md-label="Respond To Question">
-            
             <ul class="questionResponse">
                 <li v-for="(answer, index) in question.possibleAnswers"
                     :key="index"
-                    :class="{answered: bluredItems.find(x => x == answer) || userIsFinishedAnswering, incorrect: optionIcon(answer) != 'done', correct: optionIcon(answer) == 'done'}">
+                    :class="{ answered: bluredItems.find(x => x == answer) || userIsFinishedAnswering, incorrect: optionIcon(answer) != 'done', correct: optionIcon(answer) == 'done'}">
                     <div v-if="bluredItems.find(x => x == answer) || userIsFinishedAnswering"
                          class="answerOption">
                         <div class="answerIcon">
@@ -31,7 +30,7 @@
                          :style="answerOptionFill(answer)"></div>
                 </li>
             </ul>
-            
+    
             <transition name="feedbackGroup"
                         @enter="feedbackEnter"
                         @leave="feedbackLeave"
@@ -39,21 +38,21 @@
                 <md-card v-if="userHasAnsweredQuestion"
                          :key="userIsFinishedAnswering"
                          class="questionExplanation">
-                    
                     <div class="placeBetween">
-                	<md-layout md-flex="65">
-                    <md-card-header>
-                        <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
-                    </md-card-header>
-                    <md-card-content>
-                    <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
-                    </md-card-content>
-                    </md-layout>
-                    <md-layout md-flex-offset="10" md-flex="25">
-                    	<md-card-content>
-                        	<slot></slot>
-                        </md-card-content>
-                    </md-layout>
+                        <md-layout md-flex="65">
+                            <md-card-header>
+                                <div class="md-title">{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</div>
+                            </md-card-header>
+                            <md-card-content>
+                                <p v-if="userIsFinishedAnswering">{{ question.explanation }}</p>
+                            </md-card-content>
+                        </md-layout>
+                        <md-layout md-flex-offset="10"
+                                   md-flex="25">
+                            <md-card-content>
+                                <slot></slot>
+                            </md-card-content>
+                        </md-layout>
                     </div>
                 </md-card>
             </transition>
@@ -71,14 +70,14 @@
 </template>
 
 <style scoped>
-
-.placeBetween {
-       justify-content: space-between;
+    .placeBetween {
+        justify-content: space-between;
         display: flex;
         padding-bottom: 0px;
         align-items: flex-start;
         width: 100%;
-}
+    }
+    
     .questionExplanation {
         height: 0px;
         opacity: 0;

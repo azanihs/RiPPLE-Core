@@ -1,41 +1,41 @@
 <template>
-    <md-layout class="container">
-                    <div class="placeBetween">
-                        <span>
-                            <span>{{ question.responses.length }}
-                                <md-icon>reply</md-icon>
-                            </span>
-                            <md-tooltip md-direction="top">Question Responses</md-tooltip>
-                        </span>
-                        <span class="difficulty">
-                            <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
-                            <span>{{ question.difficultyRepresentation }}
-                                <md-icon>school</md-icon>
-                            </span>
-                        </span>
-                    </div>
-                    <hr></hr>
-                    <div class="placeBetween">
-                        <span class="quality">
-                            <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
-                            <md-icon :key="star"
-                                     v-for="star in getStarIcons(question.quality)">{{ star }}</md-icon>
-                        </span>
-                        <span>
-                            <router-link v-for="topic in question.topics"
-                                         :key="topic"
-                                         to="/view/questions"
-                                         class="topicChipLink">
-                                <md-chip class="topicChip">{{ topic }}</md-chip>
-                            </router-link>
-                        </span>
-                    </div>
+    <md-layout>
+        <div class="placeBetween">
+            <span>
+                <span>{{ question.responses.length }}
+                    <md-icon>reply</md-icon>
+                </span>
+                <md-tooltip md-direction="top">Question Responses</md-tooltip>
+            </span>
+            <span class="difficulty">
+                <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
+                <span>{{ question.difficultyRepresentation }}
+                    <md-icon>school</md-icon>
+                </span>
+            </span>
+        </div>
+        <hr></hr>
+        <div class="placeBetween">
+            <span class="quality">
+                <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
+                <md-icon :key="star"
+                         v-for="star in getStarIcons(question.quality)">{{ star }}</md-icon>
+            </span>
+            <span>
+                <router-link v-for="topic in question.topics"
+                             :key="topic"
+                             to="/view/questions"
+                             class="topicChipLink">
+                    <md-chip class="topicChip">{{ topic }}</md-chip>
+                </router-link>
+            </span>
+        </div>
         <md-layout md-flex="100">
             <p class="questionContent">{{question.content}}</p>
         </md-layout>
         <question-response :question="question"
                            @userAnswer="updateUserAnswer">
-			<md-card class="card">
+            <md-card class="card">
                 <md-card-header class="cardHeader">
                     <md-card-header-text>
                         <div class="md-title">Question Difficulty</div>
@@ -70,34 +70,33 @@
                 </md-card-actions>
             </md-card>
         </question-response>
-                           
-
+    
     </md-layout>
 </template>
 
 <style scoped>
-
-.placeBetween {
+    .placeBetween {
         justify-content: space-between !important;
         display: flex;
         padding-bottom: 0px;
         align-items: center;
         width: 100%;
-}
-
-.placeAround {
+    }
+    
+    .placeAround {
         justify-content: space-around !important;
         display: flex;
         padding-bottom: 0px;
         align-items: center;
         width: 100%;
-}
-
+    }
+    
     hr {
         border: none;
         border-bottom: 1px solid #ccc;
         width: 100%;
     }
+    
     h2,
     h3 {
         width: 100%;
@@ -106,8 +105,6 @@
     h3 {
         margin-top: 0px;
     }
-    
-    .container {}
     
     .questionContent {
         margin-top: 2em;
@@ -138,7 +135,8 @@
         left: 0px;
         transition: left 500ms ease;
         width: 100%;
-        background-color:  rgba(50, 85, 102, 0.2) !important;;
+        background-color: rgba(50, 85, 102, 0.2) !important;
+        ;
     }
     
     .card:not(:first-of-type) {
@@ -193,11 +191,11 @@
 
         updateUserAnswer(n: boolean) {
             this.userIsFinishedWithQuestion = n;
-            
+
             this.$emit("userAnswer", n);
         }
-        
-        
+
+
         getStarIcons(value: number): string[] {
             let stars = [];
             let numberStars;
