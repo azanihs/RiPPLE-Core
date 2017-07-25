@@ -1,5 +1,5 @@
 <template>
-    <md-card>
+    <md-card class="commentCard">
         <md-card-header>
             <md-avatar>
                 <img :src="comment.author.image"
@@ -21,6 +21,11 @@
 </template>
 
 <style scoped>
+    .commentCard {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+    
     .upvote span,
     .upvote i {
         display: inline-block;

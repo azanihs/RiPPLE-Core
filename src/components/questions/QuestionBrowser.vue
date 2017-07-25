@@ -5,14 +5,13 @@
                        key="1"
                        class="viewContainer">
                 <!-- Header -->
-                <action-buttons @back="selectedQuestion = null"></action-buttons>
-    
-                <md-layout class="questionContainer">
+                <action-buttons class=""
+                                @back="selectedQuestion = null"></action-buttons>
+                <md-layout md-flex="100"
+                           class="questionContainer">
                     <question @userAnswer="() => userIsFinished = true"
                               class="question"
-                              ref="question"
                               :question="selectedQuestion"></question>
-                    <action-buttons @back="selectedQuestion = null"></action-buttons>
                 </md-layout>
             </md-layout>
         </transition>
@@ -62,29 +61,6 @@
         opacity: 0;
     }
     
-    .questionOverlay {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0px;
-        left: 0px;
-        background-color: rgba(0, 0, 0, 0.2);
-        border: 1px solid #ddd;
-        z-index: 100;
-    }
-    
-    .questionOverlayContainer {
-        background-color: #fff;
-        width: 90%;
-        overflow: scroll;
-        margin: auto;
-    
-        padding: 1em;
-        position: relative;
-        top: 50px;
-        transition: top 10ms ease;
-    }
-    
     .headingContainer {
         border-bottom: 1px solid #222;
         margin: 8px;
@@ -96,14 +72,9 @@
         margin-bottom: 8px;
     }
     
-    .md-flex-25 .questionPreview {
-        min-width: 100%;
-    }
-    
     .questionPreview {
         min-width: 33%;
     }
-    
     
     .question {
         width: 100%;
@@ -111,7 +82,7 @@
     }
     
     .questionContainer {
-        min-width: 100%;
+        margin-bottom: 2em;
     }
 </style>
 
@@ -134,24 +105,12 @@
         }
     })
     export default class QuestionBrowser extends Vue {
-        questions: QuestionModel[] = [];
+        questions: QuestionModel[] = QuestionRepository.getMany(25);
 
         showQuestions: QuestionModel[] = [];
 
         selectedQuestion: QuestionModel = null;
         userIsFinished: boolean = false;
-
-        @Lifecycle
-        created() {
-            this.questions = QuestionRepository.getMany(25);
-            window.addEventListener("scroll", this.scrolled);
-        }
-
-        @Lifecycle
-        destroyed() {
-            window.removeEventListener("scroll", this.scrolled);
-        }
-
 
         get maxOverlayHeight() {
             return 7 * window.innerHeight / 8 + "px";
@@ -166,16 +125,6 @@
                 this.selectedQuestion = null;
             } else {
                 this.selectedQuestion = question;
-            }
-        }
-
-        scrolled(e: Event) {
-            if (this.$refs["question"]) {
-                const questionComponent = this.$refs["question"] as Vue;
-                const questionElement = questionComponent.$el as HTMLElement;
-                const doc = document.documentElement;
-                const top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
-                //questionElement.style.top = top + "px";
             }
         }
     }

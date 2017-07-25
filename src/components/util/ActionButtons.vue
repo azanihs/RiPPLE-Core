@@ -6,8 +6,10 @@
         <md-button @click="randomQuestion">
             Go To Random Question
         </md-button>
-        <md-button @click="recommendations">
-            Go to Recommendations
+        <md-button @click="recommendations"
+                   class="md-icon-button md-warn">
+            <md-icon>error_outline</md-icon>
+            <md-tooltip>Report Question</md-tooltip>
         </md-button>
     </md-layout>
 </template>
@@ -16,6 +18,7 @@
     .buttonContainer {
         width: 100%;
         justify-content: space-between;
+        margin-bottom: 2em;
     }
 </style>
 

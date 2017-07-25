@@ -1,71 +1,77 @@
 <template>
-    <md-tabs md-fixed
-             class="md-transparent responseSection">
-        <md-tab md-label="Respond To Question">
-            <ul class="questionResponse">
-                <li v-for="(possibleAnswer, index) in question.possibleAnswers"
-                    :key="index"
-                    :class="getResponseStyles(possibleAnswer)">
-                    <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer"
-                         class="answerOption">
-                        <div class="answerIcon">
-                            <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
+    <md-layout>
+        <ul class="questionResponse">
+            <li v-for="(possibleAnswer, index) in question.possibleAnswers"
+                :key="index"
+                :class="getResponseStyles(possibleAnswer)">
+                <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer"
+                     class="answerOption">
+                    <div class="answerIcon">
+                        <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
+                    </div>
+                    <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
+                </div>
+                <md-checkbox v-else-if="Array.isArray(question.solution)"
+                             :disabled="!!disabledResponses.find(x => x == answer)"
+                             :name="index"
+                             :id="possibleAnswer.id">{{index}}</md-checkbox>
+                <md-radio v-else
+                          class="answerOption"
+                          :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
+                          :md-value="index"
+                          v-model="questionResponse"
+                          name="answer"
+                          @click.native="clickedResponse"
+                          :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
+                </md-radio>
+                <div class="distributionOverlay"
+                     :style="answerOptionFill(possibleAnswer)"></div>
+            </li>
+        </ul>
+        <transition name="feedbackGroup"
+                    @enter="feedbackEnter"
+                    @leave="feedbackLeave"
+                    :css="false">
+            <md-tabs v-if="userHasCorrectAnswer"
+                     md-fixed
+                     class="md-transparent responseSection">
+                <md-tab md-label="Explanation">
+                    <md-layout>
+                        <div class="placeBetween">
+                            <md-layout md-flex="65"
+                                       class="questionExplanation">
+                                <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
+                                <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
+                            </md-layout>
+                            <md-layout md-flex-offset="10"
+                                       md-flex="25">
+                                <question-rater icon="school"
+                                                :defaultValue="question.difficulty">Difficulty</question-rater>
+                                <question-rater class="ratingCard"
+                                                :defaultValue="question.quality">Quality</question-rater>
+                            </md-layout>
                         </div>
-                        <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
+                    </md-layout>
+                </md-tab>
+                <md-tab md-label="Discussion">
+                    <h3>Question Discussion</h3>
+                    <div class="commentContainer">
+                        <comment v-for="response in question.responses.slice(0, 10)"
+                                 class="commentCard"
+                                 :key="response.id"
+                                 :comment="response"></comment>
                     </div>
-                    <md-checkbox v-else-if="Array.isArray(question.solution)"
-                                 :disabled="!!disabledResponses.find(x => x == answer)"
-                                 :name="index"
-                                 :id="possibleAnswer.id">{{index}}</md-checkbox>
-                    <md-radio v-else
-                              class="answerOption"
-                              :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
-                              :md-value="index"
-                              v-model="questionResponse"
-                              name="answer"
-                              @click.native="clickedResponse"
-                              :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
-                    </md-radio>
-                    <div class="distributionOverlay"
-                         :style="answerOptionFill(possibleAnswer)"></div>
-                </li>
-            </ul>
-    
-            <transition name="feedbackGroup"
-                        @enter="feedbackEnter"
-                        @leave="feedbackLeave"
-                        :css="false">
-                <md-layout v-if="userHasCorrectAnswer"
-                           class="questionExplanation">
-                    <div class="placeBetween">
-                        <md-layout md-flex="65">
-                            <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
-                            <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
-                        </md-layout>
-                        <md-layout md-flex-offset="10"
-                                   md-flex="25">
-                            <question-rater icon="school"
-                                            :defaultValue="question.difficulty">Difficulty</question-rater>
-                            <question-rater class="ratingCard"
-                                            :defaultValue="question.quality">Quality</question-rater>
-                        </md-layout>
-                    </div>
-                </md-layout>
-            </transition>
-        </md-tab>
-        <md-tab md-label="Discussion">
-            <h3>Question Discussion</h3>
-            <div class="questionComments">
-                <comment v-for="response in question.responses.slice(0, 10)"
-                         class="commentCard"
-                         :key="response.id"
-                         :comment="response"></comment>
-            </div>
-        </md-tab>
-    </md-tabs>
+                </md-tab>
+            </md-tabs>
+        </transition>
+    </md-layout>
 </template>
 
 <style scoped>
+    .responseSection {
+        margin-top: 2em;
+    }
+    
     .placeBetween {
         justify-content: space-between;
         display: flex;
@@ -75,34 +81,21 @@
     }
     
     .questionExplanation {
-        height: 0px;
-        opacity: 0;
-        margin-top: 2em;
-        padding: 1em;
-        background-color: #fff !important;
         border: 1px solid #ddd;
+        padding: 1em;
+        height: 100%;
     }
-    
-    .questionExplanation h3 {}
-    
-    .questionExplanation p {}
     
     .md-tabs {
         border-top: 1px solid rgba(0, 0, 0, .12);
-    }
-    
-    .cardAction {
-        max-height: 100px;
-    }
-    
-    .md-card.md-primary {
-        margin-top: 1em;
     }
     
     .questionResponse {
         list-style: none;
         margin: 0px;
         padding: 0px;
+        width: 100%;
+        margin-top: 2em;
     }
     
     .questionResponse li {
@@ -121,12 +114,8 @@
         border: 1px solid #ddd;
     }
     
-    .incorrect .distributionOverlay {
-        background-color: rgba(255, 0, 0, 0.2);
-    }
-    
-    .correct .distributionOverlay {
-        background-color: rgba(34, 85, 102, 0.4);
+    .answerOption .answerIcon {
+        margin-right: 4px;
     }
     
     .distributionOverlay {
@@ -139,27 +128,16 @@
         pointer-events: none;
     }
     
-    .responseSection {
-        width: 100%;
-        margin-top: 2em;
+    .incorrect .distributionOverlay {
+        background-color: rgba(255, 0, 0, 0.2);
     }
     
-    .questionReview h4 {
-        width: 100%;
-        padding: 1em;
+    .correct .distributionOverlay {
+        background-color: rgba(34, 85, 102, 0.4);
     }
     
-    .questionComments {
+    .commentContainer {
         width: 100%;
-    }
-    
-    .commentCard {
-        width: 100%;
-        margin-bottom: 16px;
-    }
-    
-    .answerIcon {
-        margin-right: 4px;
     }
 </style>
 <style>
@@ -204,7 +182,7 @@
                 .transition()
                 .style("height", actualHeight + "px")
                 .style("opacity", 1)
-                .duration(2000)
+                .duration(500)
                 .on("end", () => {
                     el.style.height = "auto";
                     done();
