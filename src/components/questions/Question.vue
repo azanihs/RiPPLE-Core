@@ -1,37 +1,12 @@
 <template>
     <md-layout>
-        <div class="placeBetween">
-            <span>
-                <span>{{ question.responses.length }}
-                    <md-icon>reply</md-icon>
-                </span>
-                <md-tooltip md-direction="top">Question Responses</md-tooltip>
-            </span>
-            <span class="difficulty">
-                <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
-                <span>{{ question.difficultyRepresentation }}
-                    <md-icon>school</md-icon>
-                </span>
-            </span>
-        </div>
-        <hr></hr>
-        <div class="placeBetween">
-            <span class="quality">
-                <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
-                <md-icon :key="star" v-for="star in getStarIcons(question.quality)">{{ star }}</md-icon>
-            </span>
-            <span>
-                <router-link v-for="topic in question.topics" :key="topic" to="/view/questions" class="topicChipLink">
-                    <md-chip class="topicChip">{{ topic }}</md-chip>
-                </router-link>
-            </span>
-        </div>
         <md-layout md-flex="100">
             <p class="questionContent">
                 <img v-if="question.images.length > 0" :src="question.images[0]"></img>
                 {{question.content}}
             </p>
         </md-layout>
+        <question-details :question="question"></question-details>
         <question-response :question="question" @userAnswer="updateUserAnswer">
         </question-response>
     
@@ -39,14 +14,6 @@
 </template>
 
 <style scoped>
-.placeBetween {
-    justify-content: space-between !important;
-    display: flex;
-    padding-bottom: 0px;
-    align-items: center;
-    width: 100%;
-}
-
 img {
     width: 25%;
     height: auto;
@@ -57,46 +24,8 @@ img {
     margin-right: 10px;
 }
 
-.placeAround {
-    justify-content: space-around !important;
-    display: flex;
-    padding-bottom: 0px;
-    align-items: center;
-    width: 100%;
-}
-
-hr {
-    border: none;
-    border-bottom: 1px solid #ccc;
-    width: 100%;
-}
-
-h2,
-h3 {
-    width: 100%;
-}
-
-h3 {
-    margin-top: 0px;
-}
-
 .questionContent {
     margin-top: 2em;
-}
-
-.md-chip.topicChip {
-    margin-left: 10px;
-    cursor: pointer;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    transition: 500ms ease background-color;
-}
-
-.questionInfo {
-    align-items: stretch;
-    margin-left: 2.5%;
-    min-width: 32.5%;
-    flex: 0 1 32.5%;
 }
 </style>
 
@@ -104,12 +33,14 @@ h3 {
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
+import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
 import QuestionService from "../../services/QuestionService";
 
 @Component({
     components: {
-        "question-response": QuestionResponse
+        "question-response": QuestionResponse,
+        "question-details": QuestionDetails
     }
 })
 export default class Question extends Vue {

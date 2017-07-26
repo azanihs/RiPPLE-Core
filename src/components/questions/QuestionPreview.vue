@@ -13,32 +13,7 @@
         <div class="pintoBottom">
             <md-card-area>
                 <md-card-content>
-                    <div class="placeAround">
-                        <span>
-                            <span>{{ data.responses.length }}
-                                <md-icon>reply</md-icon>
-                            </span>
-                            <md-tooltip md-direction="top">Question Responses</md-tooltip>
-                        </span>
-                        <span class="difficulty">
-                            <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
-                            <span>{{ data.difficultyRepresentation }}
-                                <md-icon>school</md-icon>
-                            </span>
-                        </span>
-                    </div>
-                    <hr></hr>
-                    <div class="placeAround">
-                        <span class="quality">
-                            <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
-                            <md-icon :key="star" v-for="star in getStarIcons(data.quality)">{{ star }}</md-icon>
-                        </span>
-                        <span>
-                            <router-link v-for="topic in data.topics" :key="topic" to="/view/questions" class="topicChipLink">
-                                <md-chip class="topicChip">{{ topic }}</md-chip>
-                            </router-link>
-                        </span>
-                    </div>
+                    <question-details :question="data"></question-details>
                 </md-card-content>
             </md-card-area>
         </div>
@@ -72,59 +47,9 @@
     padding-bottom: 8px;
 }
 
-.placeAround {
-    justify-content: space-between !important;
-    display: flex;
-    padding-bottom: 0px;
-    align-items: center;
-}
-
-.placeAround>span {
-    cursor: pointer;
-}
-
-.questionCard a.topicChipLink,
-.questionCard a.topicChipLink:visited {
-    color: #333;
-    text-decoration: none;
-    transition: 500ms ease background-color, 500ms ease color;
-}
-
-.questionCard a.topicChipLink:hover {
-    color: #bbb;
-    text-decoration: none;
-}
-
-.questionCard .topicChip {
-    margin-left: 5px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    transition: 500ms ease background-color;
-}
-
-.topicChip:hover {
-    background-color: #333;
-}
-
-
-
-
-
-
-
-
-
-
-
-/* Remove bottom border added by vue-material */
-
 .md-card .md-card-area:after {
+    /* Remove bottom border added by vue-material */
     background: none !important;
-}
-
-hr {
-    border: none;
-    border-bottom: 1px solid #ccc;
 }
 
 .truncate {
@@ -143,33 +68,17 @@ hr {
 import { Vue, Component, Lifecycle, Prop } from "av-ts";
 import { Question } from "../../interfaces/models";
 
+import QuestionDetails from "./QuestionDetails.vue";
+
 import lineClamp from "line-clamp";
 
-@Component()
+@Component({
+    components: {
+        "question-details": QuestionDetails
+    }
+})
 export default class QuestionPreview extends Vue {
     @Prop data: Question;
-
-    getStarIcons(value: number): string[] {
-        let stars = [];
-        let numberStars;
-
-        if (value % 2 == 0) {
-            numberStars = value / 2;
-            stars = new Array(numberStars).fill("star");
-            stars = stars.concat(
-                new Array(5 - numberStars).fill("star_border")
-            );
-        } else {
-            numberStars = (value - 1) / 2;
-            stars = new Array(numberStars).fill("star");
-            stars.push("star_half");
-            stars = stars.concat(
-                new Array(4 - numberStars).fill("star_border")
-            );
-        }
-
-        return stars;
-    }
 
     clampLines = () => {
         const element = this.$refs["clamp"] as HTMLElement;
