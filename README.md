@@ -1,5 +1,6 @@
-# RiPLE Client
-The client component of RiPLE
+# RiPPLE Client
+Recommendation in a Personalised Peer Learning Environment
+The client component of RiPPLE
 
 # Technology Stack
 * Development
