@@ -7,13 +7,23 @@
             </p>
         </md-layout>
         <question-details :question="question"></question-details>
-        <question-response :question="question" @userAnswer="updateUserAnswer">
-        </question-response>
+        <question-response :question="question" @userAnswer="updateUserAnswer"></question-response>
     
+        <md-button class="reportButton md-warn">Report Question
+            <md-icon>error_outline</md-icon>
+        </md-button>
     </md-layout>
 </template>
 
 <style scoped>
+.reportButton {
+    margin-left: auto;
+    margin-right: 0px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border: 1px solid #ddd;
+}
+
 img {
     width: 25%;
     height: auto;
@@ -24,8 +34,12 @@ img {
     margin-right: 10px;
 }
 
+h2 {
+    width: 100%;
+}
+
 .questionContent {
-    margin-top: 2em;
+    margin-top: 0px;
 }
 </style>
 

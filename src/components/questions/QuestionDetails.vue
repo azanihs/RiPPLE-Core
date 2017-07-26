@@ -38,6 +38,10 @@
     width: 100%;
 }
 
+.placeBetween>span {
+    cursor: pointer;
+}
+
 hr {
     border: none;
     border-bottom: 1px solid #ccc;
@@ -52,14 +56,14 @@ hr {
     transition: 500ms ease background-color;
 }
 
-.questionCard a.topicChipLink,
-.questionCard a.topicChipLink:visited {
+a.topicChipLink,
+a.topicChipLink:visited {
     color: #333;
     text-decoration: none;
     transition: 500ms ease background-color, 500ms ease color;
 }
 
-.questionCard a.topicChipLink:hover {
+a.topicChipLink:hover {
     color: #bbb;
     text-decoration: none;
 }

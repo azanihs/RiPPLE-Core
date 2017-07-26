@@ -1,5 +1,5 @@
 <template>
-    <md-layout>
+    <md-layout md-flex="100">
         <ul class="questionResponse">
             <li v-for="(possibleAnswer, index) in question.possibleAnswers" :key="index" :class="getResponseStyles(possibleAnswer)">
                 <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer" class="answerOption">
