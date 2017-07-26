@@ -21,7 +21,7 @@
     margin-right: 0px;
     margin-top: 1em;
     margin-bottom: 1em;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
 }
 
 img {
