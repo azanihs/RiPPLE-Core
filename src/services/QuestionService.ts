@@ -20,4 +20,9 @@ export default class QuestionService {
         }
         return distribution;
     }
+
+    static getMany(count: number): Question[] {
+        return QuestionRepository.getMany(count);
+    }
+
 }
