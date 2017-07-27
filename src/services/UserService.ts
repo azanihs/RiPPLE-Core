@@ -5,13 +5,18 @@ import PeerRepository from "../repositories/PeerRepository";
 export default class UserService {
 
     static getUserPeers() {
-        return PeerRepository.getMany(20 + Math.round(Math.random() * 100))
+        return PeerRepository.getMany(20 + Math.round(Math.random() * 100));
     }
 
     static getEngagementBreakdown() {
         return {
             data: {
-                labels: ["Browsing Peer Connections", "Viewing Questions", "Viewing Statistics Page", "Answering Questions"],
+                labels: [
+                    "Browsing Peer Connections",
+                    "Viewing Questions",
+                    "Viewing Statistics Page",
+                    "Answering Questions"
+                ],
                 datasets: [{
                     data: [20, 25, 40, 50],
                     label: "Your Score",
@@ -30,7 +35,7 @@ export default class UserService {
                 }]
             },
             options: {}
-        }
+        };
     }
 
     static getComparativeEngagementBreakdown() {
@@ -67,7 +72,7 @@ export default class UserService {
                     }
                 }
             }
-        }
+        };
     }
 
     static userCompetencies() {
@@ -77,7 +82,7 @@ export default class UserService {
             return {
                 x: x,
                 y: Math.round(Math.random() * 100)
-            }
+            };
         });
 
         return {
@@ -90,7 +95,7 @@ export default class UserService {
                     backgroundColor: "rgba(255, 99, 132, 0.5)",
                     showLine: false,
                     pointBorderColor: "rgba(255, 99, 132, 0.5)",
-                    pointBackgroundColor: "rgba(255, 99, 132, 0.5)",
+                    pointBackgroundColor: "rgba(255, 99, 132, 0.5)"
                 }, {
                     data: ownScore,
                     label: "Your Results",
@@ -112,19 +117,30 @@ export default class UserService {
                     }]
                 }
             }
-        }
+        };
     }
 
 
     static getEngagementScores() {
+        return [
+            "Engagement Score",
+            "Overall Grade",
+            "Goal Progress",
+            "Achievements",
+            "Recommendations Accepted",
+            "Social Connections",
+            "Study Partners",
+            "Peers Mentored",
+            "Questions Rated",
+            "Questions Asked",
+            "Questions Answered",
+            "Questions Viewed"].map(x => {
+                const item = {
+                    name: x,
+                    score: Math.floor(Math.random() * 100)
+                };
 
-        return ["Engagement Score", "Overall Grade", "Goal Progress", "Achievements", "Recommendations Accepted", "Social Connections", "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"].map(x => {
-            const item = {
-                name: x,
-                score: Math.floor(Math.random() * 100)
-            }
-
-            return item;
-        })
+                return item;
+            });
     }
 }

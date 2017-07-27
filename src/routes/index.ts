@@ -10,28 +10,28 @@ import PeerView from "../components/views/PeerView.vue";
 Vue.use(VueRouter);
 
 const routes = [{
-	path: "/",
-	component: Main,
-	children: [{
-		path: "",
-		name: "main",
-		component: ProfileView
-	}, {
-		path: "/view/questions",
-		name: "questions",
-		component: QuestionView
-	}, {
-		path: "/view/friends",
-		name: "friends",
-		component: FriendView
-	}, {
-		path: "/view/peers",
-		name: "peers",
-		component: PeerView
-	}]
+    path: "/",
+    component: Main,
+    children: [{
+        path: "",
+        name: "main",
+        component: ProfileView
+    }, {
+        path: "/view/questions",
+        name: "questions",
+        component: QuestionView
+    }, {
+        path: "/view/friends",
+        name: "friends",
+        component: FriendView
+    }, {
+        path: "/view/peers",
+        name: "peers",
+        component: PeerView
+    }]
 }];
 
 export default new VueRouter({
-	routes
+    routes
 });
 

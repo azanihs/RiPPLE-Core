@@ -34,6 +34,6 @@ export default class BadgeService {
             "thumb_up",
             "trending_up",
             "toll"
-        ][badge.id] || "priority_high"
+        ][badge.id] || "priority_high";
     }
 }

@@ -5,7 +5,7 @@ import VueMaterial from "vue-material";
 import "vue-material/dist/vue-material.css";
 
 import { Question } from "../../../src/interfaces/models";
-import QuestionCard from "@/components/questions/QuestionCard";
+import QuestionCard from "../../../src/components/questions/QuestionCard.vue";
 
 import { assert } from "chai";
 
@@ -13,8 +13,8 @@ Vue.use(VueMaterial);
 Vue.use(VueRouter);
 
 const router = new VueRouter({
-	mode: "history",
-	routes: []
+    mode: "history",
+    routes: []
 });
 
 const basicQuestion: Question = {
@@ -25,23 +25,22 @@ const basicQuestion: Question = {
 
     content: "Basic question content",
     topics: ["Topic 1", "Topic 2"],
-    images: [],
-
+    images: []
 };
 
 describe("QuestionCard.vue", () => {
     beforeEach(() => {
-		let main = document.getElementById("app");
-		if (main) {
-			main.parentElement.removeChild(main);
-		}
-		main = document.createElement("div");
-		main.id = "app";
-		document.body.appendChild(main);
+        let main = document.getElementById("app");
+        if (main) {
+            main.parentElement.removeChild(main);
+        }
+        main = document.createElement("div");
+        main.id = "app";
+        document.body.appendChild(main);
 
-		let mountPoint = document.createElement("div");
-		mountPoint.id = "mountPoint";
-		main.appendChild(mountPoint);
+        let mountPoint = document.createElement("div");
+        mountPoint.id = "mountPoint";
+        main.appendChild(mountPoint);
     });
 
     it("Correctly renders difficulty", () => {
@@ -61,7 +60,7 @@ describe("QuestionCard.vue", () => {
             value: 10,
             expected: "Hard"
         }];
-        const runTest = (data) => {
+        const runTest = data => {
             const hardQuestion: Question = Object.assign({}, basicQuestion);
             hardQuestion.difficulty = data.value;
             const mountPoint = document.getElementById("mountPoint");
@@ -72,14 +71,14 @@ describe("QuestionCard.vue", () => {
             vm.$mount(mountPoint);
             return Vue.nextTick()
                 .then(() => {
-                    assert.equal((vm.$children[0].$el.querySelector(".difficulty") as HTMLElement).innerText.trim(), data.expected + " school");
+                    const difficulty = vm.$children[0].$el.querySelector(".difficulty") as HTMLElement;
+                    assert.equal(difficulty.innerText.trim(), data.expected + " school");
                     assert.equal(vm.getDifficultyText(data.value).trim(), data.expected);
                     return;
-                })
-        }
-        return testData.reduce((chain, testCase) => {
-                return chain.then(runTest.bind(null, testCase))
-            }, runTest(testData.shift()))
+                });
+        };
+        return testData.reduce((chain, testCase) =>
+            chain.then(runTest.bind(null, testCase)), runTest(testData.shift()));
     });
 
     it("Correctly renders quality", () => {
@@ -99,7 +98,7 @@ describe("QuestionCard.vue", () => {
             value: 10,
             expected: new Array(5).fill("star")
         }];
-        const runTest = (data) => {
+        const runTest = data => {
             const hardQuestion: Question = Object.assign({}, basicQuestion);
             hardQuestion.difficulty = data.value;
             const mountPoint = document.getElementById("mountPoint");
@@ -110,14 +109,14 @@ describe("QuestionCard.vue", () => {
             vm.$mount(mountPoint);
             return Vue.nextTick()
                 .then(() => {
-                    assert.equal((vm.$children[0].$el.querySelector(".quality") as HTMLElement).childNodes.length, data.expected.length + 1) // One extra because of tooltip
+                    const quality = vm.$children[0].$el.querySelector(".quality") as HTMLElement;
+                    // One extra child because of tooltip
+                    assert.equal(quality.childNodes.length, data.expected.length + 1);
                     assert.deepEqual(vm.getStarIcons(data.value), data.expected);
-
                 });
-        }
-        return testData.reduce((chain, testCase) => {
-                return chain.then(runTest.bind(null, testCase))
-            }, runTest(testData.shift()))
-    });
+        };
 
+        return testData.reduce((chain, testCase) => chain.then(runTest.bind(null, testCase)),
+            runTest(testData.shift()));
+    });
 });
