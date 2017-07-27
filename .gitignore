@@ -7,7 +7,7 @@ Thumbs.db
 # Vuejs build result and test reports
 dist/
 test/unit/coverage
-test/e2e/coverage
+test/e2e/report
 
 # Editor Files #
 *~

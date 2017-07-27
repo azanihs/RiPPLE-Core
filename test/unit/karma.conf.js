@@ -14,7 +14,7 @@ module.exports = function(config) {
         browsers: ["PhantomJS"],
         frameworks: ["phantomjs-shim", "mocha", "chai"],
         reporters: ["spec", "coverage-istanbul"],
-        files: ['../../node_modules/babel-polyfill/dist/polyfill.js', "spec/**/*.ts"],
+        files: ["../../node_modules/babel-polyfill/dist/polyfill.js", "spec/**/*.ts"],
         preprocessors: {
             "spec/**/*.ts": ["webpack"]
         },

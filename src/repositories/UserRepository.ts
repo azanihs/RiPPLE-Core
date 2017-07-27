@@ -4,17 +4,17 @@ import f from "faker";
 
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
-const getCategory: any = i => {
-    return ["connections", "engagement", "competencies"][i];
-}
+const getCategory: any = i => ["connections", "engagement", "competencies"][i];
 
 const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
-const badges = new Array(30).fill(0).map((x, i) => ({
-    id: i,
-    category: getCategory(f.random.number({ min: 0, max: 2 })),
-    name: f.company.bsBuzz(),
-    description: f.company.catchPhrase()
-}));
+const badges = new Array(30).fill(0).map((x, i) => {
+    return ({
+        id: i,
+        category: getCategory(f.random.number({ min: 0, max: 2 })),
+        name: f.company.bsBuzz(),
+        description: f.company.catchPhrase()
+    });
+});
 
 const userBadges = badges
     .filter((_, i) => Math.random() < 0.5)
@@ -42,7 +42,7 @@ export default class UserRepository {
                 type: types[f.random.number({ min: 0, max: 2 })],
                 topic: topics[f.random.number({ min: 0, max: 10 })],
                 weight: f.random.number({ min: 0, max: 10 })
-            }
+            };
             return connection;
         });
 
@@ -56,14 +56,14 @@ export default class UserRepository {
     }
 
     static getAllAvailableBadges(): Badge[] {
-        return badges.slice()
+        return badges.slice();
     }
     static getAllUserBadges(): AcquiredBadge[] {
         return userBadges.slice();
     }
 
     static getAllAvailableCategories(): string[] {
-        return types.slice()
+        return types.slice();
     }
     static getAllAvailableTopics(): string[] {
         return topics.slice();
