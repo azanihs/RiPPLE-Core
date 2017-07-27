@@ -72,7 +72,7 @@ describe("QuestionCard.vue", () => {
             return Vue.nextTick()
                 .then(() => {
                     const difficulty = vm.$children[0].$el.querySelector(".difficulty") as HTMLElement;
-                    assert.equal(difficulty.innerText.trim(), data.expected + " school");
+                    assert.equal(difficulty.innerText.replace(/\s{2,}/, " ").trim(), data.expected + " school");
                     assert.equal(vm.getDifficultyText(data.value).trim(), data.expected);
                     return;
                 });
