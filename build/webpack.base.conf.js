@@ -6,8 +6,8 @@ var webpack = require('webpack')
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var env = process.env.NODE_ENV
-    // check env & config/index.js to decide weither to enable CSS Sourcemaps for the
-    // various preprocessor loaders added to vue-loader at the end of this file
+// check env & config/index.js to decide weither to enable CSS Sourcemaps for the
+// various preprocessor loaders added to vue-loader at the end of this file
 var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
 var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
@@ -36,36 +36,41 @@ module.exports = {
     },
     module: {
         rules: [{
-                enforce: "pre",
-                test: /.vue$/,
-                loader: "eslint-loader",
-                exclude: "/node_modules/"
-            }, {
-                test: /\.ts$/,
-                loader: 'ts-loader',
-                options: {
-                    appendTsSuffixTo: [/\.vue$/]
-                },
-                include: [path.resolve(__dirname, "../"), path.resolve(__dirname, "../typings/modules")],
-                exclude: /node_modules/
-            }, {
-                test: /\.json$/,
-                loader: 'json-loader'
-            }, {
-                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-                loader: 'url-loader',
-                query: {
-                    limit: 10000,
-                    name: utils.assetsPath('img/[name].[hash:7].[ext]')
-                }
-            }, {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                loader: 'url-loader',
-                query: {
-                    limit: 10000,
-                    name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
-                }
+            enforce: "pre",
+            test: /.vue$/,
+            loader: "eslint-loader",
+            exclude: "/node_modules/"
+        }, {
+            enforce: "pre",
+            test: /.ts$/,
+            loader: "eslint-loader",
+            exclude: "/node_modules/"
+        }, {
+            test: /\.ts$/,
+            loader: 'ts-loader',
+            options: {
+                appendTsSuffixTo: [/\.vue$/]
+            },
+            include: [path.resolve(__dirname, "../"), path.resolve(__dirname, "../typings/modules")],
+            exclude: /node_modules/
+        }, {
+            test: /\.json$/,
+            loader: 'json-loader'
+        }, {
+            test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+            loader: 'url-loader',
+            query: {
+                limit: 10000,
+                name: utils.assetsPath('img/[name].[hash:7].[ext]')
             }
+        }, {
+            test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+            loader: 'url-loader',
+            query: {
+                limit: 10000,
+                name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
+            }
+        }
 
         ]
     }
