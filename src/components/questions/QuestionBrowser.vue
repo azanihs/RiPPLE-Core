@@ -15,9 +15,14 @@
                 <h1>Questions</h1>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
-            <md-layout md-gutter="16">
-                <md-layout v-for="question in showQuestions" md-gutter :key="question.id" class="questionPreview" :class="{selected: question == selectedQuestion,}" @click.native="openQuestionPreview(question)">
+            <md-layout md-hide-xsmall md-hide-small md-hide-medium>
+                <md-layout v-for="question in showQuestions" md-flex="33" md-gutter :key="question.id" class="questionPreview" @click.native="openQuestionPreview(question)">
                     <question-preview class="questionCard" :data="question"></question-preview>
+                </md-layout>
+            </md-layout>
+            <md-layout md-hide-large-and-up>
+                <md-layout v-for="question in showQuestions" md-flex="100" :key="question.id" class="questionPreview" @click.native="openQuestionPreview(question)">
+                    <question-preview class="mobileQuestionCard" :data="question"></question-preview>
                 </md-layout>
             </md-layout>
         </md-layout>
@@ -56,8 +61,9 @@
     margin-bottom: 8px;
 }
 
-.questionPreview {
-    min-width: 33%;
+.mobileQuestionCard {
+    margin: 8px;
+    padding: 0px;
 }
 
 .question {
