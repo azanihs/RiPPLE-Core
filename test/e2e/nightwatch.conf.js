@@ -27,9 +27,9 @@ module.exports = {
 
         phantomjs: {
             desiredCapabilities: {
-                "browserName": "phantomjs",
-                "javascriptEnabled": true,
-                "acceptSslCerts": true,
+                browserName: "phantomjs",
+                javascriptEnabled: true,
+                acceptSslCerts: true,
                 "phantomjs.binary.path": require("phantomjs-prebuilt").path
             }
         },
