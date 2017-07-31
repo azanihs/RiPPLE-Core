@@ -49,7 +49,7 @@ hr {
 }
 
 .md-chip.topicChip {
-    margin-left: 10px;
+    margin-right: 5px;
     cursor: pointer;
     background-color: #ffffff;
     border: 1px solid #ccc;

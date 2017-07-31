@@ -2,50 +2,42 @@
     <md-layout md-flex="100">
         <h2>Search </h2>
         <md-layout md-flex="100" class="header">
-            <md-layout md-hide-xsmall md-hide-small md-hide-medium v-for="field in searchableFields" :key="field.displayName">
-                <h3 v-if="field.sort" @click="field.sort">
-                    <md-icon v-if="field.sort">{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
-                    {{ field.displayName }}
+            <md-layout v-for="field in searchableFields" :key="field.displayName" class="searchItem">
+                <h3 v-if="field.sort" @click="field.sort" class="sortBy">{{ field.name }}
+                    <md-icon>{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
                 </h3>
-                <h3 v-else>
-                    {{ field.displayName }}
-                </h3>
+                <h3 v-else>{{ field.name }}</h3>
+    
                 <select v-if="field.type == 'select'" @change="field.search">
-                    <option value=""></option>
                     <option v-for="option in field.options" :key="option" :value="option">{{ option }}</option>
                 </select>
-                <input v-else-if="field.type == 'text'" @change="field.search" type="text"></input>
-            </md-layout>
     
-            <md-layout md-hide-large-and-up md-flex="100" v-for="field in searchableFields" :key="field.displayName">
-                <h3 v-if="field.sort" @click="field.sort">
-                    <md-icon v-if="field.sort">{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
-                    {{ field.displayName }}
-                </h3>
-                <h3 v-else>
-                    {{ field.displayName }}
-                </h3>
-                <select v-if="field.type == 'select'" @change="field.search">
-                    <option value=" "></option>
-                    <option v-for="option in field.options " :key="option " :value="option ">{{ option }}</option>
-                </select>
-                <input v-else-if="field.type == 'text'" @change="field.search" type="text "></input>
+                <input v-else-if="field.type == 'text'" @keyup="field.search" type="text"></input>
             </md-layout>
         </md-layout>
     </md-layout>
 </template>
 
 <style scoped>
-.header {}
+.header {
+    justify-content: space-between;
+    width: 100%;
+}
+
+.searchItem {
+    flex: none;
+}
 
 h2 {
     color: #999;
 }
 
-h3 {
+h3.sortBy {
     cursor: pointer;
-    display: inline-block;
-    vertical-align: middle;
+}
+
+h3 {
+    user-select: none;
     margin: 0px 10px 0px 0px;
 }
 
@@ -68,6 +60,7 @@ export default class QuestionSearch extends Vue {
 
     reverseSortOrder: boolean = false;
     currentFilter: string = "";
+    searchMode: string = "All Questions";
 
     searchableFields: Object[] = [];
 
@@ -78,22 +71,9 @@ export default class QuestionSearch extends Vue {
     @Lifecycle
     created() {
         let textToSearch = "";
-        let topicsToKeep = "";
 
         this.searchableFields = [{
-            displayName: "Topic",
-            search: (e: MouseEvent) => {
-                if (e !== null) {
-                    topicsToKeep = (e.target as HTMLFormElement).value;
-                    this.applyFilters();
-                }
-                return x => topicsToKeep ? x.topics.find(topic => topicsToKeep == topic) !== undefined : true;
-            },
-            options: this.uniqueQuestionTopics,
-            type: "select",
-            searchValue: ""
-        }, {
-            displayName: "Sort",
+            name: "Sort By",
             search: (e?: MouseEvent) => {
                 if (e !== null) {
                     const itemToSortOn = (e.target as HTMLFormElement).value;
@@ -102,24 +82,36 @@ export default class QuestionSearch extends Vue {
                 }
                 return x => true;
             },
-            options: ["Quality", "Difficulty", "Responses"],
+            options: ["", "Difficulty", "Personalised Rating", "Quality", "Responses", "Number Of Comments", "Time"],
             type: "select",
-            searchValue: ""
-        }, {
-            displayName: "Order",
             sort: () => {
                 this.reverseSortOrder = !this.reverseSortOrder;
                 this.applyFilters();
             },
             searchValue: ""
         }, {
-            displayName: "Content",
-            search: (e?: KeyboardEvent) => {
+            name: "Show",
+            search: (e?: MouseEvent) => {
                 if (e !== null) {
-                    textToSearch = (e.target as HTMLFormElement).value;
+                    this.searchMode = (e.target as HTMLFormElement).value;
                     this.applyFilters();
                 }
-                return x => x.content.toLowerCase().indexOf(textToSearch.toLowerCase()) >= 0;
+                return x => true;
+            },
+            options: ["All Questions", "Unanswered Questions", "Answered Questions", "Wrongly Answered Questions"],
+            type: "select",
+            searchValue: ""
+        }, {
+            name: "Content",
+            search: (e?: KeyboardEvent) => {
+                if (e !== null) {
+                    textToSearch = (e.target as HTMLFormElement).value.toLowerCase();
+                    this.applyFilters();
+                }
+                return x => {
+                    return x.content.toLowerCase().indexOf(textToSearch) >= 0 ||
+                        x.topics.find(t => t.toLowerCase().indexOf(textToSearch) >= 0);
+                };
             },
             searchValue: "",
             type: "text"
@@ -135,6 +127,9 @@ export default class QuestionSearch extends Vue {
             if (this.currentFilter == "Difficulty") return q.difficulty;
             return q.responses.length;
         };
+        if (this.searchMode !== "All Questions") {
+            questions = questions.filter(x => Math.random() <= 0.25);
+        }
 
         if (this.reverseSortOrder) {
             return questions.sort((a, b) => keyValue(a) - keyValue(b)).reverse();
