@@ -21,7 +21,7 @@
                 </md-layout>
             </md-layout>
             <md-layout md-hide-large-and-up>
-                <md-layout v-for="question in showQuestions" md-flex="100" :key="question.id" class="questionPreview" @click.native="openQuestionPreview(question)">
+                <md-layout v-for="question in showQuestions" md-flex="100" :key="question.id" class="mobileQuestionPreview" @click.native="openQuestionPreview(question)">
                     <question-preview class="mobileQuestionCard" :data="question"></question-preview>
                 </md-layout>
             </md-layout>
@@ -53,6 +53,10 @@
 .headingContainer {
     border-bottom: 1px solid #222;
     margin: 8px;
+}
+
+.questionPreview {
+    padding: 8px;
 }
 
 .questionCard {

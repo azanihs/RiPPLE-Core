@@ -15,7 +15,7 @@
         <hr />
         <ul>
             <li v-for="link in links" :key="link.href">
-                <router-link :to="link.href">
+                <router-link :to="link.href" class="routerLink">
                     <md-layout md-hide-xsmall md-hide-small md-hide-medium>
                         <md-button class="linkButton">
                             <span>{{ link.text }}</span>
@@ -89,7 +89,6 @@ ul>li {
     text-align: left;
     border-radius: 0px;
 
-
     display: flex;
     flex: 1;
     justify-content: space-between;
@@ -103,6 +102,11 @@ ul>li {
 .linkButton:not(.md-icon-button)>i {
     margin-left: 0px;
     margin-right: 0px;
+}
+
+a.routerLink,
+a.routerLink:hover {
+    text-decoration: none !important;
 }
 
 .router-link-exact-active.router-link-active .linkButton.md-icon-button {
