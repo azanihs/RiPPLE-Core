@@ -20,7 +20,6 @@
 .sideNavContainer {
     min-width: 12.5%;
     flex: 0 1 12.5%;
-    position: relative;
 }
 
 .pageContent {
@@ -29,19 +28,20 @@
     flex: 0 1 85%;
 }
 
-
 .mobileSideNavContainer {
     min-width: 52px;
     flex: 0 1 52px;
     position: relative;
 }
 
-.mobilePageContent {}
+.mobileSideNavContainer .sideNav {
+    width: 100%;
+}
 
 .sideNav {
     position: absolute;
     height: 100%;
-    width: 100%;
+    width: 12.5%;
 }
 </style>
 
