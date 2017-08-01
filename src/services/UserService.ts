@@ -75,7 +75,7 @@ export default class UserService {
         };
     }
 
-    static userCompetencies() {
+    static userCompetencies(compareAgainstType: string) {
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const userGoal = topics.map(x => Math.round(Math.random() * 100));
@@ -97,20 +97,20 @@ export default class UserService {
             data: {
                 labels: ["Overall"].concat(topics),
                 datasets: [{
-                    data: [goal].concat(userGoal),
-                    label: "Your Goal",
-                    type: "line",
-                    pointStyle: "triangle",
-                    backgroundColor: "rgba(29, 50, 58, 1)",
-                    showLine: false,
-                    pointBorderColor: "rgba(29, 50, 58, 1)",
-                    pointBackgroundColor: "rgba(29, 50, 58, 1)"
-                }, {
                     data: ownSummary,
                     label: "Your Results",
                     backgroundColor: ownSummary.map(x => getColour(x) + "0.4)"),
                     borderColor: ownSummary.map(x => getColour(x) + "1)"),
                     borderWidth: 2
+                }, {
+                    data: [goal].concat(userGoal),
+                    label: compareAgainstType,
+                    type: "line",
+                    pointStyle: "dash",
+                    backgroundColor: "rgba(29, 50, 58, 0.6)",
+                    showLine: false,
+                    pointBorderColor: "rgba(29, 50, 58, 0.6)",
+                    pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
                 }]
             },
             options: {
@@ -121,10 +121,10 @@ export default class UserService {
                 },
                 scales: {
                     xAxes: [{
-                        stacked: true
+                        stacked: false
                     }],
                     yAxes: [{
-                        stacked: true
+                        stacked: false
                     }]
                 }
             }
