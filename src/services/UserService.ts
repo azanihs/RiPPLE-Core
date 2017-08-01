@@ -106,7 +106,7 @@ export default class UserService {
                     data: [goal].concat(userGoal),
                     label: compareAgainstType,
                     type: "line",
-                    pointStyle: "dash",
+                    pointStyle: "triangle",
                     backgroundColor: "rgba(29, 50, 58, 0.6)",
                     showLine: false,
                     pointBorderColor: "rgba(29, 50, 58, 0.6)",
@@ -150,7 +150,6 @@ export default class UserService {
             options: {}
         };
     }
-
 
     static getEngagementScores() {
         return [
