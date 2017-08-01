@@ -80,11 +80,24 @@ export default class UserService {
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const userGoal = topics.map(x => Math.round(Math.random() * 100));
 
+        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
+        const goal = Math.round(Math.random() * 100);
+        const getColour = c => {
+            if (c < 50) {
+                return "rgba(255, 99, 132, ";
+            } else if (c >= 50 && c <= 75) {
+                return "rgba(255, 206, 86, ";
+            } else {
+                return "rgba(34, 85, 102, ";
+            }
+        };
+
+        const ownSummary = [average].concat(ownScore);
         return {
             data: {
-                labels: topics,
+                labels: ["Overall"].concat(topics),
                 datasets: [{
-                    data: userGoal,
+                    data: [goal].concat(userGoal),
                     label: "Your Goal",
                     type: "line",
                     pointStyle: "triangle",
@@ -93,11 +106,11 @@ export default class UserService {
                     pointBorderColor: "rgba(29, 50, 58, 1)",
                     pointBackgroundColor: "rgba(29, 50, 58, 1)"
                 }, {
-                    data: ownScore,
+                    data: ownSummary,
                     label: "Your Results",
-                    backgroundColor: "rgba(34, 85, 102, 0.5)",
-                    borderColor: "rgba(29, 50, 58, 1)",
-                    borderWidth: 1
+                    backgroundColor: ownSummary.map(x => getColour(x) + "0.4)"),
+                    borderColor: ownSummary.map(x => getColour(x) + "1)"),
+                    borderWidth: 2
                 }]
             },
             options: {
