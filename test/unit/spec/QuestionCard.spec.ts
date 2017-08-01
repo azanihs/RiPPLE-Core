@@ -4,7 +4,7 @@ import VueMaterial from "vue-material";
 
 import "vue-material/dist/vue-material.css";
 
-import { Question } from "../../../src/interfaces/models";
+import { Question, Peer } from "../../../src/interfaces/models";
 import QuestionCard from "../../../src/components/questions/QuestionCard.vue";
 
 import { assert } from "chai";
@@ -17,12 +17,39 @@ const router = new VueRouter({
     routes: []
 });
 
+const peer = id => {
+    const peer: Peer = {
+        id: id,
+        name: "Test User",
+        bio: "Test Bio",
+
+        proficiencies: ["SSL"],
+        image: "",
+        availableTimes: []
+    };
+    return peer;
+};
+
 const basicQuestion: Question = {
     id: 1,
-    responseCount: 5,
+    responses: [{
+        author: peer(1),
+        upVotes: 2,
+        solution: 0,
+        content: ""
+    }],
     difficulty: 1,
     quality: 1,
-
+    difficultyRepresentation: "",
+    solution: 0,
+    possibleAnswers: [{
+        id: 0,
+        content: ""
+    }, {
+        id: 1,
+        content: ""
+    }],
+    explanation: "",
     content: "Basic question content",
     topics: ["Topic 1", "Topic 2"],
     images: []

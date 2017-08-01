@@ -29,12 +29,6 @@
         "keyword-spacing": "error",
         "no-mixed-spaces-and-tabs": "error",
         "no-unused-vars": "off",
-        "arrow-body-style": [
-            "error",
-            "as-needed", {
-                "requireReturnForObjectLiteral": true
-            }
-        ],
         "arrow-parens": [
             "error",
             "as-needed"

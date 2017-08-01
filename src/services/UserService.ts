@@ -78,28 +78,26 @@ export default class UserService {
     static userCompetencies() {
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
-        const classAverage = topics.map(x => {
-            return {
-                x: x,
-                y: Math.round(Math.random() * 100)
-            };
-        });
+        const userGoal = topics.map(x => Math.round(Math.random() * 100));
 
         return {
             data: {
                 labels: topics,
                 datasets: [{
-                    data: classAverage,
+                    data: userGoal,
                     label: "Your Goal",
-                    type: "scatter",
-                    backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    type: "line",
+                    pointStyle: "triangle",
+                    backgroundColor: "rgba(29, 50, 58, 1)",
                     showLine: false,
-                    pointBorderColor: "rgba(255, 99, 132, 0.5)",
-                    pointBackgroundColor: "rgba(255, 99, 132, 0.5)"
+                    pointBorderColor: "rgba(29, 50, 58, 1)",
+                    pointBackgroundColor: "rgba(29, 50, 58, 1)"
                 }, {
                     data: ownScore,
                     label: "Your Results",
-                    backgroundColor: "#256"
+                    backgroundColor: "rgba(34, 85, 102, 0.5)",
+                    borderColor: "rgba(29, 50, 58, 1)",
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -117,6 +115,26 @@ export default class UserService {
                     }]
                 }
             }
+        };
+    }
+
+    static userCompetenciesOverview() {
+        const topics = UserRepository.getAllAvailableTopics();
+        const ownScore = topics.map(x => Math.round(Math.random() * 100));
+        const userGoal = topics.map(x => Math.round(Math.random() * 100));
+
+        return {
+            data: {
+                labels: topics,
+                datasets: [{
+                    data: ownScore,
+                    label: "Your Qualification",
+                    borderWidth: 1,
+                    backgroundColor: [],
+                    borderColor: []
+                }]
+            },
+            options: {}
         };
     }
 

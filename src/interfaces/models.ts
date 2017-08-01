@@ -1,18 +1,31 @@
 export interface Question {
     id: number,
-    responseCount: number,
+    responses: {
+        author: Peer,
+        upVotes: number,
+        solution: number,
+        content: string
+    }[],
 
     difficulty: number,
+    difficultyRepresentation: string,
     quality: number,
 
     topics: string[],
     images?: string[],
-    content: string
+    content: string,
+
+    solution: number,
+    possibleAnswers: {
+        id: number,
+        content: string
+    }[],
+    explanation: string
 }
 
 export interface Peer {
     id: number,
-    name: number,
+    name: string,
     bio: string,
 
     proficiencies: string[],
