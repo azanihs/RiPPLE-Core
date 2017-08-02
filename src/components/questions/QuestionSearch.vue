@@ -18,6 +18,7 @@
 <style scoped>
 .header {
     justify-content: space-between;
+    margin-bottom: 1em;
     width: 100%;
 }
 

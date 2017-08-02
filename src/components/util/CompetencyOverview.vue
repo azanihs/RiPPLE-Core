@@ -1,14 +1,14 @@
 <template>
-    <md-layout md-gutter="16" class="overview">
-        <md-layout md-flex="75">
-            <h4 class="chartHeader">Your Current Results vs. {{compare}}</h4>
+    <md-layout class="overview">
+        <md-layout md-flex="75" class="leftPanel">
+            <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
             <div class="chartContainer">
                 <div class="chartPanel">
                     <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
                 </div>
             </div>
         </md-layout>
-        <md-layout md-flex="25">
+        <md-layout md-flex="25" class="rightPanel">
             <div class="settingsContainer">
                 <div class="visualisationMenu">
                     <h3>Change Visualisation Data</h3>
@@ -18,10 +18,10 @@
                         </label>
                         <md-select name="visualisationType" id="visualisationType" v-model="chart">
                             <md-option value="bar">
-                                <div class="chart barChart">Bar Chart</div>
+                                <div class="chartOption barChart">Bar Chart</div>
                             </md-option>
                             <md-option value="radar">
-                                <div class="chart pieChart">Pie Chart</div>
+                                <div class="chartOption pieChart">Pie Chart</div>
                             </md-option>
                         </md-select>
                     </md-input-container>
@@ -54,7 +54,24 @@
 .overview {
     justify-content: center;
     align-items: center;
-    margin-bottom: 1em;
+    margin-bottom: 3em;
+
+    border-radius: 2px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 2px 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+}
+
+.leftPanel {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-right-width: 0px;
+}
+
+.rightPanel {
+    padding: 16px;
+    background-color: #fafafa;
+    color: #777;
+    border: 1px solid #ddd;
+    height: 100%;
 }
 
 .chartContainer {
@@ -69,6 +86,7 @@ h3 {
     width: 100%;
     text-align: center;
     margin-top: 0px;
+    color: #999;
 }
 
 .chartPanel {
@@ -79,14 +97,14 @@ h3 {
 }
 
 
-.chart {
+.chartOption {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.chart::before {
+.chartOption::before {
     font-family: 'Material Icons';
 }
 
@@ -98,7 +116,9 @@ h3 {
     content: "pie_chart";
 }
 
-.visualisationMenu {}
+.settingsContainer {
+    margin: auto;
+}
 
 .visualisationMenu>h3 {
     margin-top: 0px;
