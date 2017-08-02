@@ -12,21 +12,11 @@
         <md-layout md-hide-large-and-up>
             <md-icon>menu</md-icon>
         </md-layout>
-        <hr />
         <ul>
             <li v-for="link in links" :key="link.href">
-                <router-link :to="link.href" class="routerLink">
-                    <md-layout md-hide-xsmall md-hide-small md-hide-medium>
-                        <md-button class="linkButton">
-                            <span>{{ link.text }}</span>
-                            <md-icon>{{link.icon}}</md-icon>
-                        </md-button>
-                    </md-layout>
-                    <md-layout md-hide-large-and-up>
-                        <md-button class="linkButton md-icon-button">
-                            <md-icon>{{link.icon}}</md-icon>
-                        </md-button>
-                    </md-layout>
+                <router-link :to="link.href" tag="md-button" class="routerLink">
+                    <span md-hide-large-and-up>{{ link.text }}</span>
+                    <md-icon>{{link.icon}}</md-icon>
                 </router-link>
             </li>
         </ul>
@@ -39,16 +29,10 @@
     color: #f2f2f2;
 }
 
-hr {
-    width: 75%;
-    border: none;
-    border-bottom: 1px solid #274550;
-    margin: 1em auto;
-}
-
 .profileContainer {
     text-align: center;
     margin: auto;
+    margin-bottom: 1em;
 }
 
 .profileContainer .imageContainer {
@@ -79,29 +63,28 @@ ul {
 ul>li {
     list-style: none;
     padding: 0px;
-    margin: 0px;
+    margin: 0px !important;
 }
 
-.linkButton {
+.routerLink {
     width: 100%;
-    box-sizing: border-box;
-    color: #f2f2f2;
-    text-align: left;
-    border-radius: 0px;
-
+    margin: 0px;
     display: flex;
     flex: 1;
     justify-content: space-between;
+    padding: 5px 10px;
+    border-radius: 0px;
+    border-top: 1px solid #274550;
 }
 
-.linkButton:not(.md-icon-button) {
-    margin-left: -1px;
-    margin-right: -1px;
+.routerLink:last-child {
+    border-bottom: 1px solid #274550;
 }
 
-.linkButton:not(.md-icon-button)>i {
+.routerLink>i {
     margin-left: 0px;
     margin-right: 0px;
+    color: #4d656d;
 }
 
 a.routerLink,
@@ -114,11 +97,11 @@ a.routerLink:hover {
     margin: 0px;
 }
 
-.router-link-exact-active.router-link-active .linkButton,
-.router-link-exact-active.router-link-active .linkButton:hover {
+.router-link-exact-active.router-link-active,
+.router-link-exact-active.router-link-active:hover {
     /* Sets the background colour of the currently selected item */
-    background-color: #ffffff;
-    color: #111;
+    background-color: #ffffff !important;
+    color: #111 !important;
 }
 
 h4 {
@@ -142,13 +125,21 @@ export default class SideNav extends Vue {
         href: "/",
         icon: "widgets"
     }, {
-        text: "View Questions",
-        href: "/view/questions",
+        text: "Author",
+        href: "/view/author",
         icon: "directions"
     }, {
-        text: "Connect To Peers",
+        text: "Answer",
+        href: "/view/questions",
+        icon: "lightbulb_outline"
+    }, {
+        text: "Connect",
         href: "/view/peers",
         icon: "group"
+    }, {
+        text: "Leader Boards",
+        href: "/view/leaderboard",
+        icon: "assignment"
     }];
 }
 </script>

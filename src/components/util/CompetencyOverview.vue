@@ -117,14 +117,62 @@ export default class CompetencyOverview extends Vue {
         this.pCompareAgainst = newVal;
     }
 
+    getColour(c) {
+        if (c < 50) {
+            return "rgba(255, 99, 132, ";
+        } else if (c >= 50 && c <= 75) {
+            return "rgba(255, 206, 86, ";
+        } else {
+            return "rgba(34, 85, 102, ";
+        }
+    };
+
     get competencies() {
         const data = UserService.userCompetencies(this.compare);
         if (this.chart == "radar") {
-            data.data.datasets[1]["type"] = "radar";
-            data.data.datasets[1]["backgroundColor"] = "rgba(29, 50, 58, 0.6)";
-            data.data.datasets[1]["pointBorderColor"] = "rgba(29, 50, 58, 0.6)";
-            data.data.datasets[1]["pointBackgroundColor"] = "rgba(29, 50, 58, 0.2)";
+            //data.data.datasets[1]["type"] = "radar";
+            //data.data.datasets[1]["backgroundColor"] = "rgba(29, 50, 58, 0.6)";
+            //data.data.datasets[1]["pointBorderColor"] = "rgba(29, 50, 58, 0.6)";
+            //data.data.datasets[1]["pointBackgroundColor"] = "rgba(29, 50, 58, 0.2)";
         }
+
+        const ownScores = data.ownScore;
+        const chartData = {
+            data: {
+                labels: data.topics,
+                datasets: [{
+                    data: ownScores,
+                    label: "Your Results",
+                    backgroundColor: ownScores.map(x => this.getColour(x) + "0.4)"),
+                    borderColor: ownScores.map(x => this.getColour(x) + "1)"),
+                    borderWidth: 2
+                }, {
+                    data: data.compareAgainst,
+                    label: this.compare,
+                    type: "line",
+                    pointStyle: "triangle",
+                    backgroundColor: "rgba(29, 50, 58, 0.6)",
+                    showLine: false,
+                    pointBorderColor: "rgba(29, 50, 58, 0.6)",
+                    pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
+                }]
+            },
+            options: {
+                scale: {
+                    ticks: {
+                        beginAtZero: true
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        stacked: false
+                    }],
+                    yAxes: [{
+                        stacked: false
+                    }]
+                }
+            }
+        };
         return data;
     }
     get lineChart() {
