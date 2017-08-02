@@ -10,7 +10,7 @@ module.exports = {
         browser
             .resizeWindow(1920, 1080)
             .url(devServer)
-            .waitForElementVisible(".sideNavContainer .navbarContainer", 1000)
+            .waitForElementVisible(".sideNavContainer .navbarContainer", 10000)
             .assert.containsText(".sideNavContainer .navbarContainer ul li:nth-of-type(1)", "PROFILE")
             .assert.containsText(".sideNavContainer .navbarContainer ul li:nth-of-type(2)", "VIEW QUESTIONS")
             .assert.containsText(".sideNavContainer .navbarContainer ul li:nth-of-type(3)", "CONNECT TO PEERS")
