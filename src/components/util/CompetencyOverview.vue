@@ -37,7 +37,6 @@
                         </md-option>
                     </md-select>
                 </md-input-container>
-    
                 <h4>Topics to Visulise</h4>
                 <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
                     {{topic}}

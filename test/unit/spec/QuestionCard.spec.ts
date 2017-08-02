@@ -5,7 +5,7 @@ import VueMaterial from "vue-material";
 import "vue-material/dist/vue-material.css";
 
 import { Question, Peer } from "../../../src/interfaces/models";
-import QuestionCard from "../../../src/components/questions/QuestionCard.vue";
+import QuestionPreview from "../../../src/components/questions/QuestionPreview.vue";
 
 import { assert } from "chai";
 
@@ -71,37 +71,21 @@ describe("QuestionCard.vue", () => {
     });
 
     it("Correctly renders difficulty", () => {
-        const testData = [{
-            value: 0,
-            expected: "Easy"
-        }, {
-            value: 3,
-            expected: "Easy"
-        }, {
-            value: 4,
-            expected: "Medium"
-        }, {
-            value: 7,
-            expected: "Hard"
-        }, {
-            value: 10,
-            expected: "Hard"
-        }];
-        const runTest = data => {
-            const hardQuestion: Question = Object.assign({}, basicQuestion);
-            hardQuestion.difficulty = data.value;
+        const testData = [0, 3, 4, 7, 10];
+        const runTest = expected => {
+            const testQuestion: Question = Object.assign({}, basicQuestion);
+            testQuestion.difficulty = expected;
             const mountPoint = document.getElementById("mountPoint");
-            let vm = new QuestionCard({
+            let vm = new QuestionPreview({
                 router: router
             });
-            vm.data = hardQuestion;
+            vm.data = testQuestion;
             vm.$mount(mountPoint);
-            return Vue.nextTick()
+            return vm.$nextTick()
                 .then(() => {
-                    const difficulty = vm.$children[0].$el.querySelector(".difficulty") as HTMLElement;
-                    assert.equal(difficulty.innerText.replace(/\s{2,}/, " ").trim(), data.expected + " school");
-                    assert.equal(vm.getDifficultyText(data.value).trim(), data.expected);
-                    return;
+                    const difficulty = vm.$el
+                        .querySelector(".rightPanel>div:nth-child(2) span");
+                    assert.equal((difficulty as HTMLElement).innerText.trim(), expected);
                 });
         };
         return testData.reduce((chain, testCase) =>
@@ -109,41 +93,25 @@ describe("QuestionCard.vue", () => {
     });
 
     it("Correctly renders quality", () => {
-        const testData = [{
-            value: 0,
-            expected: new Array(5).fill("star_border")
-        }, {
-            value: 3,
-            expected: ["star", "star_half", "star_border", "star_border", "star_border"]
-        }, {
-            value: 4,
-            expected: ["star", "star", "star_border", "star_border", "star_border"]
-        }, {
-            value: 7,
-            expected: ["star", "star", "star", "star_half", "star_border"]
-        }, {
-            value: 10,
-            expected: new Array(5).fill("star")
-        }];
-        const runTest = data => {
-            const hardQuestion: Question = Object.assign({}, basicQuestion);
-            hardQuestion.difficulty = data.value;
+        const testData = [0, 3, 4, 7, 10];
+        const runTest = expected => {
+            const testQuestion: Question = Object.assign({}, basicQuestion);
+            testQuestion.quality = expected;
             const mountPoint = document.getElementById("mountPoint");
-            let vm = new QuestionCard({
+            let vm = new QuestionPreview({
                 router: router
             });
-            vm.data = hardQuestion;
+            vm.data = testQuestion;
             vm.$mount(mountPoint);
             return Vue.nextTick()
                 .then(() => {
-                    const quality = vm.$children[0].$el.querySelector(".quality") as HTMLElement;
-                    // One extra child because of tooltip
-                    assert.equal(quality.childNodes.length, data.expected.length + 1);
-                    assert.deepEqual(vm.getStarIcons(data.value), data.expected);
+                    const quality = vm.$el
+                        .querySelector(".rightPanel>div:nth-child(3) span");
+                    assert.equal((quality as HTMLElement).innerText.trim(), expected);
+                    return;
                 });
         };
-
-        return testData.reduce((chain, testCase) => chain.then(runTest.bind(null, testCase)),
-            runTest(testData.shift()));
+        return testData.reduce((chain, testCase) =>
+            chain.then(runTest.bind(null, testCase)), runTest(testData.shift()));
     });
 });
