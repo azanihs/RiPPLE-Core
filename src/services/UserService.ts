@@ -75,31 +75,42 @@ export default class UserService {
         };
     }
 
-    static userCompetencies() {
+    static userCompetencies(compareAgainstType: string) {
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
-        const classAverage = topics.map(x => {
-            return {
-                x: x,
-                y: Math.round(Math.random() * 100)
-            };
-        });
+        const userGoal = topics.map(x => Math.round(Math.random() * 100));
 
+        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
+        const goal = Math.round(Math.random() * 100);
+        const getColour = c => {
+            if (c < 50) {
+                return "rgba(255, 99, 132, ";
+            } else if (c >= 50 && c <= 75) {
+                return "rgba(255, 206, 86, ";
+            } else {
+                return "rgba(34, 85, 102, ";
+            }
+        };
+
+        const ownSummary = [average].concat(ownScore);
         return {
             data: {
-                labels: topics,
+                labels: ["Overall"].concat(topics),
                 datasets: [{
-                    data: classAverage,
-                    label: "Your Goal",
-                    type: "scatter",
-                    backgroundColor: "rgba(255, 99, 132, 0.5)",
-                    showLine: false,
-                    pointBorderColor: "rgba(255, 99, 132, 0.5)",
-                    pointBackgroundColor: "rgba(255, 99, 132, 0.5)"
-                }, {
-                    data: ownScore,
+                    data: ownSummary,
                     label: "Your Results",
-                    backgroundColor: "#256"
+                    backgroundColor: ownSummary.map(x => getColour(x) + "0.4)"),
+                    borderColor: ownSummary.map(x => getColour(x) + "1)"),
+                    borderWidth: 2
+                }, {
+                    data: [goal].concat(userGoal),
+                    label: compareAgainstType,
+                    type: "line",
+                    pointStyle: "triangle",
+                    backgroundColor: "rgba(29, 50, 58, 0.6)",
+                    showLine: false,
+                    pointBorderColor: "rgba(29, 50, 58, 0.6)",
+                    pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
                 }]
             },
             options: {
@@ -110,16 +121,35 @@ export default class UserService {
                 },
                 scales: {
                     xAxes: [{
-                        stacked: true
+                        stacked: false
                     }],
                     yAxes: [{
-                        stacked: true
+                        stacked: false
                     }]
                 }
             }
         };
     }
 
+    static userCompetenciesOverview() {
+        const topics = UserRepository.getAllAvailableTopics();
+        const ownScore = topics.map(x => Math.round(Math.random() * 100));
+        const userGoal = topics.map(x => Math.round(Math.random() * 100));
+
+        return {
+            data: {
+                labels: topics,
+                datasets: [{
+                    data: ownScore,
+                    label: "Your Qualification",
+                    borderWidth: 1,
+                    backgroundColor: [],
+                    borderColor: []
+                }]
+            },
+            options: {}
+        };
+    }
 
     static getEngagementScores() {
         return [

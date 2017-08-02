@@ -35,17 +35,17 @@ module.exports = {
         },
         chrome: {
             desiredCapabilities: {
-                browserName: "chrome",
-                javascriptEnabled: true,
-                acceptSslCerts: true
+                "browserName": "chrome",
+                "javascriptEnabled": true,
+                "acceptSslCerts": true
             }
         },
 
         firefox: {
             desiredCapabilities: {
-                browserName: "firefox",
-                javascriptEnabled: true,
-                acceptSslCerts: true
+                "browserName": "firefox",
+                "javascriptEnabled": true,
+                "acceptSslCerts": true
             }
         }
     }
