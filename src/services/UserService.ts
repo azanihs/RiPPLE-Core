@@ -78,16 +78,15 @@ export default class UserService {
         };
     }
 
-    static userCompetencies(compareAgainstType: string) {
-        const topics = UserRepository.getAllAvailableTopics();
-        const ownScore = topics.map(x => Math.round(Math.random() * 100));
-        const userGoal = topics.map(x => Math.round(Math.random() * 100));
+    static userCompetencies(topicsToInclude: string[]) {
+        const ownScore = topicsToInclude.map(x => Math.round(Math.random() * 100));
+        const userGoal = topicsToInclude.map(x => Math.round(Math.random() * 100));
 
         const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
         const goal = Math.round(Math.random() * 100);
 
         return {
-            topics: ["Overall"].concat(topics),
+            topics: ["Overall"].concat(topicsToInclude),
             ownScore: [average].concat(ownScore),
             compareAgainst: [goal].concat(userGoal)
         };

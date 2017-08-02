@@ -6,17 +6,33 @@
         </overview-description>
         <md-layout md-flex="50">
             <div class="chartContainer">
+                <h4 class="chartHeader">
+                    <span>Your Results vs. </span>
+                    <md-input-container class="compareAgainstContainer">
+                        <md-select name="visualisationType" id="visualisationType" v-model="compare">
+                            <md-option value="Personal Goals">
+                                Personal Goals
+                            </md-option>
+                            <md-option value="Peers">
+                                Peers
+                            </md-option>
+                            <md-option value="Previous Offerings">
+                                Previous Offerings
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </h4>
                 <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
             </div>
         </md-layout>
         <md-layout md-flex="50">
-            <div class="visulisationMenu">
-                <h3>Change Visulisation Data</h3>
+            <div class="visualisationMenu">
+                <h3>Change Visualisation Data</h3>
                 <md-input-container>
-                    <label for="visulisationType">
-                        Visulisation Type
+                    <label for="visualisationType">
+                        Visualisation Type
                     </label>
-                    <md-select name="visulisationType" id="visulisationType" v-model="chart">
+                    <md-select name="visualisationType" id="visualisationType" v-model="chart">
                         <md-option value="bar">
                             <div class="chart barChart">Bar Chart</div>
                         </md-option>
@@ -25,23 +41,11 @@
                         </md-option>
                     </md-select>
                 </md-input-container>
-                <md-input-container>
-                    <label for="visulisationType">
-                        Visulisation Against
-                    </label>
-                    <md-select name="visulisationType" id="visulisationType" v-model="compare">
-                        <md-option value="Personal Goals">
-                            Personal Goals
-                        </md-option>
-                        <md-option value="Peers">
-                            Peers
-                        </md-option>
-                        <md-option value="Previous Offerings">
-                            Previous Offerings
-                        </md-option>
-                    </md-select>
-                </md-input-container>
     
+                <h4>Topics to Visulise</h4>
+                <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
+                    {{topic}}
+                </topic-chip>
             </div>
         </md-layout>
     </md-layout>
@@ -49,6 +53,22 @@
 <style scoped>
 h3 {
     width: 100%;
+}
+
+.chartHeader {
+    font-size: 16px;
+    display: flex;
+    flex: 1;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.compareAgainstContainer {
+    width: auto;
+    margin-left: 5px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    min-height: auto;
 }
 
 .chartContainer {
@@ -74,25 +94,29 @@ h3 {
     content: "pie_chart";
 }
 
-.visulisationMenu {
+.visualisationMenu {
     width: 100%;
 }
 
-.visulisationMenu>h3 {
+.visualisationMenu>h3 {
     margin-top: 0px;
 }
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import Chart from "../charts/Chart.vue";
 import UserService from "../../services/UserService";
+import TopicService from "../../services/TopicService";
+
 import OverviewDescription from "./OverviewDescription.vue";
+import TopicChip from "./TopicChip.vue";
 
 @Component({
     components: {
-        "chart": Chart,
-        "overview-description": OverviewDescription
+        Chart,
+        OverviewDescription,
+        TopicChip
     }
 })
 export default class CompetencyOverview extends Vue {
@@ -103,6 +127,7 @@ export default class CompetencyOverview extends Vue {
 
     pChartType: string = "";
     pCompareAgainst: string = "Personal Goals";
+    hiddenTopics: string[] = [];
 
     get chart() {
         return this.pChartType || this.chartType;
@@ -118,6 +143,28 @@ export default class CompetencyOverview extends Vue {
         this.pCompareAgainst = newVal;
     }
 
+    get topics() {
+        return TopicService.getAllAvailableTopics();
+    }
+
+    @Lifecycle
+    created() {
+
+    }
+
+    toggleTopic(topic) {
+        const foundIndex = this.hiddenTopics.indexOf(topic);
+        if (foundIndex >= 0) {
+            this.hiddenTopics.splice(foundIndex, 1);
+        } else {
+            this.hiddenTopics.push(topic);
+        }
+    }
+
+    isDisabled(topic) {
+        return this.hiddenTopics.indexOf(topic) >= 0;
+    }
+
     getColour(c) {
         if (c < 50) {
             return "rgba(255, 99, 132, ";
@@ -129,7 +176,9 @@ export default class CompetencyOverview extends Vue {
     };
 
     get competencies() {
-        const data = UserService.userCompetencies(this.compare);
+        const topics = this.topics.filter(x => this.hiddenTopics.indexOf(x) == -1);
+
+        const data = UserService.userCompetencies(topics);
         const ownScores = data.ownScore;
         const compareScores = data.compareAgainst;
 

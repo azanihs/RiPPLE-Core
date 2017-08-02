@@ -35,8 +35,12 @@ h2 {
 import { Vue, Component, Prop } from "av-ts";
 import Chart from "../charts/Chart.vue";
 import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+
 import UserRepository from "../../repositories/UserRepository";
+
 import UserService from "../../services/UserService";
+import TopicService from "../../services/TopicService";
+
 import OverviewDescription from "../util/OverviewDescription.vue";
 
 @Component({
@@ -55,7 +59,7 @@ export default class ConnectionOverview extends Vue {
         return UserRepository.getLoggedInUser();
     }
     get topics() {
-        return UserRepository.getAllAvailableTopics();
+        return TopicService.getAllAvailableTopics();
     }
 
     get categories() {
