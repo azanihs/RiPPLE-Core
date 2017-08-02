@@ -5,7 +5,6 @@
             <p>The competency overview will show how your are progressing towards your goals</p>
         </overview-description>
         <md-layout md-flex="50">
-    
             <div class="chartContainer">
                 <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
             </div>

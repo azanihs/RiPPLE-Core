@@ -9,6 +9,7 @@ export default class UserService {
     }
 
     static getEngagementBreakdown() {
+        // TODO: only return the data in this method. The view should handle the configuration
         return {
             data: {
                 labels: [
@@ -39,6 +40,8 @@ export default class UserService {
     }
 
     static getComparativeEngagementBreakdown() {
+        // TODO: only return the data in this method. The view should handle the configuration
+
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const classAverage = topics.map(x => Math.round(Math.random() * 100));
@@ -76,6 +79,8 @@ export default class UserService {
     }
 
     static userCompetencies(compareAgainstType: string) {
+        // TODO: only return the data in this method. The view should handle the configuration
+
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const userGoal = topics.map(x => Math.round(Math.random() * 100));
@@ -132,6 +137,8 @@ export default class UserService {
     }
 
     static userCompetenciesOverview() {
+        // TODO: only return the data in this method. The view should handle the configuration
+
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const userGoal = topics.map(x => Math.round(Math.random() * 100));
