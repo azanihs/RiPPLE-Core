@@ -1,13 +1,12 @@
 const assert = require("assert");
 
 module.exports = {
-    beforeEach: browser => {
+    "beforeEach": browser => {
         const devServer = browser.globals.devServerURL;
-
         browser
             .url(devServer)
             .waitForElementVisible("body")
-            .resizeWindow(1920, 1080)
+            .resizeWindow(1920, 1080);
     },
 
     "Desktop Question Browser Tests": browser => {
