@@ -2,15 +2,13 @@
     <md-card class="recommendationCard">
         <md-card-header>
             <md-avatar>
-                <img :src="data.image"
-                     :alt="data.name">
+                <img :src="data.image" :alt="data.name">
             </md-avatar>
             <md-card-expand>
                 <md-card-actions>
                     <span>{{ data.name }}</span>
                     <span style="flex: 1"></span>
-                    <md-button class="md-icon-button"
-                               md-expand-trigger>
+                    <md-button class="md-icon-button" md-expand-trigger>
                         <md-icon>keyboard_arrow_down</md-icon>
                     </md-button>
                 </md-card-actions>
@@ -22,18 +20,13 @@
         <md-card-area>
             <md-card-content>
                 <div class="card-reservation">
-                    <md-button-toggle md-single
-                                      class="md-button-group">
-                        <md-button v-for="time in data.availableTimes"
-                                   :key="time"> {{ time }}</md-button>
+                    <md-button-toggle md-single class="md-button-group">
+                        <md-button v-for="time in data.availableTimes" :key="time"> {{ time }}</md-button>
                     </md-button-toggle>
                     <span>
-                       <router-link v-for="prof in data.proficiencies"
-                                     :key="prof"
-                                     to="/view/peers"
-                                     class="topicChipLink">
-                            <md-chip class="topicChip">{{ prof }}</md-chip>
-                        </router-link>
+                        <topic-chip v-for="prof in data.proficiencies" :key="prof" linkTo="/view/peers">
+                            {{prof}}
+                        </topic-chip>
                     </span>
                 </div>
             </md-card-content>
@@ -46,36 +39,15 @@
 </template>
 
 <style scoped>
-    .recommendationCard a.topicChipLink,
-    .recommendationCard a.topicChipLink:visited {
-        color: #333;
-        text-decoration: none;
-        transition: 500ms ease background-color, 500ms ease color;
-    }
 
-    .recommendationCard a.topicChipLink:hover {
-        color: #bbb;
-        text-decoration: none;
-    }
-
-    .recommendationCard .topicChip {
-        margin-left: 5px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        transition: 500ms ease background-color;
-    }
-
-    .topicChip:hover {
-        background-color: #333;
-    }
 </style>
 
 <script lang="ts">
-    import { Vue, Component, Prop } from "av-ts";
+import { Vue, Component, Prop } from "av-ts";
 
-    @Component()
-    export default class RecommendationCard extends Vue {
-        @Prop data;
-        @Prop action: string;
-    }
+@Component()
+export default class RecommendationCard extends Vue {
+    @Prop data;
+    @Prop action: string;
+}
 </script>

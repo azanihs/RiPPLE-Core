@@ -36,9 +36,9 @@
                             <md-icon :key="star" v-for="star in getStarIcons(data.quality)">{{ star }}</md-icon>
                         </span>
                         <span>
-                            <router-link v-for="topic in data.topics" :key="topic" to="/view/questions" class="topicChipLink">
-                                <md-chip class="topicChip">{{ topic }}</md-chip>
-                            </router-link>
+                            <topic-chip v-for="topic in data.topics" :key="topic.id" linkTo="/view/questions">
+                                {{topic}}
+                            </topic-chip>
                         </span>
                     </div>
                 </md-card-content>
@@ -107,16 +107,8 @@
     background-color: #333;
 }
 
-
-
-
-
-
-
-
-/* Remove bottom border added by vue-material */
-
 .md-card .md-card-area:after {
+    /* Remove bottom border added by vue-material */
     background: none !important;
 }
 

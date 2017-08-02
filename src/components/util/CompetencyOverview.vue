@@ -41,6 +41,7 @@
                         </md-option>
                     </md-select>
                 </md-input-container>
+    
             </div>
         </md-layout>
     </md-layout>
@@ -175,9 +176,6 @@ export default class CompetencyOverview extends Vue {
             });
         }
         return chartData;
-    }
-    get lineChart() {
-        return UserService.getComparativeEngagementBreakdown();
     }
 }
 </script>

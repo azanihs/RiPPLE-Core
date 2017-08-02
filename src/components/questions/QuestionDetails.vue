@@ -21,9 +21,9 @@
                 <md-icon :key="star" v-for="star in starIcons">{{ star }}</md-icon>
             </span>
             <span>
-                <router-link v-for="topic in question.topics" :key="topic" to="/view/questions" class="topicChipLink">
-                    <md-chip class="topicChip">{{ topic }}</md-chip>
-                </router-link>
+                <topic-chip v-for="topic in question.topics" :key="topic" linkTo="/view/questions">
+                    {{topic}}
+                </topic-chip>
             </span>
         </div>
     </md-layout>
@@ -46,30 +46,6 @@ hr {
     border: none;
     border-bottom: 1px solid #ccc;
     width: 100%;
-}
-
-.md-chip.topicChip {
-    margin-right: 5px;
-    cursor: pointer;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    transition: 500ms ease background-color;
-}
-
-a.topicChipLink,
-a.topicChipLink:visited {
-    color: #333;
-    text-decoration: none;
-    transition: 500ms ease background-color, 500ms ease color;
-}
-
-a.topicChipLink:hover {
-    color: #bbb;
-    text-decoration: none;
-}
-
-.topicChip:hover {
-    background-color: #333;
 }
 </style>
 

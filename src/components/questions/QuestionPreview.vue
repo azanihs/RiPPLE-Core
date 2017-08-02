@@ -6,9 +6,9 @@
                 <span>{{ data.content }}</span>
             </div>
             <div class="bottomPanel">
-                <router-link v-for="topic in data.topics" :key="topic" to="/view/questions" class="topicChipLink">
-                    <md-chip class="topicChip">{{ topic }}</md-chip>
-                </router-link>
+                <topic-chip v-for="topic in data.topics" :key="topic.id" linkTo="/view/questions">
+                    {{topic}}
+                </topic-chip>
             </div>
         </div>
         <md-layout class="rightPanel">
@@ -93,30 +93,6 @@
 .topics {
     margin-bottom: 5px;
 }
-
-.md-chip.topicChip {
-    margin-right: 5px;
-    cursor: pointer;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    transition: 500ms ease background-color;
-}
-
-a.topicChipLink,
-a.topicChipLink:visited {
-    color: #333;
-    text-decoration: none;
-    transition: 500ms ease background-color, 500ms ease color;
-}
-
-a.topicChipLink:hover {
-    color: #bbb;
-    text-decoration: none;
-}
-
-.topicChip:hover {
-    background-color: #333;
-}
 </style>
 
 <script lang="ts">
@@ -124,32 +100,15 @@ import { Vue, Component, Lifecycle, Prop } from "av-ts";
 import { Question } from "../../interfaces/models";
 
 import QuestionDetails from "./QuestionDetails.vue";
-
-import lineClamp from "line-clamp";
+import TopicChip from "../util/TopicChip.vue";
 
 @Component({
     components: {
-        "question-details": QuestionDetails
+        QuestionDetails,
+        TopicChip
     }
 })
 export default class QuestionPreview extends Vue {
     @Prop data: Question;
-
-    clampLines = () => {
-        /*const element = this.$refs["clamp"] as HTMLElement;
-        if (element) {
-            lineClamp(element.childNodes[0].parentElement, { lineCount: 5 });
-        }*/
-    }
-
-    @Lifecycle
-    mounted() {
-        this.clampLines();
-    }
-
-    @Lifecycle
-    updated() {
-        this.clampLines();
-    }
 }
 </script>
