@@ -7,7 +7,11 @@
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
-                <competency-overview></competency-overview>
+                <overview-description>
+                    <h2>Competency Overview</h2>
+                    <p>The competency overview will show how your are progressing towards your goals</p>
+                </overview-description>
+                <competency-overview class="competencyOverview"></competency-overview>
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -28,7 +32,9 @@
 </template>
 
 <style scoped>
-
+.competencyOverview {
+    min-height: 500px;
+}
 </style>
 
 <script lang="ts">
@@ -41,11 +47,11 @@ import CollectedBadges from "../util/CollectedBadges.vue";
 
 @Component({
     components: {
-        "engagement-overview": EngagementOverview,
-        "competency-overview": CompetencyOverview,
-        "connection-overview": ConnectionOverview,
-        "overview-description": OverviewDescription,
-        "collected-badges": CollectedBadges
+        EngagementOverview,
+        CompetencyOverview,
+        ConnectionOverview,
+        OverviewDescription,
+        CollectedBadges
     }
 })
 export default class DefaultView extends Vue {

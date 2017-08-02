@@ -12,7 +12,7 @@
         <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
             <!-- Header -->
             <md-layout class="headingContainer" md-flex="100">
-                <h1>Questions</h1>
+                <competency-overview></competency-overview>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
             <md-layout md-hide-xsmall md-hide-small md-hide-medium>
@@ -83,6 +83,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 import ActionButtons from "../util/ActionButtons.vue";
+import CompetencyOverview from "../util/CompetencyOverview.vue";
 import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
@@ -93,6 +94,7 @@ import QuestionRepository from "../../repositories/QuestionRepository";
 @Component({
     components: {
         ActionButtons,
+        CompetencyOverview,
         QuestionSearch,
         QuestionPreview,
         Question

@@ -1,31 +1,29 @@
 <template>
     <md-layout md-gutter="16">
-        <overview-description>
-            <h2>Competency Overview</h2>
-            <p>The competency overview will show how your are progressing towards your goals</p>
-        </overview-description>
-        <md-layout md-flex="50">
-            <div class="chartContainer">
-                <h4 class="chartHeader">
-                    <span>Your Results vs. </span>
-                    <md-input-container class="compareAgainstContainer">
-                        <md-select name="visualisationType" id="visualisationType" v-model="compare">
-                            <md-option value="Personal Goals">
-                                Personal Goals
-                            </md-option>
-                            <md-option value="Peers">
-                                Peers
-                            </md-option>
-                            <md-option value="Previous Offerings">
-                                Previous Offerings
-                            </md-option>
-                        </md-select>
-                    </md-input-container>
-                </h4>
-                <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+        <md-layout md-flex="75">
+            <h4 class="chartHeader">
+                <span>Your Results vs. </span>
+                <md-input-container class="compareAgainstContainer">
+                    <md-select name="visualisationType" id="visualisationType" v-model="compare">
+                        <md-option value="Personal Goals">
+                            Personal Goals
+                        </md-option>
+                        <md-option value="Peers">
+                            Peers
+                        </md-option>
+                        <md-option value="Previous Offerings">
+                            Previous Offerings
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+            </h4>
+            <div class="chartPanel">
+                <div class="chartContainer">
+                    <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+                </div>
             </div>
         </md-layout>
-        <md-layout md-flex="50">
+        <md-layout md-flex="25">
             <div class="visualisationMenu">
                 <h3>Change Visualisation Data</h3>
                 <md-input-container>
@@ -71,8 +69,13 @@ h3 {
     min-height: auto;
 }
 
+.chartPanel {
+    display: block;
+    width: 100%;
+}
+
 .chartContainer {
-    width: 75%;
+    height: 100%;
 }
 
 .chart {

@@ -1,19 +1,16 @@
 <template>
-    <md-layout md-flex="100">
-        <h2>Search </h2>
-        <md-layout md-flex="100" class="header">
-            <md-layout v-for="field in searchableFields" :key="field.displayName" class="searchItem">
-                <h3 v-if="field.sort" @click="field.sort" class="sortBy">{{ field.name }}
-                    <md-icon>{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
-                </h3>
-                <h3 v-else>{{ field.name }}</h3>
+    <md-layout md-flex="100" class="header">
+        <md-layout v-for="field in searchableFields" :key="field.displayName" class="searchItem">
+            <h3 v-if="field.sort" @click="field.sort" class="sortBy">{{ field.name }}
+                <md-icon>{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
+            </h3>
+            <h3 v-else>{{ field.name }}</h3>
     
-                <select v-if="field.type == 'select'" @change="field.search">
-                    <option v-for="option in field.options" :key="option" :value="option">{{ option }}</option>
-                </select>
+            <select v-if="field.type == 'select'" @change="field.search">
+                <option v-for="option in field.options" :key="option" :value="option">{{ option }}</option>
+            </select>
     
-                <input v-else-if="field.type == 'text'" @keyup="field.search" type="text"></input>
-            </md-layout>
+            <input v-else-if="field.type == 'text'" @keyup="field.search" type="text"></input>
         </md-layout>
     </md-layout>
 </template>
