@@ -84,29 +84,6 @@
     cursor: pointer;
 }
 
-.questionCard a.topicChipLink,
-.questionCard a.topicChipLink:visited {
-    color: #333;
-    text-decoration: none;
-    transition: 500ms ease background-color, 500ms ease color;
-}
-
-.questionCard a.topicChipLink:hover {
-    color: #bbb;
-    text-decoration: none;
-}
-
-.questionCard .topicChip {
-    margin-left: 5px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    transition: 500ms ease background-color;
-}
-
-.topicChip:hover {
-    background-color: #333;
-}
-
 .md-card .md-card-area:after {
     /* Remove bottom border added by vue-material */
     background: none !important;
@@ -132,10 +109,13 @@ hr {
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop } from "av-ts";
 import { Question } from "../../interfaces/models";
+import TopicChip from "../util/TopicChip.vue";
 
-import lineClamp from "line-clamp";
-
-@Component()
+@Component({
+    components: {
+        TopicChip
+    }
+})
 export default class QuestionCard extends Vue {
     @Prop
     data: Question;

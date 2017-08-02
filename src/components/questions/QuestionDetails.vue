@@ -52,8 +52,13 @@ hr {
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
 import { Question } from "../../interfaces/models";
+import TopicChip from "../util/TopicChip.vue";
 
-@Component()
+@Component({
+    components: {
+        TopicChip
+    }
+})
 export default class QuestionDetails extends Vue {
     @Prop question = p({
         required: true

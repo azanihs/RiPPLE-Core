@@ -21,7 +21,8 @@ module.exports = {
             selenium_host: "localhost",
             silent: true,
             globals: {
-                devServerURL: "http://localhost:" + (process.env.PORT || config.dev.port)
+                devServerURL: "http://localhost:" + (process.env.PORT || config.dev.port),
+                waitForConditionTimeout: 10000
             }
         },
 
@@ -29,8 +30,8 @@ module.exports = {
             desiredCapabilities: {
                 "browserName": "phantomjs",
                 "javascriptEnabled": true,
-                "acceptSslCerts": true
-                //"phantomjs.binary.path": require("phantomjs-prebuilt").path
+                "acceptSslCerts": true,
+                "phantomjs.binary.path": require("phantomjs-prebuilt").path
             }
         },
         chrome: {

@@ -44,8 +44,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "av-ts";
+import TopicChip from "../util/TopicChip.vue";
 
-@Component()
+@Component({
+    components: {
+        TopicChip
+    }
+})
 export default class RecommendationCard extends Vue {
     @Prop data;
     @Prop action: string;
