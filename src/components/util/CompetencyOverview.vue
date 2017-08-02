@@ -129,51 +129,50 @@ export default class CompetencyOverview extends Vue {
 
     get competencies() {
         const data = UserService.userCompetencies(this.compare);
-
-
         const ownScores = data.ownScore;
+        const compareScores = data.compareAgainst;
+
+        const ownData = {
+            data: ownScores,
+            label: "Your Results",
+            backgroundColor: ownScores.map(x => this.getColour(x) + "0.4)"),
+            borderColor: ownScores.map(x => this.getColour(x) + "1)"),
+            borderWidth: 2
+        };
+
+        const compareData = {
+            data: compareScores,
+            label: this.compare,
+            type: "line",
+            pointStyle: "triangle",
+            backgroundColor: "rgba(29, 50, 58, 0.6)",
+            showLine: false,
+            pointBorderColor: "rgba(29, 50, 58, 0.6)",
+            pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
+        };
+
         const chartData = {
             data: {
                 labels: data.topics,
-                datasets: [{
-                    data: ownScores,
-                    label: "Your Results",
-                    backgroundColor: ownScores.map(x => this.getColour(x) + "0.4)"),
-                    borderColor: ownScores.map(x => this.getColour(x) + "1)"),
-                    borderWidth: 2
-                }, {
-                    data: data.compareAgainst,
-                    label: this.compare,
-                    type: "line",
-                    pointStyle: "triangle",
-                    backgroundColor: "rgba(29, 50, 58, 0.6)",
-                    showLine: false,
-                    pointBorderColor: "rgba(29, 50, 58, 0.6)",
-                    pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
-                }]
+                datasets: [ownData, compareData]
             },
             options: {
                 scale: {
                     ticks: {
                         beginAtZero: true
                     }
-                },
-                scales: {
-                    xAxes: [{
-                        stacked: false
-                    }],
-                    yAxes: [{
-                        stacked: false
-                    }]
                 }
             }
         };
 
         if (this.chart == "radar") {
-            chartData.data.datasets[1]["type"] = "radar";
-            chartData.data.datasets[1]["backgroundColor"] = "rgba(29, 50, 58, 0.6)";
-            chartData.data.datasets[1]["pointBorderColor"] = "rgba(29, 50, 58, 0.6)";
-            chartData.data.datasets[1]["pointBackgroundColor"] = "rgba(29, 50, 58, 0.2)";
+            Object.assign(compareData, {
+                type: "radar",
+                pointStyle: "default",
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                pointBorderColor: "rgba(0, 0, 0, 0.6)",
+                pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
+            });
         }
         return chartData;
     }
