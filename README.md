@@ -39,7 +39,6 @@ This project comes packaged with several convenience commands
 * `npm run e2e`
     * Runs all integration tests for the project. They are located under `./test/e2e/spec/`.
 	* The current webdrivers which are used are:
-		* Chrome (requires version >= 58.0.3029.0)
 		* PhantomJS (runs headlessly) (Installed locally as part of `npm install`)
 * `npm run test`
     * Runs all unit tests and e2e tests. It is the same as `npm run unit && npm run e2e`
