@@ -129,12 +129,7 @@ export default class CompetencyOverview extends Vue {
 
     get competencies() {
         const data = UserService.userCompetencies(this.compare);
-        if (this.chart == "radar") {
-            //data.data.datasets[1]["type"] = "radar";
-            //data.data.datasets[1]["backgroundColor"] = "rgba(29, 50, 58, 0.6)";
-            //data.data.datasets[1]["pointBorderColor"] = "rgba(29, 50, 58, 0.6)";
-            //data.data.datasets[1]["pointBackgroundColor"] = "rgba(29, 50, 58, 0.2)";
-        }
+
 
         const ownScores = data.ownScore;
         const chartData = {
@@ -173,7 +168,14 @@ export default class CompetencyOverview extends Vue {
                 }
             }
         };
-        return data;
+
+        if (this.chart == "radar") {
+            chartData.data.datasets[1]["type"] = "radar";
+            chartData.data.datasets[1]["backgroundColor"] = "rgba(29, 50, 58, 0.6)";
+            chartData.data.datasets[1]["pointBorderColor"] = "rgba(29, 50, 58, 0.6)";
+            chartData.data.datasets[1]["pointBackgroundColor"] = "rgba(29, 50, 58, 0.2)";
+        }
+        return chartData;
     }
     get lineChart() {
         return UserService.getComparativeEngagementBreakdown();
