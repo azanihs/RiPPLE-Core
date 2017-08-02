@@ -18,9 +18,7 @@
                 </md-input-container>
             </h4>
             <div class="chartPanel">
-                <div class="chartContainer">
-                    <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
-                </div>
+                <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
             </div>
         </md-layout>
         <md-layout md-flex="25">
@@ -74,9 +72,6 @@ h3 {
     width: 100%;
 }
 
-.chartContainer {
-    height: 100%;
-}
 
 .chart {
     flex: 1;

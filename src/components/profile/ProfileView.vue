@@ -33,7 +33,7 @@
 
 <style scoped>
 .competencyOverview {
-    min-height: 500px;
+    height: 500px;
 }
 </style>
 
