@@ -1,10 +1,10 @@
 <template>
-    <router-link v-if="linkTo" :to="linkTo" class="topicChipLink" :class="isDisabled">
+    <router-link v-if="linkTo" :to="linkTo" class="topicChipLink" :class="status">
         <md-chip class="topicChip">
             <slot></slot>
         </md-chip>
     </router-link>
-    <md-chip v-else class="topicChip" :class="isDisabled">
+    <md-chip v-else class="topicChip" :class="status">
         <slot></slot>
     </md-chip>
 </template>
@@ -23,27 +23,32 @@ a.topicChipLink:hover {
 }
 
 .md-chip.topicChip {
-    margin-right: 5px;
     background-color: #fff;
+
+    margin-bottom: 5px;
+    margin-right: 5px;
     border: 1px solid #ccc;
     transition: 500ms ease background-color;
     cursor: pointer;
 }
 
-.md-chip.topicChip:hover {
-    background-color: #333;
-    color: #eee;
+.selected.md-chip.topicChip {
+    background-color: #256;
+    color: #f2f2f2;
 }
 
-.md-chip.topicChip.disabled {
-    background-color: #f2f2f2;
-    font-style: italic;
-    border-color: #ccc;
+.selected.md-chip.topicChip:hover {
+    background-color: #fff;
+    color: #222;
 }
 
-.md-chip.topicChip.disabled:hover {
-    background-color: #333;
-    color: #eee;
+.disabled.md-chip.topicChip {
+    color: #333;
+}
+
+.disabled.md-chip.topicChip:hover {
+    background-color: #256;
+    color: #f2f2f2;
 }
 </style>
 
@@ -61,9 +66,10 @@ export default class TopicChip extends Vue {
         default: false
     });
 
-    get isDisabled() {
+    get status() {
         return {
-            disabled: this.disabled
+            disabled: this.disabled,
+            selected: !this.disabled
         };
     }
 

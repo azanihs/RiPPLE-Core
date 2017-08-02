@@ -12,7 +12,7 @@
         <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
             <!-- Header -->
             <md-layout class="headingContainer" md-flex="100">
-                <competency-overview></competency-overview>
+                <competency-overview @changeTopics="filterQuestionTopic"></competency-overview>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
             <md-layout md-hide-xsmall md-hide-small md-hide-medium>
@@ -103,7 +103,9 @@ import QuestionRepository from "../../repositories/QuestionRepository";
 export default class QuestionBrowser extends Vue {
     questions: QuestionModel[] = QuestionRepository.getMany(25);
 
-    showQuestions: QuestionModel[] = [];
+    searchedQuestions: QuestionModel[] = [];
+
+    topicsToUse: string[] = [];
 
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
@@ -112,8 +114,14 @@ export default class QuestionBrowser extends Vue {
         return 7 * window.innerHeight / 8 + "px";
     }
 
+    get showQuestions() {
+        return this.searchedQuestions.filter(x => {
+            return x.topics.find(t => this.topicsToUse.indexOf(t) >= 0);
+        });
+    }
+
     changeDisplay(searchedQuestions: QuestionModel[]) {
-        this.showQuestions = searchedQuestions;
+        this.searchedQuestions = searchedQuestions;
     }
 
 
@@ -131,5 +139,10 @@ export default class QuestionBrowser extends Vue {
             this.selectedQuestion = question;
         }
     }
+
+    filterQuestionTopic(topicsToUse) {
+        this.topicsToUse = topicsToUse;
+    }
+
 }
 </script>

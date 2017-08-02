@@ -155,6 +155,11 @@ export default class CompetencyOverview extends Vue {
     }
 
     @Lifecycle
+    created() {
+        this.$emit("changeTopics", this.topics);
+    }
+
+    @Lifecycle
     mounted() {
         this.updateChart();
         window.addEventListener("resize", this.updateChart);
@@ -172,6 +177,9 @@ export default class CompetencyOverview extends Vue {
         } else {
             this.hiddenTopics.push(topic);
         }
+
+        const topicsToShow = this.topics.filter(x => this.hiddenTopics.indexOf(x) === -1);
+        this.$emit("changeTopics", topicsToShow);
     }
 
     isDisabled(topic) {
