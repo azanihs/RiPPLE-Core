@@ -33,19 +33,12 @@ export default class Chart extends Vue {
 
     @Lifecycle
     mounted() {
-        const dim = this.$el.parentElement.getBoundingClientRect();
-        // Need to test cross-browser implications of disabling this
-        this.$el.setAttribute("width", "" + dim.width);
-        this.$el.setAttribute("height", "" + dim.height);
-        this.$el.style.width = "100%";
-        this.$el.style.height = "100%";
-
         this.chart = new ChartJS(this.$el, {
             type: this.type,
             data: this.data,
-            options: this.options,
-            responsive: true,
-            maintainAspectRatio: false
+            options: Object.assign({
+                maintainAspectRatio: false
+            }, this.options)
         });
 
         setTimeout(() => {
@@ -55,15 +48,16 @@ export default class Chart extends Vue {
 
     resetChart() {
         this.$nextTick(() => {
-            this.chart.destroy();
-
-            this.chart = new ChartJS(this.$el, {
-                type: this.type,
-                data: this.data,
-                options: this.options,
-                responsive: true,
-                maintainAspectRatio: false
-            });
+            setTimeout(() => {
+                this.chart.destroy();
+                this.chart = new ChartJS(this.$el, {
+                    type: this.type,
+                    data: this.data,
+                    options: Object.assign({
+                        maintainAspectRatio: false
+                    }, this.options)
+                });
+            }, 50);
         });
     }
 
@@ -87,5 +81,6 @@ export default class Chart extends Vue {
 <style scoped>
 .chartjs {
     max-width: 100%;
+    margin: auto;
 }
 </style>

@@ -12,7 +12,7 @@
         <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
             <!-- Header -->
             <md-layout class="headingContainer" md-flex="100">
-                <competency-overview class="competencyOverview"></competency-overview>
+                <competency-overview></competency-overview>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
             <md-layout md-hide-xsmall md-hide-small md-hide-medium>
@@ -53,10 +53,6 @@
 .headingContainer {
     border-bottom: 1px solid #222;
     margin: 8px;
-}
-
-.competencyOverview {
-    min-height: 500px;
 }
 
 .questionPreview {

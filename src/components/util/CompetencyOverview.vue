@@ -1,74 +1,81 @@
 <template>
-    <md-layout md-gutter="16">
+    <md-layout md-gutter="16" class="overview">
         <md-layout md-flex="75">
-            <h4 class="chartHeader">
-                <span>Your Results vs. </span>
-                <md-input-container class="compareAgainstContainer">
-                    <md-select name="visualisationType" id="visualisationType" v-model="compare">
-                        <md-option value="Personal Goals">
-                            Personal Goals
-                        </md-option>
-                        <md-option value="Peers">
-                            Peers
-                        </md-option>
-                        <md-option value="Previous Offerings">
-                            Previous Offerings
-                        </md-option>
-                    </md-select>
-                </md-input-container>
-            </h4>
-            <div class="chartPanel">
-                <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+            <h4 class="chartHeader">Your Current Results vs. {{compare}}</h4>
+            <div class="chartContainer">
+                <div class="chartPanel">
+                    <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+                </div>
             </div>
         </md-layout>
         <md-layout md-flex="25">
-            <div class="visualisationMenu">
-                <h3>Change Visualisation Data</h3>
-                <md-input-container>
-                    <label for="visualisationType">
-                        Visualisation Type
-                    </label>
-                    <md-select name="visualisationType" id="visualisationType" v-model="chart">
-                        <md-option value="bar">
-                            <div class="chart barChart">Bar Chart</div>
-                        </md-option>
-                        <md-option value="radar">
-                            <div class="chart pieChart">Pie Chart</div>
-                        </md-option>
-                    </md-select>
-                </md-input-container>
-                <h4>Topics to Visulise</h4>
-                <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
-                    {{topic}}
-                </topic-chip>
+            <div class="settingsContainer">
+                <div class="visualisationMenu">
+                    <h3>Change Visualisation Data</h3>
+                    <md-input-container>
+                        <label for="visualisationType">
+                            Visualisation Type
+                        </label>
+                        <md-select name="visualisationType" id="visualisationType" v-model="chart">
+                            <md-option value="bar">
+                                <div class="chart barChart">Bar Chart</div>
+                            </md-option>
+                            <md-option value="radar">
+                                <div class="chart pieChart">Pie Chart</div>
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container>
+                        <label for="visulisationCompare">
+                            Compare Data
+                        </label>
+                        <md-select name="visulisationCompare" id="visulisationCompare" v-model="compare">
+                            <md-option value="Personal Goals">
+                                Personal Goals
+                            </md-option>
+                            <md-option value="Peers">
+                                Peers
+                            </md-option>
+                            <md-option value="Previous Offerings">
+                                Previous Offerings
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <h4>Topics to Visulise</h4>
+                    <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
+                        {{topic}}
+                    </topic-chip>
+                </div>
             </div>
         </md-layout>
     </md-layout>
 </template>
 <style scoped>
+.overview {
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.chartContainer {
+    width: 100%;
+}
+
 h3 {
     width: 100%;
 }
 
 .chartHeader {
-    font-size: 16px;
-    display: flex;
-    flex: 1;
-    align-items: baseline;
-    justify-content: center;
-}
-
-.compareAgainstContainer {
-    width: auto;
-    margin-left: 5px;
-    margin-bottom: 0px;
-    padding-top: 0px;
-    min-height: auto;
+    width: 100%;
+    text-align: center;
+    margin-top: 0px;
 }
 
 .chartPanel {
     display: block;
     width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 
@@ -91,9 +98,7 @@ h3 {
     content: "pie_chart";
 }
 
-.visualisationMenu {
-    width: 100%;
-}
+.visualisationMenu {}
 
 .visualisationMenu>h3 {
     margin-top: 0px;
@@ -144,9 +149,20 @@ export default class CompetencyOverview extends Vue {
         return TopicService.getAllAvailableTopics();
     }
 
-    @Lifecycle
-    created() {
+    updateChart() {
+        const dim = this.$el.querySelector(".visualisationMenu").getBoundingClientRect();
+        this.$el.querySelector(".chartContainer")["style"].height = dim.height + "px";
+    }
 
+    @Lifecycle
+    mounted() {
+        this.updateChart();
+        window.addEventListener("resize", this.updateChart);
+    }
+
+    @Lifecycle
+    destroyed() {
+        window.removeEventListener("resize", this.updateChart);
     }
 
     toggleTopic(topic) {
@@ -204,6 +220,7 @@ export default class CompetencyOverview extends Vue {
                 datasets: [ownData, compareData]
             },
             options: {
+                responsive: true,
                 scale: {
                     ticks: {
                         beginAtZero: true
@@ -219,6 +236,9 @@ export default class CompetencyOverview extends Vue {
                 backgroundColor: "rgba(0, 0, 0, 0.4)",
                 pointBorderColor: "rgba(0, 0, 0, 0.6)",
                 pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
+            });
+            Object.assign(chartData.options, {
+                //responsive: false
             });
         }
         return chartData;

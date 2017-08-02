@@ -11,7 +11,7 @@
                     <h2>Competency Overview</h2>
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
-                <competency-overview class="competencyOverview"></competency-overview>
+                <competency-overview></competency-overview>
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -32,9 +32,7 @@
 </template>
 
 <style scoped>
-.competencyOverview {
-    height: 500px;
-}
+
 </style>
 
 <script lang="ts">
