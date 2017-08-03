@@ -33,7 +33,6 @@
                 <md-tooltip md-direction="top">Question Suitability</md-tooltip>
             </div>
         </md-layout>
-    
     </div>
 </template>
 

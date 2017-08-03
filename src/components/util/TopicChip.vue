@@ -22,6 +22,10 @@ a.topicChipLink:hover {
     text-decoration: none;
 }
 
+a.topicChipLink:hover .topicChip {
+    background-color: #333;
+}
+
 .md-chip.topicChip {
     background-color: #fff;
 
