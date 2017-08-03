@@ -1,65 +1,62 @@
 <template>
-    <md-layout md-flex="100">
-        <md-layout class="overview">
-            <md-layout md-flex="75" class="leftPanel">
-                <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
-                <div class="chartContainer">
-                    <div class="chartPanel">
-                        <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+    <md-layout md-flex="100" class="overview">
+        <md-card>
+            <md-layout md-flex="100">
+                <md-layout md-flex="75" class="leftPanel">
+                    <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
+                    <div class="chartContainer">
+                        <div class="chartPanel">
+                            <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+                        </div>
                     </div>
-                </div>
-            </md-layout>
-            <md-layout md-flex="25" class="rightPanel">
-                <div class="settingsContainer">
-                    <div class="visualisationMenu">
-                        <h3>Change Visualisation Data</h3>
-                        <md-input-container>
-                            <label for="visualisationType">
-                                Visualisation Type
-                            </label>
-                            <md-select name="visualisationType" id="visualisationType" v-model="chart">
-                                <md-option value="bar">
-                                    <div class="chartOption barChart">Bar Chart</div>
-                                </md-option>
-                                <md-option value="radar">
-                                    <div class="chartOption pieChart">Pie Chart</div>
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                        <md-input-container>
-                            <label for="visulisationCompare">
-                                Compare Data
-                            </label>
-                            <md-select name="visulisationCompare" id="visulisationCompare" v-model="compare">
-                                <md-option value="Personal Goals">
-                                    Personal Goals
-                                </md-option>
-                                <md-option value="Peers">
-                                    Peers
-                                </md-option>
-                                <md-option value="Previous Offerings">
-                                    Previous Offerings
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                        <h4>Topics to Visulise</h4>
-                        <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
-                            {{topic}}
-                        </topic-chip>
+                </md-layout>
+                <md-layout md-flex="25" class="rightPanel">
+                    <div class="settingsContainer">
+                        <div class="visualisationMenu">
+                            <h3>Change Visualisation Data</h3>
+                            <md-input-container>
+                                <label for="visualisationType">
+                                    Visualisation Type
+                                </label>
+                                <md-select name="visualisationType" id="visualisationType" v-model="chart">
+                                    <md-option value="bar">
+                                        <div class="chartOption barChart">Bar Chart</div>
+                                    </md-option>
+                                    <md-option value="radar">
+                                        <div class="chartOption pieChart">Pie Chart</div>
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container>
+                                <label for="visulisationCompare">
+                                    Compare Data
+                                </label>
+                                <md-select name="visulisationCompare" id="visulisationCompare" v-model="compare">
+                                    <md-option value="Personal Goals">
+                                        Personal Goals
+                                    </md-option>
+                                    <md-option value="Peers">
+                                        Peers
+                                    </md-option>
+                                    <md-option value="Previous Offerings">
+                                        Previous Offerings
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                            <h4>Topics to Visulise</h4>
+                            <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
+                                {{topic}}
+                            </topic-chip>
+                        </div>
                     </div>
-                </div>
+                </md-layout>
             </md-layout>
-        </md-layout>
+        </md-card>
     </md-layout>
 </template>
 <style scoped>
 .overview {
-    justify-content: center;
-    align-items: center;
     margin-bottom: 3em;
-
-    border-radius: 2px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 2px 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
 }
 
 .leftPanel {
