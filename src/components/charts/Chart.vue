@@ -1,5 +1,5 @@
 <template>
-    <canvas class="chartjs">
+    <canvas class="chartjs" :width="width" :height="height">
     </canvas>
 </template>
 
@@ -31,15 +31,33 @@ export default class Chart extends Vue {
 
     chart: ChartJS = null;
 
-    @Lifecycle
-    mounted() {
+    get height() {
+        if (this.$el) {
+            return this.$el.parentElement.getBoundingClientRect().height;
+        }
+    }
+    get width() {
+        if (this.$el) {
+            return this.$el.parentElement.getBoundingClientRect().width;
+        }
+    }
+
+    mountChart() {
+        const chartOptions = Object.assign({
+            maintainAspectRatio: false,
+            responsive: this.type == "radar" ? false : true
+        }, this.options);
+
         this.chart = new ChartJS(this.$el, {
             type: this.type,
             data: this.data,
-            options: Object.assign({
-                maintainAspectRatio: false
-            }, this.options)
+            options: chartOptions
         });
+    }
+
+    @Lifecycle
+    mounted() {
+        this.mountChart();
 
         setTimeout(() => {
             this.resetChart();
@@ -48,16 +66,8 @@ export default class Chart extends Vue {
 
     resetChart() {
         this.$nextTick(() => {
-            setTimeout(() => {
-                this.chart.destroy();
-                this.chart = new ChartJS(this.$el, {
-                    type: this.type,
-                    data: this.data,
-                    options: Object.assign({
-                        maintainAspectRatio: false
-                    }, this.options)
-                });
-            }, 50);
+            this.chart.destroy();
+            this.mountChart();
         });
     }
 
@@ -82,5 +92,6 @@ export default class Chart extends Vue {
 .chartjs {
     max-width: 100%;
     margin: auto;
+    transition: width 250ms linear, height 250ms linear;
 }
 </style>

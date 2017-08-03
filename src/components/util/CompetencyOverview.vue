@@ -1,6 +1,6 @@
 <template>
     <md-layout md-flex="100" class="overview">
-        <md-card>
+        <md-card class="fullWidth">
             <md-layout md-flex="100">
                 <md-layout md-flex="75" class="leftPanel">
                     <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
@@ -55,6 +55,10 @@
     </md-layout>
 </template>
 <style scoped>
+.fullWidth {
+    width: 100%;
+}
+
 .overview {
     margin-bottom: 3em;
 }
@@ -248,7 +252,9 @@ export default class CompetencyOverview extends Vue {
                 datasets: [ownData, compareData]
             },
             options: {
-                responsive: true,
+                legend: {
+                    display: false
+                },
                 scale: {
                     ticks: {
                         beginAtZero: true
