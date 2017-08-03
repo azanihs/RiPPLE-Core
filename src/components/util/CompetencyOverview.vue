@@ -252,9 +252,6 @@ export default class CompetencyOverview extends Vue {
                 datasets: [ownData, compareData]
             },
             options: {
-                legend: {
-                    display: false
-                },
                 scale: {
                     ticks: {
                         beginAtZero: true
