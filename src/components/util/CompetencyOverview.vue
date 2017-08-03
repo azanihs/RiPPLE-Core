@@ -23,7 +23,7 @@
                                         <div class="chartOption barChart">Bar Chart</div>
                                     </md-option>
                                     <md-option value="radar">
-                                        <div class="chartOption pieChart">Pie Chart</div>
+                                        <div class="chartOption radarChart">Radar Chart</div>
                                     </md-option>
                                 </md-select>
                             </md-input-container>
@@ -105,14 +105,15 @@ h3 {
 
 .chartOption::before {
     font-family: 'Material Icons';
+    margin-right: 5px;
 }
 
 .barChart::before {
-    content: "bar_chart";
+    content: "\E01D";
 }
 
-.pieChart::before {
-    content: "pie_chart";
+.radarChart::before {
+    content: "\E1B3";
 }
 
 .settingsContainer {
@@ -264,8 +265,9 @@ export default class CompetencyOverview extends Vue {
                 pointBorderColor: "rgba(0, 0, 0, 0.6)",
                 pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
             });
-            Object.assign(chartData.options, {
-                //responsive: false
+            Object.assign(ownData, {
+                backgroundColor: ownData.backgroundColor[0],
+                borderColor: ownData.borderColor[0]
             });
         }
         return chartData;
