@@ -5,7 +5,7 @@
                 <!-- Header -->
                 <action-buttons class="" @back="selectedQuestion = null" @randomQuestion="selectRandom"></action-buttons>
                 <md-layout md-flex="100" class="questionContainer">
-                    <question @userAnswer="() => userIsFinished = true" class="question" :question="selectedQuestion"></question>
+                    <question @userAnswer="setUserIsFinished" class="question" :question="selectedQuestion"></question>
                 </md-layout>
             </md-layout>
         </transition>
@@ -109,6 +109,10 @@ export default class QuestionBrowser extends Vue {
 
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
+
+    setUserIsFinished(newVal: boolean) {
+        this.userIsFinished = newVal;
+    }
 
     get maxOverlayHeight() {
         return 7 * window.innerHeight / 8 + "px";
