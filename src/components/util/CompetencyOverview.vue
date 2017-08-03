@@ -57,6 +57,7 @@
 <style scoped>
 .fullWidth {
     width: 100%;
+    user-select: none;
 }
 
 .overview {
