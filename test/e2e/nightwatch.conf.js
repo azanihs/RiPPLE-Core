@@ -21,7 +21,8 @@ module.exports = {
             selenium_host: "localhost",
             silent: true,
             globals: {
-                devServerURL: "http://localhost:" + (process.env.PORT || config.dev.port)
+                devServerURL: "http://localhost:" + (process.env.PORT || config.dev.port),
+                waitForConditionTimeout: 10000
             }
         },
 

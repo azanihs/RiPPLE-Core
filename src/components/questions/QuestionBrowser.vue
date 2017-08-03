@@ -5,14 +5,14 @@
                 <!-- Header -->
                 <action-buttons class="" @back="selectedQuestion = null" @randomQuestion="selectRandom"></action-buttons>
                 <md-layout md-flex="100" class="questionContainer">
-                    <question @userAnswer="() => userIsFinished = true" class="question" :question="selectedQuestion"></question>
+                    <question @userAnswer="setUserIsFinished" class="question" :question="selectedQuestion"></question>
                 </md-layout>
             </md-layout>
         </transition>
         <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
             <!-- Header -->
             <md-layout class="headingContainer" md-flex="100">
-                <h1>Questions</h1>
+                <competency-overview @changeTopics="filterQuestionTopic"></competency-overview>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
             <md-layout md-hide-xsmall md-hide-small md-hide-medium>
@@ -83,6 +83,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 import ActionButtons from "../util/ActionButtons.vue";
+import CompetencyOverview from "../util/CompetencyOverview.vue";
 import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
@@ -93,6 +94,7 @@ import QuestionRepository from "../../repositories/QuestionRepository";
 @Component({
     components: {
         ActionButtons,
+        CompetencyOverview,
         QuestionSearch,
         QuestionPreview,
         Question
@@ -101,17 +103,29 @@ import QuestionRepository from "../../repositories/QuestionRepository";
 export default class QuestionBrowser extends Vue {
     questions: QuestionModel[] = QuestionRepository.getMany(25);
 
-    showQuestions: QuestionModel[] = [];
+    searchedQuestions: QuestionModel[] = [];
+
+    topicsToUse: string[] = [];
 
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
+
+    setUserIsFinished(newVal: boolean) {
+        this.userIsFinished = newVal;
+    }
 
     get maxOverlayHeight() {
         return 7 * window.innerHeight / 8 + "px";
     }
 
+    get showQuestions() {
+        return this.searchedQuestions.filter(x => {
+            return x.topics.find(t => this.topicsToUse.indexOf(t) >= 0);
+        });
+    }
+
     changeDisplay(searchedQuestions: QuestionModel[]) {
-        this.showQuestions = searchedQuestions;
+        this.searchedQuestions = searchedQuestions;
     }
 
 
@@ -129,5 +143,10 @@ export default class QuestionBrowser extends Vue {
             this.selectedQuestion = question;
         }
     }
+
+    filterQuestionTopic(topicsToUse) {
+        this.topicsToUse = topicsToUse;
+    }
+
 }
 </script>

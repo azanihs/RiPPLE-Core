@@ -9,6 +9,7 @@ export default class UserService {
     }
 
     static getEngagementBreakdown() {
+        // TODO: only return the data in this method. The view should handle the configuration
         return {
             data: {
                 labels: [
@@ -39,6 +40,8 @@ export default class UserService {
     }
 
     static getComparativeEngagementBreakdown() {
+        // TODO: only return the data in this method. The view should handle the configuration
+
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const classAverage = topics.map(x => Math.round(Math.random() * 100));
@@ -75,63 +78,23 @@ export default class UserService {
         };
     }
 
-    static userCompetencies(compareAgainstType: string) {
-        const topics = UserRepository.getAllAvailableTopics();
-        const ownScore = topics.map(x => Math.round(Math.random() * 100));
-        const userGoal = topics.map(x => Math.round(Math.random() * 100));
+    static userCompetencies(topicsToInclude: string[]) {
+        const ownScore = topicsToInclude.map(x => Math.round(Math.random() * 100));
+        const userGoal = topicsToInclude.map(x => Math.round(Math.random() * 100));
 
         const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
         const goal = Math.round(Math.random() * 100);
-        const getColour = c => {
-            if (c < 50) {
-                return "rgba(255, 99, 132, ";
-            } else if (c >= 50 && c <= 75) {
-                return "rgba(255, 206, 86, ";
-            } else {
-                return "rgba(34, 85, 102, ";
-            }
-        };
 
-        const ownSummary = [average].concat(ownScore);
         return {
-            data: {
-                labels: ["Overall"].concat(topics),
-                datasets: [{
-                    data: ownSummary,
-                    label: "Your Results",
-                    backgroundColor: ownSummary.map(x => getColour(x) + "0.4)"),
-                    borderColor: ownSummary.map(x => getColour(x) + "1)"),
-                    borderWidth: 2
-                }, {
-                    data: [goal].concat(userGoal),
-                    label: compareAgainstType,
-                    type: "line",
-                    pointStyle: "triangle",
-                    backgroundColor: "rgba(29, 50, 58, 0.6)",
-                    showLine: false,
-                    pointBorderColor: "rgba(29, 50, 58, 0.6)",
-                    pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
-                }]
-            },
-            options: {
-                scale: {
-                    ticks: {
-                        beginAtZero: true
-                    }
-                },
-                scales: {
-                    xAxes: [{
-                        stacked: false
-                    }],
-                    yAxes: [{
-                        stacked: false
-                    }]
-                }
-            }
+            topics: ["Overall"].concat(topicsToInclude),
+            ownScore: [average].concat(ownScore),
+            compareAgainst: [goal].concat(userGoal)
         };
     }
 
     static userCompetenciesOverview() {
+        // TODO: only return the data in this method. The view should handle the configuration
+
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const userGoal = topics.map(x => Math.round(Math.random() * 100));
