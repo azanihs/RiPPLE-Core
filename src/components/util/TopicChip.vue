@@ -18,7 +18,7 @@ a.topicChipLink:visited {
 }
 
 a.topicChipLink:hover {
-    color: #eee;
+    color: #eee !important;
     text-decoration: none;
 }
 
