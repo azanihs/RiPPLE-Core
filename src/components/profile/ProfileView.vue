@@ -1,6 +1,5 @@
 <template>
     <md-layout>
-        <h1>Profile</h1>
         <md-tabs md-fixed class="md-transparent">
             <md-tab md-label="Engagement">
                 <overview-description>

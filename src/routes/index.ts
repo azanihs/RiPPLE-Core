@@ -8,13 +8,15 @@ import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import QuestionRecommender from "../components/questions/QuestionRecommender.vue";
 import PeerView from "../components/views/PeerView.vue";
 
+import WIP from "../components/WIP.vue";
+
 Vue.use(VueRouter);
 
 const routes = [{
     path: "/",
     component: Main,
     children: [{
-        path: "",
+        path: "/",
         name: "main",
         component: ProfileView
     }, {
@@ -33,6 +35,10 @@ const routes = [{
         path: "/view/question/:id",
         name: "question",
         component: QuestionRecommender
+    }, {
+        path: "*",
+        name: "error",
+        component: WIP
     }]
 }];
 
