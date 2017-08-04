@@ -93,8 +93,6 @@ export default class UserService {
     }
 
     static userCompetenciesOverview() {
-        // TODO: only return the data in this method. The view should handle the configuration
-
         const topics = UserRepository.getAllAvailableTopics();
         const ownScore = topics.map(x => Math.round(Math.random() * 100));
         const userGoal = topics.map(x => Math.round(Math.random() * 100));
@@ -114,27 +112,18 @@ export default class UserService {
         };
     }
 
-    static getEngagementScores() {
-        return [
-            "Engagement Score",
-            "Overall Grade",
-            "Goal Progress",
-            "Achievements",
-            "Recommendations Accepted",
-            "Social Connections",
-            "Study Partners",
-            "Peers Mentored",
-            "Questions Rated",
-            "Questions Asked",
-            "Questions Answered",
-            "Questions Viewed"].map(x => {
-                const item = {
-                    name: x,
-                    score: Math.floor(Math.random() * 100)
-                };
+    static getEngagementScores(itemsToGet: string[]) {
+        const ownScore = itemsToGet.map(x => Math.round(Math.random() * 100));
+        const userGoal = itemsToGet.map(x => Math.round(Math.random() * 100));
 
-                return item;
-            });
+        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
+        const goal = Math.round(Math.random() * 100);
+
+        return {
+            topics: ["Overall"].concat(itemsToGet),
+            ownScore: [average].concat(ownScore),
+            compareAgainst: [goal].concat(userGoal)
+        };
     }
 
 

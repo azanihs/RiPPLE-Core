@@ -6,7 +6,8 @@
                     <h2>Engagement Overview</h2>
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
-                <engagement-overview class="separator"></engagement-overview>
+                <variable-data-visualiser class="separator" :dataCategories="engagementItems" :compareList="generateEngagement">
+                </variable-data-visualiser>
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -14,7 +15,8 @@
                     <h2>Competency Overview</h2>
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
-                <competency-overview class="separator"></competency-overview>
+                <variable-data-visualiser class="separator" :dataCategories="topics" :compareList="generateCompetencies">
+                </variable-data-visualiser>
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -51,16 +53,14 @@ import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 
 import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
-import EngagementOverview from "./EngagementOverview.vue";
-import CompetencyOverview from "../util/CompetencyOverview.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 import ConnectionOverview from "./ConnectionOverview.vue";
 import OverviewDescription from "../util/OverviewDescription.vue";
 import CollectedBadges from "../util/CollectedBadges.vue";
 
 @Component({
     components: {
-        EngagementOverview,
-        CompetencyOverview,
+        VariableDataVisualiser,
         ConnectionOverview,
         ConnectednessHeatmap,
         OverviewDescription,
@@ -75,9 +75,34 @@ export default class DefaultView extends Vue {
     get topics() {
         return TopicService.getAllAvailableTopics();
     }
+    get engagementItems() {
+        return [
+            "Engagement Score",
+            "Overall Grade",
+            "Goal Progress",
+            "Achievements",
+            "Recommendations Accepted",
+            "Social Connections",
+            "Study Partners",
+            "Peers Mentored",
+            "Questions Rated",
+            "Questions Asked",
+            "Questions Answered",
+            "Questions Viewed"];
+    }
+
+    generateEngagement(itemsToInclude) {
+        return UserService.getEngagementScores(itemsToInclude);
+    }
 
     get categories() {
+        // Mentoring types
         return UserService.getAllAvailableCategories();
     }
+
+    generateCompetencies(itemsToInclude) {
+        return UserService.userCompetencies(itemsToInclude);
+    }
+
 }
 </script>

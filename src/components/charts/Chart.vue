@@ -1,5 +1,5 @@
 <template>
-    <canvas class="chartjs" :width="width" :height="height">
+    <canvas class="chartjs">
     </canvas>
 </template>
 
@@ -13,7 +13,6 @@ export default class Chart extends Vue {
     @Prop type = p({
         type: String,
         required: true
-        //validator: val => types.find(val)
     });
     @Prop data = p({
         type: Object,
@@ -31,21 +30,10 @@ export default class Chart extends Vue {
 
     chart: ChartJS = null;
 
-    get height() {
-        if (this.$el) {
-            return this.$el.parentElement.getBoundingClientRect().height;
-        }
-    }
-    get width() {
-        if (this.$el) {
-            return this.$el.parentElement.getBoundingClientRect().width;
-        }
-    }
-
     mountChart() {
         const chartOptions = Object.assign({
             maintainAspectRatio: false,
-            responsive: this.type == "radar" ? false : true
+            responsive: true
         }, this.options);
 
         this.chart = new ChartJS(this.$el, {
