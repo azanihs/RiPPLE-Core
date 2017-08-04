@@ -1,4 +1,5 @@
 import { Badge } from "../interfaces/models";
+import UserRepository from "../repositories/UserRepository";
 
 export default class BadgeService {
     static badgeToIcon(badge: Badge): string {
@@ -35,5 +36,9 @@ export default class BadgeService {
             "trending_up",
             "toll"
         ][badge.id] || "priority_high";
+    }
+
+    static getAllAvailableBadges() {
+        return UserRepository.getAllAvailableBadges();
     }
 }

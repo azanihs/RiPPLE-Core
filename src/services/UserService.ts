@@ -146,4 +146,17 @@ export default class UserService {
     static getAllAvailableCategories(): string[] {
         return UserRepository.getAllAvailableCategories();
     }
+
+    static getRecommendedConnections(count: number) {
+        return PeerRepository.getMany(count);
+    }
+
+    static getOutstandingRequests(count: number) {
+        return PeerRepository.getMany(count);
+    }
+
+    static userHasBadge(badgeId) {
+        // TODO: This lookup is very slow, a hashmap or similar would be better.
+        return UserRepository.getAllUserBadges().find(x => x.badgeId == badgeId);
+    }
 }

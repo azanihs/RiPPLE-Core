@@ -90,7 +90,7 @@ import { Vue, Component, Lifecycle } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
-import QuestionRepository from "../../repositories/QuestionRepository";
+import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
 
 import ActionButtons from "../util/ActionButtons.vue";
@@ -110,7 +110,7 @@ import Question from "./Question.vue";
     }
 })
 export default class QuestionBrowser extends Vue {
-    questions: QuestionModel[] = QuestionRepository.getMany(25);
+    questions: QuestionModel[] = QuestionService.getRecommendedForUser(25);
 
     searchedQuestions: QuestionModel[] = [];
 

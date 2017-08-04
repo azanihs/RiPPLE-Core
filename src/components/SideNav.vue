@@ -114,11 +114,11 @@ h4 {
 
 <script lang="ts">
 import { Vue, Component, Prop } from "av-ts";
-import PeerRepository from "../repositories/PeerRepository";
+import UserService from "../services/UserService";
 
 @Component()
 export default class SideNav extends Vue {
-    personalAvatar = PeerRepository.getMany(1)[0].image;
+    personalAvatar = UserService.getLoggedInUser().self.image;
 
     links = [{
         text: "Profile",

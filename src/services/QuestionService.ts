@@ -6,6 +6,9 @@ export default class QuestionService {
         return QuestionRepository.getMany(1)[0];
     }
 
+    static getRecommendedForUser(count: number) {
+        return QuestionRepository.getMany(count);
+    }
     static distributionForQuestion(question: Question) {
         const numberAnswers = question.possibleAnswers.length;
         const distribution = new Map();
