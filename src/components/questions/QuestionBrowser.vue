@@ -12,7 +12,7 @@
         <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
             <!-- Header -->
             <md-layout class="headingContainer" md-flex="100">
-                <competency-overview @changeTopics="filterQuestionTopic"></competency-overview>
+                <competency-overview class="overview" @changeTopics="filterQuestionTopic"></competency-overview>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
             <md-layout md-hide-xsmall md-hide-small md-hide-medium>
@@ -30,6 +30,9 @@
 </template>
 
 <style scoped>
+.overview {
+    margin-bottom: 2em;
+}
 .hidden {
     visibility: hidden;
     height: 0px;
