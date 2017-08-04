@@ -6,7 +6,6 @@
 <script lang="ts">
 import ChartJS from "chart.js";
 import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
-const types = ["line", "bar", "radar", "polarArea", "pie", "doughnut", "bubble"];
 
 @Component()
 export default class Chart extends Vue {
