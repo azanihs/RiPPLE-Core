@@ -60,10 +60,6 @@
     user-select: none;
 }
 
-.overview {
-    margin-bottom: 3em;
-}
-
 .leftPanel {
     padding: 16px;
     border: 1px solid #ddd;

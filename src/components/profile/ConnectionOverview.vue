@@ -1,20 +1,25 @@
 <template>
-    <md-layout>
-        <overview-description>
-            <h2>Connection Overview</h2>
-            <p>The connections overview will show you how you have connected to peers through Ripple.</p>
-        </overview-description>
-        <connectedness-heatmap :data="profileData" :topics="topics" :categories="categories">
-        </connectedness-heatmap>
-        <h2>Peer Connections</h2>
-        <md-layout md-flex="100">
-            <md-image v-for="peer in peerConnections" :key="peer.id" class="connectionImage" :md-src="peer.image"></md-image>
+    <md-card class="card">
+        <md-layout>
+            <h2>Peer Connections</h2>
+            <md-layout md-flex="100">
+                <md-image v-for="peer in peerConnections" :key="peer.id" class="connectionImage" :md-src="peer.image"></md-image>
+            </md-layout>
         </md-layout>
-    </md-layout>
+    </md-card>
 </template>
 <style scoped>
+.card {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1;
+    padding: 16px;
+}
+
 h2 {
     width: 100%;
+    margin-top: 0px;
 }
 
 .connectionImage {
@@ -32,11 +37,8 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "av-ts";
-import Chart from "../charts/Chart.vue";
+import { Vue, Component } from "av-ts";
 import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
-
-import UserRepository from "../../repositories/UserRepository";
 
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
@@ -56,14 +58,14 @@ export default class ConnectionOverview extends Vue {
     }
 
     get profileData() {
-        return UserRepository.getLoggedInUser();
+        return UserService.getLoggedInUser();
     }
     get topics() {
         return TopicService.getAllAvailableTopics();
     }
 
     get categories() {
-        return UserRepository.getAllAvailableCategories();
+        return UserService.getAllAvailableCategories();
     }
 }
 </script>

@@ -1,33 +1,39 @@
 <template>
-    <md-layout>
-        <overview-description>
-            <h2>Engagement Overview</h2>
-            <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
-        </overview-description>
-        <md-layout md-flex="50">
-            <h3>Activity Breakdown</h3>
-            <div class="pieChart">
-                <chart :type="'pie'" :data="pieChart.data" :options="pieChart.options">
-                </chart>
-            </div>
-        </md-layout>
-        <md-layout md-flex="50">
-            <div class="engagementScoreContainer">
-                <div v-for="item in engagementItems" :key="item.name" class="engagementItem">
-                    <h3>{{item.name}}</h3>
-                    <div class="engagementScore">
-                        <div class="engagementButton">
-                            {{item.score}}
+    <md-card class="card">
+        <md-layout>
+            <md-layout md-flex="50">
+                <h3>Activity Breakdown</h3>
+                <div class="pieChart">
+                    <chart :type="'pie'" :data="pieChart.data" :options="pieChart.options">
+                    </chart>
+                </div>
+            </md-layout>
+            <md-layout md-flex="50">
+                <div class="engagementScoreContainer">
+                    <div v-for="item in engagementItems" :key="item.name" class="engagementItem">
+                        <h3>{{item.name}}</h3>
+                        <div class="engagementScore">
+                            <div class="engagementButton">
+                                {{item.score}}
+                            </div>
+                            <md-spinner md-theme="spinner" class="engagementScoreProgress" :md-stroke="2" :md-progress="100"></md-spinner>
+                            <md-spinner class="engagementScoreProgress" :md-stroke="2" :md-progress="item.score"></md-spinner>
                         </div>
-                        <md-spinner md-theme="spinner" class="engagementScoreProgress" :md-stroke="2" :md-progress="100"></md-spinner>
-                        <md-spinner class="engagementScoreProgress" :md-stroke="2" :md-progress="item.score"></md-spinner>
                     </div>
                 </div>
-            </div>
+            </md-layout>
         </md-layout>
-    </md-layout>
+    </md-card>
 </template>
 <style scoped>
+.card {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1;
+    padding: 16px;
+}
+
 .engagementScoreContainer {
     width: 100%;
     display: flex;

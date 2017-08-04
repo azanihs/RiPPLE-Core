@@ -136,4 +136,25 @@ export default class UserService {
                 return item;
             });
     }
+
+
+    /**
+ * Returns an array of Peer objects
+ * @param {number} peerCount The number of peers to return
+ * @return {Peer[]} An array of Peers with length peerCount
+ */
+    static getLoggedInUser(): User {
+        return UserRepository.getLoggedInUser();
+    }
+
+    static getAllAvailableBadges(): Badge[] {
+        return UserRepository.getAllAvailableBadges();
+    }
+    static getAllUserBadges(): AcquiredBadge[] {
+        return UserRepository.getAllUserBadges();
+    }
+
+    static getAllAvailableCategories(): string[] {
+        return UserRepository.getAllAvailableCategories();
+    }
 }
