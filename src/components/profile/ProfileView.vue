@@ -196,7 +196,7 @@ export default class DefaultView extends Vue {
             "Competencies",
             "Goal Progress",
             "Achievements",
-            "Recommendations Accepted",
+            "Recommendations",
             "Social Connections",
             "Study Partners",
             "Peers Mentored",
