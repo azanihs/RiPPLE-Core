@@ -57,11 +57,14 @@
     color: #ddd;
 }
 
+.badge {
+    padding: 0.5em;
+}
+
 .obtained .badge {
     color: #f2f2f2;
     background-color: #256;
     border-radius: 50%;
-    padding: 0.5em;
 }
 
 .badgeProgress:not(.obtained).progress {

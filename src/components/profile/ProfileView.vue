@@ -2,21 +2,26 @@
     <md-layout>
         <md-tabs md-fixed class="md-transparent">
             <md-tab md-label="Overview">
-                <md-layout md-flex="100" class="separator">
-                    <md-layout md-flex="50">
-                        g
+                <md-layout md-flex="100" class="separator overview">
+                    <md-layout class="notificationSummary">
+                        <h2>Notifications</h2>
                     </md-layout>
-                    <md-layout md-flex="50">
-                        <md-card class="card">
-                            <div v-for="item in engagementSummary" :key="item.name" class="engagementItem">
-                                <h3>{{item.name}}</h3>
-                                <div class="engagementScore">
-                                    <div class="engagementButton">
-                                        {{item.score}}
-                                    </div>
-                                    <md-spinner md-theme="spinner" class="engagementScoreProgress" :md-stroke="2" :md-progress="100"></md-spinner>
-                                    <md-spinner class="progressSpinner engagementScoreProgress" :md-stroke="2" :md-progress="item.score"></md-spinner>
+                    <md-layout class="engagementSummary">
+                        <h2>Engagement</h2>
+                    </md-layout>
+    
+                    <md-layout class="notificationSummary">
+                        <notifications :showCount="5"></notifications>
+                    </md-layout>
+                    <md-layout class="engagementSummary">
+                        <md-card v-for="item in engagementSummary" :key="item.name" class="engagementItem">
+                            <h3>{{item.name}}</h3>
+                            <div class="engagementScore">
+                                <div class="engagementButton">
+                                    {{item.score}}
                                 </div>
+                                <md-spinner md-theme="spinner" class="engagementScoreProgress" :md-stroke="2" :md-progress="100"></md-spinner>
+                                <md-spinner class="progressSpinner engagementScoreProgress" :md-stroke="2" :md-progress="item.score"></md-spinner>
                             </div>
                         </md-card>
                     </md-layout>
@@ -60,17 +65,45 @@
                 <collected-badges class="separator" topic='competencies'></collected-badges>
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
+            <md-tab md-label="Notifications">
+                <overview-description>
+                    <h2>Notifications Overview</h2>
+                    <p>The notifications overview shows you things which require your attention or action</p>
+                </overview-description>
+                <notifications></notifications>
+            </md-tab>
         </md-tabs>
     </md-layout>
 </template>
 
 <style scoped>
+.overview {
+    align-items: flex-start;
+}
+
 .separator {
     margin-bottom: 2em;
 }
 
+.notificationSummary {
+    align-items: flex-start;
+    min-width: 48.75%;
+    flex: 0 1 48.75%;
+}
+
+.engagementSummary {
+    align-items: flex-start;
+    min-width: 48.75%;
+    flex: 0 1 48.75%;
+    margin-left: 2.5%
+}
+
+h2 {
+    width: 100%;
+}
+
 .engagementItem {
-    flex-grow: 1;
+    flex: none !important;
     width: 47.5%;
     padding: 1em;
     display: flex;
@@ -79,6 +112,7 @@
     background-color: #f9f9f9;
     margin-bottom: 2em;
     border: 1px solid #f2f2f2;
+    overflow: hidden;
 }
 
 .engagementItem:nth-child(odd) {
@@ -131,6 +165,7 @@ import { Vue, Component } from "av-ts";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 
+import Notifications from "../util/Notifications.vue";
 import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
 import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 import ConnectionOverview from "./ConnectionOverview.vue";
@@ -143,6 +178,7 @@ import CollectedBadges from "../util/CollectedBadges.vue";
         ConnectionOverview,
         ConnectednessHeatmap,
         OverviewDescription,
+        Notifications,
         CollectedBadges
     }
 })

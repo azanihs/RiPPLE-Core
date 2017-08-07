@@ -1,4 +1,4 @@
-import { User, Peer, Badge, AcquiredBadge, UserSummary } from "../interfaces/models";
+import { User, Peer, Badge, AcquiredBadge, UserSummary, Notification } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import PeerRepository from "../repositories/PeerRepository";
 
@@ -96,5 +96,9 @@ export default class UserService {
             };
             return summary;
         }).sort((a, b) => b.reputation - a.reputation);
+    }
+
+    static getUserNotifications(count: number): Notification[] {
+        return UserRepository.getUserNotifications().slice(0, count);
     }
 }

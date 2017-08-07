@@ -75,4 +75,9 @@ export interface PeerConnection {
     date: Date, // Date the connection was made
 }
 
-
+export interface Notification {
+    id: number,
+    type: "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting",
+    content: string,
+    read: boolean
+}
