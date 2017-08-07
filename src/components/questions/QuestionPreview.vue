@@ -1,5 +1,5 @@
 <template>
-    <md-card md-with-hover>
+    <md-card md-with-hover class="card">
         <div class="cardContainer">
             <div class="leftPanel fullHeight">
                 <div ref="clamp" class="clamp">
@@ -39,6 +39,10 @@
 </template>
 
 <style scoped>
+.card {
+    padding: 0px !important;
+}
+
 .cardContainer {
     display: flex;
     flex: 1;

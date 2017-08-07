@@ -45,6 +45,14 @@ export interface User {
     }[]
 }
 
+export interface UserSummary {
+    name: string,
+    reputation: number,
+    questionsContributed: number,
+    numberAnswers: number,
+    numberComments: number
+}
+
 export interface Badge {
     id: number,
     name: string,
@@ -66,3 +74,5 @@ export interface PeerConnection {
     weight: number,
     date: Date, // Date the connection was made
 }
+
+

@@ -1,4 +1,4 @@
-import { User, Peer, Badge, AcquiredBadge } from "../interfaces/models";
+import { User, Peer, Badge, AcquiredBadge, UserSummary } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import PeerRepository from "../repositories/PeerRepository";
 
@@ -83,5 +83,18 @@ export default class UserService {
     static userHasBadge(badgeId) {
         // TODO: This lookup is slow, a hashmap or similar would be better.
         return UserRepository.getAllUserBadges().find(x => x.badge.id == badgeId);
+    }
+
+    static mostReputableUsers(): UserSummary[] {
+        return UserService.getOutstandingRequests(10).map(x => {
+            const summary: UserSummary = {
+                name: x.name,
+                reputation: Math.floor(Math.random() * 20),
+                questionsContributed: Math.floor(Math.random() * 20),
+                numberAnswers: Math.floor(Math.random() * 20),
+                numberComments: Math.floor(Math.random() * 20)
+            };
+            return summary;
+        }).sort((a, b) => b.reputation - a.reputation);
     }
 }
