@@ -15,7 +15,10 @@
 </template>
 
 <style>
-
+.badgeSpinner.md-theme-default.md-spinner .md-spinner-path {
+    /* TODO: Move out of global scope */
+    stroke: #256;
+}
 </style>
 <style scoped>
 .badgeContainer {

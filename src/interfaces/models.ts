@@ -53,7 +53,7 @@ export interface Badge {
 }
 
 export interface AcquiredBadge {
-    badgeId: number,
+    badge: Badge,
     progress: number,
     dateAcquired: Date
 }

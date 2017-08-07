@@ -33,6 +33,7 @@
                     <h2>Achievement Overview</h2>
                     <p>The achievement overview tracks noteable feats you have accomplished in Ripple, and shows you your progress towards those you have not yet achieved.</p>
                 </overview-description>
+                <collected-badges class="separator" topic='closest'></collected-badges>
                 <collected-badges class="separator" topic='engagement'></collected-badges>
                 <collected-badges class="separator" topic='competencies'></collected-badges>
                 <collected-badges topic='connections'></collected-badges>

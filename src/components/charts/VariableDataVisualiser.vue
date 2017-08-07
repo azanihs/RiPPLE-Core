@@ -211,8 +211,9 @@ export default class VariableDataVisualiser extends Vue {
 
     @Lifecycle
     mounted() {
-        this.updateChart();
         window.addEventListener("resize", this.updateChart);
+        this.$nextTick()
+            .then(this.updateChart);
     }
 
     @Lifecycle

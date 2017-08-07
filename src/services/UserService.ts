@@ -156,7 +156,7 @@ export default class UserService {
     }
 
     static userHasBadge(badgeId) {
-        // TODO: This lookup is very slow, a hashmap or similar would be better.
-        return UserRepository.getAllUserBadges().find(x => x.badgeId == badgeId);
+        // TODO: This lookup is slow, a hashmap or similar would be better.
+        return UserRepository.getAllUserBadges().find(x => x.badge.id == badgeId);
     }
 }

@@ -52,11 +52,12 @@ export default class CollectedBadges extends Vue {
     @Prop topic = p(String);
 
     get availableBadges() {
-        const badges = BadgeService.getAllAvailableBadges();
-        if (this.topic != "all") {
-            return badges.filter(x => x.category == this.topic);
-        }
-        return badges;
+        if (this.topic == "all")
+            return BadgeService.getAllAvailableBadges();
+        else if (this.topic == "closest")
+            return BadgeService.getClosestUserBadges();
+        else
+            return BadgeService.getBadgeByType(this.topic);
     }
 }
 </script>
