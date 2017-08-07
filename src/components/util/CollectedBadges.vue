@@ -1,5 +1,5 @@
 <template>
-    <md-card class="card">
+    <md-card>
         <md-layout>
             <h3>{{topic}} Badges</h3>
             <md-layout v-for="badge in availableBadges" :key="badge.id" md-flex="33" class="badgeGutter" md-gutter>
@@ -10,14 +10,6 @@
 </template>
 
 <style scoped>
-.card {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex: 1;
-    padding: 16px;
-}
-
 h3 {
     width: 100%;
     margin-top: 0px;

@@ -59,6 +59,7 @@
 .fullWidth {
     width: 100%;
     user-select: none;
+    padding: 0px !important;
 }
 
 .leftPanel {

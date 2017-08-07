@@ -1,6 +1,6 @@
 <template>
     <md-card md-with-hover>
-        <div class="card">
+        <div class="cardContainer">
             <div class="leftPanel fullHeight">
                 <div ref="clamp" class="clamp">
                     <img v-if="data.images.length > 0" :src="data.images[0]"></img>
@@ -39,7 +39,7 @@
 </template>
 
 <style scoped>
-.card {
+.cardContainer {
     display: flex;
     flex: 1;
     height: 262px;

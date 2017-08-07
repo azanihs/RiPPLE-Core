@@ -3,7 +3,7 @@
     Should only be used when the vue-material library does not provide *nice* ways to style components
 */
 
-.md-card.card.md-theme-default {
+.md-card.md-theme-default {
     /*
         Used to make the vue-material cards take up full width
     */
@@ -19,4 +19,12 @@
         Used to colour the md-spinners with a colour which follows the colour scheme
     */
     stroke: #256;
+}
+
+.md-theme-default .md-tab-header.md-active {
+    color: #256 !important;
+}
+
+.md-theme-default .md-tab-indicator {
+    background-color: #256 !important;
 }

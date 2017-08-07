@@ -1,14 +1,14 @@
 <template>
-    <md-card class="card">
+    <md-card>
         <md-layout>
             <h2>Social Connectedness</h2>
             <table v-once class="connectedTable">
                 <thead>
                     <tr>
                         <th>Connection Type</td>
-                        <th v-for="topic in topics" :key="topic">
-                            {{topic}}
-                        </th>
+                            <th v-for="topic in topics" :key="topic">
+                                {{topic}}
+                            </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,8 +29,8 @@
     table-layout: fixed;
     border-collapse: collapse;
     width: 100%;
-
 }
+
 h2 {
     margin-top: 0px;
 }
@@ -44,6 +44,7 @@ h2 {
     font-weight: 700;
     padding: 0.25em;
 }
+
 .connectedTable tr td:first-child {
     font-weight: 700;
 }
@@ -71,14 +72,6 @@ td:hover {
     background-color: #eee !important;
     cursor: pointer;
     color: #222 !important;
-}
-
-.card {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex: 1;
-    padding: 16px;
 }
 </style>
 

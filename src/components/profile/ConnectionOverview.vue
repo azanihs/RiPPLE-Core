@@ -1,5 +1,5 @@
 <template>
-    <md-card class="card">
+    <md-card>
         <md-layout>
             <h2>Peer Connections</h2>
             <md-layout md-flex="100">
@@ -9,14 +9,6 @@
     </md-card>
 </template>
 <style scoped>
-.card {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex: 1;
-    padding: 16px;
-}
-
 h2 {
     width: 100%;
     margin-top: 0px;
