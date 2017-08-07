@@ -3,6 +3,8 @@ import Router from "./routes";
 import VueMaterial from "vue-material";
 import "vue-material/dist/vue-material.css";
 
+import "./style/style.css";
+
 // Global scoped addons
 Vue.use(VueMaterial);
 

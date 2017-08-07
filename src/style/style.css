@@ -1,0 +1,22 @@
+/** 
+    CSS file to contain global styles
+    Should only be used when the vue-material library does not provide *nice* ways to style components
+*/
+
+.md-card.card.md-theme-default {
+    /*
+        Used to make the vue-material cards take up full width
+    */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1;
+    padding: 16px;
+}
+
+.progressSpinner.md-theme-default.md-spinner .md-spinner-path {
+    /*
+        Used to colour the md-spinners with a colour which follows the colour scheme
+    */
+    stroke: #256;
+}

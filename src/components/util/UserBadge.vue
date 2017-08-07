@@ -5,7 +5,7 @@
                 <md-icon>{{badgeIcon}}</md-icon>
             </div>
             <md-spinner v-if="userBadge && userBadge.progress >= 0" md-theme="spinner" class="badgeSpinner" :md-stroke="2" :md-progress="100"></md-spinner>
-            <md-spinner v-if="userBadge && userBadge.progress >= 0" class="badgeSpinner" :md-stroke="2" :md-progress="userBadge.progress"></md-spinner>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0" class="progressSpinner badgeSpinner" :md-stroke="2" :md-progress="userBadge.progress"></md-spinner>
         </div>
         <div class="badgeDescription">
             <h4>{{badge.name}}</h4>
@@ -14,12 +14,6 @@
     </div>
 </template>
 
-<style>
-.badgeSpinner.md-theme-default.md-spinner .md-spinner-path {
-    /* TODO: Move out of global scope */
-    stroke: #256;
-}
-</style>
 <style scoped>
 .badgeContainer {
     display: flex;
