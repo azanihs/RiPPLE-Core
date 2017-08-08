@@ -12,7 +12,8 @@
         <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
             <!-- Header -->
             <md-layout class="headingContainer" md-flex="100">
-                <competency-overview @changeTopics="filterQuestionTopic"></competency-overview>
+                <variable-data-visualiser class="overview" @changeTopics="filterQuestionTopic" :dataCategories="topics" :compareList="generateCompetencies">
+                </variable-data-visualiser>
                 <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
             </md-layout>
             <md-layout md-hide-xsmall md-hide-small md-hide-medium>
@@ -30,6 +31,10 @@
 </template>
 
 <style scoped>
+.overview {
+    margin-bottom: 2em;
+}
+
 .hidden {
     visibility: hidden;
     height: 0px;
@@ -82,26 +87,30 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
+import { Question as QuestionModel } from "../../interfaces/models";
+
+import UserService from "../../services/UserService";
+import QuestionService from "../../services/QuestionService";
+import TopicService from "../../services/TopicService";
+
 import ActionButtons from "../util/ActionButtons.vue";
-import CompetencyOverview from "../util/CompetencyOverview.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
 
-import { Question as QuestionModel } from "../../interfaces/models";
-import QuestionRepository from "../../repositories/QuestionRepository";
 
 @Component({
     components: {
         ActionButtons,
-        CompetencyOverview,
+        VariableDataVisualiser,
         QuestionSearch,
         QuestionPreview,
         Question
     }
 })
 export default class QuestionBrowser extends Vue {
-    questions: QuestionModel[] = QuestionRepository.getMany(25);
+    questions: QuestionModel[] = QuestionService.getRecommendedForUser(25);
 
     searchedQuestions: QuestionModel[] = [];
 
@@ -146,6 +155,14 @@ export default class QuestionBrowser extends Vue {
 
     filterQuestionTopic(topicsToUse) {
         this.topicsToUse = topicsToUse;
+    }
+
+    get topics() {
+        return TopicService.getAllAvailableTopics();
+    }
+
+    generateCompetencies(itemsToInclude) {
+        return UserService.userCompetencies(itemsToInclude);
     }
 
 }

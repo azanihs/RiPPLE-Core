@@ -7,6 +7,9 @@ import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import QuestionRecommender from "../components/questions/QuestionRecommender.vue";
 import PeerView from "../components/views/PeerView.vue";
+import LeaderBoard from "../components/leaderboard/LeaderBoard.vue";
+
+import WIP from "../components/WIP.vue";
 
 Vue.use(VueRouter);
 
@@ -14,7 +17,7 @@ const routes = [{
     path: "/",
     component: Main,
     children: [{
-        path: "",
+        path: "/",
         name: "main",
         component: ProfileView
     }, {
@@ -33,6 +36,14 @@ const routes = [{
         path: "/view/question/:id",
         name: "question",
         component: QuestionRecommender
+    }, {
+        path: "/view/leaderboard",
+        name: "leaderboard",
+        component: LeaderBoard
+    }, {
+        path: "*",
+        name: "error",
+        component: WIP
     }]
 }];
 

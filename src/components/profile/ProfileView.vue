@@ -1,9 +1,40 @@
 <template>
     <md-layout>
-        <h1>Profile</h1>
         <md-tabs md-fixed class="md-transparent">
+            <md-tab md-label="Overview">
+                <md-layout md-flex="100" class="separator overview">
+                    <md-layout class="notificationSummary">
+                        <h2>Notifications</h2>
+                    </md-layout>
+                    <md-layout class="engagementSummary">
+                        <h2>Engagement</h2>
+                    </md-layout>
+    
+                    <md-layout class="notificationSummary">
+                        <notifications :showCount="5"></notifications>
+                    </md-layout>
+                    <md-layout class="engagementSummary">
+                        <md-card v-for="item in engagementSummary" :key="item.name" class="engagementItem">
+                            <h3>{{item.name}}</h3>
+                            <div class="engagementScore">
+                                <div class="engagementButton">
+                                    {{item.score}}
+                                </div>
+                                <md-spinner md-theme="spinner" class="engagementScoreProgress" :md-stroke="2" :md-progress="100"></md-spinner>
+                                <md-spinner class="progressSpinner engagementScoreProgress" :md-stroke="2" :md-progress="item.score"></md-spinner>
+                            </div>
+                        </md-card>
+                    </md-layout>
+                </md-layout>
+                <collected-badges topic='closest'></collected-badges>
+            </md-tab>
             <md-tab md-label="Engagement">
-                <engagement-overview></engagement-overview>
+                <overview-description>
+                    <h2>Engagement Overview</h2>
+                    <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
+                </overview-description>
+                <variable-data-visualiser class="separator" :dataCategories="engagementItems" :compareList="generateEngagement">
+                </variable-data-visualiser>
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -11,11 +42,17 @@
                     <h2>Competency Overview</h2>
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
-                <competency-overview></competency-overview>
+                <variable-data-visualiser class="separator" :dataCategories="topics" :compareList="generateCompetencies">
+                </variable-data-visualiser>
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
-                <connection-overview></connection-overview>
+                <overview-description>
+                    <h2>Connection Overview</h2>
+                    <p>The connections overview will show you how you have connected to peers through Ripple.</p>
+                </overview-description>
+                <connectedness-heatmap class="separator" :data="profileData" :topics="topics" :categories="categories"></connectedness-heatmap>
+                <connection-overview class="separator"></connection-overview>
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
             <md-tab md-label="Achievements">
@@ -23,35 +60,172 @@
                     <h2>Achievement Overview</h2>
                     <p>The achievement overview tracks noteable feats you have accomplished in Ripple, and shows you your progress towards those you have not yet achieved.</p>
                 </overview-description>
-                <collected-badges :separator="false" topic='engagement'></collected-badges>
-                <collected-badges topic='competencies'></collected-badges>
+                <collected-badges class="separator" topic='closest'></collected-badges>
+                <collected-badges class="separator" topic='engagement'></collected-badges>
+                <collected-badges class="separator" topic='competencies'></collected-badges>
                 <collected-badges topic='connections'></collected-badges>
+            </md-tab>
+            <md-tab md-label="Notifications">
+                <overview-description>
+                    <h2>Notifications Overview</h2>
+                    <p>The notifications overview shows you things which require your attention or action</p>
+                </overview-description>
+                <notifications></notifications>
             </md-tab>
         </md-tabs>
     </md-layout>
 </template>
 
 <style scoped>
+.overview {
+    align-items: flex-start;
+}
 
+.separator {
+    margin-bottom: 2em;
+}
+
+.notificationSummary {
+    align-items: flex-start;
+    min-width: 48.75%;
+    flex: 0 1 48.75%;
+}
+
+.engagementSummary {
+    align-items: flex-start;
+    min-width: 48.75%;
+    flex: 0 1 48.75%;
+    margin-left: 2.5%
+}
+
+h2 {
+    width: 100%;
+}
+
+.engagementItem {
+    flex: none !important;
+    width: 47.5%;
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    margin-bottom: 2em;
+    border: 1px solid #f2f2f2;
+    overflow: hidden;
+}
+
+.engagementItem:nth-child(odd) {
+    margin-right: 2.5%;
+}
+
+.engagementItem:nth-child(even) {
+    margin-left: 2.5%;
+}
+
+h3 {
+    width: 100%;
+}
+
+.engagementItem h3 {
+    display: inline-block;
+    vertical-align: middle;
+    width: 75%;
+    margin: 0px;
+}
+
+.engagementScore {
+    position: relative;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    right: 25px;
+}
+
+.engagementButton {
+    font-size: 1.5em;
+    background-color: transparent !important;
+    color: #256 !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.engagementScoreProgress {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 </style>
 
 <script lang="ts">
 import { Vue, Component } from "av-ts";
-import EngagementOverview from "./EngagementOverview.vue";
-import CompetencyOverview from "../util/CompetencyOverview.vue";
+import UserService from "../../services/UserService";
+import TopicService from "../../services/TopicService";
+
+import Notifications from "../util/Notifications.vue";
+import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 import ConnectionOverview from "./ConnectionOverview.vue";
 import OverviewDescription from "../util/OverviewDescription.vue";
 import CollectedBadges from "../util/CollectedBadges.vue";
 
 @Component({
     components: {
-        EngagementOverview,
-        CompetencyOverview,
+        VariableDataVisualiser,
         ConnectionOverview,
+        ConnectednessHeatmap,
         OverviewDescription,
+        Notifications,
         CollectedBadges
     }
 })
 export default class DefaultView extends Vue {
+
+    get profileData() {
+        return UserService.getLoggedInUser();
+    }
+    get topics() {
+        return TopicService.getAllAvailableTopics();
+    }
+
+    get engagementItems() {
+        return [
+            "Competencies",
+            "Goal Progress",
+            "Achievements",
+            "Recommendations",
+            "Social Connections",
+            "Study Partners",
+            "Peers Mentored",
+            "Questions Rated",
+            "Questions Asked",
+            "Questions Answered",
+            "Questions Viewed"];
+    }
+
+    get engagementSummary() {
+        const scores = UserService.getEngagementScores(this.engagementItems);
+        return scores.topics.map((x, i) => ({
+            name: x,
+            score: scores.ownScore[i]
+        }));
+    }
+
+    generateEngagement(itemsToInclude) {
+        return UserService.getEngagementScores(itemsToInclude);
+    }
+
+    get categories() {
+        // Mentoring types
+        return UserService.getAllAvailableCategories();
+    }
+
+    generateCompetencies(itemsToInclude) {
+        return UserService.userCompetencies(itemsToInclude);
+    }
+
 }
 </script>

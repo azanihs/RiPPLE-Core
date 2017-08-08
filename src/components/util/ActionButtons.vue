@@ -17,7 +17,6 @@
     width: 100%;
     justify-content: space-between;
     margin-bottom: 2em;
-    border-bottom: 1px solid #ddd;
 }
 </style>
 

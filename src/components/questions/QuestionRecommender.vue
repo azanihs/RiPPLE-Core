@@ -16,7 +16,6 @@
 .competencyContainer {
     height: 10em;
     padding-bottom: 1em;
-    border-bottom: 1px solid #ddd;
 }
 
 h3 {

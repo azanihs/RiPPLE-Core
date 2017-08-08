@@ -1,12 +1,12 @@
 <template>
-    <md-layout md-flex="100" class="overview">
+    <md-layout md-flex="100">
         <md-card class="fullWidth">
             <md-layout md-flex="100">
                 <md-layout md-flex="75" class="leftPanel">
                     <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
                     <div class="chartContainer">
                         <div class="chartPanel">
-                            <chart :type="chart" :data="competencies.data" :options="competencies.options"></chart>
+                            <chart ref="chart" :type="chart" :data="chartData.data" :options="chartData.options"></chart>
                         </div>
                     </div>
                 </md-layout>
@@ -44,8 +44,8 @@
                                 </md-select>
                             </md-input-container>
                             <h4>Topics to Visulise</h4>
-                            <topic-chip v-for="topic in topics" :key="topic" :disabled="isDisabled(topic)" @click.native="toggleTopic(topic)">
-                                {{topic}}
+                            <topic-chip v-for="category in dataCategories" :key="category" :disabled="isDisabled(category)" @click.native="toggleVisible(category)">
+                                {{category}}
                             </topic-chip>
                         </div>
                     </div>
@@ -54,14 +54,12 @@
         </md-card>
     </md-layout>
 </template>
+
 <style scoped>
 .fullWidth {
     width: 100%;
     user-select: none;
-}
-
-.overview {
-    margin-bottom: 3em;
+    padding: 0px !important;
 }
 
 .leftPanel {
@@ -132,29 +130,36 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import Chart from "../charts/Chart.vue";
-import UserService from "../../services/UserService";
-import TopicService from "../../services/TopicService";
 
-import OverviewDescription from "./OverviewDescription.vue";
-import TopicChip from "./TopicChip.vue";
+import TopicChip from "../util/TopicChip.vue";
+import Chart from "./Chart.vue";
 
 @Component({
     components: {
         Chart,
-        OverviewDescription,
         TopicChip
     }
 })
-export default class CompetencyOverview extends Vue {
-    @Prop chartType = p({
+export default class VariableDataVisualiser extends Vue {
+    @Prop
+    dataCategories = p({ // Topics...
+        required: true
+    }) as string[];
+
+    @Prop
+    compareList = p({ // Dataset to compare against. Function to access that data based on dataType
+        required: true
+    }) as Function;
+
+    @Prop
+    chartType = p({
         type: String,
         default: "bar"
     }) as string;
 
+    hiddenData = {};
     pChartType: string = "";
     pCompareAgainst: string = "Personal Goals";
-    hiddenTopics: string[] = [];
 
     get chart() {
         return this.pChartType || this.chartType;
@@ -166,49 +171,9 @@ export default class CompetencyOverview extends Vue {
     get compare() {
         return this.pCompareAgainst;
     }
+
     set compare(newVal: string) {
         this.pCompareAgainst = newVal;
-    }
-
-    get topics() {
-        return TopicService.getAllAvailableTopics();
-    }
-
-    updateChart() {
-        const dim = this.$el.querySelector(".visualisationMenu").getBoundingClientRect();
-        this.$el.querySelector(".chartContainer")["style"].height = dim.height + "px";
-    }
-
-    @Lifecycle
-    created() {
-        this.$emit("changeTopics", this.topics);
-    }
-
-    @Lifecycle
-    mounted() {
-        this.updateChart();
-        window.addEventListener("resize", this.updateChart);
-    }
-
-    @Lifecycle
-    destroyed() {
-        window.removeEventListener("resize", this.updateChart);
-    }
-
-    toggleTopic(topic) {
-        const foundIndex = this.hiddenTopics.indexOf(topic);
-        if (foundIndex >= 0) {
-            this.hiddenTopics.splice(foundIndex, 1);
-        } else {
-            this.hiddenTopics.push(topic);
-        }
-
-        const topicsToShow = this.topics.filter(x => this.hiddenTopics.indexOf(x) === -1);
-        this.$emit("changeTopics", topicsToShow);
-    }
-
-    isDisabled(topic) {
-        return this.hiddenTopics.indexOf(topic) >= 0;
     }
 
     getColour(c) {
@@ -221,10 +186,46 @@ export default class CompetencyOverview extends Vue {
         }
     };
 
-    get competencies() {
-        const topics = this.topics.filter(x => this.hiddenTopics.indexOf(x) == -1);
+    isDisabled(dataItem) {
+        return !!this.hiddenData[dataItem];
+    }
 
-        const data = UserService.userCompetencies(topics);
+    toggleVisible(dataItem) {
+        if (this.hiddenData[dataItem]) {
+            this.$set(this.hiddenData, dataItem, false);
+        } else {
+            this.$set(this.hiddenData, dataItem, true);
+        }
+        const topicsToShow = this.dataCategories.filter(x => !this.isDisabled(x));
+        this.$emit("changeTopics", topicsToShow);
+    }
+
+    updateChart() {
+        const dim = this.$el.querySelector(".visualisationMenu").getBoundingClientRect();
+        this.$el.querySelector(".chartContainer")["style"].height = dim.height + "px";
+    }
+
+    @Lifecycle
+    created() {
+        this.$emit("changeTopics", this.dataCategories);
+    }
+
+    @Lifecycle
+    mounted() {
+        window.addEventListener("resize", this.updateChart);
+        this.$nextTick()
+            .then(this.updateChart);
+    }
+
+    @Lifecycle
+    destroyed() {
+        window.removeEventListener("resize", this.updateChart);
+    }
+
+    get chartData() {
+        const items = this.dataCategories.filter(x => !this.isDisabled(x));
+        const data = this.compareList(items);
+
         const ownScores = data.ownScore;
         const compareScores = data.compareAgainst;
 

@@ -45,6 +45,14 @@ export interface User {
     }[]
 }
 
+export interface UserSummary {
+    name: string,
+    reputation: number,
+    questionsContributed: number,
+    numberAnswers: number,
+    numberComments: number
+}
+
 export interface Badge {
     id: number,
     name: string,
@@ -53,7 +61,7 @@ export interface Badge {
 }
 
 export interface AcquiredBadge {
-    badgeId: number,
+    badge: Badge,
     progress: number,
     dateAcquired: Date
 }
@@ -65,4 +73,11 @@ export interface PeerConnection {
     topic: string,
     weight: number,
     date: Date, // Date the connection was made
+}
+
+export interface Notification {
+    id: number,
+    type: "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting",
+    content: string,
+    read: boolean
 }
