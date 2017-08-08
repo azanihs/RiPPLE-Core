@@ -68,7 +68,14 @@ export default class LeaderBoard extends Vue {
         const users = this.mostReputableUsers;
         const sortKey = this.sortType || "reputation";
 
-        users.sort((a, b) => a[sortKey] - b[sortKey]);
+        const sortMethod = (a, b) => {
+            if (Number.isNaN(+a[sortKey])) {
+                return a[sortKey].localeCompare(b[sortKey]);
+            }
+            return a[sortKey] - b[sortKey];
+        };
+
+        users.sort(sortMethod);
         if (this.reverse) {
             return users.reverse();
         }
