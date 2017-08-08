@@ -8,6 +8,7 @@
                 <div class="rightPanel">
                     <h3>{{notification.type}}</h3>
                     <p>{{notification.content}}</p>
+                    <span class="date">{{ ('' + date.getFullYear()).slice(2,4) }}/{{ date.getMonth() + 1}}/{{ date.getDate() }} {{date.getHours()}}:{{date.getMinutes()}}</span>
                 </div>
             </md-card>
         </div>
@@ -54,6 +55,14 @@ p+p {
     margin-bottom: 1em;
     width: 100%;
 }
+
+.date {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    font-style: italic;
+    color: #999;
+}
 </style>
 
 <script lang="ts">
@@ -69,6 +78,8 @@ export default class Notifications extends Vue {
         type: Number,
         default: 10
     }) as number;
+
+    date = new Date();
 
     get notifications() {
         return UserService.getUserNotifications(this.showCount);

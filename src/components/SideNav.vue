@@ -125,10 +125,6 @@ export default class SideNav extends Vue {
         href: "/",
         icon: "widgets"
     }, {
-        text: "Author",
-        href: "/view/author",
-        icon: "directions"
-    }, {
         text: "Answer",
         href: "/view/questions",
         icon: "lightbulb_outline"
