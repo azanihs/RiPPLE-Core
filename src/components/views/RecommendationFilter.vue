@@ -66,29 +66,8 @@ h3 {
     position: relative;
 }
 
-
-.chartOption {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.chartOption::before {
-    font-family: 'Material Icons';
-    margin-right: 5px;
-}
-
-.barChart::before {
-    content: "\E01D";
-}
-
-.radarChart::before {
-    content: "\E1B3";
-}
-
 .settingsContainer {
-    margin: auto;
+    margin: 0px auto auto auto;
 }
 
 .visualisationMenu>h3 {
@@ -179,6 +158,9 @@ export default class RecommendationFilter extends Vue {
                 datasets: [ownData]
             },
             options: {
+                legend: {
+                    display: false
+                },
                 scale: {
                     ticks: {
                         beginAtZero: true

@@ -33,3 +33,8 @@
     /* Centers a checkbox inside of an md-table */
     margin: auto !important;
 }
+
+.componentSeparator {
+    /* Applies a gap between components */
+    margin-bottom: 1em;
+}

@@ -4,34 +4,34 @@
             <md-icon>access_time</md-icon>
             Select your weekly availability so that we can match you up with people who have similar schedules
         </h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th v-for="time in preferenceTimes"
-                        :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
-                    </th>
-                </tr>
-            </thead>
+        <md-card>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th v-for="time in preferenceTimes"
+                            :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
+                        </th>
+                    </tr>
+                </thead>
     
-            <tbody>
-                <tr v-for="activity in preferenceActivities"
-                    :key="activity">
-                    <td>
-                        {{ activity }}
-                    </td>
-                    <td v-for="time in preferenceTimes"
-                        :key="time"
-                        class="centerAlign"
-                        :style="getCellShade(time)">
-                        <md-checkbox class="centerCheckbox"
-                                     @change="checkboxChange"
-                                     :id="`${activity}_${time}`"
-                                     :name="`${activity}_${time}`"></md-checkbox>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                <tbody>
+                    <tr v-for="activity in preferenceActivities"
+                        :key="activity">
+                        <td>{{ activity }}</td>
+                        <td v-for="time in preferenceTimes"
+                            :key="time"
+                            class="centerAlign"
+                            :style="getCellShade(time)">
+                            <md-checkbox class="centerCheckbox"
+                                         @change="checkboxChange"
+                                         :id="`${activity}_${time}`"
+                                         :name="`${activity}_${time}`"></md-checkbox>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-card>
     </md-layout>
 </template>
 
@@ -40,13 +40,26 @@ h2 {
     width: 100%;
 }
 
-.centerAlign {
-    text-align: center;
+.table {
+    border: none;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
 }
 
-.table {
-    border: 1px solid #ccc;
-    width: 100%;
+.table thead tr {
+    background-color: #256;
+    color: #f2f2f2;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #efefef;
+}
+
+.table tr td,
+.table thead tr th {
+    text-align: center;
+    padding: 8px 0px;
 }
 </style>
 

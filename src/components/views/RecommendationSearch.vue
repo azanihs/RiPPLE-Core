@@ -1,13 +1,14 @@
 <template>
     <md-layout md-flex="100">
-        <md-layout md-flex="100">
+        <md-layout md-flex="100"
+                   class="componentSeparator">
             <!-- Plot topics -->
             <recommendation-filter :topics="topics"
                                    :types="searchTypes">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th></th>
+                            <th>Topics</th>
                             <th v-for="sType in searchTypes"
                                 :key="sType">{{ sType }}
                             </th>
@@ -74,8 +75,26 @@
     padding-right: 2px !important;
 }
 
-.centerAlign {
+.table {
+    border: none;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table thead tr {
+    background-color: #256;
+    color: #f2f2f2;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #efefef;
+}
+
+.table tr td,
+.table thead tr th {
     text-align: center;
+    padding: 8px 0px;
 }
 </style>
 

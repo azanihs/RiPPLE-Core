@@ -1,7 +1,7 @@
 <template>
     <md-layout md-flex="100">
         <md-layout md-flex="100"
-                   class="headingContainer">
+                   class="componentSeparator">
             <h1>Availability</h1>
             <availability-selector @change="shuffleData(null)"></availability-selector>
         </md-layout>
@@ -10,31 +10,12 @@
                                    :generator="this.shuffleData"
                                    :topics="topics"></recommendation-search>
         </md-layout>
-        <!--<md-layout class="fullHeight"
-                                                       md-flex="100">
-                                                <md-tabs md-fixed
-                                                         class="md-transparent"
-                                                         @change="tabChange">
-                                                    <md-tab v-for="tab in tabLookup"
-                                                            :key="tab.name"
-                                                            :md-label="tab.name">
-                                                        <recommendations @change="shuffleData(tab.name)"
-                                                                         :tabName="tab.heading"
-                                                                         :peers="tab.data"
-                                                                         :threshold="tab.name == 'Provide Mentorship' ? 75 : 0"></recommendations>
-                                                    </md-tab>
-                                                </md-tabs>
-                                            </md-layout>-->
     </md-layout>
 </template>
 
 <style scoped>
 h1 {
     width: 100%;
-}
-
-.headingContainer {
-    margin: 8px 0px 0px 0px;
 }
 
 .md-tabs {
