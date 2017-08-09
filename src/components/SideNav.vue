@@ -14,9 +14,10 @@
         </md-layout>
         <ul>
             <li v-for="link in links" :key="link.href">
-                <router-link :to="link.href" tag="md-button" class="routerLink">
+                <router-link :to="link.href" class="md-button routerLink">
                     <span md-hide-large-and-up>{{ link.text }}</span>
                     <md-icon>{{link.icon}}</md-icon>
+                    <md-ink-ripple></md-ink-ripple>
                 </router-link>
             </li>
         </ul>

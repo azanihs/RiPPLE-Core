@@ -3,6 +3,10 @@
         <md-table md-sort="reputation" md-sort-type="asc" @sort="sort">
             <md-table-header>
                 <md-table-row>
+                    <md-table-head>
+                        <md-icon>account_box</md-icon>
+                        <span>Avatar</span>
+                    </md-table-head>
                     <md-table-head md-sort-by="name">
                         <md-icon>account_box</md-icon>
                         <span>Name</span>
@@ -27,6 +31,9 @@
             </md-table-header>
             <md-table-body>
                 <md-table-row v-for="user in sortedUsers" :key="user.id">
+                    <md-table-cell>
+                        <md-image class="avatar" :md-src="user.image" :alt="user.name"></md-image>
+                    </md-table-cell>
                     <md-table-cell>{{ user.name }}</md-table-cell>
                     <md-table-cell>{{ user.reputation }}</md-table-cell>
                     <md-table-cell>{{ user.questionsContributed }}</md-table-cell>
@@ -43,6 +50,11 @@
 .table {
     margin-top: 1em;
     flex-direction: column !important;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
 }
 </style>
 

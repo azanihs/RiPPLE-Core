@@ -47,6 +47,7 @@ export interface User {
 
 export interface UserSummary {
     name: string,
+    image: string,
     reputation: number,
     questionsContributed: number,
     numberAnswers: number,

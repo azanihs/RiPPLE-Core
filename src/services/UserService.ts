@@ -89,6 +89,7 @@ export default class UserService {
         return UserService.getOutstandingRequests(100).map(x => {
             const summary: UserSummary = {
                 name: x.name,
+                image: x.image,
                 reputation: Math.floor(Math.random() * 20),
                 questionsContributed: Math.floor(Math.random() * 20),
                 numberAnswers: Math.floor(Math.random() * 20),
