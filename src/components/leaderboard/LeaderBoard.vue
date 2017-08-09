@@ -35,6 +35,7 @@
                 </md-table-row>
             </md-table-body>
         </md-table>
+        <md-table-pagination ref="pagination" :md-total="mostReputableUsers.length" :md-size="itemsPerPage" :md-page="pageIndex" @pagination="updateShowItems"></md-table-pagination>
     </md-table-card>
 </template>
 
@@ -52,8 +53,23 @@ import UserService from "../../services/UserService";
 @Component()
 export default class LeaderBoard extends Vue {
 
+    itemsPerPage = 10;
+    pageIndex = 1;
+
     sortType: string = "";
     reverse: boolean = false;
+
+    @Lifecycle
+    created() {
+        // TODO: Ew. Pagination component does not update totalItems on mount.
+        this.$nextTick(() => {
+            this.$refs["pagination"]["totalItems"] = this.mostReputableUsers.length;
+        });
+    }
+    updateShowItems(a) {
+        this.itemsPerPage = a.size;
+        this.pageIndex = a.page;
+    }
 
     sort(item) {
         this.sortType = item.name;
@@ -75,11 +91,9 @@ export default class LeaderBoard extends Vue {
             return a[sortKey] - b[sortKey];
         };
 
-        users.sort(sortMethod);
-        if (this.reverse) {
-            return users.reverse();
-        }
-        return users;
+        const sortedUsers = this.reverse ? users.sort().reverse() : users.sort(sortMethod);
+        const startIndex = (this.pageIndex - 1) * this.itemsPerPage;
+        return sortedUsers.slice(startIndex, startIndex + this.itemsPerPage);
     }
 }
 </script>

@@ -86,7 +86,7 @@ export default class UserService {
     }
 
     static mostReputableUsers(): UserSummary[] {
-        return UserService.getOutstandingRequests(10).map(x => {
+        return UserService.getOutstandingRequests(100).map(x => {
             const summary: UserSummary = {
                 name: x.name,
                 reputation: Math.floor(Math.random() * 20),
