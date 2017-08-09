@@ -18,7 +18,7 @@
             <md-table-body>
                 <md-table-row v-for="activity in preferenceActivities"
                               :key="activity">
-                    <md-table-cell class="alignLeft">
+                    <md-table-cell>
                         {{ activity }}
                     </md-table-cell>
                     <md-table-cell v-for="time in preferenceTimes"
