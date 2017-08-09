@@ -86,8 +86,8 @@ export default class AvailabilitySelector extends Vue {
     }
 
     getCellShade(time) {
-        // Perferably have a lookup table generated on mount
         const weight = Math.random() < 0.75 ? 0 : Math.random() - 0.25;
+        // Perferably have a lookup table generated on mount
         return {
             background: `rgba(34, 85, 102, ${weight})`
         };
