@@ -102,4 +102,10 @@ export default class UserService {
     static getUserNotifications(count: number): Notification[] {
         return UserRepository.getUserNotifications().slice(0, count);
     }
+
+    static getMeetingHistory() {
+        return ["UQ", "Toowong", "Indro", "Indooroopilly"].map(x => ({
+            name: x
+        }));
+    }
 }
