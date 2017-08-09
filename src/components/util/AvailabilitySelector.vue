@@ -4,33 +4,34 @@
             <md-icon>access_time</md-icon>
             Select your weekly availability so that we can match you up with people who have similar schedules
         </h2>
-        <md-table v-once
-                  class="table">
-            <md-table-header>
-                <md-table-row>
-                    <md-table-head>Day</md-table-head>
-                    <md-table-head v-for="time in preferenceTimes"
-                                   :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
-                    </md-table-head>
-                </md-table-row>
-            </md-table-header>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th v-for="time in preferenceTimes"
+                        :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
+                    </th>
+                </tr>
+            </thead>
     
-            <md-table-body>
-                <md-table-row v-for="activity in preferenceActivities"
-                              :key="activity">
-                    <md-table-cell>
+            <tbody>
+                <tr v-for="activity in preferenceActivities"
+                    :key="activity">
+                    <td>
                         {{ activity }}
-                    </md-table-cell>
-                    <md-table-cell v-for="time in preferenceTimes"
-                                   :key="time"
-                                   :style="getCellShade(time)">
-                        <md-checkbox @change="checkboxChange"
+                    </td>
+                    <td v-for="time in preferenceTimes"
+                        :key="time"
+                        class="centerAlign"
+                        :style="getCellShade(time)">
+                        <md-checkbox class="centerCheckbox"
+                                     @change="checkboxChange"
                                      :id="`${activity}_${time}`"
                                      :name="`${activity}_${time}`"></md-checkbox>
-                    </md-table-cell>
-                </md-table-row>
-            </md-table-body>
-        </md-table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </md-layout>
 </template>
 
@@ -39,8 +40,8 @@ h2 {
     width: 100%;
 }
 
-.md-checkbox {
-    margin: 0px auto;
+.centerAlign {
+    text-align: center;
 }
 
 .table {

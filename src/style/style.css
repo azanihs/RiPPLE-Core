@@ -1,4 +1,4 @@
-/** 
+/**
     CSS file to contain global styles
     Should only be used when the vue-material library does not provide *nice* ways to style components
 */
@@ -27,4 +27,9 @@
 
 .md-theme-default .md-tab-indicator {
     background-color: #256 !important;
+}
+
+.centerCheckbox {
+    /* Centers a checkbox inside of an md-table */
+    margin: auto !important;
 }
