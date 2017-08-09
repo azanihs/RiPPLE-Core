@@ -4,7 +4,7 @@
             <md-table-header>
                 <md-table-row>
                     <md-table-head>
-                        <md-icon>account_box</md-icon>
+                        <md-icon>camera_alt</md-icon>
                         <span>Avatar</span>
                     </md-table-head>
                     <md-table-head md-sort-by="name">
@@ -55,6 +55,8 @@
 .avatar {
     width: 50px;
     height: 50px;
+    border: 2px solid #ccc;
+    box-shadow: 2px 2px 10px #888;
 }
 </style>
 
