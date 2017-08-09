@@ -1,16 +1,25 @@
 <template>
     <md-layout md-flex="95">
-        <md-layout md-flex="100" class="headingContainer">
+        <md-layout md-flex="100"
+                   class="headingContainer">
             <h1>Availability</h1>
             <availability-selector @change="shuffleData(null)"></availability-selector>
         </md-layout>
         <md-layout class="headingContainer">
             <h1>Connect To Peers</h1>
         </md-layout>
-        <md-layout class="fullHeight" md-flex="100">
-            <md-tabs md-fixed class="md-transparent" @change="tabChange">
-                <md-tab v-for="tab in tabLookup" :key="tab.name" :md-label="tab.name">
-                    <recommendations @change="shuffleData(tab.name)" :tabName="tab.heading" :peers="tab.data" :threshold="tab.name == 'Provide Mentorship' ? 75 : 0"></recommendations>
+        <md-layout class="fullHeight"
+                   md-flex="100">
+            <md-tabs md-fixed
+                     class="md-transparent"
+                     @change="tabChange">
+                <md-tab v-for="tab in tabLookup"
+                        :key="tab.name"
+                        :md-label="tab.name">
+                    <recommendations @change="shuffleData(tab.name)"
+                                     :tabName="tab.heading"
+                                     :peers="tab.data"
+                                     :threshold="tab.name == 'Provide Mentorship' ? 75 : 0"></recommendations>
                 </md-tab>
             </md-tabs>
         </md-layout>

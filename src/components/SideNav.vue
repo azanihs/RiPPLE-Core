@@ -1,6 +1,9 @@
 <template>
     <div class="navbarContainer">
-        <md-layout md-flex="100" md-hide-xsmall md-hide-small md-hide-medium>
+        <md-layout md-flex="100"
+                   md-hide-xsmall
+                   md-hide-small
+                   md-hide-medium>
             <div class="profileContainer">
                 <div class="imageContainer">
                     <img :src="personalAvatar" />
@@ -13,8 +16,10 @@
             <md-icon>menu</md-icon>
         </md-layout>
         <ul>
-            <li v-for="link in links" :key="link.href">
-                <router-link :to="link.href" class="md-button routerLink">
+            <li v-for="link in links"
+                :key="link.href">
+                <router-link :to="link.href"
+                             class="md-button routerLink">
                     <span md-hide-large-and-up>{{ link.text }}</span>
                     <md-icon>{{link.icon}}</md-icon>
                     <md-ink-ripple></md-ink-ripple>

@@ -1,7 +1,9 @@
 <template>
     <md-layout>
         <h2>
-            <md-icon>access_time </md-icon> Select your weekly availability so that we can match you up with people who have similar schedules
+            <md-icon>access_time
+            </md-icon>
+            Select your weekly availability so that we can match you up with people who have similar schedules
         </h2>
         <md-table v-once
                   class="table">
@@ -33,55 +35,55 @@
 </template>
 
 <style scoped>
-    h2 {
-        width: 100%;
-    }
-    
-    .md-checkbox {
-        margin: 0px auto;
-    }
-    
-    .table {
-        border: 1px solid #ccc;
-        width: 100%;
-    }
+h2 {
+    width: 100%;
+}
+
+.md-checkbox {
+    margin: 0px auto;
+}
+
+.table {
+    border: 1px solid #ccc;
+    width: 100%;
+}
 </style>
 
 <script lang="ts">
-    import { Vue, Component, Lifecycle, Prop } from "av-ts";
-    import { Question } from "../../interfaces/models";
+import { Vue, Component, Lifecycle, Prop } from "av-ts";
+import { Question } from "../../interfaces/models";
 
-    @Component()
-    export default class AvailabilitySelector extends Vue {
-        preferenceActivities: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-        preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
+@Component()
+export default class AvailabilitySelector extends Vue {
+    preferenceActivities: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
 
-        /**
-        *   Converts a twenty four hour time to twelve hour with an "am" or "pm" suffix
-        *   @param {number} time Twenty four hour time to convert to twelve hour
-        *   @return {string} Twelve hour representation of time with "am" or "pm" suffix
-        */
-        twentyFourHourToTwelveHourPeriod(twentyHourTime: number): string {
-            const time = +twentyHourTime;
-            if (time == 12) {
-                return `${time}pm`;
-            } else if (time < 12) {
-                return `${time}am`;
-            }
-            return `${time - 12}pm`;
+    /**
+    *   Converts a twenty four hour time to twelve hour with an "am" or "pm" suffix
+    *   @param {number} time Twenty four hour time to convert to twelve hour
+    *   @return {string} Twelve hour representation of time with "am" or "pm" suffix
+    */
+    twentyFourHourToTwelveHourPeriod(twentyHourTime: number): string {
+        const time = +twentyHourTime;
+        if (time == 12) {
+            return `${time}pm`;
+        } else if (time < 12) {
+            return `${time}am`;
         }
-
-        checkboxChange() {
-            this.$emit("change");
-        }
-
-        addNewRow() {
-            throw new Error("addNewRow not implemented");
-        }
-
-        deleteRow() {
-            throw new Error("deleteRow not implemented");
-        }
-
+        return `${time - 12}pm`;
     }
+
+    checkboxChange() {
+        this.$emit("change");
+    }
+
+    addNewRow() {
+        throw new Error("addNewRow not implemented");
+    }
+
+    deleteRow() {
+        throw new Error("deleteRow not implemented");
+    }
+
+}
 </script>
