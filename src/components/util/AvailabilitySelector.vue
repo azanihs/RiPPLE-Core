@@ -1,8 +1,7 @@
 <template>
     <md-layout>
         <h2>
-            <md-icon>access_time
-            </md-icon>
+            <md-icon>access_time</md-icon>
             Select your weekly availability so that we can match you up with people who have similar schedules
         </h2>
         <md-table v-once
@@ -23,7 +22,8 @@
                         {{ activity }}
                     </md-table-cell>
                     <md-table-cell v-for="time in preferenceTimes"
-                                   :key="time">
+                                   :key="time"
+                                   :style="getCellShade(time)">
                         <md-checkbox @change="checkboxChange"
                                      :id="`${activity}_${time}`"
                                      :name="`${activity}_${time}`"></md-checkbox>
@@ -85,5 +85,12 @@ export default class AvailabilitySelector extends Vue {
         throw new Error("deleteRow not implemented");
     }
 
+    getCellShade(time) {
+        // Perferably have a lookup table generated on mount
+        const weight = Math.random() < 0.75 ? 0 : Math.random() - 0.25;
+        return {
+            background: `rgba(34, 85, 102, ${weight})`
+        };
+    }
 }
 </script>
