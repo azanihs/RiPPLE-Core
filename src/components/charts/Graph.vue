@@ -22,6 +22,9 @@ export default class Graph extends Vue {
     width = 600;
     height = 300;
 
+    graphWidth = 0;
+    graphHeight = 0
+
     @Prop edges = p({
         type: Array,
         required: true
@@ -54,7 +57,7 @@ export default class Graph extends Vue {
         const nodeRadius = 20;
         const maxWeight = Math.max(...this.formattedEdges.map(x => x.weight));
         const minWeight = Math.min(...this.formattedEdges.map(x => x.weight));
-        const lineColour = d3.interpolate("red", "#256");
+        const lineColour = d3.interpolate("pink", "#256");
         const maxColour = Math.max(...this.formattedEdges.map(x => x.colour));
         const minColour = Math.min(...this.formattedEdges.map(x => x.colour));
         const getStrokeColour = d => lineColour((d.colour - maxColour) / (minColour - maxColour));
@@ -62,15 +65,24 @@ export default class Graph extends Vue {
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
         svg.html(null);
 
+        const container = svg
+            .append("g")
+            .attr("class", "container")
+            .attr("transform", `translate(${nodeRadius},${nodeRadius})`);
+
+        this.graphWidth = this.width - (nodeRadius * 2);
+        this.graphHeight = this.height - (nodeRadius * 2);
+
+
         const forceLink = d3.forceLink(this.formattedEdges);
         const simulation = d3.forceSimulation(this.formattedNodes)
             .alpha(3)
             .force("collision", d3.forceCollide(3 * nodeRadius).strength(1))
             .force("link", forceLink.distance(3 * nodeRadius).strength(0.8))
             .force("body", d3.forceManyBody().distanceMin(nodeRadius))
-            .force("center", d3.forceCenter(this.width / 2, this.height / 2)) as any;
+            .force("center", d3.forceCenter(this.graphWidth / 2, this.graphHeight / 2)) as any;
 
-        const link = svg.append("g")
+        const link = container.append("g")
             .attr("class", "links")
             .selectAll("line")
             .data(this.formattedEdges)
@@ -79,7 +91,7 @@ export default class Graph extends Vue {
             .attr("stroke", getStrokeColour)
             .attr("stroke-width", d => normalise(minWeight, maxWeight, d.weight));
 
-        const node = svg.append("g")
+        const node = container.append("g")
             .attr("class", "nodes")
             .selectAll("circle")
             .data(this.formattedNodes)
@@ -101,7 +113,7 @@ export default class Graph extends Vue {
             })
             .attr("fill", "#fff");
 
-        const labels = svg.append("g")
+        const labels = container.append("g")
             .attr("class", "labels")
             .selectAll("text")
             .data(this.formattedNodes)
@@ -134,11 +146,11 @@ export default class Graph extends Vue {
         return () => {
             node
                 .attr("cx", d => {
-                    d.x = Math.max(radius, Math.min(this.width - radius, d.x));
+                    d.x = Math.max(radius, Math.min(this.graphWidth - radius, d.x));
                     return d.x;
                 })
                 .attr("cy", d => {
-                    d.y = Math.max(radius, Math.min(this.height - radius, d.y));
+                    d.y = Math.max(radius, Math.min(this.graphHeight - radius, d.y));
                     return d.y;
                 });
 
