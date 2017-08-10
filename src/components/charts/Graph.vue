@@ -44,6 +44,7 @@ export default class Graph extends Vue {
             colour: x[3]
         }));
         this.formattedNodes = this.nodes;
+        const selfLoops = this.formattedEdges.filter(x => x.source == x.target);
 
         const minRange = 2;
         const maxRange = 10;
@@ -85,7 +86,20 @@ export default class Graph extends Vue {
             .data(this.formattedNodes)
             .enter().append("circle")
             .attr("r", nodeRadius)
-            .attr("stroke", "#444")
+            .attr("stroke", d => {
+                const foundSelfLoop = selfLoops.find(selfLoop => selfLoop.source == d);
+                if (foundSelfLoop) {
+                    return getStrokeColour(foundSelfLoop);
+                }
+                return "#444";
+            })
+            .attr("stroke-width", d => {
+                const foundSelfLoop = selfLoops.find(selfLoop => selfLoop.source == d);
+                if (foundSelfLoop) {
+                    return normalise(minWeight, maxWeight, foundSelfLoop.weight);
+                }
+                return 1;
+            })
             .attr("fill", "#fff");
 
         const labels = svg.append("g")
