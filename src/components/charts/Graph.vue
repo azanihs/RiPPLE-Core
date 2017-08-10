@@ -13,9 +13,8 @@ svg {}
 
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import UserService from "../../services/UserService";
-import TopicService from "../../services/TopicService";
 
 import * as d3 from "d3";
 
@@ -24,36 +23,28 @@ export default class Graph extends Vue {
     width = 600;
     height = 300;
 
-    edges = [];
-    nodes = [];
-
-    /*@Prop edges = p({
+    @Prop edges = p({
         type: Array,
         required: true
-    });*/
+    });
 
-    /*@Prop nodes = p({
+    @Prop nodes = p({
         type: Array,
         required: true
-    })*/
+    });
 
-    @Lifecycle
-    mounted() {
-        this.nodes = TopicService.getAllAvailableTopics().map((x, i) => ({
-            id: x,
-            group: i
+    formattedEdges = [];
+    formattedNodes = [];
+
+    render() {
+        this.formattedEdges = this.edges.map(x => ({
+            source: x[0],
+            target: x[1],
+            weight: x[2],
+            colour: x[3]
         }));
+        this.formattedNodes = this.nodes;
 
-        this.nodes.forEach(x => {
-            const randomNode = this.nodes[Math.floor(Math.random() * this.nodes.length)];
-            //this.edges.push([x, randomNode, Math.random(), Math.random()]);
-            this.edges.push({
-                source: x,
-                target: randomNode,
-                weight: Math.random() * 10,
-                colour: Math.random() * 10
-            });
-        });
         const minRange = 2;
         const maxRange = 10;
         const normalise = (min, max, v) => {
@@ -61,26 +52,28 @@ export default class Graph extends Vue {
         };
 
         const nodeRadius = 20;
-        const maxWeight = Math.max(...this.edges.map(x => x.weight));
-        const minWeight = Math.min(...this.edges.map(x => x.weight));
+        const maxWeight = Math.max(...this.formattedEdges.map(x => x.weight));
+        const minWeight = Math.min(...this.formattedEdges.map(x => x.weight));
         const lineColour = d3.interpolate("red", "#256");
-        const maxColour = Math.max(...this.edges.map(x => x.colour));
-        const minColour = Math.min(...this.edges.map(x => x.colour));
+        const maxColour = Math.max(...this.formattedEdges.map(x => x.colour));
+        const minColour = Math.min(...this.formattedEdges.map(x => x.colour));
         const getStrokeColour = d => lineColour((d.colour - maxColour) / (minColour - maxColour));
 
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
+        svg.html(null);
 
-        const simulation = d3.forceSimulation(this.nodes)
-            .alpha(2)
+        const forceLink = d3.forceLink(this.formattedEdges);
+        const simulation = d3.forceSimulation(this.formattedNodes)
+            .alpha(3)
             .force("collision", d3.forceCollide(nodeRadius * 3).strength(1))
-            .force("link", d3.forceLink(this.edges).distance(2 * nodeRadius).strength(0.8).distance(nodeRadius * 3))
+            .force("link", forceLink.distance(3 * nodeRadius).strength(0.8).distance(nodeRadius * 3))
             .force("body", d3.forceManyBody().theta(4))
             .force("center", d3.forceCenter(this.width / 2, this.height / 2)) as any;
 
         const link = svg.append("g")
             .attr("class", "links")
             .selectAll("line")
-            .data(this.edges)
+            .data(this.formattedEdges)
             .enter()
             .append("line")
             .attr("stroke", getStrokeColour)
@@ -89,7 +82,7 @@ export default class Graph extends Vue {
         const node = svg.append("g")
             .attr("class", "nodes")
             .selectAll("circle")
-            .data(this.nodes)
+            .data(this.formattedNodes)
             .enter().append("circle")
             .attr("r", nodeRadius)
             .attr("stroke", "#444")
@@ -98,7 +91,7 @@ export default class Graph extends Vue {
         const labels = svg.append("g")
             .attr("class", "labels")
             .selectAll("text")
-            .data(this.nodes)
+            .data(this.formattedNodes)
             .enter().append("text")
             .attr("dx", d => d.cx)
             .attr("dy", d => d.cy)
@@ -107,6 +100,21 @@ export default class Graph extends Vue {
 
         simulation
             .on("tick", this.ticked(link, node, labels, nodeRadius));
+    }
+
+    @Watch("edges")
+    edgeChange() {
+        this.render();
+    }
+
+    @Watch("nodes")
+    nodeChange() {
+        this.render();
+    }
+
+    @Lifecycle
+    mounted() {
+        this.render();
     }
 
     ticked(link, node, labels, radius) {
