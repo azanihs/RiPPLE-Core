@@ -71,9 +71,10 @@ export default class Graph extends Vue {
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
 
         const simulation = d3.forceSimulation(this.nodes)
-            .force("collision", d3.forceCollide(nodeRadius + 10).strength(1))
-            .force("link", d3.forceLink(this.edges).distance(4 * nodeRadius).strength(0.8))
-            .force("body", d3.forceManyBody())
+            .alpha(2)
+            .force("collision", d3.forceCollide(nodeRadius * 3).strength(1))
+            .force("link", d3.forceLink(this.edges).distance(2 * nodeRadius).strength(0.8).distance(nodeRadius * 3))
+            .force("body", d3.forceManyBody().theta(4))
             .force("center", d3.forceCenter(this.width / 2, this.height / 2)) as any;
 
         const link = svg.append("g")
@@ -102,9 +103,7 @@ export default class Graph extends Vue {
             .attr("dx", d => d.cx)
             .attr("dy", d => d.cy)
             .attr("text-anchor", "middle")
-
             .text(d => d.id);
-
 
         simulation
             .on("tick", this.ticked(link, node, labels, nodeRadius));
