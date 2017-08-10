@@ -11,7 +11,6 @@
 svg {}
 </style>
 
-
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import UserService from "../../services/UserService";
@@ -66,9 +65,9 @@ export default class Graph extends Vue {
         const forceLink = d3.forceLink(this.formattedEdges);
         const simulation = d3.forceSimulation(this.formattedNodes)
             .alpha(3)
-            .force("collision", d3.forceCollide(nodeRadius * 3).strength(1))
-            .force("link", forceLink.distance(3 * nodeRadius).strength(0.8).distance(nodeRadius * 3))
-            .force("body", d3.forceManyBody().theta(4))
+            .force("collision", d3.forceCollide(3 * nodeRadius).strength(1))
+            .force("link", forceLink.distance(3 * nodeRadius).strength(0.8))
+            .force("body", d3.forceManyBody().distanceMin(nodeRadius))
             .force("center", d3.forceCenter(this.width / 2, this.height / 2)) as any;
 
         const link = svg.append("g")
