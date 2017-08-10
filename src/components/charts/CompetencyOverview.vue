@@ -4,8 +4,8 @@
         <div class="chartContainer">
             <div class="chartPanel">
                 <chart :type="chartType"
-                       :data="data"
-                       :options="options"></chart>
+                    :data="data"
+                    :options="options"></chart>
             </div>
         </div>
     </md-layout>

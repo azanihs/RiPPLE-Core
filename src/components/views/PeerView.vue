@@ -1,14 +1,16 @@
 <template>
     <md-layout md-flex="100">
         <md-layout md-flex="100"
-                   class="componentSeparator">
+            class="componentSeparator">
             <h1>Availability</h1>
             <availability-selector @change="shuffleData(null)"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
-            <recommendation-search :searchTypes="searchTypes"
-                                   :generator="this.shuffleData"
-                                   :topics="topics"></recommendation-search>
+            <md-card>
+                <recommendation-search :searchTypes="searchTypes"
+                    :generator="this.shuffleData"
+                    :topics="topics"></recommendation-search>
+            </md-card>
         </md-layout>
     </md-layout>
 </template>

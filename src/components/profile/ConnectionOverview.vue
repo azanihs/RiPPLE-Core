@@ -3,7 +3,10 @@
         <md-layout>
             <h2>Peer Connections</h2>
             <md-layout md-flex="100">
-                <md-image v-for="peer in peerConnections" :key="peer.id" class="connectionImage" :md-src="peer.image"></md-image>
+                <md-image v-for="peer in peerConnections"
+                    :key="peer.id"
+                    class="connectionImage"
+                    :md-src="peer.image"></md-image>
             </md-layout>
         </md-layout>
     </md-card>

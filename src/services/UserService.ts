@@ -73,11 +73,23 @@ export default class UserService {
     }
 
     static getRecommendedConnections(count: number) {
-        return PeerRepository.getMany(count);
+        const recommendations = PeerRepository.getMany(count) as any;
+        const categoryLength = this.getAllAvailableCategories().length;
+        recommendations.forEach(x => {
+            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
+        });
+
+        return recommendations;
     }
 
     static getOutstandingRequests(count: number) {
-        return PeerRepository.getMany(count);
+        const recommendations = PeerRepository.getMany(count) as any;
+        const categoryLength = this.getAllAvailableCategories().length;
+        recommendations.forEach(x => {
+            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
+        });
+
+        return recommendations;
     }
 
     static userHasBadge(badgeId) {
