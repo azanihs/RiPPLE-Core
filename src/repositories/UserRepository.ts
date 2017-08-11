@@ -18,6 +18,33 @@ const badges = new Array(30).fill(0).map((x, i) => {
     });
 });
 
+const userTopicScores = {};
+const userGoalScores = {};
+
+const topicNodes = topics.map(x => {
+    const topicNode = {
+        id: x
+    };
+    userTopicScores[x] = [topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)];
+    userGoalScores[x] = [topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)];
+    return topicNode;
+});
+
+topicNodes.forEach(x => {
+    const randomNode = topicNodes[Math.floor(Math.random() * topicNodes.length)];
+    if (randomNode == x) {
+        return;
+    }
+    userTopicScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+});
+topicNodes.forEach(x => {
+    const randomNode = topicNodes[Math.floor(Math.random() * topicNodes.length)];
+    if (randomNode == x) {
+        return;
+    }
+    userGoalScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+});
+
 const userBadges = badges
     .filter((_, i) => Math.random() < 0.5)
     .map((x: Badge) => {
@@ -84,4 +111,23 @@ export default class UserRepository {
     static getAllAvailableTopics(): string[] {
         return topics.slice();
     }
+
+    static userScoreForTopic(topic: string) {
+        return {
+            source: userTopicScores[topic][0],
+            target: userTopicScores[topic][1],
+            competency: userTopicScores[topic][2],
+            attempts: userTopicScores[topic][3]
+        };
+    }
+
+    static userGoalForTopic(topic: string) {
+        return {
+            source: userGoalScores[topic][0],
+            target: userGoalScores[topic][1],
+            competency: userGoalScores[topic][2],
+            attempts: userGoalScores[topic][3]
+        };
+    }
+
 }

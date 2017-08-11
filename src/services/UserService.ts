@@ -9,16 +9,13 @@ export default class UserService {
     }
 
     static userCompetencies(topicsToInclude: string[]) {
-        const ownScore = topicsToInclude.map(x => Math.round(Math.random() * 100));
-        const userGoal = topicsToInclude.map(x => Math.round(Math.random() * 100));
-
-        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
-        const goal = Math.round(Math.random() * 100);
+        const ownScores = topicsToInclude.map(UserRepository.userScoreForTopic);
+        const userGoals = topicsToInclude.map(UserRepository.userGoalForTopic);
 
         return {
-            topics: ["Overall"].concat(topicsToInclude),
-            ownScore: [average].concat(ownScore),
-            compareAgainst: [goal].concat(userGoal)
+            topics: topicsToInclude, // Node List
+            ownScores: ownScores, // Edge list of self
+            compareAgainst: userGoals // Edge list of other
         };
     }
 

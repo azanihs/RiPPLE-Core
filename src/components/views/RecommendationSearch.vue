@@ -1,7 +1,7 @@
 <template>
     <md-layout md-flex="100">
         <md-layout md-flex="100"
-            class="componentSeparator">
+                   class="componentSeparator">
             <!-- Plot topics -->
             <table class="table">
                 <thead>
@@ -18,31 +18,31 @@
                         <td>
                             <span>{{ topic }}</span>
                             <div class="cellOverlay"
-                                :style="getCellWeight(topic)"></div>
+                                 :style="getCellWeight(topic)"></div>
                         </td>
                         <td v-for="sType in searchTypes"
                             :key="sType"
                             class="centerAlign">
                             <md-checkbox class="centerCheckbox"
-                                :disabled="checkboxIsDisabled(sType, topic)"
-                                @change="checkboxChange"
-                                :id="`${sType}_${topic}`"
-                                :name="`${sType}_${topic}`"></md-checkbox>
+                                         :disabled="checkboxIsDisabled(sType, topic)"
+                                         @change="checkboxChange"
+                                         :id="`${sType}_${topic}`"
+                                         :name="`${sType}_${topic}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </md-layout>
         <md-tabs md-fixed
-            class="md-transparent">
+                 class="md-transparent">
             <md-tab md-label="Find"
-                class="tab">
+                    class="tab">
                 <md-layout md-flex="100"
-                    md-gutter="16">
+                           md-gutter="16">
                     <md-layout md-flex="33"
-                        md-gutter
-                        v-for="(recommendation, i) in generator(searchType).recommendations"
-                        :key="i">
+                               md-gutter
+                               v-for="(recommendation, i) in generator(searchType).recommendations"
+                               :key="i">
                         <recommendation-card :data="recommendation">
                             Request
                         </recommendation-card>
@@ -50,13 +50,13 @@
                 </md-layout>
             </md-tab>
             <md-tab md-label="Review"
-                class="tab">
+                    class="tab">
                 <md-layout md-flex="100"
-                    md-gutter="16">
+                           md-gutter="16">
                     <md-layout md-flex="33"
-                        md-gutter
-                        v-for="(recommendation, i) in generator(searchType).requests"
-                        :key="i">
+                               md-gutter
+                               v-for="(recommendation, i) in generator(searchType).requests"
+                               :key="i">
                         <recommendation-card :data="recommendation">
                             Request
                         </recommendation-card>
@@ -114,11 +114,9 @@ import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import UserService from "../../services/UserService";
 
 import RecommendationCard from "./RecommendationCard.vue";
-import RecommendationFilter from "./RecommendationFilter.vue";
 
 @Component({
     components: {
-        RecommendationFilter,
         RecommendationCard
     }
 })
@@ -148,7 +146,10 @@ export default class RecommendationSearch extends Vue {
     @Lifecycle
     created() {
         this.searchType = this.searchTypes[0];
-        this.competencies = UserService.userCompetencies(this.topics).ownScore;
+        this.competencies = UserService.userCompetencies(this.topics)
+            .ownScores
+            .filter(x => x.source == x.target)
+            .map(x => x.competency);
     }
 
     checkboxChange() {

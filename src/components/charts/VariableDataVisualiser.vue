@@ -32,6 +32,9 @@
                                     <md-option value="radar">
                                         <div class="chartOption radarChart">Radar Chart</div>
                                     </md-option>
+                                    <md-option value="topicDependency">
+                                        <div class="chartOption topicDependency">Topic Dependency Chart</div>
+                                    </md-option>
                                 </md-select>
                             </md-input-container>
                             <md-input-container>
@@ -130,6 +133,11 @@ h3 {
 .radarChart::before {
     content: "\E1B3";
 }
+
+.topicDependency::before {
+    content: "\E8C3";
+}
+
 
 .settingsContainer {
     margin: auto;
@@ -236,21 +244,26 @@ export default class VariableDataVisualiser extends Vue {
 
     get chartData() {
         const items = this.dataCategories.filter(x => !this.isDisabled(x));
-        const data = this.compareList(items);
+        const { topics, ownScores, compareAgainst } = this.compareList(items);
 
-        const ownScores = data.ownScore;
-        const compareScores = data.compareAgainst;
+        let compareResults = compareAgainst;
+        let ownResults = ownScores;
+        if (this.chart != "topicDependency") {
+            // Get all self loops from edge list, and use that competency.
+            compareResults = compareAgainst.filter(x => x.source == x.target).map(x => x.competency);
+            ownResults = ownScores.filter(x => x.source == x.target).map(x => x.competency);
+        }
 
         const ownData = {
-            data: ownScores,
+            data: ownResults,
             label: "Your Results",
-            backgroundColor: ownScores.map(x => this.getColour(x) + "0.4)"),
-            borderColor: ownScores.map(x => this.getColour(x) + "1)"),
+            backgroundColor: ownResults.map(x => this.getColour(x) + "0.4)"),
+            borderColor: ownResults.map(x => this.getColour(x) + "1)"),
             borderWidth: 2
         };
 
         const compareData = {
-            data: compareScores,
+            data: compareResults,
             label: this.compare,
             type: "line",
             pointStyle: "triangle",
@@ -262,7 +275,7 @@ export default class VariableDataVisualiser extends Vue {
 
         const chartData = {
             data: {
-                labels: data.topics,
+                labels: topics,
                 datasets: [ownData, compareData]
             },
             options: {

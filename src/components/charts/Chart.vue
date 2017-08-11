@@ -1,10 +1,18 @@
 <template>
-    <canvas class="chartjs">
+    <canvas v-if="type != 'topicDependency'"
+            class="chartjs">
     </canvas>
+    <div v-else-if="type == 'topicDependency'">
+        <chart :edges="data.edges"
+               :nodes="data.nodes"></chart>
+        <chart :edges="data.edges"
+               :nodes="data.nodes"></chart>
+    </div>
 </template>
 
 <script lang="ts">
 import ChartJS from "chart.js";
+import Graph from "./Graph.vue";
 import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
 
 @Component()
@@ -30,16 +38,22 @@ export default class Chart extends Vue {
     chart: ChartJS = null;
 
     mountChart() {
-        const chartOptions = Object.assign({
-            maintainAspectRatio: false,
-            responsive: true
-        }, this.options);
+        if (this.type == "topicDependency") {
+            this.chart = {
+                destroy: () => { }
+            };
+        } else {
+            const chartOptions = Object.assign({
+                maintainAspectRatio: false,
+                responsive: true
+            }, this.options);
 
-        this.chart = new ChartJS(this.$el, {
-            type: this.type,
-            data: this.data,
-            options: chartOptions
-        });
+            this.chart = new ChartJS(this.$el, {
+                type: this.type,
+                data: this.data,
+                options: chartOptions
+            });
+        }
     }
 
     @Lifecycle
