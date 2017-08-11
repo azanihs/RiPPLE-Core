@@ -141,6 +141,10 @@ export default class Chart extends Vue {
     height: 100%;
 }
 
+.graph:first-child {
+    border-right: 1px solid #ccc;
+}
+
 .graph {
     width: 50%;
     height: 100%;
