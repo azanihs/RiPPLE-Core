@@ -25,8 +25,9 @@ const topicNodes = topics.map(x => {
     const topicNode = {
         id: x
     };
-    userTopicScores[x] = [topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)];
-    userGoalScores[x] = [topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)];
+    // Ensure at least one self-loop per topic
+    userTopicScores[x] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
+    userGoalScores[x] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
     return topicNode;
 });
 
@@ -113,21 +114,21 @@ export default class UserRepository {
     }
 
     static userScoreForTopic(topic: string) {
-        return {
-            source: userTopicScores[topic][0],
-            target: userTopicScores[topic][1],
-            competency: userTopicScores[topic][2],
-            attempts: userTopicScores[topic][3]
-        };
+        return userTopicScores[topic].map(x => ({
+            source: x[0],
+            target: x[1],
+            competency: x[2],
+            attempts: x[3]
+        }));
     }
 
     static userGoalForTopic(topic: string) {
-        return {
-            source: userGoalScores[topic][0],
-            target: userGoalScores[topic][1],
-            competency: userGoalScores[topic][2],
-            attempts: userGoalScores[topic][3]
-        };
+        return userGoalScores[topic].map(x => ({
+            source: x[0],
+            target: x[1],
+            competency: x[2],
+            attempts: x[3]
+        }));
     }
 
 }

@@ -42,10 +42,10 @@
                     <h2>Engagement Overview</h2>
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
-                <variable-data-visualiser class="componentSeparator"
-                                          :dataCategories="engagementItems"
-                                          :compareList="generateEngagement">
-                </variable-data-visualiser>
+                <!--<variable-data-visualiser class="componentSeparator"
+                                              :dataCategories="engagementItems"
+                                              :compareList="generateEngagement">
+                    </variable-data-visualiser>-->
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">

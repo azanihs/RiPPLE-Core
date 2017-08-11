@@ -9,11 +9,21 @@ export default class UserService {
     }
 
     static userCompetencies(topicsToInclude: string[]) {
-        const ownScores = topicsToInclude.map(UserRepository.userScoreForTopic);
-        const userGoals = topicsToInclude.map(UserRepository.userGoalForTopic);
+        const ownScores = topicsToInclude.map(UserRepository.userScoreForTopic).reduce((a, b) => a.concat(b), []);
+        const userGoals = topicsToInclude.map(UserRepository.userGoalForTopic).reduce((a, b) => a.concat(b), []);
+
+        const topics = ownScores
+            .map(x => x.source)
+            .reduce((carry, topicNode) => {
+                if (topicsToInclude.find(x => x == topicNode.id) &&
+                    !carry.find(x => x == topicNode)) {
+                    carry.push(topicNode);
+                }
+                return carry;
+            }, []);
 
         return {
-            topics: topicsToInclude, // Node List
+            topics: topics, // Node List
             ownScores: ownScores, // Edge list of self
             compareAgainst: userGoals // Edge list of other
         };

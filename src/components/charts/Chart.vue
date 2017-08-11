@@ -1,12 +1,20 @@
 <template>
-    <canvas v-if="type != 'topicDependency'"
-            class="chartjs">
-    </canvas>
-    <div v-else-if="type == 'topicDependency'">
-        <chart :edges="data.edges"
-               :nodes="data.nodes"></chart>
-        <chart :edges="data.edges"
-               :nodes="data.nodes"></chart>
+    <div v-if="type != 'topicDependency'"
+         class="chartContainer">
+        <canvas class="chartjs"></canvas>
+    </div>
+    <div class="graphContainer"
+         v-else>
+        <graph ref="graph"
+               :width="width"
+               :height="height"
+               :edges="data.datasets[0].data"
+               :nodes="data.labels"></graph>
+        <graph ref="graph"
+               :width="width"
+               :height="height"
+               :edges="data.datasets[1].data"
+               :nodes="data.labels"></graph>
     </div>
 </template>
 
@@ -15,7 +23,11 @@ import ChartJS from "chart.js";
 import Graph from "./Graph.vue";
 import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
 
-@Component()
+@Component({
+    components: {
+        Graph
+    }
+})
 export default class Chart extends Vue {
     @Prop type = p({
         type: String,
@@ -28,6 +40,7 @@ export default class Chart extends Vue {
             return {};
         }
     });
+
     @Prop options = p({
         type: Object,
         default: () => {
@@ -37,10 +50,26 @@ export default class Chart extends Vue {
 
     chart: ChartJS = null;
 
+    get width() {
+        return this.$el.getBoundingClientRect().width / 2;
+    }
+    get height() {
+        return this.$el.getBoundingClientRect().height;
+    }
+
     mountChart() {
         if (this.type == "topicDependency") {
             this.chart = {
-                destroy: () => { }
+                destroy: () => { },
+                update: () => {
+                    this.$nextTick(() => {
+                        if (this.$refs["graph"]) {
+                            (this.$refs["graph"] as Graph[]).forEach(x => {
+                                x.render();
+                            });
+                        }
+                    });
+                }
             };
         } else {
             const chartOptions = Object.assign({
@@ -48,7 +77,7 @@ export default class Chart extends Vue {
                 responsive: true
             }, this.options);
 
-            this.chart = new ChartJS(this.$el, {
+            this.chart = new ChartJS(this.$el.querySelector("canvas"), {
                 type: this.type,
                 data: this.data,
                 options: chartOptions
@@ -72,9 +101,23 @@ export default class Chart extends Vue {
         });
     }
 
+    @Lifecycle
+    beforeUpdate() {
+        if (this.type == "topicDependency") {
+            this.chart.destroy();
+        }
+    }
+
     @Watch("type")
     handleTypeChange() {
-        this.resetChart();
+        if (this.type == "topicDependency") {
+            this.chart.destroy();
+            this.$nextTick(() => {
+                this.mountChart();
+            });
+        } else {
+            this.resetChart();
+        }
     }
 
     @Watch("options")
@@ -94,5 +137,15 @@ export default class Chart extends Vue {
     max-width: 100%;
     margin: auto;
     transition: width 250ms linear, height 250ms linear;
+}
+
+.chartContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.graphContainer {
+    display: flex;
+    flex: 1;
 }
 </style>

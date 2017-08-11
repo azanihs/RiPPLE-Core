@@ -246,12 +246,14 @@ export default class VariableDataVisualiser extends Vue {
         const items = this.dataCategories.filter(x => !this.isDisabled(x));
         const { topics, ownScores, compareAgainst } = this.compareList(items);
 
-        let compareResults = compareAgainst;
-        let ownResults = ownScores;
+        let compareResults = compareAgainst.map(x => x);
+        let ownResults = ownScores.map(x => x);
+        let dataTopics = topics;
         if (this.chart != "topicDependency") {
             // Get all self loops from edge list, and use that competency.
             compareResults = compareAgainst.filter(x => x.source == x.target).map(x => x.competency);
             ownResults = ownScores.filter(x => x.source == x.target).map(x => x.competency);
+            dataTopics = topics.map(x => x.id);
         }
 
         const ownData = {
@@ -275,7 +277,7 @@ export default class VariableDataVisualiser extends Vue {
 
         const chartData = {
             data: {
-                labels: topics,
+                labels: dataTopics,
                 datasets: [ownData, compareData]
             },
             options: {
@@ -300,6 +302,7 @@ export default class VariableDataVisualiser extends Vue {
                 borderColor: ownData.borderColor[0]
             });
         }
+
         return chartData;
     }
 }

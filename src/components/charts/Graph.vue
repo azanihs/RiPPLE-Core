@@ -1,9 +1,9 @@
 <template>
     <svg xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        ref="svg"
-        :width="width"
-        :height="height">
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         ref="svg"
+         :width="width"
+         :height="height">
     </svg>
 </template>
 
@@ -19,11 +19,18 @@ import * as d3 from "d3";
 
 @Component()
 export default class Graph extends Vue {
-    width = 600;
-    height = 300;
 
     graphWidth = 0;
     graphHeight = 0
+
+    @Prop
+    width = p({
+        default: 600
+    }) as number;
+    @Prop
+    height = p({
+        default: 150
+    }) as number;
 
     @Prop edges = p({
         type: Array,
@@ -35,16 +42,12 @@ export default class Graph extends Vue {
         required: true
     });
 
+
     formattedEdges = [];
     formattedNodes = [];
 
     render() {
-        this.formattedEdges = this.edges.map(x => ({
-            source: x[0],
-            target: x[1],
-            weight: x[2],
-            colour: x[3]
-        }));
+        this.formattedEdges = this.edges.slice();
         this.formattedNodes = this.nodes;
         const selfLoops = this.formattedEdges.filter(x => x.source == x.target);
 
@@ -55,12 +58,12 @@ export default class Graph extends Vue {
         };
 
         const nodeRadius = 20;
-        const maxWeight = Math.max(...this.formattedEdges.map(x => x.weight));
-        const minWeight = Math.min(...this.formattedEdges.map(x => x.weight));
+        const maxWeight = Math.max(...this.formattedEdges.map(x => x.attempts));
+        const minWeight = Math.min(...this.formattedEdges.map(x => x.attempts));
         const lineColour = d3.interpolate("pink", "#256");
-        const maxColour = Math.max(...this.formattedEdges.map(x => x.colour));
-        const minColour = Math.min(...this.formattedEdges.map(x => x.colour));
-        const getStrokeColour = d => lineColour((d.colour - maxColour) / (minColour - maxColour));
+        const maxColour = Math.max(...this.formattedEdges.map(x => x.competency));
+        const minColour = Math.min(...this.formattedEdges.map(x => x.competency));
+        const getStrokeColour = d => lineColour((d.competency - maxColour) / (minColour - maxColour));
 
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
         svg.html(null);
@@ -72,7 +75,6 @@ export default class Graph extends Vue {
 
         this.graphWidth = this.width - (nodeRadius * 2);
         this.graphHeight = this.height - (nodeRadius * 2);
-
 
         const forceLink = d3.forceLink(this.formattedEdges);
         const simulation = d3.forceSimulation(this.formattedNodes)
@@ -89,7 +91,7 @@ export default class Graph extends Vue {
             .enter()
             .append("line")
             .attr("stroke", getStrokeColour)
-            .attr("stroke-width", d => normalise(minWeight, maxWeight, d.weight));
+            .attr("stroke-width", d => normalise(minWeight, maxWeight, d.attempts));
 
         const node = container.append("g")
             .attr("class", "nodes")
@@ -107,7 +109,7 @@ export default class Graph extends Vue {
             .attr("stroke-width", d => {
                 const foundSelfLoop = selfLoops.find(selfLoop => selfLoop.source == d);
                 if (foundSelfLoop) {
-                    return normalise(minWeight, maxWeight, foundSelfLoop.weight);
+                    return normalise(minWeight, maxWeight, foundSelfLoop.attempts);
                 }
                 return 1;
             })
