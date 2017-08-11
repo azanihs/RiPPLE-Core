@@ -168,9 +168,9 @@ export default class RecommendationSearch extends Vue {
     getColour(c) {
         if (c < 50) {
             return "rgba(255, 99, 132, ";
-        } else if (c >= 50 && c <= 75) {
+        } else if (c >= 50 && c < 85) {
             return "rgba(255, 206, 86, ";
-        } else {
+        } else if (c >= 85) {
             return "rgba(34, 85, 102, ";
         }
     };

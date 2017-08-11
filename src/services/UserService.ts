@@ -9,18 +9,14 @@ export default class UserService {
     }
 
     static userCompetencies(topicsToInclude: string[]) {
-        const ownScores = topicsToInclude.map(UserRepository.userScoreForTopic).reduce((a, b) => a.concat(b), [])
-            .filter(x => {
-                // Only keep edges where target && source appear in topicsToInclude
-                return topicsToInclude.find(topics => topics == x.source.id)
-                    && topicsToInclude.find(topics => topics == x.target.id);
-            });
-        const userGoals = topicsToInclude.map(UserRepository.userGoalForTopic).reduce((a, b) => a.concat(b), [])
-            .filter(x => {
-                // Only keep edges where target && source appear in topicsToInclude
-                return topicsToInclude.find(topics => topics == x.source.id)
-                    && topicsToInclude.find(topics => topics == x.target.id);
-            });
+        // Only keep edges where target && source appear in topicsToInclude
+        const flattenAndFilter = topics => topics
+            .reduce((a, b) => a.concat(b), [])
+            .filter(x => topicsToInclude.find(topics => topics == x.source.id)
+                && topicsToInclude.find(topics => topics == x.target.id));
+
+        const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
+        const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
 
         const topics = ownScores
             .map(x => x.source)
@@ -39,37 +35,34 @@ export default class UserService {
         };
     }
 
-    static userCompetenciesOverview() {
-        const topics = UserRepository.getAllAvailableTopics();
-        const ownScore = topics.map(x => Math.round(Math.random() * 100));
-        const userGoal = topics.map(x => Math.round(Math.random() * 100));
-
-        return {
-            data: {
-                labels: topics,
-                datasets: [{
-                    data: ownScore,
-                    label: "Your Qualification",
-                    borderWidth: 1,
-                    backgroundColor: [],
-                    borderColor: []
-                }]
-            },
-            options: {}
-        };
+    static getAllAvailableEngagementTypes() {
+        return UserRepository.getAllAvailableEngagementTypes();
     }
 
     static getEngagementScores(itemsToGet: string[]) {
-        const ownScore = itemsToGet.map(x => Math.round(Math.random() * 100));
-        const userGoal = itemsToGet.map(x => Math.round(Math.random() * 100));
+        // Only keep edges where target && source appear in topicsToInclude
+        const flattenAndFilter = topics => topics
+            .reduce((a, b) => a.concat(b), [])
+            .filter(x => itemsToGet.find(topics => topics == x.source.id)
+                && itemsToGet.find(topics => topics == x.target.id));
 
-        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
-        const goal = Math.round(Math.random() * 100);
+        const ownScores = flattenAndFilter(itemsToGet.map(UserRepository.userEngagementForType));
+        const userGoals = flattenAndFilter(itemsToGet.map(UserRepository.engagementOtherForType));
+
+        const topics = ownScores
+            .map(x => x.source)
+            .reduce((carry, topicNode) => {
+                if (itemsToGet.find(x => x == topicNode.id) &&
+                    !carry.find(x => x == topicNode)) {
+                    carry.push(topicNode);
+                }
+                return carry;
+            }, []);
 
         return {
-            topics: ["Overall"].concat(itemsToGet),
-            ownScore: [average].concat(ownScore),
-            compareAgainst: [goal].concat(userGoal)
+            topics: topics, // Node List
+            ownScores: ownScores, // Edge list of self
+            compareAgainst: userGoals // Edge list of other
         };
     }
 

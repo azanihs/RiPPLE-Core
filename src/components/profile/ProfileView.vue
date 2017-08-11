@@ -42,10 +42,10 @@
                     <h2>Engagement Overview</h2>
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
-                <!--<variable-data-visualiser class="componentSeparator"
-                                              :dataCategories="engagementItems"
-                                              :compareList="generateEngagement">
-                    </variable-data-visualiser>-->
+                <variable-data-visualiser class="componentSeparator"
+                                          :dataCategories="engagementItems"
+                                          :compareList="generateEngagement">
+                </variable-data-visualiser>
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -207,26 +207,19 @@ export default class DefaultView extends Vue {
     }
 
     get engagementItems() {
-        return [
-            "Competencies",
-            "Goal Progress",
-            "Achievements",
-            "Recommendations",
-            "Social Connections",
-            "Study Partners",
-            "Peers Mentored",
-            "Questions Rated",
-            "Questions Asked",
-            "Questions Answered",
-            "Questions Viewed"];
+        return UserService.getAllAvailableEngagementTypes();
     }
 
     get engagementSummary() {
-        const scores = UserService.getEngagementScores(this.engagementItems);
-        return scores.topics.map((x, i) => ({
-            name: x,
-            score: scores.ownScore[i]
-        }));
+        const { ownScores } = UserService.getEngagementScores(this.engagementItems);
+        // Return all self-loops and competencies.
+
+        return ownScores
+            .filter(x => x.target == x.source)
+            .map(x => ({
+                name: x.target.id,
+                score: x.competency
+            }));
     }
 
     generateEngagement(itemsToInclude) {
