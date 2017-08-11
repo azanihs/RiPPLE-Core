@@ -4,15 +4,14 @@
         <canvas class="chartjs"></canvas>
     </div>
     <div class="graphContainer"
+         @resize="graphResize"
          v-else>
-        <graph ref="graph"
-               :width="width"
-               :height="height"
+        <graph class="graph"
+               ref="graph"
                :edges="data.datasets[0].data"
                :nodes="data.labels"></graph>
-        <graph ref="graph"
-               :width="width"
-               :height="height"
+        <graph class="graph"
+               ref="graph"
                :edges="data.datasets[1].data"
                :nodes="data.labels"></graph>
     </div>
@@ -50,11 +49,8 @@ export default class Chart extends Vue {
 
     chart: ChartJS = null;
 
-    get width() {
-        return this.$el.getBoundingClientRect().width / 2;
-    }
-    get height() {
-        return this.$el.getBoundingClientRect().height;
+    graphResize = () => {
+        this.chart.update();
     }
 
     mountChart() {
@@ -147,5 +143,11 @@ export default class Chart extends Vue {
 .graphContainer {
     display: flex;
     flex: 1;
+    height: 100%;
+}
+
+.graph {
+    width: 50%;
+    height: 100%;
 }
 </style>

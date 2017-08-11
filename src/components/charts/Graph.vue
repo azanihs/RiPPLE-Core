@@ -23,14 +23,8 @@ export default class Graph extends Vue {
     graphWidth = 0;
     graphHeight = 0
 
-    @Prop
-    width = p({
-        default: 600
-    }) as number;
-    @Prop
-    height = p({
-        default: 150
-    }) as number;
+    width = 0;
+    height = 0;
 
     @Prop edges = p({
         type: Array,
@@ -139,9 +133,21 @@ export default class Graph extends Vue {
         this.render();
     }
 
+    updateDimensions() {
+        const { width, height } = this.$el.getBoundingClientRect();
+        this.width = width;
+        this.height = height;
+        this.render();
+    }
+
     @Lifecycle
     mounted() {
-        this.render();
+        window.addEventListener("resize", this.updateDimensions);
+        this.updateDimensions();
+    }
+    @Lifecycle
+    destroyed() {
+        window.removeEventListener("resize", this.updateDimensions);
     }
 
     ticked(link, node, labels, radius) {
