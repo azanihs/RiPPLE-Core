@@ -74,6 +74,7 @@ export interface PeerConnection {
     topic: string,
     weight: number,
     date: Date, // Date the connection was made
+    availableTime: Date
 }
 
 export interface Notification {

@@ -212,8 +212,8 @@ export default class DefaultView extends Vue {
 
     get engagementSummary() {
         const { ownScores } = UserService.getEngagementScores(this.engagementItems);
-        // Return all self-loops and competencies.
 
+        // Return all self-loops competencies.
         return ownScores
             .filter(x => x.target == x.source)
             .map(x => ({

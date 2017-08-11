@@ -87,6 +87,7 @@ export default class UserService {
         const categoryLength = this.getAllAvailableCategories().length;
         recommendations.forEach(x => {
             x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
+            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
         });
 
         return recommendations;
@@ -97,6 +98,7 @@ export default class UserService {
         const categoryLength = this.getAllAvailableCategories().length;
         recommendations.forEach(x => {
             x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
+            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
         });
 
         return recommendations;

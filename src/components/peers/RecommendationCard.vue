@@ -1,33 +1,32 @@
 <template>
     <md-card md-with-hover
-        class="recommendationsCard">
+             class="recommendationsCard">
         <md-card-header class="fullWidth">
             <md-avatar>
                 <md-avatar>
                     <img :src="data.image"
-                        :alt="data.name">
+                         :alt="data.name">
                 </md-avatar>
             </md-avatar>
             <div class="md-title">{{data.name}}</div>
             <div class="md-subhead">
                 <topic-chip v-for="prof in data.proficiencies"
-                    :key="prof"
-                    linkTo="/view/peers">
+                            :key="prof"
+                            linkTo="/view/peers">
                     {{prof}}
                 </topic-chip>
             </div>
             <md-button class="type"> {{ data.recommendationType }}</md-button>
+            <md-button class="date"> {{ meetingTime }}</md-button>
         </md-card-header>
         <md-card-content class="fullWidth flex">
             <md-input-container class="autoComplete">
                 <label>Meeting Location</label>
                 <md-autocomplete v-model="meetingLocation"
-                    :list="meetingHistory"
-                    :filter-list="findItem"></md-autocomplete>
+                                 :list="meetingHistory"
+                                 :filter-list="findItem"></md-autocomplete>
             </md-input-container>
-            <div>
-                <md-button> {{ data.availableTimes[0] }}</md-button>
-            </div>
+    
         </md-card-content>
     
         <md-card-actions>
@@ -62,6 +61,13 @@
     font-size: 10px;
 }
 
+.date {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 10px;
+}
+
 .autoComplete {
     margin-bottom: 0px;
 }
@@ -87,6 +93,13 @@ export default class RecommendationCard extends Vue {
         return possibleList.filter(x => x.name.toLowerCase().indexOf(this.meetingLocation.toLowerCase()) >= 0);
     }
 
+    get meetingTime() {
+        const dayToEnglish = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const meetDate = this.data.availableTime as Date;
+
+        const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
+        return this.data.availableTimes[0] + " " + date;
+    }
     get meetingHistory() {
         return UserService.getMeetingHistory();
     }
