@@ -59,11 +59,6 @@ export default class Chart extends Vue {
                 destroy: () => { },
                 update: () => {
                     this.$nextTick(() => {
-                        if (this.$refs["graph"]) {
-                            (this.$refs["graph"] as Graph[]).forEach(x => {
-                                x.render();
-                            });
-                        }
                     });
                 }
             };

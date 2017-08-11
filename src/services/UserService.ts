@@ -9,8 +9,18 @@ export default class UserService {
     }
 
     static userCompetencies(topicsToInclude: string[]) {
-        const ownScores = topicsToInclude.map(UserRepository.userScoreForTopic).reduce((a, b) => a.concat(b), []);
-        const userGoals = topicsToInclude.map(UserRepository.userGoalForTopic).reduce((a, b) => a.concat(b), []);
+        const ownScores = topicsToInclude.map(UserRepository.userScoreForTopic).reduce((a, b) => a.concat(b), [])
+            .filter(x => {
+                // Only keep edges where target && source appear in topicsToInclude
+                return topicsToInclude.find(topics => topics == x.source.id)
+                    && topicsToInclude.find(topics => topics == x.target.id);
+            });
+        const userGoals = topicsToInclude.map(UserRepository.userGoalForTopic).reduce((a, b) => a.concat(b), [])
+            .filter(x => {
+                // Only keep edges where target && source appear in topicsToInclude
+                return topicsToInclude.find(topics => topics == x.source.id)
+                    && topicsToInclude.find(topics => topics == x.target.id);
+            });
 
         const topics = ownScores
             .map(x => x.source)
