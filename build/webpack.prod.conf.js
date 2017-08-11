@@ -86,7 +86,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         // split vendor js into its own file
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
-            minChunks: function(module, count) {
+            minChunks: function (module, count) {
                 // any required modules inside node_modules are extracted to vendor
                 return (
                     module.resource &&
@@ -105,23 +105,5 @@ var webpackConfig = merge(baseWebpackConfig, {
         })
     ]
 })
-
-if (config.build.productionGzip) {
-    var CompressionWebpackPlugin = require('compression-webpack-plugin')
-
-    webpackConfig.plugins.push(
-        new CompressionWebpackPlugin({
-            asset: '[path].gz[query]',
-            algorithm: 'gzip',
-            test: new RegExp(
-                '\\.(' +
-                config.build.productionGzipExtensions.join('|') +
-                ')$'
-            ),
-            threshold: 10240,
-            minRatio: 0.8
-        })
-    )
-}
 
 module.exports = webpackConfig
