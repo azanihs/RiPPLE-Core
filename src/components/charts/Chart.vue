@@ -1,13 +1,36 @@
 <template>
-    <canvas class="chartjs">
-    </canvas>
+    <div v-if="type != 'topicDependency'"
+        class="chartContainer">
+        <canvas class="chartjs"></canvas>
+    </div>
+    <graph-comparator v-else
+        :data="data"
+        :nodes="data.labels"></graph-comparator>
 </template>
+
+<style scoped>
+.chartjs {
+    max-width: 100%;
+    margin: auto;
+    transition: width 250ms linear, height 250ms linear;
+}
+
+.chartContainer {
+    width: 100%;
+    height: 100%;
+}
+</style>
 
 <script lang="ts">
 import ChartJS from "chart.js";
+import GraphComparator from "./GraphComparator.vue";
 import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
 
-@Component()
+@Component({
+    components: {
+        GraphComparator
+    }
+})
 export default class Chart extends Vue {
     @Prop type = p({
         type: String,
@@ -20,6 +43,7 @@ export default class Chart extends Vue {
             return {};
         }
     });
+
     @Prop options = p({
         type: Object,
         default: () => {
@@ -30,16 +54,26 @@ export default class Chart extends Vue {
     chart: ChartJS = null;
 
     mountChart() {
-        const chartOptions = Object.assign({
-            maintainAspectRatio: false,
-            responsive: true
-        }, this.options);
+        if (this.type == "topicDependency") {
+            this.chart = {
+                destroy: () => { },
+                update: () => {
+                    this.$nextTick(() => {
+                    });
+                }
+            };
+        } else {
+            const chartOptions = Object.assign({
+                maintainAspectRatio: false,
+                responsive: true
+            }, this.options);
 
-        this.chart = new ChartJS(this.$el, {
-            type: this.type,
-            data: this.data,
-            options: chartOptions
-        });
+            this.chart = new ChartJS(this.$el.querySelector("canvas"), {
+                type: this.type,
+                data: this.data,
+                options: chartOptions
+            });
+        }
     }
 
     @Lifecycle
@@ -58,9 +92,23 @@ export default class Chart extends Vue {
         });
     }
 
+    @Lifecycle
+    beforeUpdate() {
+        if (this.type == "topicDependency") {
+            this.chart.destroy();
+        }
+    }
+
     @Watch("type")
     handleTypeChange() {
-        this.resetChart();
+        if (this.type == "topicDependency") {
+            this.chart.destroy();
+            this.$nextTick(() => {
+                this.mountChart();
+            });
+        } else {
+            this.resetChart();
+        }
     }
 
     @Watch("options")
@@ -75,10 +123,4 @@ export default class Chart extends Vue {
 }
 </script>
 
-<style scoped>
-.chartjs {
-    max-width: 100%;
-    margin: auto;
-    transition: width 250ms linear, height 250ms linear;
-}
-</style>
+

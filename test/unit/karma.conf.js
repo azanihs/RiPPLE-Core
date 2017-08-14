@@ -5,7 +5,7 @@
 const webpackConfig = require("../../build/webpack.dev.conf");
 const path = require("path");
 
-module.exports = function(config) {
+module.exports = config => {
     config.set({
         // to run in additional browsers:
         // 1. install corresponding karma launcher
@@ -14,7 +14,7 @@ module.exports = function(config) {
         browsers: ["PhantomJS"],
         frameworks: ["phantomjs-shim", "mocha", "chai"],
         reporters: ["spec", "coverage-istanbul"],
-        files: ["../../node_modules/babel-polyfill/dist/polyfill.js", "spec/**/*.ts"],
+        files: ["../../node_modules/babel-polyfill/dist/polyfill.min.js", "spec/**/*.ts"],
         preprocessors: {
             "spec/**/*.ts": ["webpack"]
         },

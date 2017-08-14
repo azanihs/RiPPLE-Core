@@ -9,50 +9,60 @@ export default class UserService {
     }
 
     static userCompetencies(topicsToInclude: string[]) {
-        const ownScore = topicsToInclude.map(x => Math.round(Math.random() * 100));
-        const userGoal = topicsToInclude.map(x => Math.round(Math.random() * 100));
+        // Only keep edges where target && source appear in topicsToInclude
+        const flattenAndFilter = topics => topics
+            .reduce((a, b) => a.concat(b), [])
+            .filter(x => topicsToInclude.find(topics => topics == x.source.id)
+                && topicsToInclude.find(topics => topics == x.target.id));
 
-        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
-        const goal = Math.round(Math.random() * 100);
+        const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
+        const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
+
+        const topics = ownScores
+            .map(x => x.source)
+            .reduce((carry, topicNode) => {
+                if (topicsToInclude.find(x => x == topicNode.id) &&
+                    !carry.find(x => x == topicNode)) {
+                    carry.push(topicNode);
+                }
+                return carry;
+            }, []);
 
         return {
-            topics: ["Overall"].concat(topicsToInclude),
-            ownScore: [average].concat(ownScore),
-            compareAgainst: [goal].concat(userGoal)
+            topics: topics, // Node List
+            ownScores: ownScores, // Edge list of self
+            compareAgainst: userGoals // Edge list of other
         };
     }
 
-    static userCompetenciesOverview() {
-        const topics = UserRepository.getAllAvailableTopics();
-        const ownScore = topics.map(x => Math.round(Math.random() * 100));
-        const userGoal = topics.map(x => Math.round(Math.random() * 100));
-
-        return {
-            data: {
-                labels: topics,
-                datasets: [{
-                    data: ownScore,
-                    label: "Your Qualification",
-                    borderWidth: 1,
-                    backgroundColor: [],
-                    borderColor: []
-                }]
-            },
-            options: {}
-        };
+    static getAllAvailableEngagementTypes() {
+        return UserRepository.getAllAvailableEngagementTypes();
     }
 
     static getEngagementScores(itemsToGet: string[]) {
-        const ownScore = itemsToGet.map(x => Math.round(Math.random() * 100));
-        const userGoal = itemsToGet.map(x => Math.round(Math.random() * 100));
+        // Only keep edges where target && source appear in topicsToInclude
+        const flattenAndFilter = topics => topics
+            .reduce((a, b) => a.concat(b), [])
+            .filter(x => itemsToGet.find(topics => topics == x.source.id)
+                && itemsToGet.find(topics => topics == x.target.id));
 
-        const average = Math.round(ownScore.reduce((a, b) => a + b, 0) / ownScore.length);
-        const goal = Math.round(Math.random() * 100);
+        const ownScores = flattenAndFilter(itemsToGet.map(UserRepository.userEngagementForType));
+        const userGoals = flattenAndFilter(itemsToGet.map(UserRepository.engagementOtherForType));
+
+        const topics = ownScores
+            .map(x => x.source)
+            .reduce((carry, topicNode) => {
+                if (itemsToGet.find(x => x == topicNode.id) &&
+                    !carry.find(x => x == topicNode)) {
+                    carry.push(topicNode);
+                }
+                return carry;
+            }, []);
 
         return {
-            topics: ["Overall"].concat(itemsToGet),
-            ownScore: [average].concat(ownScore),
-            compareAgainst: [goal].concat(userGoal)
+            topics: topics, // Node List
+            ownScores: ownScores, // Edge list of self
+            compareAgainst: userGoals // Edge list of other
         };
     }
 
@@ -73,11 +83,25 @@ export default class UserService {
     }
 
     static getRecommendedConnections(count: number) {
-        return PeerRepository.getMany(count);
+        const recommendations = PeerRepository.getMany(count) as any;
+        const categoryLength = this.getAllAvailableCategories().length;
+        recommendations.forEach(x => {
+            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
+            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
+        });
+
+        return recommendations;
     }
 
     static getOutstandingRequests(count: number) {
-        return PeerRepository.getMany(count);
+        const recommendations = PeerRepository.getMany(count) as any;
+        const categoryLength = this.getAllAvailableCategories().length;
+        recommendations.forEach(x => {
+            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
+            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
+        });
+
+        return recommendations;
     }
 
     static userHasBadge(badgeId) {
@@ -86,9 +110,10 @@ export default class UserService {
     }
 
     static mostReputableUsers(): UserSummary[] {
-        return UserService.getOutstandingRequests(10).map(x => {
+        return UserService.getOutstandingRequests(100).map(x => {
             const summary: UserSummary = {
                 name: x.name,
+                image: x.image,
                 reputation: Math.floor(Math.random() * 20),
                 questionsContributed: Math.floor(Math.random() * 20),
                 numberAnswers: Math.floor(Math.random() * 20),
@@ -100,5 +125,11 @@ export default class UserService {
 
     static getUserNotifications(count: number): Notification[] {
         return UserRepository.getUserNotifications().slice(0, count);
+    }
+
+    static getMeetingHistory() {
+        return ["UQ", "Toowong", "Indro", "Indooroopilly"].map(x => ({
+            name: x
+        }));
     }
 }

@@ -47,6 +47,7 @@ export interface User {
 
 export interface UserSummary {
     name: string,
+    image: string,
     reputation: number,
     questionsContributed: number,
     numberAnswers: number,
@@ -73,6 +74,7 @@ export interface PeerConnection {
     topic: string,
     weight: number,
     date: Date, // Date the connection was made
+    availableTime: Date
 }
 
 export interface Notification {

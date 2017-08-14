@@ -2,15 +2,20 @@
     <md-layout md-flex="100">
         <md-card class="fullWidth">
             <md-layout md-flex="100">
-                <md-layout md-flex="75" class="leftPanel">
+                <md-layout md-flex="75"
+                    class="leftPanel">
                     <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
                     <div class="chartContainer">
                         <div class="chartPanel">
-                            <chart ref="chart" :type="chart" :data="chartData.data" :options="chartData.options"></chart>
+                            <chart ref="chart"
+                                :type="chart"
+                                :data="chartData.data"
+                                :options="chartData.options"></chart>
                         </div>
                     </div>
                 </md-layout>
-                <md-layout md-flex="25" class="rightPanel">
+                <md-layout md-flex="25"
+                    class="rightPanel">
                     <div class="settingsContainer">
                         <div class="visualisationMenu">
                             <h3>Change Visualisation Data</h3>
@@ -18,12 +23,17 @@
                                 <label for="visualisationType">
                                     Visualisation Type
                                 </label>
-                                <md-select name="visualisationType" id="visualisationType" v-model="chart">
+                                <md-select name="visualisationType"
+                                    id="visualisationType"
+                                    v-model="chart">
                                     <md-option value="bar">
                                         <div class="chartOption barChart">Bar Chart</div>
                                     </md-option>
                                     <md-option value="radar">
                                         <div class="chartOption radarChart">Radar Chart</div>
+                                    </md-option>
+                                    <md-option value="topicDependency">
+                                        <div class="chartOption topicDependency">Topic Dependency Chart</div>
                                     </md-option>
                                 </md-select>
                             </md-input-container>
@@ -31,7 +41,9 @@
                                 <label for="visulisationCompare">
                                     Compare Data
                                 </label>
-                                <md-select name="visulisationCompare" id="visulisationCompare" v-model="compare">
+                                <md-select name="visulisationCompare"
+                                    id="visulisationCompare"
+                                    v-model="compare">
                                     <md-option value="Personal Goals">
                                         Personal Goals
                                     </md-option>
@@ -44,7 +56,10 @@
                                 </md-select>
                             </md-input-container>
                             <h4>Topics to Visulise</h4>
-                            <topic-chip v-for="category in dataCategories" :key="category" :disabled="isDisabled(category)" @click.native="toggleVisible(category)">
+                            <topic-chip v-for="category in dataCategories"
+                                :key="category"
+                                :disabled="isDisabled(category)"
+                                @click.native="toggleVisible(category)">
                                 {{category}}
                             </topic-chip>
                         </div>
@@ -118,6 +133,11 @@ h3 {
 .radarChart::before {
     content: "\E1B3";
 }
+
+.topicDependency::before {
+    content: "\E8C3";
+}
+
 
 .settingsContainer {
     margin: auto;
@@ -213,8 +233,9 @@ export default class VariableDataVisualiser extends Vue {
     @Lifecycle
     mounted() {
         window.addEventListener("resize", this.updateChart);
-        this.$nextTick()
-            .then(this.updateChart);
+        requestAnimationFrame(() => {
+            this.updateChart();
+        });
     }
 
     @Lifecycle
@@ -224,21 +245,28 @@ export default class VariableDataVisualiser extends Vue {
 
     get chartData() {
         const items = this.dataCategories.filter(x => !this.isDisabled(x));
-        const data = this.compareList(items);
+        const { topics, ownScores, compareAgainst } = this.compareList(items);
 
-        const ownScores = data.ownScore;
-        const compareScores = data.compareAgainst;
+        let compareResults = compareAgainst.map(x => x);
+        let ownResults = ownScores.map(x => x);
+        let dataTopics = topics;
+        if (this.chart != "topicDependency") {
+            // Get all self loops from edge list, and use that competency.
+            compareResults = compareAgainst.filter(x => x.source == x.target).map(x => x.competency);
+            ownResults = ownScores.filter(x => x.source == x.target).map(x => x.competency);
+            dataTopics = topics.map(x => x.id);
+        }
 
         const ownData = {
-            data: ownScores,
+            data: ownResults,
             label: "Your Results",
-            backgroundColor: ownScores.map(x => this.getColour(x) + "0.4)"),
-            borderColor: ownScores.map(x => this.getColour(x) + "1)"),
+            backgroundColor: ownResults.map(x => this.getColour(x) + "0.4)"),
+            borderColor: ownResults.map(x => this.getColour(x) + "1)"),
             borderWidth: 2
         };
 
         const compareData = {
-            data: compareScores,
+            data: compareResults,
             label: this.compare,
             type: "line",
             pointStyle: "triangle",
@@ -250,7 +278,7 @@ export default class VariableDataVisualiser extends Vue {
 
         const chartData = {
             data: {
-                labels: data.topics,
+                labels: dataTopics,
                 datasets: [ownData, compareData]
             },
             options: {
@@ -275,6 +303,7 @@ export default class VariableDataVisualiser extends Vue {
                 borderColor: ownData.borderColor[0]
             });
         }
+
         return chartData;
     }
 }

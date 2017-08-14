@@ -1,87 +1,110 @@
 <template>
     <md-layout>
         <h2>
-            <md-icon>access_time </md-icon> Select your weekly availability so that we can match you up with people who have similar schedules
+            <md-icon>access_time</md-icon>
+            Select your weekly availability so that we can match you up with people who have similar schedules
         </h2>
-        <md-table v-once
-                  class="table">
-            <md-table-header>
-                <md-table-row>
-                    <md-table-head>Day</md-table-head>
-                    <md-table-head v-for="time in preferenceTimes"
-                                   :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
-                    </md-table-head>
-                </md-table-row>
-            </md-table-header>
+        <md-card>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th v-for="time in preferenceTimes"
+                            :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
+                        </th>
+                    </tr>
+                </thead>
     
-            <md-table-body>
-                <md-table-row v-for="activity in preferenceActivities"
-                              :key="activity">
-                    <md-table-cell class="alignLeft">
-                        {{ activity }}
-                    </md-table-cell>
-                    <md-table-cell v-for="time in preferenceTimes"
-                                   :key="time">
-                        <md-checkbox @change="checkboxChange"
-                                     :id="`${activity}_${time}`"
-                                     :name="`${activity}_${time}`"></md-checkbox>
-                    </md-table-cell>
-                </md-table-row>
-            </md-table-body>
-        </md-table>
+                <tbody>
+                    <tr v-for="activity in preferenceActivities"
+                        :key="activity">
+                        <td>{{ activity }}</td>
+                        <td v-for="time in preferenceTimes"
+                            :key="time"
+                            class="centerAlign"
+                            :style="getCellShade(time)">
+                            <md-checkbox class="centerCheckbox"
+                                         @change="checkboxChange"
+                                         :id="`${activity}_${time}`"
+                                         :name="`${activity}_${time}`"></md-checkbox>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-card>
     </md-layout>
 </template>
 
 <style scoped>
-    h2 {
-        width: 100%;
-    }
-    
-    .md-checkbox {
-        margin: 0px auto;
-    }
-    
-    .table {
-        border: 1px solid #ccc;
-        width: 100%;
-    }
+h2 {
+    width: 100%;
+}
+
+.table {
+    border: none;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.table thead tr {
+    background-color: #256;
+    color: #f2f2f2;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #efefef;
+}
+
+.table tr td,
+.table thead tr th {
+    text-align: center;
+    padding: 8px 0px;
+}
 </style>
 
 <script lang="ts">
-    import { Vue, Component, Lifecycle, Prop } from "av-ts";
-    import { Question } from "../../interfaces/models";
+import { Vue, Component, Lifecycle, Prop } from "av-ts";
+import { Question } from "../../interfaces/models";
 
-    @Component()
-    export default class AvailabilitySelector extends Vue {
-        preferenceActivities: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-        preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
+@Component()
+export default class AvailabilitySelector extends Vue {
+    preferenceActivities: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
 
-        /**
-        *   Converts a twenty four hour time to twelve hour with an "am" or "pm" suffix
-        *   @param {number} time Twenty four hour time to convert to twelve hour
-        *   @return {string} Twelve hour representation of time with "am" or "pm" suffix
-        */
-        twentyFourHourToTwelveHourPeriod(twentyHourTime: number): string {
-            const time = +twentyHourTime;
-            if (time == 12) {
-                return `${time}pm`;
-            } else if (time < 12) {
-                return `${time}am`;
-            }
-            return `${time - 12}pm`;
+    /**
+    *   Converts a twenty four hour time to twelve hour with an "am" or "pm" suffix
+    *   @param {number} time Twenty four hour time to convert to twelve hour
+    *   @return {string} Twelve hour representation of time with "am" or "pm" suffix
+    */
+    twentyFourHourToTwelveHourPeriod(twentyHourTime: number): string {
+        const time = +twentyHourTime;
+        if (time == 12) {
+            return `${time}pm`;
+        } else if (time < 12) {
+            return `${time}am`;
         }
-
-        checkboxChange() {
-            this.$emit("change");
-        }
-
-        addNewRow() {
-            throw new Error("addNewRow not implemented");
-        }
-
-        deleteRow() {
-            throw new Error("deleteRow not implemented");
-        }
-
+        return `${time - 12}pm`;
     }
+
+    checkboxChange() {
+        this.$emit("change");
+    }
+
+    addNewRow() {
+        throw new Error("addNewRow not implemented");
+    }
+
+    deleteRow() {
+        throw new Error("deleteRow not implemented");
+    }
+
+    getCellShade(time) {
+        const weight = Math.random() < 0.75 ? 0 : Math.random() - 0.25;
+        // Perferably have a lookup table generated on mount
+        return {
+            background: `rgba(34, 85, 102, ${weight})`
+        };
+    }
+}
 </script>

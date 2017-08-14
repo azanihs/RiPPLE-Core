@@ -1,29 +1,56 @@
 <template>
     <div>
         <transition name="fade">
-            <md-layout v-if="selectedQuestion" key="1" class="viewContainer">
+            <md-layout v-if="selectedQuestion"
+                       key="1"
+                       class="viewContainer">
                 <!-- Header -->
-                <action-buttons class="" @back="selectedQuestion = null" @randomQuestion="selectRandom"></action-buttons>
-                <md-layout md-flex="100" class="questionContainer">
-                    <question @userAnswer="setUserIsFinished" class="question" :question="selectedQuestion"></question>
+                <action-buttons class=""
+                                @back="selectedQuestion = null"
+                                @randomQuestion="selectRandom"></action-buttons>
+                <md-layout md-flex="100"
+                           class="questionContainer">
+                    <question @userAnswer="setUserIsFinished"
+                              class="question"
+                              :question="selectedQuestion"></question>
                 </md-layout>
             </md-layout>
         </transition>
-        <md-layout :class="{hidden: selectedQuestion}" key="2" class="viewContainer">
+        <md-layout :class="{hidden: selectedQuestion}"
+                   key="2"
+                   class="viewContainer">
             <!-- Header -->
-            <md-layout class="headingContainer" md-flex="100">
-                <variable-data-visualiser class="overview" @changeTopics="filterQuestionTopic" :dataCategories="topics" :compareList="generateCompetencies">
+            <md-layout class="headingContainer"
+                       md-flex="100">
+                <variable-data-visualiser class="overview"
+                                          @changeTopics="filterQuestionTopic"
+                                          :dataCategories="topics"
+                                          :compareList="generateCompetencies">
                 </variable-data-visualiser>
-                <question-search :availableQuestions="questions" @searched="changeDisplay"></question-search>
+                <question-search :availableQuestions="questions"
+                                 @searched="changeDisplay"></question-search>
             </md-layout>
-            <md-layout md-hide-xsmall md-hide-small md-hide-medium>
-                <md-layout v-for="question in showQuestions" md-flex="33" md-gutter :key="question.id" class="questionPreview" @click.native="openQuestionPreview(question)">
-                    <question-preview class="questionCard" :data="question"></question-preview>
+            <md-layout md-hide-xsmall
+                       md-hide-small
+                       md-hide-medium>
+                <md-layout v-for="question in showQuestions"
+                           md-flex="33"
+                           md-gutter
+                           :key="question.id"
+                           class="questionPreview"
+                           @click.native="openQuestionPreview(question)">
+                    <question-preview class="questionCard"
+                                      :data="question"></question-preview>
                 </md-layout>
             </md-layout>
             <md-layout md-hide-large-and-up>
-                <md-layout v-for="question in showQuestions" md-flex="100" :key="question.id" class="mobileQuestionPreview" @click.native="openQuestionPreview(question)">
-                    <question-preview class="mobileQuestionCard" :data="question"></question-preview>
+                <md-layout v-for="question in showQuestions"
+                           md-flex="100"
+                           :key="question.id"
+                           class="mobileQuestionPreview"
+                           @click.native="openQuestionPreview(question)">
+                    <question-preview class="mobileQuestionCard"
+                                      :data="question"></question-preview>
                 </md-layout>
             </md-layout>
         </md-layout>

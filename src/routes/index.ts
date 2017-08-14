@@ -5,8 +5,7 @@ import Main from "../main";
 import ProfileView from "../components/profile/ProfileView.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
-import QuestionRecommender from "../components/questions/QuestionRecommender.vue";
-import PeerView from "../components/views/PeerView.vue";
+import PeerView from "../components/peers/PeerView.vue";
 import LeaderBoard from "../components/leaderboard/LeaderBoard.vue";
 
 import WIP from "../components/WIP.vue";
@@ -32,10 +31,6 @@ const routes = [{
         path: "/view/peers",
         name: "peers",
         component: PeerView
-    }, {
-        path: "/view/question/:id",
-        name: "question",
-        component: QuestionRecommender
     }, {
         path: "/view/leaderboard",
         name: "leaderboard",
