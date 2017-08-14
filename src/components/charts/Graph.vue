@@ -1,9 +1,9 @@
 <template>
     <svg xmlns="http://www.w3.org/2000/svg"
-         xmlns:xlink="http://www.w3.org/1999/xlink"
-         ref="svg"
-         :width="width"
-         :height="height">
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        ref="svg"
+        :width="width"
+        :height="height">
     </svg>
 </template>
 
@@ -20,12 +20,16 @@ import * as d3 from "d3";
 @Component()
 export default class Graph extends Vue {
 
+    willAnimateNextChange = true;
+    simulationIsFinished = false;
+
     graphWidth = 0;
     graphHeight = 0
 
+    nodeRadius = 20;
+
     width = 0;
     height = 0;
-
     @Prop edges = p({
         type: Array,
         required: true
@@ -35,15 +39,15 @@ export default class Graph extends Vue {
         type: Array,
         required: true
     });
+    @Prop
+    shouldTick: boolean;
 
-
-    formattedEdges = [];
-    formattedNodes = [];
+    simulation = null;
 
     render() {
-        this.formattedEdges = this.edges.slice();
-        this.formattedNodes = this.nodes;
-        const selfLoops = this.formattedEdges.filter(x => x.source == x.target);
+        const edges = this.edges.slice();
+        const nodes = this.nodes.slice();
+        const selfLoops = edges.filter(x => x.source == x.target);
 
         const minRange = 2;
         const maxRange = 10;
@@ -51,12 +55,12 @@ export default class Graph extends Vue {
             return (maxRange - minRange) * ((v - min) / (max - min)) + minRange;
         };
 
-        const nodeRadius = 20;
-        const maxWeight = Math.max(...this.formattedEdges.map(x => x.attempts));
-        const minWeight = Math.min(...this.formattedEdges.map(x => x.attempts));
+        const nodeRadius = this.nodeRadius;
+        const maxWeight = Math.max(...edges.map(x => x.attempts));
+        const minWeight = Math.min(...edges.map(x => x.attempts));
         const lineColour = d3.interpolate("pink", "#256");
-        const maxColour = Math.max(...this.formattedEdges.map(x => x.competency));
-        const minColour = Math.min(...this.formattedEdges.map(x => x.competency));
+        const maxColour = Math.max(...edges.map(x => x.competency));
+        const minColour = Math.min(...edges.map(x => x.competency));
         const getStrokeColour = d => lineColour((d.competency - maxColour) / (minColour - maxColour));
 
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
@@ -70,8 +74,8 @@ export default class Graph extends Vue {
         this.graphWidth = this.width - (nodeRadius * 2);
         this.graphHeight = this.height - (nodeRadius * 2);
 
-        const forceLink = d3.forceLink(this.formattedEdges);
-        const simulation = d3.forceSimulation(this.formattedNodes)
+        const forceLink = d3.forceLink(edges);
+        this.simulation = d3.forceSimulation(nodes)
             .alpha(3)
             .force("collision", d3.forceCollide(3 * nodeRadius))
             .force("link", forceLink.distance(3 * nodeRadius))
@@ -81,7 +85,7 @@ export default class Graph extends Vue {
         const link = container.append("g")
             .attr("class", "links")
             .selectAll("line")
-            .data(this.formattedEdges)
+            .data(edges)
             .enter()
             .append("line")
             .attr("stroke", getStrokeColour)
@@ -90,7 +94,7 @@ export default class Graph extends Vue {
         const node = container.append("g")
             .attr("class", "nodes")
             .selectAll("circle")
-            .data(this.formattedNodes)
+            .data(nodes)
             .enter().append("circle")
             .attr("r", nodeRadius)
             .attr("stroke", d => {
@@ -109,18 +113,36 @@ export default class Graph extends Vue {
             })
             .attr("fill", "#fff");
 
-        const labels = container.append("g")
+        const label = container.append("g")
             .attr("class", "labels")
             .selectAll("text")
-            .data(this.formattedNodes)
+            .data(nodes)
             .enter().append("text")
             .attr("dx", d => d.cx)
             .attr("dy", d => d.cy)
             .attr("text-anchor", "middle")
             .text(d => d.id);
 
-        simulation
-            .on("tick", this.ticked(link, node, labels, nodeRadius));
+        this.$emit("graphElements", {
+            node: node,
+            link: link,
+            label: label
+        });
+
+        this.simulation.on("end", () => {
+            this.simulationIsFinished = true;
+        });
+
+        if (this.shouldTick) {
+            if (this.willAnimateNextChange) {
+                this.simulation
+                    .on("tick", this.ticked(nodeRadius * 2));
+            } else {
+                this.computeStaticLayout();
+            }
+        } else {
+            this.simulation.stop();
+        }
     }
 
     @Watch("edges")
@@ -135,44 +157,56 @@ export default class Graph extends Vue {
 
     updateDimensions() {
         const { width, height } = this.$el.getBoundingClientRect();
+        if (!this.simulationIsFinished) {
+            this.computeStaticLayout();
+            return;
+        }
+        const oldWidth = this.width;
+        const oldHeight = this.height;
+        this.width = width;
+        this.height = height;
+        this.$emit("rescale",
+            { width: oldWidth, height: oldHeight },
+            { width: width, height: height }
+        );
+    }
+
+    @Lifecycle
+    mounted() {
+        if (this.shouldTick) {
+            window.addEventListener("resize", this.updateDimensions);
+        }
+        const { width, height } = this.$el.getBoundingClientRect();
         this.width = width;
         this.height = height;
         this.render();
     }
 
     @Lifecycle
-    mounted() {
-        window.addEventListener("resize", this.updateDimensions);
-        this.updateDimensions();
-    }
-    @Lifecycle
     destroyed() {
-        window.removeEventListener("resize", this.updateDimensions);
+        if (this.shouldTick) {
+            window.removeEventListener("resize", this.updateDimensions);
+        }
     }
 
-    ticked(link, node, labels, radius) {
+    ticked(radius) {
         return () => {
-            node
-                .attr("cx", d => {
-                    d.x = Math.max(radius, Math.min(this.graphWidth - radius, d.x));
-                    return d.x;
-                })
-                .attr("cy", d => {
-                    d.y = Math.max(radius, Math.min(this.graphHeight - radius, d.y));
-                    return d.y;
-                });
-
-            link
-                .attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
-
-            const data = node.data();
-            labels
-                .attr("dx", (d, i) => data[i].x)
-                .attr("dy", (d, i) => data[i].y + 4);
+            this.willAnimateNextChange = false;
+            this.$emit("tick", this.graphWidth, this.graphHeight, radius);
         };
+    }
+
+    computeStaticLayout() {
+        this.simulation.stop();
+        this.simulation.on("tick", null);
+
+        const end = Math.ceil(Math.log(this.simulation.alphaMin()) / Math.log(1 - this.simulation.alphaDecay()));
+        for (let i = 0; i < end; i++) {
+            this.simulation.tick();
+        }
+
+        this.ticked(this.nodeRadius * 2)();
+        this.simulationIsFinished = true;
     }
 }
 </script>

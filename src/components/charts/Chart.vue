@@ -1,30 +1,34 @@
 <template>
     <div v-if="type != 'topicDependency'"
-         class="chartContainer">
+        class="chartContainer">
         <canvas class="chartjs"></canvas>
     </div>
-    <div class="graphContainer"
-         @resize="graphResize"
-         v-else>
-        <graph class="graph"
-               ref="graph"
-               :edges="data.datasets[0].data"
-               :nodes="data.labels"></graph>
-        <graph class="graph"
-               ref="graph"
-               :edges="data.datasets[1].data"
-               :nodes="data.labels"></graph>
-    </div>
+    <graph-comparator v-else
+        :data="data"
+        :nodes="data.labels"></graph-comparator>
 </template>
+
+<style scoped>
+.chartjs {
+    max-width: 100%;
+    margin: auto;
+    transition: width 250ms linear, height 250ms linear;
+}
+
+.chartContainer {
+    width: 100%;
+    height: 100%;
+}
+</style>
 
 <script lang="ts">
 import ChartJS from "chart.js";
-import Graph from "./Graph.vue";
+import GraphComparator from "./GraphComparator.vue";
 import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
 
 @Component({
     components: {
-        Graph
+        GraphComparator
     }
 })
 export default class Chart extends Vue {
@@ -48,10 +52,6 @@ export default class Chart extends Vue {
     });
 
     chart: ChartJS = null;
-
-    graphResize = () => {
-        this.chart.update();
-    }
 
     mountChart() {
         if (this.type == "topicDependency") {
@@ -123,30 +123,4 @@ export default class Chart extends Vue {
 }
 </script>
 
-<style scoped>
-.chartjs {
-    max-width: 100%;
-    margin: auto;
-    transition: width 250ms linear, height 250ms linear;
-}
 
-.chartContainer {
-    width: 100%;
-    height: 100%;
-}
-
-.graphContainer {
-    display: flex;
-    flex: 1;
-    height: 100%;
-}
-
-.graph:first-child {
-    border-right: 1px solid #ccc;
-}
-
-.graph {
-    width: 50%;
-    height: 100%;
-}
-</style>
