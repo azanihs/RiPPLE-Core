@@ -1,22 +1,42 @@
 <template>
     <md-layout class="buttonContainer">
         <md-button @click="back">
-            <md-icon>keyboard_return</md-icon> Return
+            <md-icon>keyboard_return</md-icon>
+            <span>Return</span>
             <md-tooltip>Return To Questions</md-tooltip>
         </md-button>
-        <md-button @click="randomQuestion">
-            Random Question
-            <md-icon>shuffle</md-icon>
-            <md-tooltip>Random Question</md-tooltip>
+        <md-button class="md-warn"
+                   @click="report">
+            <span>Report Question</span>
+            <md-icon>error_outline</md-icon>
         </md-button>
+    
+        <div class="border">
+            <hr />
+        </div>
     </md-layout>
 </template>
 
 <style scoped>
+.border {
+    width: 100%;
+    padding: 0px 16px;
+}
+
+hr {
+    width: 100%;
+    display: block;
+    text-align: center;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+
 .buttonContainer {
     width: 100%;
     justify-content: space-between;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
+    margin-left: -16px;
+    margin-right: -16px;
 }
 </style>
 
@@ -29,11 +49,8 @@ export default class ActionButtons extends Vue {
     back() {
         this.$emit("back");
     }
-    randomQuestion() {
-        this.$emit("randomQuestion");
-    }
-    recommendations() {
-        this.$emit("recommendations");
+    report() {
+        this.$emit("report");
     }
 
 }

@@ -5,12 +5,10 @@
                        key="1"
                        class="viewContainer">
                 <!-- Header -->
-                <action-buttons class=""
-                                @back="selectedQuestion = null"
-                                @randomQuestion="selectRandom"></action-buttons>
                 <md-layout md-flex="100"
                            class="questionContainer">
                     <question @userAnswer="setUserIsFinished"
+                              @newQuestion="selectRandom"
                               class="question"
                               :question="selectedQuestion"></question>
                 </md-layout>
@@ -69,7 +67,8 @@
 }
 
 .viewContainer {
-    position: relative;
+    position: absolute;
+    top: 8px;
 }
 
 .fade-enter-active,
@@ -148,6 +147,7 @@ export default class QuestionBrowser extends Vue {
 
     setUserIsFinished(newVal: boolean) {
         this.userIsFinished = newVal;
+        this.selectedQuestion = null;
     }
 
     get maxOverlayHeight() {

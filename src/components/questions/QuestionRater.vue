@@ -1,37 +1,24 @@
 <template>
-    <md-card class="card" md-with-hover>
+    <md-card>
         <md-card-header class="cardHeader">
             <md-card-header-text>
-                <div class="md-title">
+                <h2>
                     <slot></slot>
-                </div>
+                </h2>
             </md-card-header-text>
-    
-            <md-card-media class="cardIcon">
-                <md-icon>{{icon}}</md-icon>
-            </md-card-media>
         </md-card-header>
-    
         <md-card-actions class="cardAction">
-            <rating :max="5" :disabled="disabled" :icon="icon" :defaultIndex="defaultValue"></rating>
+            <rating :max="10"
+                    :disabled="disabled"
+                    :icon="icon"
+                    :defaultIndex="defaultValue"></rating>
         </md-card-actions>
     </md-card>
 </template>
 
 <style scoped>
-.card {
-    position: relative;
-    width: 100%;
-    background-color: transparent !important;
-
+.cardHeader {
     padding: 0px !important;
-    flex-wrap: nowrap !important;
-    flex-direction: column !important;
-    flex: none !important;
-}
-
-.card:not(:first-of-type) {
-    margin-top: 2em;
 }
 
 .cardIcon {
@@ -39,15 +26,15 @@
     height: auto !important;
 }
 
-.cardHeader {
-    align-items: center;
-}
-
-.md-title {
-    margin-top: 0px !important;
+h2 {
+    padding: 0px;
+    margin: 0px 0px 0.5em 0px;
+    color: #666;
 }
 
 .cardAction {
+    min-width: 100%;
+    padding: 0px !important;
     justify-content: flex-start !important;
 }
 </style>

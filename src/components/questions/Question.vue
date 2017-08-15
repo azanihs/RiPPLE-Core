@@ -1,37 +1,87 @@
 <template>
     <md-layout>
+        <action-buttons @back="updateUserAnswer(true)"></action-buttons>
         <md-layout md-flex="100">
-            <p class="questionContent">
-                <img v-if="question.images.length > 0" :src="question.images[0]"></img>
-                {{question.content}}
-            </p>
-        </md-layout>
-        <question-details :question="question"></question-details>
-        <question-response :question="question" @userAnswer="updateUserAnswer"></question-response>
+            <md-layout md-flex="50"
+                       class="questionContainer">
+                <md-card>
+                    <p class="questionContent">
+                        <img v-if="question.images.length > 0"
+                             :src="question.images[0]"></img>
+                        {{question.content}}
+                    </p>
+                    <question-details :question="question"></question-details>
+                </md-card>
     
-        <md-button class="reportButton md-warn">Report Question
-            <md-icon>error_outline</md-icon>
-        </md-button>
+                <transition name="fade">
+                    <md-layout md-flex="100"
+                               v-if="userIsFinishedWithQuestion">
+                        <md-layout class="between">
+                            <question-rater class="rater"
+                                            icon="start">Rate Quality</question-rater>
+                            <question-rater class="rater"
+                                            icon="school">Rate Difficulty</question-rater>
+                        </md-layout>
+                    </md-layout>
+                </transition>
+            </md-layout>
+            <question-response class="responseContainer"
+                               :question="question"
+                               @userAnswer="updateUserAnswer"></question-response>
+        </md-layout>
+        <md-speed-dial md-open="hover"
+                       class="md-fab-bottom-right floatingAction">
+            <md-button class="md-fab md-primary"
+                       @click="nextQuestion"
+                       md-fab-trigger>
+                <md-icon md-icon-morph>arrow_forward</md-icon>
+                <md-icon v-if="!userIsFinishedWithQuestion">replay</md-icon>
+                <md-tooltip v-if="!userIsFinishedWithQuestion"
+                            md-direction="left">Skip Question</md-tooltip>
+    
+                <md-icon v-if="userIsFinishedWithQuestion">arrow_forward</md-icon>
+                <md-tooltip v-if="userIsFinishedWithQuestion"
+                            md-direction="left">Next Question</md-tooltip>
+            </md-button>
+    
+            <md-button class="md-fab md-primary md-mini md-clean"
+                       @click="nextQuestion">
+                <md-icon>shuffle</md-icon>
+                <md-tooltip md-direction="left">Random Question</md-tooltip>
+            </md-button>
+            <md-button class="md-fab md-primary md-mini md-clean">
+                <md-icon>error_outline</md-icon>
+                <md-tooltip md-direction="left">Report Question</md-tooltip>
+            </md-button>
+        </md-speed-dial>
     </md-layout>
 </template>
 
 <style scoped>
+.fade-enter-active {
+    transition: opacity 250ms ease;
+}
+
+.fade-enter {
+    opacity: 0;
+}
+
 .reportButton {
     margin-left: auto;
     margin-right: 0px;
     margin-top: 1em;
     margin-bottom: 1em;
     border: 1px solid #eee;
+    width: 100%;
 }
 
 img {
-    width: 25%;
+    width: 50%;
     height: auto;
     float: left;
     border: 1px solid #bbb;
-    padding-right: 10px;
-    padding-bottom: 10px;
     margin-right: 10px;
+    box-shadow: 2px 2px 5px #aaa;
 }
 
 h2 {
@@ -41,20 +91,71 @@ h2 {
 .questionContent {
     margin-top: 0px;
 }
+
+.questionContainer,
+.responseContainer {
+    min-width: 49.25%;
+    flex: 0 1 49.25%;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+
+.responseContainer {
+    margin-left: 1.5%;
+}
+
+.rater {
+    min-width: 100%;
+}
+
+.rater {
+    margin-top: 1em;
+}
+
+.between {
+    justify-content: space-between;
+}
+
+.actionContainer {
+    justify-content: flex-end;
+}
+
+.actionButtons {
+    flex: none !important;
+}
+
+.actionButtons .button {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.floatingAction {
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 16px !important;
+}
+
+.floatingAction>button {
+    background-color: #1d323a !important;
+}
 </style>
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
+import QuestionRater from "./QuestionRater.vue";
+import ActionButtons from "../util/ActionButtons.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
 import QuestionService from "../../services/QuestionService";
 
 @Component({
     components: {
-        "question-response": QuestionResponse,
-        "question-details": QuestionDetails
+        ActionButtons,
+        QuestionRater,
+        QuestionResponse,
+        QuestionDetails
     }
 })
 export default class Question extends Vue {
@@ -62,13 +163,7 @@ export default class Question extends Vue {
         required: true
     }) as QuestionModel;
 
-    // question = QuestionService.getQuestion(this.type);
-    userQualityRating: string = null;
     userIsFinishedWithQuestion: boolean = false;
-
-    changeQualityRating(newRating: string) {
-        this.userQualityRating = newRating;
-    }
 
     updateUserAnswer(n: boolean) {
         this.userIsFinishedWithQuestion = n;
@@ -76,28 +171,10 @@ export default class Question extends Vue {
         this.$emit("userAnswer", n);
     }
 
-
-    getStarIcons(value: number): string[] {
-        let stars = [];
-        let numberStars;
-
-        if (value % 2 == 0) {
-            numberStars = value / 2;
-            stars = new Array(numberStars).fill("star");
-            stars = stars.concat(
-                new Array(5 - numberStars).fill("star_border")
-            );
-        } else {
-            numberStars = (value - 1) / 2;
-            stars = new Array(numberStars).fill("star");
-            stars.push("star_half");
-            stars = stars.concat(
-                new Array(4 - numberStars).fill("star_border")
-            );
-        }
-
-        return stars;
+    nextQuestion() {
+        this.$emit("newQuestion");
     }
+
 
 }
 </script>
