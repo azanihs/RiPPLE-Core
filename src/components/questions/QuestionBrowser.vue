@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="relative">
         <transition name="fade">
             <md-layout v-if="selectedQuestion"
                        key="1"
@@ -56,6 +56,11 @@
 </template>
 
 <style scoped>
+.relative {
+    position: relative;
+    width: 100%;
+}
+
 .overview {
     margin-bottom: 2em;
 }
@@ -83,7 +88,6 @@
 
 .headingContainer {
     border-bottom: 1px solid #222;
-    margin: 8px;
 }
 
 .questionPreview {
@@ -112,7 +116,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Lifecycle, Watch } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
@@ -144,6 +148,13 @@ export default class QuestionBrowser extends Vue {
 
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
+
+    @Watch("selectedQuestion")
+    questionChanged() {
+        if (this.selectedQuestion != null) {
+            window.scrollTo(0, 0);
+        }
+    }
 
     setUserIsFinished(newVal: boolean) {
         this.userIsFinished = newVal;

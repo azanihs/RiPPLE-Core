@@ -1,6 +1,7 @@
 <template>
     <md-layout>
-        <action-buttons @back="updateUserAnswer(true)"></action-buttons>
+        <h2>Answer Question</h2>
+        <!--<action-buttons @back="updateUserAnswer(true)"></action-buttons>-->
         <md-layout md-flex="100">
             <md-layout md-flex="50"
                        class="questionContainer">
@@ -45,9 +46,9 @@
             </md-button>
     
             <md-button class="md-fab md-primary md-mini md-clean"
-                       @click="nextQuestion">
-                <md-icon>shuffle</md-icon>
-                <md-tooltip md-direction="left">Random Question</md-tooltip>
+                       @click="closeQuestion">
+                <md-icon>replay</md-icon>
+                <md-tooltip md-direction="left">Return</md-tooltip>
             </md-button>
             <md-button class="md-fab md-primary md-mini md-clean">
                 <md-icon>error_outline</md-icon>
@@ -167,14 +168,14 @@ export default class Question extends Vue {
 
     updateUserAnswer(n: boolean) {
         this.userIsFinishedWithQuestion = n;
-
-        this.$emit("userAnswer", n);
     }
 
     nextQuestion() {
         this.$emit("newQuestion");
     }
 
-
+    closeQuestion() {
+        this.$emit("userAnswer");
+    }
 }
 </script>
