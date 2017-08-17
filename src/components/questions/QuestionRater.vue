@@ -8,7 +8,7 @@
             </md-card-header-text>
         </md-card-header>
         <md-card-actions class="cardAction">
-            <rating :max="10"
+            <rating :max="5"
                     :disabled="disabled"
                     :icon="icon"
                     :defaultIndex="defaultValue"></rating>

@@ -3,7 +3,7 @@
         <h2>Answer Question</h2>
         <!--<action-buttons @back="updateUserAnswer(true)"></action-buttons>-->
         <md-layout md-flex="100">
-            <md-layout md-flex="50"
+            <md-layout md-flex="100"
                        class="questionContainer">
                 <md-card>
                     <p class="questionContent">
@@ -13,22 +13,20 @@
                     </p>
                     <question-details :question="question"></question-details>
                 </md-card>
-    
-                <transition name="fade">
-                    <md-layout md-flex="100"
-                               v-if="userIsFinishedWithQuestion">
-                        <md-layout class="between">
-                            <question-rater class="rater"
-                                            icon="start">Rate Quality</question-rater>
-                            <question-rater class="rater"
-                                            icon="school">Rate Difficulty</question-rater>
-                        </md-layout>
-                    </md-layout>
-                </transition>
             </md-layout>
-            <question-response class="responseContainer"
+            <question-response class="responseContainer componentSeparator"
                                :question="question"
-                               @userAnswer="updateUserAnswer"></question-response>
+                               @userAnswer="updateUserAnswer">
+                <md-layout md-flex="100"
+                           v-if="userIsFinishedWithQuestion">
+                    <md-layout class="between">
+                        <question-rater class="rater"
+                                        icon="start">Rate Quality</question-rater>
+                        <question-rater class="rater"
+                                        icon="school">Rate Difficulty</question-rater>
+                    </md-layout>
+                </md-layout>
+            </question-response>
         </md-layout>
         <md-speed-dial md-open="hover"
                        class="md-fab-bottom-right floatingAction">
@@ -97,16 +95,20 @@ h2 {
 .responseContainer {
     min-width: 49.25%;
     flex: 0 1 49.25%;
+    min-width: 100%;
+    flex: 0 1 100%;
     align-content: flex-start;
     align-items: flex-start;
 }
 
 .responseContainer {
-    margin-left: 1.5%;
+    /*margin-left: 1.5%;*/
 }
 
 .rater {
-    min-width: 100%;
+    min-width: 40%;
+    max-width: 45%;
+    width: 40%;
 }
 
 .rater {
