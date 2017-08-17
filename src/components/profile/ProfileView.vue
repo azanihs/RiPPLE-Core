@@ -143,18 +143,21 @@ h3 {
 }
 
 .engagementItem h3 {
-    display: inline-block;
-    vertical-align: middle;
-    width: 75%;
-    margin: 0px;
+    display: block;
+    width: 100%;
+    margin: 0px 0px 0.5em 0px;
+    text-align: center;
 }
 
 .engagementScore {
     position: relative;
     text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-    right: 25px;
+    left: 50%;
+    height: 50px;
+}
+
+.engagementScore::after {
+    content: "\00a0";
 }
 
 .engagementButton {
