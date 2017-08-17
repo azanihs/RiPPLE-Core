@@ -201,12 +201,15 @@ label {
 }
 </style>
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Prop, Lifecycle } from "av-ts";
 import UserService from "./services/UserService";
 
 @Component()
 export default class Main extends Vue {
     personalAvatar = UserService.getLoggedInUser().self.image;
+
+    @Prop
+    path;
 
     menuIcon = "menu";
     mobileMode = false;
@@ -248,7 +251,7 @@ export default class Main extends Vue {
         }
     }
     updatePageName() {
-        this.pageTitle = this.links.find(x => x.href == this.$route.path).text + " Page";
+        this.pageTitle = this.links.find(x => x.href == this.path).text + " Page";
     }
 
     @Lifecycle

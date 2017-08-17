@@ -15,6 +15,9 @@ Vue.use(VueRouter);
 const routes = [{
     path: "/",
     component: Main,
+    props: x => ({
+        path: x.path
+    }),
     children: [{
         path: "/",
         name: "main",
