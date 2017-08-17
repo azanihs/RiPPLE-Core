@@ -5,7 +5,7 @@
                    md-hide-medium-and-up></md-layout>
         <md-layout md-hide-medium-and-up
                    class="menuContainer">
-            <h2>Page Title</h2>
+            <h2>{{ pageTitle }}</h2>
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
@@ -210,6 +210,7 @@ export default class Main extends Vue {
 
     menuIcon = "menu";
     mobileMode = false;
+    pageTitle = "";
 
     links = [{
         text: "Profile",
@@ -246,10 +247,14 @@ export default class Main extends Vue {
             container.style.transform = "translate3d(0,0,0)";
         }
     }
+    updatePageName() {
+        this.pageTitle = this.links.find(x => x.href == this.$route.path).text + " Page";
+    }
 
     @Lifecycle
     mounted() {
         window.addEventListener("resize", this.resized);
+        this.updatePageName();
         this.resized();
     }
     @Lifecycle
@@ -259,6 +264,7 @@ export default class Main extends Vue {
 
     toggleSideNav() {
         if (this.mobileMode) {
+            this.updatePageName();
             const menuButton = (this.$refs["menuButton"] as any).$el as HTMLElement;
             const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
 
