@@ -8,7 +8,7 @@
                 <md-tooltip md-direction="top">Question Responses</md-tooltip>
             </div>
             <div>
-                <span>{{ question.difficultyRepresentation }}
+                <span>{{ question.difficulty }}
                     <md-icon>school</md-icon>
                 </span>
                 <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
@@ -17,8 +17,9 @@
         <hr />
         <div class="placeBetween">
             <div>
-                <md-icon :key="star"
-                         v-for="star in starIcons">{{ star }}</md-icon>
+                <span>{{ question.quality }}
+                    <md-icon>star</md-icon>
+                </span>
                 <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
             </div>
             <div>
