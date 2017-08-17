@@ -4,7 +4,6 @@
             <md-layout v-if="selectedQuestion"
                        key="1"
                        class="viewContainer">
-                <!-- Header -->
                 <md-layout md-flex="100"
                            class="questionContainer">
                     <question @userAnswer="setUserIsFinished"
@@ -17,7 +16,6 @@
         <md-layout :class="{hidden: selectedQuestion}"
                    key="2"
                    class="viewContainer">
-            <!-- Header -->
             <md-layout class="headingContainer"
                        md-flex="100">
                 <variable-data-visualiser class="overview"
@@ -149,6 +147,17 @@ export default class QuestionBrowser extends Vue {
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
 
+
+    get topics() {
+        return TopicService.getAllAvailableTopics();
+    }
+
+    get showQuestions() {
+        return this.searchedQuestions.filter(x => {
+            return x.topics.find(t => this.topicsToUse.indexOf(t) >= 0);
+        });
+    }
+
     @Watch("selectedQuestion")
     questionChanged() {
         if (this.selectedQuestion != null) {
@@ -161,20 +170,9 @@ export default class QuestionBrowser extends Vue {
         this.selectedQuestion = null;
     }
 
-    get maxOverlayHeight() {
-        return 7 * window.innerHeight / 8 + "px";
-    }
-
-    get showQuestions() {
-        return this.searchedQuestions.filter(x => {
-            return x.topics.find(t => this.topicsToUse.indexOf(t) >= 0);
-        });
-    }
-
     changeDisplay(searchedQuestions: QuestionModel[]) {
         this.searchedQuestions = searchedQuestions;
     }
-
 
     selectRandom() {
         this.selectedQuestion = null;
@@ -193,10 +191,6 @@ export default class QuestionBrowser extends Vue {
 
     filterQuestionTopic(topicsToUse) {
         this.topicsToUse = topicsToUse;
-    }
-
-    get topics() {
-        return TopicService.getAllAvailableTopics();
     }
 
     generateCompetencies(itemsToInclude) {

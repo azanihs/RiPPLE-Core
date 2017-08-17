@@ -1,10 +1,13 @@
 <template>
-    <md-layout>
-        <h2>Answer Question</h2>
-        <!--<action-buttons @back="updateUserAnswer(true)"></action-buttons>-->
+    <md-layout class="bottomSpace">
+        <md-layout md-hide-xsmall
+                   md-hide-small
+                   md-hide-medium>
+            <action-buttons @back="closeQuestion()"></action-buttons>
+        </md-layout>
         <md-layout md-flex="100">
             <md-layout md-flex="100"
-                       class="questionContainer">
+                       class="questionContainer componentSeparator">
                 <md-card>
                     <p class="questionContent">
                         <img v-if="question.images.length > 0"
@@ -19,7 +22,16 @@
                                @userAnswer="updateUserAnswer">
                 <md-layout md-flex="100"
                            v-if="userIsFinishedWithQuestion">
-                    <md-layout class="between">
+                    <md-layout class="between"
+                               md-hide-xsmall
+                               md-hide-small>
+                        <question-rater class="rater"
+                                        icon="start">Rate Quality</question-rater>
+                        <question-rater class="rater"
+                                        icon="school">Rate Difficulty</question-rater>
+                    </md-layout>
+                    <md-layout class="between small"
+                               md-hide-small-and-up>
                         <question-rater class="rater"
                                         icon="start">Rate Quality</question-rater>
                         <question-rater class="rater"
@@ -93,30 +105,33 @@ h2 {
 
 .questionContainer,
 .responseContainer {
-    min-width: 49.25%;
-    flex: 0 1 49.25%;
     min-width: 100%;
     flex: 0 1 100%;
-    align-content: flex-start;
-    align-items: flex-start;
-}
-
-.responseContainer {
-    /*margin-left: 1.5%;*/
 }
 
 .rater {
     min-width: 40%;
     max-width: 45%;
     width: 40%;
-}
-
-.rater {
     margin-top: 1em;
 }
 
+.rater:nth-child(even) {
+    text-align: right;
+    flex-direction: row-reverse;
+}
+
 .between {
+    margin-top: 2em;
+    border-top: 1px solid #eee;
     justify-content: space-between;
+}
+
+.between.small .rater {
+    min-width: 100%;
+    width: 100%;
+    text-align: left;
+    flex-direction: row;
 }
 
 .actionContainer {
@@ -141,14 +156,19 @@ h2 {
 .floatingAction>button {
     background-color: #1d323a !important;
 }
+
+.bottomSpace {
+    margin-bottom: 4em;
+}
 </style>
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
-import QuestionRater from "./QuestionRater.vue";
 import ActionButtons from "../util/ActionButtons.vue";
+
+import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
 import QuestionService from "../../services/QuestionService";

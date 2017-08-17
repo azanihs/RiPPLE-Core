@@ -30,6 +30,7 @@
                 <li v-for="link in links"
                     :key="link.href">
                     <router-link :to="link.href"
+                                 @click.native="toggleSideNav"
                                  class="md-button routerLink">
                         <span>{{ link.text }}</span>
                         <md-icon>{{link.icon}}</md-icon>
@@ -61,6 +62,7 @@
 
 .menuContainer h2 {
     padding-right: 16px;
+    color: #999;
 }
 
 .menuButton {
@@ -256,19 +258,21 @@ export default class Main extends Vue {
     }
 
     toggleSideNav() {
-        const menuButton = (this.$refs["menuButton"] as any).$el as HTMLElement;
-        const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
+        if (this.mobileMode) {
+            const menuButton = (this.$refs["menuButton"] as any).$el as HTMLElement;
+            const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
 
-        if (!container.style.transform) {
-            container.style.transform = "translate3d(0,0,0)";
-            container.style.opacity = "1";
-            menuButton.style.color = "#f2f2f2";
-            this.menuIcon = "close";
-        } else {
-            menuButton.style.color = "#222";
-            container.style.transform = null;
-            container.style.display = null;
-            this.menuIcon = "menu";
+            if (!container.style.transform) {
+                container.style.transform = "translate3d(0,0,0)";
+                container.style.opacity = "1";
+                menuButton.style.color = "#f2f2f2";
+                this.menuIcon = "close";
+            } else {
+                menuButton.style.color = "#222";
+                container.style.transform = null;
+                container.style.display = null;
+                this.menuIcon = "menu";
+            }
         }
     }
 }

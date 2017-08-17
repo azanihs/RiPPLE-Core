@@ -1,6 +1,6 @@
 <template>
     <md-layout md-flex="100">
-        <md-card>
+        <md-card class="componentSeparator">
             <md-layout md-flex="100">
                 <ul class="questionResponse">
                     <li v-for="(possibleAnswer, index) in question.possibleAnswers"
@@ -38,8 +38,8 @@
                     :css="false">
             <md-card v-if="userHasCorrectAnswer"
                      class="correctFill">
-                <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
-                <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
+                <h2>Explanation</h2>
+                <p>{{ question.explanation }}</p>
                 <slot></slot>
             </md-card>
         </transition>
@@ -66,7 +66,7 @@
 .answerOption {
     width: 100%;
     cursor: pointer;
-    padding: 2em;
+    padding: 1em 2em;
     display: flex;
     align-items: center;
     border: 1px solid #ddd;
