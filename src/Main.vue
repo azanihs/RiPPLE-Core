@@ -96,7 +96,7 @@
 
 .sideNavContainer.mobilePage {
     width: auto;
-    min-width: 25%;
+    min-width: 170px;
 }
 
 .pageContent {
