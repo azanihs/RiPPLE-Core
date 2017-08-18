@@ -1,16 +1,13 @@
 <template>
-    <div>
+    <div class="relative">
         <transition name="fade">
             <md-layout v-if="selectedQuestion"
                        key="1"
                        class="viewContainer">
-                <!-- Header -->
-                <action-buttons class=""
-                                @back="selectedQuestion = null"
-                                @randomQuestion="selectRandom"></action-buttons>
                 <md-layout md-flex="100"
                            class="questionContainer">
                     <question @userAnswer="setUserIsFinished"
+                              @newQuestion="selectRandom"
                               class="question"
                               :question="selectedQuestion"></question>
                 </md-layout>
@@ -19,7 +16,6 @@
         <md-layout :class="{hidden: selectedQuestion}"
                    key="2"
                    class="viewContainer">
-            <!-- Header -->
             <md-layout class="headingContainer"
                        md-flex="100">
                 <variable-data-visualiser class="overview"
@@ -58,6 +54,11 @@
 </template>
 
 <style scoped>
+.relative {
+    position: relative;
+    width: 100%;
+}
+
 .overview {
     margin-bottom: 2em;
 }
@@ -69,7 +70,8 @@
 }
 
 .viewContainer {
-    position: relative;
+    position: absolute;
+    top: 8px;
 }
 
 .fade-enter-active,
@@ -84,7 +86,6 @@
 
 .headingContainer {
     border-bottom: 1px solid #222;
-    margin: 8px;
 }
 
 .questionPreview {
@@ -113,7 +114,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Lifecycle, Watch } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
@@ -146,12 +147,9 @@ export default class QuestionBrowser extends Vue {
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
 
-    setUserIsFinished(newVal: boolean) {
-        this.userIsFinished = newVal;
-    }
 
-    get maxOverlayHeight() {
-        return 7 * window.innerHeight / 8 + "px";
+    get topics() {
+        return TopicService.getAllAvailableTopics();
     }
 
     get showQuestions() {
@@ -160,10 +158,21 @@ export default class QuestionBrowser extends Vue {
         });
     }
 
+    @Watch("selectedQuestion")
+    questionChanged() {
+        if (this.selectedQuestion != null) {
+            window.scrollTo(0, 0);
+        }
+    }
+
+    setUserIsFinished(newVal: boolean) {
+        this.userIsFinished = newVal;
+        this.selectedQuestion = null;
+    }
+
     changeDisplay(searchedQuestions: QuestionModel[]) {
         this.searchedQuestions = searchedQuestions;
     }
-
 
     selectRandom() {
         this.selectedQuestion = null;
@@ -182,10 +191,6 @@ export default class QuestionBrowser extends Vue {
 
     filterQuestionTopic(topicsToUse) {
         this.topicsToUse = topicsToUse;
-    }
-
-    get topics() {
-        return TopicService.getAllAvailableTopics();
     }
 
     generateCompetencies(itemsToInclude) {

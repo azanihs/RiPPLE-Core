@@ -1,30 +1,33 @@
 <template>
     <md-layout md-flex="100">
         <div class="placeBetween">
-            <span>
+            <div>
                 <span>{{ question.responses.length }}
                     <md-icon>reply</md-icon>
                 </span>
                 <md-tooltip md-direction="top">Question Responses</md-tooltip>
-            </span>
-            <span>
-                <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
+            </div>
+            <div>
                 <span>{{ question.difficultyRepresentation }}
                     <md-icon>school</md-icon>
                 </span>
-            </span>
+                <md-tooltip md-direction="top">Question Difficulty</md-tooltip>
+            </div>
         </div>
-        <hr></hr>
+        <hr />
         <div class="placeBetween">
-            <span>
+            <div>
+                <md-icon :key="star"
+                         v-for="star in starIcons">{{ star }}</md-icon>
                 <md-tooltip md-direction="bottom">Question Quality</md-tooltip>
-                <md-icon :key="star" v-for="star in starIcons">{{ star }}</md-icon>
-            </span>
-            <span>
-                <topic-chip v-for="topic in question.topics" :key="topic" linkTo="/view/questions">
+            </div>
+            <div>
+                <topic-chip v-for="topic in question.topics"
+                            :key="topic"
+                            linkTo="/view/questions">
                     {{topic}}
                 </topic-chip>
-            </span>
+            </div>
         </div>
     </md-layout>
 </template>
@@ -38,8 +41,9 @@
     width: 100%;
 }
 
-.placeBetween>span {
+.placeBetween>div {
     cursor: pointer;
+    color: #1d323a;
 }
 
 hr {

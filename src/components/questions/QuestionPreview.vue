@@ -1,13 +1,18 @@
 <template>
-    <md-card md-with-hover class="card">
+    <md-card md-with-hover
+             class="card">
         <div class="cardContainer">
             <div class="leftPanel fullHeight">
-                <div ref="clamp" class="clamp">
-                    <img v-if="data.images.length > 0" :src="data.images[0]"></img>
+                <div ref="clamp"
+                     class="clamp">
+                    <img v-if="data.images.length > 0"
+                         :src="data.images[0]"></img>
                     <span>{{ data.content }}</span>
                 </div>
                 <div class="bottomPanel">
-                    <topic-chip v-for="topic in data.topics" :key="topic.id" linkTo="/view/questions">
+                    <topic-chip v-for="topic in data.topics"
+                                :key="topic.id"
+                                linkTo="/view/questions">
                         {{topic}}
                     </topic-chip>
                 </div>
