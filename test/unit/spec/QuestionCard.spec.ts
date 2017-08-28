@@ -42,7 +42,7 @@ const basicQuestion: Question = {
     quality: 1,
     difficultyRepresentation: "",
     solution: 0,
-    possibleAnswers: [{
+    distractors: [{
         id: 0,
         content: ""
     }, {

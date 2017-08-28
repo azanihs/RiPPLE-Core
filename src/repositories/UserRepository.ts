@@ -1,4 +1,4 @@
-import { User, Peer, Badge, AcquiredBadge, Notification } from "../interfaces/models";
+import { User, Peer, Badge, AcquiredBadge, Notification, Topic } from "../interfaces/models";
 import PeerRepository from "./PeerRepository";
 import faker from "faker";
 
@@ -137,9 +137,6 @@ export default class UserRepository {
     static getAllAvailableCategories(): string[] {
         return types.slice();
     }
-    static getAllAvailableTopics(): string[] {
-        return topics.slice();
-    }
 
     static getAllAvailableEngagementTypes(): string[] {
         return engagementTypes.slice();
@@ -163,8 +160,8 @@ export default class UserRepository {
         }));
     }
 
-    static userScoreForTopic(topic: string) {
-        return userTopicScores[topic].map(x => ({
+    static userScoreForTopic(topic: Topic) {
+        return userTopicScores[topic.id].map(x => ({
             source: x[0],
             target: x[1],
             competency: x[2],
@@ -172,8 +169,8 @@ export default class UserRepository {
         }));
     }
 
-    static userGoalForTopic(topic: string) {
-        return userGoalScores[topic].map(x => ({
+    static userGoalForTopic(topic: Topic) {
+        return userGoalScores[topic.id].map(x => ({
             source: x[0],
             target: x[1],
             competency: x[2],

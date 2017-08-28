@@ -1,7 +1,18 @@
-import QuestionRepository from "../repositories/UserRepository";
+import QuestionRepository from "../repositories/QuestionRepository";
 
 export default class TopicService {
-    static getAllAvailableTopics(): string[] {
-        return QuestionRepository.getAllAvailableTopics();
+    static topics = [];
+
+    static getAllAvailableTopics() {
+        const update = QuestionRepository.getAllAvailableTopics()
+            .then(topics => {
+                topics.forEach(x => {
+                    if (TopicService.topics.find(t => t.id === x.id) === undefined) {
+                        TopicService.topics.push(x);
+                    }
+                });
+            });
+
+        return TopicService.topics;
     }
 }

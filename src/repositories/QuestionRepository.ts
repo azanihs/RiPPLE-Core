@@ -1,57 +1,44 @@
-import { Question } from "../interfaces/models";
+import { Question, Topic } from "../interfaces/models";
 import PeerRepository from "./PeerRepository";
 import f from "faker";
 
+const topics = {};
 export default class QuestionRepository {
+    static getMany(count: number): Promise<Question[]> {
+        return fetch("//localhost:8000/questions/all")
+            .then(questions => questions.json())
+            .then(questions => questions.map(x => {
+                const question: Question = {
+                    id: x.id,
+                    difficulty: x.difficulty,
+                    quality: x.quality,
+                    solution: x.distractors.find(d => d.isCorrect === true),
+                    distractors: x.distractors,
+                    topics: x.topics.map(t => {
+                        let topic: Topic = topics[t.id];
+                        if (topic === undefined) {
+                            topic = {
+                                id: t.id,
+                                name: t.name
+                            };
+                            topics[t.id] = topic;
+                        }
+                        return topics[t.id];
+                    }),
 
-    /**
-     * Returns a collection of questions
-     * @param {number} count The number of questions to return
-     * @return {Question[]} An array of questions with length equal to count
-     */
-    static getMany(count: number): Question[] {
-        return new Array(count).fill(0).map((_, i) => {
-            const questionContent = new Array(20).fill(0).map(x => f.hacker.phrase()).join(" ");
-            const images = Math.random() < 0.5 ? [f.image.image()] : [];
+                    content: x.content,
+                    explanation: x.explanation,
 
-            const topicCount = f.random.number({ min: 2, max: 4 });
-            const topics = new Array(topicCount).fill(0).map(x => f.hacker.abbreviation()) as string[];
-            const difficulty = f.random.number({ min: 0, max: 10 });
+                    responses: []
+                };
 
-            const question: Question = {
-                id: i,
-                responses: new Array(Math.floor(Math.random() * 500)).fill(0).map(x => ({
-                    author: PeerRepository.getMany(1)[0],
-                    upVotes: Math.floor(Math.random() * 100),
-                    solution: Math.floor(Math.random() * 4),
-                    content: new Array(10).fill(0).map(x => f.hacker.phrase()).join(" ")
-                })),
-                difficulty: difficulty,
-                difficultyRepresentation: this.getDifficultyText(difficulty),
-                quality: f.random.number({ min: 0, max: 10 }),
-
-                topics: topics,
-                images: images,
-                content: questionContent,
-
-                possibleAnswers: new Array(4).fill(0).map((x, i) => ({
-                    id: i,
-                    content: new Array(2).fill(0).map(x => f.hacker.phrase()).join(" ")
-                })),
-                solution: Math.floor(Math.random() * 4),
-                explanation: new Array(10).fill(0).map(x => f.hacker.phrase()).join(" ")
-            };
-            return question;
-        });
+                return question;
+            }));
     }
 
-    static getDifficultyText(difficulty: number): string {
-        if (difficulty <= 3.3) {
-            return "Easy";
-        } else if (difficulty > 3.3 && difficulty <= 6.6) {
-            return "Medium";
-        } else {
-            return "Hard";
-        }
+    static getAllAvailableTopics(): Promise<Topic[]> {
+        return QuestionRepository.getMany(25)
+            .then(questions => questions.reduce((a: Topic[], b: Question) => a.concat(b.topics), []));
     }
+
 }

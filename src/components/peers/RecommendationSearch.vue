@@ -111,6 +111,8 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Topic } from "../../interfaces/models";
+
 import UserService from "../../services/UserService";
 
 import RecommendationCard from "./RecommendationCard.vue";
@@ -137,7 +139,7 @@ export default class RecommendationSearch extends Vue {
     topics = p({
         required: true,
         type: Array
-    }) as string[];
+    }) as Topic[];
 
     searchType = "";
 

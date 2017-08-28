@@ -11,7 +11,7 @@
                     <md-layout class="engagementSummary">
                         <h2>Engagement</h2>
                     </md-layout>
-    
+
                     <md-layout class="notificationSummary">
                         <notifications :showCount="5"></notifications>
                     </md-layout>

@@ -115,7 +115,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import { Question as QuestionModel } from "../../interfaces/models";
+import { Question as QuestionModel, Topic as TopicModel } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import QuestionService from "../../services/QuestionService";
@@ -138,24 +138,26 @@ import Question from "./Question.vue";
     }
 })
 export default class QuestionBrowser extends Vue {
-    questions: QuestionModel[] = QuestionService.getRecommendedForUser(25);
+    questions: QuestionModel[] = [];
 
     searchedQuestions: QuestionModel[] = [];
 
-    topicsToUse: string[] = [];
+    topicsToUse: TopicModel[] = [];
 
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
 
+    @Lifecycle
+    async created() {
+        this.questions = await QuestionService.getRecommendedForUser(25);
+    }
 
     get topics() {
         return TopicService.getAllAvailableTopics();
     }
 
     get showQuestions() {
-        return this.searchedQuestions.filter(x => {
-            return x.topics.find(t => this.topicsToUse.indexOf(t) >= 0);
-        });
+        return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
     }
 
     @Watch("selectedQuestion")

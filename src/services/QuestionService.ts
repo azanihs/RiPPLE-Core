@@ -9,22 +9,23 @@ export default class QuestionService {
     static getRecommendedForUser(count: number) {
         return QuestionRepository.getMany(count);
     }
+
     static distributionForQuestion(question: Question) {
-        const numberAnswers = question.possibleAnswers.length;
+        const numberAnswers = question.distractors.length;
         const distribution = new Map();
         const distributionSum = 0;
         for (let i = 0; i < numberAnswers; i++) {
             const responseDistribution = Math.random() / 2;
             if (Math.abs(responseDistribution - distributionSum) < 0 || i == numberAnswers - 1) {
-                distribution.set(question.possibleAnswers[i], Math.abs(distributionSum - responseDistribution));
+                distribution.set(question.distractors[i], Math.abs(distributionSum - responseDistribution));
             } else {
-                distribution.set(question.possibleAnswers[i], responseDistribution);
+                distribution.set(question.distractors[i], responseDistribution);
             }
         }
         return distribution;
     }
 
-    static getMany(count: number): Question[] {
+    static getMany(count: number) {
         return QuestionRepository.getMany(count);
     }
 }

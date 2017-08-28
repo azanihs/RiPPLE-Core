@@ -1,26 +1,33 @@
+export interface Topic {
+    id: number,
+    name: string
+};
+
 export interface Question {
     id: number,
+
+
+    difficulty: number,
+    quality: number,
+
+    topics: Topic[],
+
+    content: string,
+    explanation: string
+    solution: number,
+    distractors: {
+        id: number,
+        content: string,
+        isCorrect: boolean,
+        response: string
+    }[],
+
     responses: {
         author: Peer,
         upVotes: number,
         solution: number,
         content: string
     }[],
-
-    difficulty: number,
-    difficultyRepresentation: string,
-    quality: number,
-
-    topics: string[],
-    images?: string[],
-    content: string,
-
-    solution: number,
-    possibleAnswers: {
-        id: number,
-        content: string
-    }[],
-    explanation: string
 }
 
 export interface Peer {

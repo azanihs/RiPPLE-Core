@@ -1,4 +1,4 @@
-import { User, Peer, Badge, AcquiredBadge, UserSummary, Notification } from "../interfaces/models";
+import { User, Peer, Badge, AcquiredBadge, UserSummary, Notification, Topic } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import PeerRepository from "../repositories/PeerRepository";
 
@@ -8,15 +8,17 @@ export default class UserService {
         return PeerRepository.getMany(20 + Math.round(Math.random() * 100));
     }
 
-    static userCompetencies(topicsToInclude: string[]) {
+    static userCompetencies(topicsToInclude: Topic[]) {
         // Only keep edges where target && source appear in topicsToInclude
         const flattenAndFilter = topics => topics
             .reduce((a, b) => a.concat(b), [])
             .filter(x => topicsToInclude.find(topics => topics == x.source.id)
                 && topicsToInclude.find(topics => topics == x.target.id));
 
-        const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
-        const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
+        //const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
+        //const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
+        const ownScores = [];
+        const userGoals = [];
 
         const topics = ownScores
             .map(x => x.source)

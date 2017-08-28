@@ -1,16 +1,26 @@
 <template>
-    <md-layout md-flex="100" class="header">
-        <md-layout v-for="field in searchableFields" :key="field.displayName" class="searchItem">
-            <h3 v-if="field.sort" @click="field.sort" class="sortBy">{{ field.name }}
+    <md-layout md-flex="100"
+               class="header">
+        <md-layout v-for="field in searchableFields"
+                   :key="field.displayName"
+                   class="searchItem">
+            <h3 v-if="field.sort"
+                @click="field.sort"
+                class="sortBy">{{ field.name }}
                 <md-icon>{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
             </h3>
             <h3 v-else>{{ field.name }}</h3>
-    
-            <select v-if="field.type == 'select'" @change="field.search">
-                <option v-for="option in field.options" :key="option" :value="option">{{ option }}</option>
+
+            <select v-if="field.type == 'select'"
+                    @change="field.search">
+                <option v-for="option in field.options"
+                        :key="option"
+                        :value="option">{{ option }}</option>
             </select>
-    
-            <input v-else-if="field.type == 'text'" @keyup="field.search" type="text"></input>
+
+            <input v-else-if="field.type == 'text'"
+                   @keyup="field.search"
+                   type="text"></input>
         </md-layout>
     </md-layout>
 </template>
@@ -48,7 +58,7 @@ input {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Question } from "../../interfaces/models";
 
 @Component()
@@ -63,7 +73,9 @@ export default class QuestionSearch extends Vue {
     searchableFields: Object[] = [];
 
     get uniqueQuestionTopics() {
-        return Array.from(new Set(this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))));
+        const topics = this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b), []);
+
+        return Array.from(new Set(topics)).map(x => topics.find(t => t == x));
     }
 
     @Lifecycle
@@ -108,7 +120,7 @@ export default class QuestionSearch extends Vue {
                 }
                 return x => {
                     return x.content.toLowerCase().indexOf(textToSearch) >= 0 ||
-                        x.topics.find(t => t.toLowerCase().indexOf(textToSearch) >= 0);
+                        x.topics.find(t => t.name.toLowerCase().indexOf(textToSearch) >= 0);
                 };
             },
             searchValue: "",
@@ -145,6 +157,11 @@ export default class QuestionSearch extends Vue {
         });
 
         this.$emit("searched", this.filter(searchResults));
+    }
+
+    @Watch("availableQuestions")
+    handler() {
+        this.applyFilters();
     }
 }
 </script>
