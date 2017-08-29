@@ -1,18 +1,19 @@
-import QuestionRepository from "../repositories/QuestionRepository";
+import { pushNotify, mergeCache } from "./Notify";
+import TopicRepository from "../repositories/TopicRepository";
 
+let topicCache = [];
 export default class TopicService {
-    static topics = [];
 
-    static getAllAvailableTopics() {
-        const update = QuestionRepository.getAllAvailableTopics()
-            .then(topics => {
-                topics.forEach(x => {
-                    if (TopicService.topics.find(t => t.id === x.id) === undefined) {
-                        TopicService.topics.push(x);
-                    }
-                });
-            });
+    static getAllAvailableTopics(notify?: Function) {
+        //TODO: Fix race condition. Multiple components calling this at the same time could collide
+        const originalLength = topicCache.length;
+        TopicRepository.getAllAvailableTopics().then(topics => {
+            topics.forEach(mergeCache(topicCache));
+            if (originalLength !== topicCache.length) {
+                pushNotify(notify, topicCache);
+            }
+        });
 
-        return TopicService.topics;
+        return topicCache;
     }
 }

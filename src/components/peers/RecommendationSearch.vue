@@ -14,9 +14,9 @@
                 </thead>
                 <tbody>
                     <tr v-for="topic in topics"
-                        :key="topic">
+                        :key="topic.id">
                         <td>
-                            <span>{{ topic }}</span>
+                            <span>{{ topic.name }}</span>
                             <div class="cellOverlay"
                                  :style="getCellWeight(topic)"></div>
                         </td>

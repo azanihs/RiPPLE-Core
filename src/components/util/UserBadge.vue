@@ -1,11 +1,19 @@
 <template>
     <div class="badgeContainer">
-        <div class="badgeProgress" :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+        <div class="badgeProgress"
+             :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
             <div class="badge">
                 <md-icon>{{badgeIcon}}</md-icon>
             </div>
-            <md-spinner v-if="userBadge && userBadge.progress >= 0" md-theme="spinner" class="badgeSpinner" :md-stroke="2" :md-progress="100"></md-spinner>
-            <md-spinner v-if="userBadge && userBadge.progress >= 0" class="progressSpinner badgeSpinner" :md-stroke="2" :md-progress="userBadge.progress"></md-spinner>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0"
+                        md-theme="spinner"
+                        class="badgeSpinner"
+                        :md-stroke="2"
+                        :md-progress="100"></md-spinner>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0"
+                        class="progressSpinner badgeSpinner"
+                        :md-stroke="2"
+                        :md-progress="userBadge.progress"></md-spinner>
         </div>
         <div class="badgeDescription">
             <h4>{{badge.name}}</h4>
@@ -87,7 +95,7 @@ export default class UserBadge extends Vue {
     }
 
     get userBadge(): AcquiredBadge {
-        return UserService.userHasBadge(this.badge.id);
+        return BadgeService.userHasBadge(this.badge.id);
     }
 
     get userHasBadge(): boolean {

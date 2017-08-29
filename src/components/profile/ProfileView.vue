@@ -202,11 +202,18 @@ import CollectedBadges from "../util/CollectedBadges.vue";
 })
 export default class DefaultView extends Vue {
 
+    pTopics = [];
+
     get profileData() {
         return UserService.getLoggedInUser();
     }
+
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        this.pTopics = TopicService.getAllAvailableTopics(topics => {
+            this.pTopics = topics;
+        });
+
+        return this.pTopics;
     }
 
     get engagementItems() {

@@ -26,7 +26,7 @@ h1 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Lifecycle, Watch } from "av-ts";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 import AvailabilitySelector from "../util/AvailabilitySelector.vue";
@@ -41,6 +41,7 @@ import RecommendationSearch from "./RecommendationSearch.vue";
 export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
+    pTopics = [];
 
     @Lifecycle
     created() {
@@ -48,7 +49,11 @@ export default class PeerView extends Vue {
     }
 
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        this.pTopics = TopicService.getAllAvailableTopics(topics => {
+            this.pTopics = topics;
+        });
+
+        return this.pTopics;
     }
 
     shuffleData(type: string) {

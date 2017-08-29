@@ -3,19 +3,19 @@
         <md-card class="fullWidth">
             <md-layout md-flex="100">
                 <md-layout md-flex="75"
-                    class="leftPanel">
+                           class="leftPanel">
                     <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
                     <div class="chartContainer">
                         <div class="chartPanel">
                             <chart ref="chart"
-                                :type="chart"
-                                :data="chartData.data"
-                                :options="chartData.options"></chart>
+                                   :type="chart"
+                                   :data="chartData.data"
+                                   :options="chartData.options"></chart>
                         </div>
                     </div>
                 </md-layout>
                 <md-layout md-flex="25"
-                    class="rightPanel">
+                           class="rightPanel">
                     <div class="settingsContainer">
                         <div class="visualisationMenu">
                             <h3>Change Visualisation Data</h3>
@@ -24,8 +24,8 @@
                                     Visualisation Type
                                 </label>
                                 <md-select name="visualisationType"
-                                    id="visualisationType"
-                                    v-model="chart">
+                                           id="visualisationType"
+                                           v-model="chart">
                                     <md-option value="bar">
                                         <div class="chartOption barChart">Bar Chart</div>
                                     </md-option>
@@ -42,8 +42,8 @@
                                     Compare Data
                                 </label>
                                 <md-select name="visulisationCompare"
-                                    id="visulisationCompare"
-                                    v-model="compare">
+                                           id="visulisationCompare"
+                                           v-model="compare">
                                     <md-option value="Personal Goals">
                                         Personal Goals
                                     </md-option>
@@ -57,10 +57,10 @@
                             </md-input-container>
                             <h4>Topics to Visulise</h4>
                             <topic-chip v-for="category in dataCategories"
-                                :key="category"
-                                :disabled="isDisabled(category)"
-                                @click.native="toggleVisible(category)">
-                                {{category}}
+                                        :key="category.id"
+                                        :disabled="isDisabled(category)"
+                                        @click.native="toggleVisible(category)">
+                                {{category.name}}
                             </topic-chip>
                         </div>
                     </div>
@@ -150,6 +150,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Topic } from "../../interfaces/models";
 
 import TopicChip from "../util/TopicChip.vue";
 import Chart from "./Chart.vue";
@@ -164,7 +165,7 @@ export default class VariableDataVisualiser extends Vue {
     @Prop
     dataCategories = p({ // Topics...
         required: true
-    }) as string[];
+    }) as Topic[];
 
     @Prop
     compareList = p({ // Dataset to compare against. Function to access that data based on dataType
@@ -207,14 +208,14 @@ export default class VariableDataVisualiser extends Vue {
     };
 
     isDisabled(dataItem) {
-        return !!this.hiddenData[dataItem];
+        return !!this.hiddenData[dataItem.id];
     }
 
     toggleVisible(dataItem) {
-        if (this.hiddenData[dataItem]) {
-            this.$set(this.hiddenData, dataItem, false);
+        if (this.hiddenData[dataItem.id]) {
+            this.$set(this.hiddenData, dataItem.id, false);
         } else {
-            this.$set(this.hiddenData, dataItem, true);
+            this.$set(this.hiddenData, dataItem.id, true);
         }
         const topicsToShow = this.dataCategories.filter(x => !this.isDisabled(x));
         this.$emit("changeTopics", topicsToShow);

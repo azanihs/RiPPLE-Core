@@ -9,21 +9,19 @@ export default class UserService {
     }
 
     static userCompetencies(topicsToInclude: Topic[]) {
-        // Only keep edges where target && source appear in topicsToInclude
         const flattenAndFilter = topics => topics
             .reduce((a, b) => a.concat(b), [])
-            .filter(x => topicsToInclude.find(topics => topics == x.source.id)
-                && topicsToInclude.find(topics => topics == x.target.id));
+            .filter(x => topicsToInclude.find(topic => topic.id == x.source.id)
+                && topicsToInclude.find(topic => topic.id == x.target.id));
 
-        //const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
-        //const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
-        const ownScores = [];
-        const userGoals = [];
+        // Only keep edges where target && source appear in topicsToInclude
+        const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
+        const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
 
         const topics = ownScores
             .map(x => x.source)
             .reduce((carry, topicNode) => {
-                if (topicsToInclude.find(x => x == topicNode.id) &&
+                if (topicsToInclude.find(x => x.id == topicNode.id) &&
                     !carry.find(x => x == topicNode)) {
                     carry.push(topicNode);
                 }
@@ -72,14 +70,6 @@ export default class UserService {
         return UserRepository.getLoggedInUser();
     }
 
-    static getAllAvailableBadges(): Badge[] {
-        return UserRepository.getAllAvailableBadges();
-    }
-
-    static getAllUserBadges(): AcquiredBadge[] {
-        return UserRepository.getAllUserBadges();
-    }
-
     static getAllAvailableCategories(): string[] {
         return UserRepository.getAllAvailableCategories();
     }
@@ -104,11 +94,6 @@ export default class UserService {
         });
 
         return recommendations;
-    }
-
-    static userHasBadge(badgeId) {
-        // TODO: This lookup is slow, a hashmap or similar would be better.
-        return UserRepository.getAllUserBadges().find(x => x.badge.id == badgeId);
     }
 
     static mostReputableUsers(): UserSummary[] {

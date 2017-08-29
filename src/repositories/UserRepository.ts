@@ -11,24 +11,18 @@ const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recom
     "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"];
 
 const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
-const badges = new Array(30).fill(0).map((x, i) => {
-    return ({
-        id: i,
-        category: getCategory(f.random.number({ min: 0, max: 2 })),
-        name: f.company.bsBuzz(),
-        description: f.company.catchPhrase()
-    });
-});
+
 
 const userTopicScores = {};
 const userGoalScores = {};
-const topicNodes = topics.map(x => {
+const topicNodes = topics.map((x, id) => {
     const topicNode = {
-        id: x
+        id: id,
+        name: x
     };
     // Ensure at least one self-loop per topic
-    userTopicScores[x] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
-    userGoalScores[x] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
+    userTopicScores[id] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
+    userGoalScores[id] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
     return topicNode;
 });
 topicNodes.forEach(x => {
@@ -74,17 +68,6 @@ engagementNodes.forEach(x => {
     otherEngagementScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
 });
 
-const userBadges = badges
-    .filter((_, i) => Math.random() < 0.5)
-    .map((x: Badge) => {
-        const acquiredBadge: AcquiredBadge = {
-            badge: x,
-            progress: Math.random() < 0.5 ? (Math.random() * 100) : -1,
-            dateAcquired: new Date()
-        };
-        return acquiredBadge;
-    });
-
 export default class UserRepository {
 
     /**
@@ -125,13 +108,6 @@ export default class UserRepository {
             content: f.hacker.phrase(),
             read: !!(Math.random() < 0.5)
         }));
-    }
-
-    static getAllAvailableBadges(): Badge[] {
-        return badges.slice();
-    }
-    static getAllUserBadges(): AcquiredBadge[] {
-        return userBadges.slice();
     }
 
     static getAllAvailableCategories(): string[] {

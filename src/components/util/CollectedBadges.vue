@@ -2,7 +2,7 @@
     <md-card>
         <md-layout>
             <h3>{{topic}} Badges</h3>
-            <md-layout v-for="badge in availableBadges"
+            <md-layout v-for="badge in pBadges"
                        :key="badge.id"
                        md-flex="33"
                        class="badgeGutter"
@@ -35,7 +35,7 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
+import { Vue, Prop, Lifecycle, Watch, Component, p } from "av-ts";
 import UserBadge from "../util/UserBadge.vue";
 import BadgeService from "../../services/BadgeService";
 
@@ -47,13 +47,27 @@ import BadgeService from "../../services/BadgeService";
 export default class CollectedBadges extends Vue {
     @Prop topic = p(String);
 
-    get availableBadges() {
-        if (this.topic == "all")
-            return BadgeService.getAllAvailableBadges();
-        else if (this.topic == "closest")
-            return BadgeService.getClosestUserBadges();
-        else
-            return BadgeService.getBadgeByType(this.topic);
+    pBadges = [];
+
+    @Lifecycle
+    mounted() {
+        const notify = newBadges => {
+            this.pBadges = newBadges;
+        };
+
+        if (this.topic == "all") {
+            this.pBadges = BadgeService.getAllAvailableBadges(notify);
+        } else if (this.topic == "closest") {
+            this.pBadges = BadgeService.getClosestUserBadges(notify);
+        } else {
+            this.pBadges = BadgeService.getBadgeByType(this.topic, notify);
+        }
+    }
+
+    @Watch("pBadges")
+    handler() {
+        console.log(this.topic);
+        console.log(this.pBadges);
     }
 }
 </script>

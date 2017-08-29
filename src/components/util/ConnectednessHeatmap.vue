@@ -2,19 +2,23 @@
     <md-card>
         <md-layout>
             <h2>Social Connectedness</h2>
-            <table v-once class="connectedTable">
+            <table class="connectedTable">
                 <thead>
                     <tr>
-                        <th>Connection Type</td>
-                            <th v-for="topic in topics" :key="topic">
-                                {{topic}}
-                            </th>
+                        <th>Connection Type</th>
+                        <th v-for="topic in topics"
+                            :key="topic.id">
+                            {{topic.name}}
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="mentorType in categories" :key="mentorType">
+                    <tr v-for="mentorType in categories"
+                        :key="mentorType">
                         <td>{{mentorType}}</td>
-                        <td v-for="topic in topics" :key="topic" :style="renderColor(mentorType, topic)">
+                        <td v-for="topic in topics"
+                            :key="topic.id"
+                            :style="renderColor(mentorType, topic)">
                             {{renderWeights[mentorType][topic] || 0}}
                         </td>
                     </tr>
