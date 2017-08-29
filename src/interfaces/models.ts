@@ -12,17 +12,17 @@ export interface Question {
 
     content: string,
     explanation: string
-    solution: number,
-    distractors: {
-        id: number,
-        content: string,
-        isCorrect: boolean,
-        response: string
-    }[],
+    solution: Distractor,
+    distractors: Distractor[],
 
     responses: QuestionResponse[]
 };
-
+export interface Distractor {
+    id: number,
+    content: string,
+    isCorrect: boolean,
+    response: string
+}
 export interface QuestionResponse {
     author: User,
     upVotes: number,

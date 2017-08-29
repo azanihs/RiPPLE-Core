@@ -10,8 +10,6 @@
                        class="questionContainer componentSeparator">
                 <md-card>
                     <p class="questionContent">
-                        <img v-if="question.images.length > 0"
-                             :src="question.images[0]"></img>
                         {{question.content}}
                     </p>
                     <question-details :question="question"></question-details>
@@ -49,15 +47,15 @@
                 <md-icon v-if="!userIsFinishedWithQuestion">replay</md-icon>
                 <md-tooltip v-if="!userIsFinishedWithQuestion"
                             md-direction="left">Skip Question</md-tooltip>
-    
+
                 <md-icon v-if="userIsFinishedWithQuestion">arrow_forward</md-icon>
                 <md-tooltip v-if="userIsFinishedWithQuestion"
                             md-direction="left">Next Question</md-tooltip>
             </md-button>
-    
+
             <md-button class="md-fab md-primary md-mini md-clean"
                        @click="closeQuestion">
-                <md-icon>replay</md-icon>
+                <md-icon>keyboard_return</md-icon>
                 <md-tooltip md-direction="left">Return</md-tooltip>
             </md-button>
             <md-button class="md-fab md-primary md-mini md-clean">

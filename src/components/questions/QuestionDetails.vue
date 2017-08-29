@@ -26,7 +26,7 @@
                 <topic-chip v-for="topic in question.topics"
                             :key="topic"
                             linkTo="/view/questions">
-                    {{topic}}
+                    {{topic.name}}
                 </topic-chip>
             </div>
         </div>

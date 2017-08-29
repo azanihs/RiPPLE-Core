@@ -225,11 +225,11 @@ export default class QuestionResponse extends Vue {
         if (Array.isArray(this.question.solution)) {
             return this.question.solution.find(x => x == solution.id) ? "done" : "clear";
         }
-        return this.question.solution == solution.id ? "done" : "clear";
+        return this.question.solution == solution ? "done" : "clear";
     }
 
     get userHasCorrectAnswer() {
-        return this.question.solution == this.questionResponse;
+        return this.question.distractors[this.questionResponse] == this.question.solution;
     }
 
     resetAnswer() {
