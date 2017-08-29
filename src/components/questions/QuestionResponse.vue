@@ -32,37 +32,29 @@
                     @enter="feedbackEnter"
                     @leave="feedbackLeave"
                     :css="false">
-            <md-tabs v-if="userHasCorrectAnswer"
-                     md-fixed
-                     class="md-transparent responseSection">
-                <md-tab md-label="Explanation">
-                    <md-layout>
-                        <div class="placeBetween">
-                            <md-layout md-flex="65"
-                                       class="questionExplanation">
-                                <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
-                                <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
-                            </md-layout>
-                            <md-layout md-flex-offset="10"
-                                       md-flex="25">
-                                <question-rater icon="school"
-                                                :defaultValue="question.difficulty">Rate Difficulty</question-rater>
-                                <question-rater class="ratingCard"
-                                                :defaultValue="question.quality">Rate Quality</question-rater>
-                            </md-layout>
-                        </div>
-                    </md-layout>
-                </md-tab>
-                <md-tab md-label="Discussion">
-                    <h3>Question Discussion</h3>
-                    <div class="commentContainer">
-                        <comment v-for="response in question.responses.slice(0, 10)"
-                                 class="commentCard"
-                                 :key="response.id"
-                                 :comment="response"></comment>
-                    </div>
-                </md-tab>
-            </md-tabs>
+            <md-layout md-flex="100"
+                       md-gutter="8"
+                       v-if="userHasCorrectAnswer">
+                <md-layout md-flex="100"
+                           class="componentSeparator"
+                           md-gutter>
+                    <md-card>
+                        <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
+                        <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
+                    </md-card>
+                </md-layout>
+
+                <md-layout md-flex="100"
+                           md-gutter
+                           class="componentSeparator">
+                    <md-card class="placeBetween">
+                        <question-rater icon="school"
+                                        :defaultValue="question.difficulty">Rate Difficulty</question-rater>
+                        <question-rater class="ratingCard"
+                                        :defaultValue="question.quality">Rate Quality</question-rater>
+                    </md-card>
+                </md-layout>
+            </md-layout>
         </transition>
     </md-layout>
 </template>
@@ -119,11 +111,16 @@
 
 h2 {
     margin: 0px;
+    width: 100%;
 }
 
 .correctFill {
     background-color: rgba(34, 85, 102, 0.4) !important;
     min-width: 100%;
+}
+
+.placeBetween {
+    justify-content: space-between;
 }
 </style>
 <style>
