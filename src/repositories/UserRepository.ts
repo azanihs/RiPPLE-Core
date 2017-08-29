@@ -1,4 +1,4 @@
-import { User, Peer, Badge, AcquiredBadge, Notification, Topic } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection } from "../interfaces/models";
 import PeerRepository from "./PeerRepository";
 import faker from "faker";
 
@@ -80,32 +80,58 @@ engagementNodes.forEach(x => {
     otherEngagementScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
 });
 
+const makeUser = () => {
+    const getType = i => {
+        return types[i] as "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner";
+    };
+
+    const connections = new Array(f.random.number({ min: 2, max: 10 })).fill(0).map(x => {
+        const connection: PeerConnection = {
+            edgeStart: 0,
+            edgeEnd: 0,
+
+            type: getType(f.random.number({ min: 0, max: 2 })),
+            topic: f.random.number({ min: 0, max: 5 }),
+            weight: f.random.number({ min: 0, max: 10 }),
+            date: new Date(),
+            availableTime: new Date()
+        };
+        return connection;
+    });
+    const proficiencies = new Array(f.random.number({ min: 1, max: 4 }))
+        .fill(0).map(x => f.hacker.abbreviation()) as string[];
+
+    const user: User = {
+        id: IDCounter++,
+        name: f.name.findName(),
+        bio: f.hacker.phrase() + " " + f.hacker.phrase(),
+        image: f.image.avatar(),
+
+        proficiencies: proficiencies,
+        connections: connections
+    };
+    return user;
+};
+
+const loggedInUser = makeUser();
+const userPeers = new Array(100).fill(0).map(makeUser);
+
 export default class UserRepository {
 
-    /**
-     * Returns an array of Peer objects
-     * @param {number} peerCount The number of peers to return
-     * @return {Peer[]} An array of Peers with length peerCount
-     */
-    static getLoggedInUser(): User {
-        const peer: Peer = PeerRepository.getMany(1)[0];
-        const connections = new Array(f.random.number({ min: 2, max: 10 })).fill(0).map(x => {
-            const connection = {
-                id: IDCounter++,
-                type: types[f.random.number({ min: 0, max: 2 })],
-                topic: topics[f.random.number({ min: 0, max: 10 })],
-                weight: f.random.number({ min: 0, max: 10 })
-            };
-            return connection;
+    static getLoggedInUser(): Promise<User> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(loggedInUser);
+            }, Math.random() * 1000);
         });
+    }
 
-        const user: User = {
-            id: IDCounter++,
-            self: peer,
-            connections: connections
-        };
-
-        return user;
+    static getUserConnections(count: number): Promise<User[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(userPeers.slice(0, count));
+            }, Math.random() * 1000);
+        });
     }
 
     static getUserNotifications(): Promise<Notification[]> {

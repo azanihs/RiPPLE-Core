@@ -13,7 +13,7 @@
                 </md-button>
             </div>
         </md-card-header>
-    
+
         <md-card-content>
             {{comment.content}}
         </md-card-content>
@@ -21,48 +21,44 @@
 </template>
 
 <style scoped>
-    .commentCard {
-        width: 100%;
-        margin-bottom: 16px;
-    }
-    
-    .upvote span,
-    .upvote i {
-        display: inline-block;
-        vertical-align: middle;
-        width: auto;
-        height: auto;
-        min-width: auto;
-        min-height: auto;
-        font-size: 16px;
-    }
-    
-    .upvote span {
-        font-size: 14px;
-    }
-    
-    .cardActions {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        color: #256;
-    }
+.commentCard {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.upvote span,
+.upvote i {
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+    height: auto;
+    min-width: auto;
+    min-height: auto;
+    font-size: 16px;
+}
+
+.upvote span {
+    font-size: 14px;
+}
+
+.cardActions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: #256;
+}
 </style>
 
 <script lang="ts">
-    import { Vue, Component, Prop, p } from "av-ts";
-    import { Peer } from "../../interfaces/models";
+import { Vue, Component, Prop, p } from "av-ts";
+import { User, QuestionResponse } from "../../interfaces/models";
 
-    @Component()
-    export default class Comment extends Vue {
-        @Prop comment = p({
-            type: Object,
-            required: true
-        }) as {
-            author: Peer,
-            upVotes: number,
-            content: string
-        }
+@Component()
+export default class Comment extends Vue {
+    @Prop comment = p({
+        type: Object,
+        required: true
+    }) as QuestionResponse[];
 
-    }
+}
 </script>

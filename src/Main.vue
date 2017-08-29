@@ -206,7 +206,19 @@ import UserService from "./services/UserService";
 
 @Component()
 export default class Main extends Vue {
-    personalAvatar = UserService.getLoggedInUser().self.image;
+
+    pAvatar = "";
+
+    get personalAvatar() {
+        const u = UserService.getLoggedInUser(user => {
+            this.pAvatar = user.image;
+        });
+        if (u !== undefined) {
+            this.pAvatar = u.image;
+        }
+
+        return this.pAvatar;
+    }
 
     @Prop
     path;

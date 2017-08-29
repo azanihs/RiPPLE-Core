@@ -1,15 +1,27 @@
 import { pushNotify, mergeCache } from "./Notify";
 
-import { User, Peer, Badge, AcquiredBadge, UserSummary, Notification, Topic } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
-import PeerRepository from "../repositories/PeerRepository";
 
 const cachedNotifications = [];
+const cachedPeers = [];
+let cachedLoggedInUser = undefined;
+const cachedRecommendedConnections = [];
+const cachedOutstandingRequests = [];
 
 export default class UserService {
 
-    static getUserPeers() {
-        return PeerRepository.getMany(20 + Math.round(Math.random() * 100));
+    static getUserPeers(notify?: Function) {
+        const originalLength = cachedPeers.length;
+        UserRepository.getUserConnections(20 + Math.round(Math.random() * 100))
+            .then(peers => {
+                peers.forEach(mergeCache(cachedPeers));
+                if (originalLength !== cachedPeers.length) {
+                    pushNotify(notify, cachedPeers);
+                }
+            });
+
+        return cachedPeers;
     }
 
     static userCompetencies(topicsToInclude: Topic[]) {
@@ -70,34 +82,44 @@ export default class UserService {
         };
     }
 
-    static getLoggedInUser(): User {
-        return UserRepository.getLoggedInUser();
+    static getLoggedInUser(notify?: Function): User {
+        const originalID = cachedLoggedInUser === undefined ? -1 : cachedLoggedInUser.id;
+        UserRepository.getLoggedInUser().then(user => {
+            if (originalID !== user.id) {
+                cachedLoggedInUser = user;
+                pushNotify(notify, cachedLoggedInUser);
+            }
+        });
+
+        return cachedLoggedInUser;
     }
 
     static getAllAvailableCategories(): string[] {
         return UserRepository.getAllAvailableCategories();
     }
 
-    static getRecommendedConnections(count: number) {
-        const recommendations = PeerRepository.getMany(count) as any;
-        const categoryLength = this.getAllAvailableCategories().length;
-        recommendations.forEach(x => {
-            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
-            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
-        });
-
-        return recommendations;
+    static getRecommendedConnections(count: number, notify?: Function) {
+        const originalLength = cachedRecommendedConnections.length;
+        UserRepository.getUserConnections(count)
+            .then(recommendations => {
+                recommendations.forEach(mergeCache(cachedRecommendedConnections));
+                if (originalLength !== cachedRecommendedConnections.length) {
+                    pushNotify(notify, cachedRecommendedConnections);
+                }
+            });
+        return cachedRecommendedConnections;
     }
 
-    static getOutstandingRequests(count: number) {
-        const recommendations = PeerRepository.getMany(count) as any;
-        const categoryLength = this.getAllAvailableCategories().length;
-        recommendations.forEach(x => {
-            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
-            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
-        });
-
-        return recommendations;
+    static getOutstandingRequests(count: number, notify?: Function) {
+        const originalLength = cachedOutstandingRequests.length;
+        UserRepository.getUserConnections(count)
+            .then(recommendations => {
+                recommendations.forEach(mergeCache(cachedOutstandingRequests));
+                if (originalLength !== cachedOutstandingRequests.length) {
+                    pushNotify(notify, cachedOutstandingRequests);
+                }
+            });
+        return cachedOutstandingRequests;
     }
 
     static mostReputableUsers(): UserSummary[] {

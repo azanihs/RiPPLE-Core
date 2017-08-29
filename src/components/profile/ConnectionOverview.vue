@@ -4,9 +4,9 @@
             <h2>Peer Connections</h2>
             <md-layout md-flex="100">
                 <md-image v-for="peer in peerConnections"
-                    :key="peer.id"
-                    class="connectionImage"
-                    :md-src="peer.image"></md-image>
+                          :key="peer.id"
+                          class="connectionImage"
+                          :md-src="peer.image"></md-image>
             </md-layout>
         </md-layout>
     </md-card>
@@ -33,30 +33,34 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component } from "av-ts";
-import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
 
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 
-import OverviewDescription from "../util/OverviewDescription.vue";
-
-@Component({
-    components: {
-        "connectedness-heatmap": ConnectednessHeatmap,
-        "overview-description": OverviewDescription
-    }
-})
+@Component()
 export default class ConnectionOverview extends Vue {
 
+    pTopics = [];
+    pPeers = [];
+
     get peerConnections() {
-        return UserService.getUserPeers();
+        UserService.getUserPeers(newPeers => {
+            this.pPeers = newPeers;
+        });
+
+        return this.pPeers;
     }
 
     get profileData() {
         return UserService.getLoggedInUser();
     }
+
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        TopicService.getAllAvailableTopics(newTopics => {
+            this.pTopics = newTopics;
+        });
+
+        return this.pTopics;
     }
 
     get categories() {

@@ -5,8 +5,6 @@ export interface Topic {
 
 export interface Question {
     id: number,
-
-
     difficulty: number,
     quality: number,
 
@@ -22,57 +20,26 @@ export interface Question {
         response: string
     }[],
 
-    responses: {
-        author: Peer,
-        upVotes: number,
-        solution: number,
-        content: string
-    }[],
-}
+    responses: QuestionResponse[]
+};
 
-export interface Peer {
-    id: number,
-    name: string,
-    bio: string,
-
-    proficiencies: string[],
-    image: string,
-    availableTimes: string[]
-}
+export interface QuestionResponse {
+    author: User,
+    upVotes: number,
+    solution: number,
+    content: string
+};
 
 export interface User {
     id: number,
-    self: Peer,
-
-    connections: { // Should be replaced with PeerConnection[]
-        id: number,
-        type: string,
-        topic: string,
-        weight: number
-    }[]
-}
-
-export interface UserSummary {
     name: string,
+    bio: string,
     image: string,
-    reputation: number,
-    questionsContributed: number,
-    numberAnswers: number,
-    numberComments: number
-}
 
-export interface Badge {
-    id: number,
-    name: string,
-    category: "engagement" | "competencies" | "connections",
-    description: string
-}
-
-export interface AcquiredBadge {
-    badge: Badge,
-    progress: number,
-    dateAcquired: Date
-}
+    proficiencies?: string[],
+    availableTimes?: string[]
+    connections: PeerConnection[]
+};
 
 export interface PeerConnection {
     edgeStart: number, // ID of edge start. Corresponds to a User ID
@@ -82,11 +49,33 @@ export interface PeerConnection {
     weight: number,
     date: Date, // Date the connection was made
     availableTime: Date
-}
+};
+
+export interface UserSummary {
+    name: string,
+    image: string,
+    reputation: number,
+    questionsContributed: number,
+    numberAnswers: number,
+    numberComments: number
+};
+
+export interface Badge {
+    id: number,
+    name: string,
+    category: "engagement" | "competencies" | "connections",
+    description: string
+};
+
+export interface AcquiredBadge {
+    badge: Badge,
+    progress: number,
+    dateAcquired: Date
+};
 
 export interface Notification {
     id: number,
     type: "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting",
     content: string,
     read: boolean
-}
+};

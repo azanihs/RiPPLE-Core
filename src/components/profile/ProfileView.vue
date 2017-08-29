@@ -64,8 +64,9 @@
                     <h2>Connection Overview</h2>
                     <p>The connections overview will show you how you have connected to peers through Ripple.</p>
                 </overview-description>
-                <connectedness-heatmap class="componentSeparator"
-                                       :data="profileData"
+                <connectedness-heatmap v-if="profileData"
+                                       class="componentSeparator"
+                                       :user="profileData"
                                        :topics="topics"
                                        :categories="categories"></connectedness-heatmap>
                 <connection-overview class="componentSeparator"></connection-overview>
@@ -203,9 +204,14 @@ import CollectedBadges from "../util/CollectedBadges.vue";
 export default class DefaultView extends Vue {
 
     pTopics = [];
+    pUser = undefined;
 
     get profileData() {
-        return UserService.getLoggedInUser();
+        this.pUser = UserService.getLoggedInUser(user => {
+            this.pUser = user;
+        });
+
+        return this.pUser;
     }
 
     get topics() {

@@ -18,8 +18,8 @@
                         <td>{{mentorType}}</td>
                         <td v-for="topic in topics"
                             :key="topic.id"
-                            :style="renderColor(mentorType, topic)">
-                            {{renderWeights[mentorType][topic] || 0}}
+                            :style="renderColor(mentorType, topic.id)">
+                            {{renderWeights[mentorType][topic.id] || 0}}
                         </td>
                     </tr>
                 </tbody>
@@ -84,14 +84,14 @@ import { Vue, Prop, Lifecycle, Component } from "av-ts";
 
 @Component()
 export default class ConnectednessHeatmap extends Vue {
-    @Prop data;
+    @Prop user;
     @Prop topics;
     @Prop categories;
 
     renderWeights = {};
 
     renderColor(category, topic) {
-        const max = this.data.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
+        const max = this.user.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
         const weight = (this.renderWeights[category] && this.renderWeights[category][topic]) || 0;
         return {
             background: `rgba(34, 85, 102, ${weight / max})`
@@ -101,7 +101,7 @@ export default class ConnectednessHeatmap extends Vue {
     @Lifecycle
     created() {
         this.categories.forEach(category => {
-            this.renderWeights[category] = this.data.connections
+            this.renderWeights[category] = this.user.connections
                 .filter(x => x.type == category)
                 .reduce((categoryWeight, connection) => {
                     if (categoryWeight[connection.topic] === undefined) {
