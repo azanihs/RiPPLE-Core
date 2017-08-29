@@ -91,7 +91,7 @@ const makeUser = () => {
             edgeEnd: 0,
 
             type: getType(f.random.number({ min: 0, max: 2 })),
-            topic: f.random.number({ min: 0, max: 5 }),
+            topic: f.random.number({ min: 1, max: 6 }),
             weight: f.random.number({ min: 0, max: 10 }),
             date: new Date(),
             availableTime: new Date()
@@ -107,6 +107,7 @@ const makeUser = () => {
         bio: f.hacker.phrase() + " " + f.hacker.phrase(),
         image: f.image.avatar(),
 
+        availableTime: new Date(),
         proficiencies: proficiencies,
         connections: connections
     };

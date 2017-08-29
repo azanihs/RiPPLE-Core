@@ -9,6 +9,8 @@ let cachedLoggedInUser = undefined;
 const cachedRecommendedConnections = [];
 const cachedOutstandingRequests = [];
 
+const cachedLeaderboardUsers = [];
+
 export default class UserService {
 
     static getUserPeers(notify?: Function) {
@@ -122,18 +124,29 @@ export default class UserService {
         return cachedOutstandingRequests;
     }
 
-    static mostReputableUsers(): UserSummary[] {
-        return UserService.getOutstandingRequests(100).map(x => {
-            const summary: UserSummary = {
-                name: x.name,
-                image: x.image,
-                reputation: Math.floor(Math.random() * 20),
-                questionsContributed: Math.floor(Math.random() * 20),
-                numberAnswers: Math.floor(Math.random() * 20),
-                numberComments: Math.floor(Math.random() * 20)
-            };
-            return summary;
-        }).sort((a, b) => b.reputation - a.reputation);
+    static mostReputableUsers(notify?: Function): UserSummary[] {
+        const originalLength = cachedLeaderboardUsers.length;
+        UserRepository.getUserConnections(100)
+            .then(leaders => {
+                leaders.map(x => {
+                    const summary: UserSummary = {
+                        name: x.name,
+                        image: x.image,
+                        reputation: Math.floor(Math.random() * 20),
+                        questionsContributed: Math.floor(Math.random() * 20),
+                        numberAnswers: Math.floor(Math.random() * 20),
+                        numberComments: Math.floor(Math.random() * 20)
+                    };
+                    return summary;
+                })
+                    .sort((a, b) => b.reputation - a.reputation)
+                    .forEach(mergeCache(cachedLeaderboardUsers));
+
+                if (originalLength !== cachedLeaderboardUsers.length) {
+                    pushNotify(notify, cachedLeaderboardUsers);
+                }
+            });
+        return cachedLeaderboardUsers;
     }
 
     static getUserNotifications(count: number, notify?: Function): Notification[] {

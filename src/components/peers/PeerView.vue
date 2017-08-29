@@ -8,7 +8,6 @@
         <md-layout md-flex="100">
             <md-card>
                 <recommendation-search :searchTypes="searchTypes"
-                                       :generator="this.shuffleData"
                                        :topics="topics"></recommendation-search>
             </md-card>
         </md-layout>
@@ -45,7 +44,6 @@ export default class PeerView extends Vue {
 
     @Lifecycle
     created() {
-        this.shuffleData("all");
     }
 
     get topics() {
@@ -54,13 +52,6 @@ export default class PeerView extends Vue {
         });
 
         return this.pTopics;
-    }
-
-    shuffleData(type: string) {
-        return {
-            recommendations: UserService.getRecommendedConnections(3),
-            requests: UserService.getOutstandingRequests(3)
-        };
     }
 }
 </script>

@@ -2,7 +2,6 @@
     <md-layout md-flex="100">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <!-- Plot topics -->
             <table class="table">
                 <thead>
                     <tr>
@@ -41,7 +40,7 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
-                               v-for="(recommendation, i) in generator(searchType).recommendations"
+                               v-for="(recommendation, i) in recommendations"
                                :key="i">
                         <recommendation-card :data="recommendation">
                             Request
@@ -55,7 +54,7 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
-                               v-for="(recommendation, i) in generator(searchType).requests"
+                               v-for="(recommendation, i) in requests"
                                :key="i">
                         <recommendation-card :data="recommendation">
                             Request
@@ -130,28 +129,39 @@ export default class RecommendationSearch extends Vue {
     }) as string[];
 
     @Prop
-    generator = p({ // Function takes in arguments from searchTypes
-        required: true,
-        type: Function
-    }) as Function;
-
-    @Prop
     topics = p({
         required: true,
         type: Array
     }) as Topic[];
 
-    searchType = "";
 
     competencies = [];
 
+    pRecommendations = [];
+    pRequests = [];
+
     @Lifecycle
     created() {
-        this.searchType = this.searchTypes[0];
         this.competencies = UserService.userCompetencies(this.topics)
             .ownScores
             .filter(x => x.source == x.target)
             .map(x => x.competency);
+    }
+
+    get recommendations() {
+        this.pRecommendations = UserService.getRecommendedConnections(3, recommendations => {
+            this.pRecommendations = recommendations;
+        });
+
+        return this.pRecommendations;
+    }
+
+    get requests() {
+        this.pRequests = UserService.getOutstandingRequests(3, requests => {
+            this.pRequests = requests;
+        });
+
+        return this.pRequests;
     }
 
     checkboxChange() {

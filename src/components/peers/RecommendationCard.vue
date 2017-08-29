@@ -26,9 +26,9 @@
                                  :list="meetingHistory"
                                  :filter-list="findItem"></md-autocomplete>
             </md-input-container>
-    
+
         </md-card-content>
-    
+
         <md-card-actions>
             <md-button>Ignore</md-button>
             <md-button>
@@ -98,7 +98,8 @@ export default class RecommendationCard extends Vue {
         const meetDate = this.data.availableTime as Date;
 
         const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
-        return this.data.availableTimes[0] + " " + date;
+        const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;
+        return date + " " + time;
     }
     get meetingHistory() {
         return UserService.getMeetingHistory();

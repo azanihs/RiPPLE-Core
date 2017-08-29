@@ -99,7 +99,7 @@ export default class Notifications extends Vue {
     }
 
     get notifications() {
-        UserService.getUserNotifications(this.showCount, newNotifications => {
+        this.pNotifications = UserService.getUserNotifications(this.showCount, newNotifications => {
             this.pNotifications = newNotifications;
         });
 

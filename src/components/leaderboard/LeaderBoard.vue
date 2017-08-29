@@ -1,6 +1,8 @@
 <template>
     <md-table-card class="table">
-        <md-table md-sort="reputation" md-sort-type="asc" @sort="sort">
+        <md-table md-sort="reputation"
+                  md-sort-type="asc"
+                  @sort="sort">
             <md-table-header>
                 <md-table-row>
                     <md-table-head>
@@ -30,9 +32,12 @@
                 </md-table-row>
             </md-table-header>
             <md-table-body>
-                <md-table-row v-for="user in sortedUsers" :key="user.id">
+                <md-table-row v-for="user in sortedUsers"
+                              :key="user.id">
                     <md-table-cell>
-                        <md-image class="avatar" :md-src="user.image" :alt="user.name"></md-image>
+                        <md-image class="avatar"
+                                  :md-src="user.image"
+                                  :alt="user.name"></md-image>
                     </md-table-cell>
                     <md-table-cell>{{ user.name }}</md-table-cell>
                     <md-table-cell>{{ user.reputation }}</md-table-cell>
@@ -42,7 +47,11 @@
                 </md-table-row>
             </md-table-body>
         </md-table>
-        <md-table-pagination ref="pagination" :md-total="mostReputableUsers.length" :md-size="itemsPerPage" :md-page="pageIndex" @pagination="updateShowItems"></md-table-pagination>
+        <md-table-pagination ref="pagination"
+                             :md-total="users.length"
+                             :md-size="itemsPerPage"
+                             :md-page="pageIndex"
+                             @pagination="updateShowItems"></md-table-pagination>
     </md-table-card>
 </template>
 
@@ -73,11 +82,13 @@ export default class LeaderBoard extends Vue {
     sortType: string = "";
     reverse: boolean = false;
 
+    pUsers = [];
+
     @Lifecycle
     created() {
         // TODO: Ew. Pagination component does not update totalItems on mount.
         this.$nextTick(() => {
-            this.$refs["pagination"]["totalItems"] = this.mostReputableUsers.length;
+            //this.$refs["pagination"]["totalItems"] = this.users.length;
         });
     }
     updateShowItems(a) {
@@ -90,12 +101,15 @@ export default class LeaderBoard extends Vue {
         this.reverse = item.type == "desc";
     }
 
-    get mostReputableUsers() {
-        return UserService.mostReputableUsers();
+    get users() {
+        this.pUsers = UserService.mostReputableUsers(newUsers => {
+            this.pUsers = newUsers;
+        });
+        return this.pUsers;
     }
 
     get sortedUsers() {
-        const users = this.mostReputableUsers;
+        const users = this.users;
         const sortKey = this.sortType || "reputation";
 
         const sortMethod = (a, b) => {

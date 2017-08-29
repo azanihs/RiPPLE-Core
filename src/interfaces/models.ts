@@ -37,7 +37,7 @@ export interface User {
     image: string,
 
     proficiencies?: string[],
-    availableTimes?: string[]
+    availableTime?: Date,
     connections: PeerConnection[]
 };
 
