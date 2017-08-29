@@ -12,6 +12,7 @@ const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recom
 
 const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
 
+type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
 
 const userTopicScores = {};
 const userGoalScores = {};
@@ -39,6 +40,17 @@ topicNodes.forEach(x => {
     }
     userGoalScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
 });
+
+const getRandomTopic = () => {
+    const i = f.random.number({ min: 0, max: 3 });
+    return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
+};
+const notifications = new Array(50).fill(0).map(x => ({
+    id: Math.random(),
+    type: getRandomTopic() as NotificationType,
+    content: f.hacker.phrase(),
+    read: !!(Math.random() < 0.5)
+}));
 
 const userEngagementScores = {};
 const otherEngagementScores = {};
@@ -96,18 +108,12 @@ export default class UserRepository {
         return user;
     }
 
-    static getUserNotifications(): Notification[] {
-        const getRandomTopic = () => {
-            const i = f.random.number({ min: 0, max: 3 });
-            return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
-        };
-
-        return new Array(50).fill(0).map(x => ({
-            id: Math.random(),
-            type: getRandomTopic() as "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting",
-            content: f.hacker.phrase(),
-            read: !!(Math.random() < 0.5)
-        }));
+    static getUserNotifications(): Promise<Notification[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(notifications);
+            }, Math.random() * 1000);
+        });
     }
 
     static getAllAvailableCategories(): string[] {

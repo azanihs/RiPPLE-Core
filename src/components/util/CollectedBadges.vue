@@ -63,7 +63,6 @@ export default class CollectedBadges extends Vue {
             this.pBadges = BadgeService.getAllAvailableBadges(notify);
         } else if (this.topic == "closest") {
             this.pBadges = BadgeService.getClosestUserBadges(notify);
-            // this.pBadges = BadgeService.getBadgeByType(this.topic, notify);
         } else {
             this.pBadges = BadgeService.getBadgeByType(this.topic, notify);
         }

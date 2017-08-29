@@ -29,7 +29,7 @@ export default class BadgeRepository {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve(badges.slice());
-            }, 500);
+            }, Math.random() * 100);
         });
     }
 
@@ -37,7 +37,7 @@ export default class BadgeRepository {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve(userBadges.slice());
-            }, 500);
+            }, Math.random() * 100);
         });
     }
 }

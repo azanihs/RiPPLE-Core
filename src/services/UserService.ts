@@ -1,6 +1,10 @@
+import { pushNotify, mergeCache } from "./Notify";
+
 import { User, Peer, Badge, AcquiredBadge, UserSummary, Notification, Topic } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import PeerRepository from "../repositories/PeerRepository";
+
+const cachedNotifications = [];
 
 export default class UserService {
 
@@ -110,8 +114,18 @@ export default class UserService {
         }).sort((a, b) => b.reputation - a.reputation);
     }
 
-    static getUserNotifications(count: number): Notification[] {
-        return UserRepository.getUserNotifications().slice(0, count);
+    static getUserNotifications(count: number, notify?: Function): Notification[] {
+        const originalLength = cachedNotifications.length;
+
+        UserRepository.getUserNotifications()
+            .then(notifications => {
+                notifications.forEach(mergeCache(cachedNotifications));
+                if (originalLength !== cachedNotifications.length) {
+                    pushNotify(notify, cachedNotifications);
+                }
+            });
+
+        return cachedNotifications.slice(0, count);
     }
 
     static getMeetingHistory() {

@@ -138,8 +138,10 @@ import Question from "./Question.vue";
     }
 })
 export default class QuestionBrowser extends Vue {
-    questions: QuestionModel[] = [];
 
+    pTopics = [];
+
+    questions: QuestionModel[] = [];
     searchedQuestions: QuestionModel[] = [];
 
     topicsToUse: TopicModel[] = [];
@@ -153,7 +155,11 @@ export default class QuestionBrowser extends Vue {
     }
 
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        this.pTopics = TopicService.getAllAvailableTopics(topics => {
+            this.pTopics = topics;
+        });
+
+        return this.pTopics;
     }
 
     get showQuestions() {
