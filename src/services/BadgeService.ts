@@ -92,11 +92,9 @@ export default class BadgeService {
                 .slice(0, 3)
                 .map(x => x.badge))
             .then(badges => {
-                cachedClosestUserBadges.splice(0, cachedClosestUserBadges.length);
-                badges.forEach(badge => cachedClosestUserBadges.push(badge));
-
-                if (!originalCache.every((x, i) => originalCache.length === cachedClosestUserBadges.length
-                    && originalCache[i] === cachedClosestUserBadges[i])) {
+                if (originalCache.length !== badges.length || badges.every((x, i) => x !== originalCache[i])) {
+                    cachedClosestUserBadges.splice(0, cachedClosestUserBadges.length);
+                    badges.forEach(badge => cachedClosestUserBadges.push(badge));
                     pushNotify(notify, cachedClosestUserBadges);
                 }
             });
