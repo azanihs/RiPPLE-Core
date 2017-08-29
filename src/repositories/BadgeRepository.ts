@@ -14,8 +14,9 @@ const badges = new Array(30).fill(0).map((x, i) => {
 
 const userBadges = badges
     .filter((_, i) => Math.random() < 0.5)
-    .map((x: Badge) => {
+    .map((x: Badge, i) => {
         const acquiredBadge: AcquiredBadge = {
+            id: i,
             badge: x,
             progress: Math.random() < 0.5 ? (Math.random() * 100) : -1,
             dateAcquired: new Date()

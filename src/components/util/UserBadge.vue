@@ -81,21 +81,28 @@
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component } from "av-ts";
+import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
 import { AcquiredBadge, Badge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
 import UserService from "../../services/UserService";
 
 @Component()
 export default class UserBadge extends Vue {
-    @Prop badge: Badge;
+    @Prop badge = p({
+        required: true
+    }) as Badge;
+
+    pUserHasBadge = undefined;
 
     get badgeIcon() {
         return BadgeService.badgeToIcon(this.badge);
     }
 
     get userBadge(): AcquiredBadge {
-        return BadgeService.userHasBadge(this.badge.id);
+        this.pUserHasBadge = BadgeService.userHasBadge(this.badge, hasIt => {
+            this.pUserHasBadge = hasIt;
+        });
+        return this.pUserHasBadge;
     }
 
     get userHasBadge(): boolean {

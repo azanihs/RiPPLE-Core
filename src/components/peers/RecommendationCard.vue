@@ -4,19 +4,19 @@
         <md-card-header class="fullWidth">
             <md-avatar>
                 <md-avatar>
-                    <img :src="data.image"
-                         :alt="data.name">
+                    <img :src="user.image"
+                         :alt="user.name">
                 </md-avatar>
             </md-avatar>
-            <div class="md-title">{{data.name}}</div>
+            <div class="md-title">{{user.name}}</div>
             <div class="md-subhead">
-                <topic-chip v-for="prof in data.proficiencies"
+                <topic-chip v-for="prof in user.proficiencies"
                             :key="prof"
                             linkTo="/view/peers">
                     {{prof}}
                 </topic-chip>
             </div>
-            <md-button class="type"> {{ data.recommendationType }}</md-button>
+            <md-button class="type"> {{ user.recommendationType }}</md-button>
             <md-button class="date"> {{ meetingTime }}</md-button>
         </md-card-header>
         <md-card-content class="fullWidth flex">
@@ -85,7 +85,7 @@ import TopicChip from "../util/TopicChip.vue";
     }
 })
 export default class RecommendationCard extends Vue {
-    @Prop data;
+    @Prop user;
 
     meetingLocation = "";
 
@@ -95,7 +95,7 @@ export default class RecommendationCard extends Vue {
 
     get meetingTime() {
         const dayToEnglish = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const meetDate = this.data.availableTime as Date;
+        const meetDate = this.user.availableTime as Date;
 
         const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
         const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;

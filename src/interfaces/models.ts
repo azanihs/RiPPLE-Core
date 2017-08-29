@@ -68,6 +68,7 @@ export interface Badge {
 };
 
 export interface AcquiredBadge {
+    id: number,
     badge: Badge,
     progress: number,
     dateAcquired: Date

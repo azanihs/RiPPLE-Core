@@ -43,23 +43,23 @@ export default class BadgeService {
         ][badge.id] || "priority_high";
     }
 
-    static userHasBadge(badgeId, notify?: Function) {
+    static userHasBadge(badge: Badge, notify?: Function) {
+        const originalLength = cachedUserAquiredBadges.length;
         BadgeRepository.getAllUserBadges()
             .then(badges => {
-                const originalLength = cachedUserAquiredBadges.length;
                 badges.forEach(mergeCache(cachedUserAquiredBadges));
                 if (originalLength !== cachedUserAquiredBadges.length) {
-                    pushNotify(notify, cachedUserAquiredBadges.find(x => x.badge.id == badgeId));
+                    pushNotify(notify, cachedUserAquiredBadges.find(x => x.badge == badge));
                 }
             });
 
-        return cachedUserAquiredBadges.find(x => x.badge.id === badgeId);
+        return cachedUserAquiredBadges.find(x => x.badge === badge);
     }
 
     static getAllAvailableBadges(notify?: Function) {
+        const originalLength = cachedBadges.length;
         BadgeRepository.getAllAvailableBadges()
             .then(badges => {
-                const originalLength = cachedBadges.length;
                 badges.forEach(mergeCache(cachedBadges));
                 if (originalLength !== cachedBadges.length) {
                     pushNotify(notify, cachedBadges);
