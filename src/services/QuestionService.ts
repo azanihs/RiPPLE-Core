@@ -1,7 +1,17 @@
+import { pushNotify } from "./Notify";
 import QuestionRepository from "../repositories/QuestionRepository";
 import { Question } from "../interfaces/models";
 
 export default class QuestionService {
+    static search(searchQuery, notify?: Function) {
+        const { sortField, sortDesc, filterField, query } = searchQuery;
+
+        QuestionRepository.search(sortField || "", sortDesc ? "DESC" : "ASC", filterField || "", query || "")
+            .then(searchResult => {
+                pushNotify(notify, searchResult);
+            });
+    }
+
     static getQuestion(type: string) {
         return QuestionRepository.getMany(1)[0];
     }
