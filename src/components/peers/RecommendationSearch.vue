@@ -42,7 +42,7 @@
                                md-gutter
                                v-for="(recommendation, i) in recommendations"
                                :key="i">
-                        <recommendation-card :data="recommendation">
+                        <recommendation-card :user="recommendation">
                             Request
                         </recommendation-card>
                     </md-layout>
@@ -56,7 +56,7 @@
                                md-gutter
                                v-for="(recommendation, i) in requests"
                                :key="i">
-                        <recommendation-card :data="recommendation">
+                        <recommendation-card :user="recommendation">
                             Request
                         </recommendation-card>
                     </md-layout>

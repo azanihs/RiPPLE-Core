@@ -74,7 +74,9 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "av-ts";
+import { Vue, Component, Prop, p } from "av-ts";
+import { User } from "../../interfaces/models";
+
 import UserService from "../../services/UserService";
 
 import TopicChip from "../util/TopicChip.vue";
@@ -85,7 +87,9 @@ import TopicChip from "../util/TopicChip.vue";
     }
 })
 export default class RecommendationCard extends Vue {
-    @Prop user;
+    @Prop user = p({
+        required: true
+    }) as User;
 
     meetingLocation = "";
 
