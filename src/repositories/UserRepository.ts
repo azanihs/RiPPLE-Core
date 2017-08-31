@@ -1,4 +1,4 @@
-import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Node } from "../interfaces/models";
 import PeerRepository from "./PeerRepository";
 import faker from "faker";
 
@@ -15,7 +15,6 @@ const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x
 type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
 
 const userTopicScores = {};
-const userGoalScores = {};
 const topicNodes = topics.map((x, id) => {
     const topicNode = {
         id: id,
@@ -23,7 +22,6 @@ const topicNodes = topics.map((x, id) => {
     };
     // Ensure at least one self-loop per topic
     userTopicScores[id] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
-    userGoalScores[id] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
     return topicNode;
 });
 topicNodes.forEach(x => {
@@ -32,13 +30,6 @@ topicNodes.forEach(x => {
         return;
     }
     userTopicScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
-});
-topicNodes.forEach(x => {
-    const randomNode = topicNodes[Math.floor(Math.random() * topicNodes.length)];
-    if (randomNode == x) {
-        return;
-    }
-    userGoalScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
 });
 
 const getRandomTopic = () => {
@@ -53,15 +44,13 @@ const notifications = new Array(50).fill(0).map(x => ({
 }));
 
 const userEngagementScores = {};
-const otherEngagementScores = {};
 const engagementNodes = engagementTypes.map(x => {
     const engagementNode = {
-        id: x
+        id: x,
+        name: ""
     };
     // Ensure at least one self-loop per topic
     userEngagementScores[x] = [[engagementNode, engagementNode,
-        Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
-    otherEngagementScores[x] = [[engagementNode, engagementNode,
         Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
     return engagementNode;
 });
@@ -71,13 +60,6 @@ engagementNodes.forEach(x => {
         return;
     }
     userEngagementScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
-});
-engagementNodes.forEach(x => {
-    const randomNode = engagementNodes[Math.floor(Math.random() * engagementNodes.length)];
-    if (randomNode == x) {
-        return;
-    }
-    otherEngagementScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
 });
 
 const makeUser = () => {
@@ -143,15 +125,55 @@ export default class UserRepository {
         });
     }
 
-    static getAllAvailableCategories(): string[] {
-        return types.slice();
+    static getAllAvailableCategories(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(types.slice());
+            }, Math.random() * 1000);
+        });
     }
 
-    static getAllAvailableEngagementTypes(): string[] {
-        return engagementTypes.slice();
+    static getAllAvailableEngagementTypes(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(engagementTypes.slice());
+            }, Math.random() * 1000);
+        });
     }
 
-    static userEngagementForType(type: string) {
+    static getUserMeetingHistory(): Promise<{ name: string }[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(["UQ", "Toowong", "Indro", "Indooroopilly"].map(x => ({
+                    name: x
+                })));
+            }, Math.random() * 1000);
+        });
+    }
+
+    static serverAggregate(aggregate: string): Promise<Node[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (aggregate == "engagement") {
+                    resolve(Object.keys(userEngagementScores).map(x => ({
+                        source: userEngagementScores[x][0],
+                        target: userEngagementScores[x][1],
+                        competency: userEngagementScores[x][2],
+                        attempts: userEngagementScores[x][3]
+                    })));
+                } else if (aggregate == "competency") {
+                    resolve(Object.keys(userTopicScores).map(x => ({
+                        source: userTopicScores[x][0],
+                        target: userTopicScores[x][1],
+                        competency: userTopicScores[x][2],
+                        attempts: userTopicScores[x][3]
+                    })));
+                }
+            }, Math.random() * 1000);
+        });
+    }
+
+    /*static userEngagementForType(type: string) {
         return userEngagementScores[type].map(x => ({
             source: x[0],
             target: x[1],
@@ -185,6 +207,6 @@ export default class UserRepository {
             competency: x[2],
             attempts: x[3]
         }));
-    }
+    }*/
 
 }

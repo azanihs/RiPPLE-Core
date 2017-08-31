@@ -30,6 +30,13 @@ export interface QuestionResponse {
     content: string
 };
 
+export interface Node {
+    source: Topic,
+    target: Topic,
+    competency: number,
+    attempts: number
+};
+
 export interface User {
     id: number,
     name: string,

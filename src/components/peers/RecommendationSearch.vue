@@ -109,30 +109,33 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Mixin, Lifecycle, Prop, p } from "av-ts";
+
 import { Topic } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 
 import RecommendationCard from "./RecommendationCard.vue";
 
+import PropUpdate from "../mixins/PropUpdate";
+
 @Component({
     components: {
         RecommendationCard
     }
 })
-export default class RecommendationSearch extends Vue {
+export default class RecommendationSearch extends Mixin(PropUpdate) {
     @Prop
-    searchTypes = p({
+    searchTypes = p<string[]>({
         required: true,
         type: Array
-    }) as string[];
+    });
 
     @Prop
-    topics = p({
+    topics = p<Topic[]>({
         required: true,
         type: Array
-    }) as Topic[];
+    });
 
 
     competencies = [];
@@ -142,6 +145,9 @@ export default class RecommendationSearch extends Vue {
 
     @Lifecycle
     created() {
+        UserService.subscribe("getRecommenedConnections", this.PropUpdate("pRecommendations"));
+        UserService.unsubscribe("getOutstandingRequests", this.PropUpdate("pRequests"));
+
         this.competencies = UserService.userCompetencies(this.topics)
             .ownScores
             .filter(x => x.source == x.target)
@@ -149,18 +155,10 @@ export default class RecommendationSearch extends Vue {
     }
 
     get recommendations() {
-        this.pRecommendations = UserService.getRecommendedConnections(3, recommendations => {
-            this.pRecommendations = recommendations;
-        });
-
         return this.pRecommendations;
     }
 
     get requests() {
-        this.pRequests = UserService.getOutstandingRequests(3, requests => {
-            this.pRequests = requests;
-        });
-
         return this.pRequests;
     }
 

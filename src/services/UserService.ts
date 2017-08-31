@@ -1,17 +1,82 @@
-import { pushNotify, mergeCache } from "./Notify";
+import { pushNotify, mergeCache, mergeStringCache, eventBus } from "./Notify";
 
 import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 
-const cachedNotifications = [];
-const cachedPeers = [];
-let cachedLoggedInUser = undefined;
-const cachedRecommendedConnections = [];
-const cachedOutstandingRequests = [];
+const cachedNotifications: Notification[] = [];
+const cachedPeers: User[] = [];
+let cachedLoggedInUser: User = undefined;
+const cachedRecommendedConnections: User[] = [];
 
-const cachedLeaderboardUsers = [];
+const cachedOutstandingRequests: User[] = [];
+
+const cachedLeaderboardUsers: UserSummary[] = [];
+const cachedMentoringTypes: string[] = [];
+const cachedEngagementTypes: string[] = [];
+const cachedMeetingHistory: { name: string }[] = [];
+
+const queues: { [eventId: string]: Function[] } = {};
 
 export default class UserService {
+    static subscribe(event: string, callback: Function) {
+        if (queues[event] === undefined) {
+            queues[event] = [callback];
+            eventBus.$on(event, data => {
+                queues[event].forEach(cb => cb(data));
+            });
+        } else {
+            queues[event].push(callback)
+        }
+    }
+
+    static generateGraph(topicsToInclude: any[], sourceData, otherData) {
+
+        // Only keep edges where target && source appear in topicsToInclude        
+        const flattenAndFilter = topics => topics
+            .reduce((a, b) => a.concat(b), [])
+            .filter(x => topicsToInclude.find(topic => topic == x.source)
+                && topicsToInclude.find(topic => topic == x.target));
+
+        const ownScores = flattenAndFilter(topicsToInclude.map(sourceData));
+        const userGoals = flattenAndFilter(topicsToInclude.map(otherData));
+
+        const topics = ownScores
+            .map(x => x.source)
+            .reduce((carry, topicNode) => {
+                if (topicsToInclude.find(x => x == topicNode) &&
+                    !carry.find(x => x == topicNode)) {
+                    carry.push(topicNode);
+                }
+                return carry;
+            }, []);
+
+        return {
+            topics: topics, // Node List
+            ownScores: ownScores, // Edge list of self
+            compareAgainst: userGoals // Edge list of other
+        };
+    }
+
+    static userCompetencies(topicsToInclude: Topic[], compareTo: string, notify?: Function) {
+        return UserService.generateGraph(topicsToInclude, UserRepository.serverAggregate("competency"), UserRepository.serverAggregate(compareTo));
+    }
+
+    static getEngagementScores(itemsToInclude: string[], compareTo: string, notify?: Function) {
+        return UserService.generateGraph(itemsToInclude, UserRepository.serverAggregate("engagement"), UserRepository.serverAggregate(compareTo));
+    }
+
+    static getAllAvailableEngagementTypes(notify?: Function): string[] {
+        const originalLength = cachedEngagementTypes.length;
+
+        UserRepository.getAllAvailableEngagementTypes().then(categories => {
+            categories.forEach(mergeStringCache(cachedEngagementTypes));
+            if (originalLength != cachedEngagementTypes.length) {
+                pushNotify(notify, cachedEngagementTypes);
+            }
+        });
+
+        return cachedEngagementTypes;
+    }
 
     static getUserPeers(notify?: Function) {
         const originalLength = cachedPeers.length;
@@ -26,64 +91,6 @@ export default class UserService {
         return cachedPeers;
     }
 
-    static userCompetencies(topicsToInclude: Topic[]) {
-        const flattenAndFilter = topics => topics
-            .reduce((a, b) => a.concat(b), [])
-            .filter(x => topicsToInclude.find(topic => topic.id == x.source.id)
-                && topicsToInclude.find(topic => topic.id == x.target.id));
-
-        // Only keep edges where target && source appear in topicsToInclude
-        const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
-        const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
-
-        const topics = ownScores
-            .map(x => x.source)
-            .reduce((carry, topicNode) => {
-                if (topicsToInclude.find(x => x.id == topicNode.id) &&
-                    !carry.find(x => x == topicNode)) {
-                    carry.push(topicNode);
-                }
-                return carry;
-            }, []);
-
-        return {
-            topics: topics, // Node List
-            ownScores: ownScores, // Edge list of self
-            compareAgainst: userGoals // Edge list of other
-        };
-    }
-
-    static getAllAvailableEngagementTypes() {
-        return UserRepository.getAllAvailableEngagementTypes();
-    }
-
-    static getEngagementScores(itemsToGet: string[]) {
-        // Only keep edges where target && source appear in topicsToInclude
-        const flattenAndFilter = topics => topics
-            .reduce((a, b) => a.concat(b), [])
-            .filter(x => itemsToGet.find(topics => topics == x.source.id)
-                && itemsToGet.find(topics => topics == x.target.id));
-
-        const ownScores = flattenAndFilter(itemsToGet.map(UserRepository.userEngagementForType));
-        const userGoals = flattenAndFilter(itemsToGet.map(UserRepository.engagementOtherForType));
-
-        const topics = ownScores
-            .map(x => x.source)
-            .reduce((carry, topicNode) => {
-                if (itemsToGet.find(x => x == topicNode.id) &&
-                    !carry.find(x => x == topicNode)) {
-                    carry.push(topicNode);
-                }
-                return carry;
-            }, []);
-
-        return {
-            topics: topics, // Node List
-            ownScores: ownScores, // Edge list of self
-            compareAgainst: userGoals // Edge list of other
-        };
-    }
-
     static getLoggedInUser(notify?: Function): User {
         const originalID = cachedLoggedInUser === undefined ? -1 : cachedLoggedInUser.id;
         UserRepository.getLoggedInUser().then(user => {
@@ -96,11 +103,21 @@ export default class UserService {
         return cachedLoggedInUser;
     }
 
-    static getAllAvailableCategories(): string[] {
-        return UserRepository.getAllAvailableCategories();
+    static getAllAvailableMentoringTypes(notify?: Function): string[] {
+        const originalLength = cachedMentoringTypes.length;
+
+        UserRepository.getAllAvailableCategories().then(categories => {
+            categories.forEach(mergeStringCache(cachedMentoringTypes));
+            if (originalLength != cachedMentoringTypes.length) {
+                pushNotify(notify, cachedMentoringTypes);
+            }
+        });
+
+        return cachedMentoringTypes;
     }
 
-    static getRecommendedConnections(count: number, notify?: Function) {
+    static getRecommendedConnections(notify?: Function, count: number) {
+
         const originalLength = cachedRecommendedConnections.length;
         UserRepository.getUserConnections(count)
             .then(recommendations => {
@@ -112,13 +129,13 @@ export default class UserService {
         return cachedRecommendedConnections;
     }
 
-    static getOutstandingRequests(count: number, notify?: Function) {
+    static getOutstandingRequests(count: number): User[] {
         const originalLength = cachedOutstandingRequests.length;
         UserRepository.getUserConnections(count)
             .then(recommendations => {
                 recommendations.forEach(mergeCache(cachedOutstandingRequests));
                 if (originalLength !== cachedOutstandingRequests.length) {
-                    pushNotify(notify, cachedOutstandingRequests);
+                    eventBus.$emit("getOutstandingRequests", cachedOutstandingRequests);
                 }
             });
         return cachedOutstandingRequests;
@@ -163,9 +180,16 @@ export default class UserService {
         return cachedNotifications.slice(0, count);
     }
 
-    static getMeetingHistory() {
-        return ["UQ", "Toowong", "Indro", "Indooroopilly"].map(x => ({
-            name: x
-        }));
+    static getMeetingHistory(notify?: Function) {
+        const originalLength = cachedMeetingHistory.length;
+
+        UserRepository.getAllAvailableCategories().then(categories => {
+            categories.forEach(mergeStringCache(cachedMeetingHistory));
+            if (originalLength != cachedMeetingHistory.length) {
+                pushNotify(notify, cachedMeetingHistory);
+            }
+        });
+
+        return cachedMeetingHistory;
     }
 }

@@ -242,9 +242,8 @@ export default class DefaultView extends Vue {
         return UserService.getEngagementScores(itemsToInclude);
     }
 
-    get categories() {
-        // Mentoring types
-        return UserService.getAllAvailableCategories();
+    get mentoringTypes() {
+        return UserService.getAllAvailableMentoringTypes();
     }
 
     generateCompetencies(itemsToInclude) {
