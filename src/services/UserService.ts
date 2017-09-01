@@ -103,17 +103,9 @@ export default class UserService {
         return cachedLoggedInUser;
     }
 
-    static getAllAvailableMentoringTypes(notify?: Function): string[] {
-        const originalLength = cachedMentoringTypes.length;
-
-        UserRepository.getAllAvailableCategories().then(categories => {
-            categories.forEach(mergeStringCache(cachedMentoringTypes));
-            if (originalLength != cachedMentoringTypes.length) {
-                pushNotify(notify, cachedMentoringTypes);
-            }
-        });
-
-        return cachedMentoringTypes;
+    static getAllAvailableCategories(): string[] {
+        //return UserRepository.getAllAvailableCategories();
+        return [];
     }
 
     static getRecommendedConnections(notify?: Function, count: number) {

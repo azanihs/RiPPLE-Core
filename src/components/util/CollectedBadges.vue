@@ -35,7 +35,8 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Watch, Component, p } from "av-ts";
+import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
+import PropUpdate from "../mixins/PropUpdate";
 import UserBadge from "../util/UserBadge.vue";
 import BadgeService from "../../services/BadgeService";
 
@@ -44,30 +45,26 @@ import BadgeService from "../../services/BadgeService";
         "user-badge": UserBadge
     }
 })
-export default class CollectedBadges extends Vue {
+export default class CollectedBadges extends PropUpdate {
     @Prop topic = p(String);
 
-    pBadges = [];
+    availableBadges = [];
 
     @Lifecycle
-    mounted() {
-
-    }
-
-    get availableBadges() {
-        const notify = newBadges => {
-            this.pBadges = newBadges;
-        };
+    created() {
+        let subscription = undefined;
+        let param = undefined;
 
         if (this.topic == "all") {
-            this.pBadges = BadgeService.getAllAvailableBadges(notify);
+            subscription = BadgeService.getAllAvailableBadges;
         } else if (this.topic == "closest") {
-            this.pBadges = BadgeService.getClosestUserBadges(notify);
+            subscription = BadgeService.getClosestUserBadges;
         } else {
-            this.pBadges = BadgeService.getBadgeByType(this.topic, notify);
+            subscription = BadgeService.getBadgeByType;
+            param = this.topic;
         }
-
-        return this.pBadges;
+        BadgeService.subscribe(subscription, param, this.updateProp("availableBadges"));
     }
+
 }
 </script>

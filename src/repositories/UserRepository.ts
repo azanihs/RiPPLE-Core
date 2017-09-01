@@ -1,5 +1,4 @@
-import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Node } from "../interfaces/models";
-import PeerRepository from "./PeerRepository";
+import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection } from "../interfaces/models";
 import faker from "faker";
 
 const f: any = faker;
@@ -137,38 +136,6 @@ export default class UserRepository {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 resolve(engagementTypes.slice());
-            }, Math.random() * 1000);
-        });
-    }
-
-    static getUserMeetingHistory(): Promise<{ name: string }[]> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(["UQ", "Toowong", "Indro", "Indooroopilly"].map(x => ({
-                    name: x
-                })));
-            }, Math.random() * 1000);
-        });
-    }
-
-    static serverAggregate(aggregate: string): Promise<Node[]> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (aggregate == "engagement") {
-                    resolve(Object.keys(userEngagementScores).map(x => ({
-                        source: userEngagementScores[x][0],
-                        target: userEngagementScores[x][1],
-                        competency: userEngagementScores[x][2],
-                        attempts: userEngagementScores[x][3]
-                    })));
-                } else if (aggregate == "competency") {
-                    resolve(Object.keys(userTopicScores).map(x => ({
-                        source: userTopicScores[x][0],
-                        target: userTopicScores[x][1],
-                        competency: userTopicScores[x][2],
-                        attempts: userTopicScores[x][3]
-                    })));
-                }
             }, Math.random() * 1000);
         });
     }

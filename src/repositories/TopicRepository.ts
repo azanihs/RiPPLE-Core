@@ -10,9 +10,9 @@ export default class TopicRepository {
         return topics[topic.id];
     }
 
-    static getAllAvailableTopics() {
+    static getAllAvailableTopics(): Promise<Topic[]> {
         return fetch("//localhost:8000/questions/topics/")
-            .then(questions => questions.json())
-            .then(questions => questions.map(x => TopicRepository.topicPointer(x)));
+            .then(topics => topics.json())
+            .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
 }

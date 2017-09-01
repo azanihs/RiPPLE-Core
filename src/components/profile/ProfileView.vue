@@ -42,10 +42,10 @@
                     <h2>Engagement Overview</h2>
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
-                <variable-data-visualiser class="componentSeparator"
-                                          :dataCategories="engagementItems"
-                                          :compareList="generateEngagement">
-                </variable-data-visualiser>
+                <!--<variable-data-visualiser class="componentSeparator"
+                                                  :dataCategories="engagementItems"
+                                                  :compareList="generateEngagement">
+                        </variable-data-visualiser>-->
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -53,10 +53,10 @@
                     <h2>Competency Overview</h2>
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
-                <variable-data-visualiser class="componentSeparator"
-                                          :dataCategories="topics"
-                                          :compareList="generateCompetencies">
-                </variable-data-visualiser>
+                <!--<variable-data-visualiser class="componentSeparator"
+                                              :dataCategories="topics"
+                                              :compareList="generateCompetencies">
+                    </variable-data-visualiser>-->
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -180,7 +180,7 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Component } from "av-ts";
+import { Vue, Component, Lifecycle } from "av-ts";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 
@@ -227,7 +227,8 @@ export default class DefaultView extends Vue {
     }
 
     get engagementSummary() {
-        const { ownScores } = UserService.getEngagementScores(this.engagementItems);
+        return [];
+        /*const { ownScores } = UserService.getEngagementScores(this.engagementItems);
 
         // Return all self-loops competencies.
         return ownScores
@@ -235,7 +236,7 @@ export default class DefaultView extends Vue {
             .map(x => ({
                 name: x.target.id,
                 score: x.competency
-            }));
+            }));*/
     }
 
     generateEngagement(itemsToInclude) {

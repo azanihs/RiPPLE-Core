@@ -81,27 +81,31 @@
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
+import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
+import PropUpdate from "../mixins/PropUpdate";
+
 import { AcquiredBadge, Badge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
 import UserService from "../../services/UserService";
 
 @Component()
-export default class UserBadge extends Vue {
+export default class UserBadge extends PropUpdate {
     @Prop badge = p({
         required: true
     }) as Badge;
 
     pUserHasBadge = undefined;
 
+    @Lifecycle
+    created() {
+        BadgeService.subscribe(BadgeService.userHasBadge, this.badge, this.updateProp("pUserHasBadge"));
+    }
+
     get badgeIcon() {
         return BadgeService.badgeToIcon(this.badge);
     }
 
     get userBadge(): AcquiredBadge {
-        this.pUserHasBadge = BadgeService.userHasBadge(this.badge, hasIt => {
-            this.pUserHasBadge = hasIt;
-        });
         return this.pUserHasBadge;
     }
 

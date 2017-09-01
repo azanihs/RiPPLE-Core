@@ -2,10 +2,10 @@ import { Vue, Trait } from "av-ts";
 
 @Trait
 class PropUpdate extends Vue {
-    propUpdate(propName: string) {
-        return (newValue: any) => {
+    updateProp(propName: string) {
+        return newValue => {
             this[propName] = newValue;
-        }
+        };
     }
 }
 
