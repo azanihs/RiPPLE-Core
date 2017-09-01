@@ -1,5 +1,4 @@
 import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection } from "../interfaces/models";
-import PeerRepository from "./PeerRepository";
 import faker from "faker";
 
 const f: any = faker;
@@ -143,12 +142,20 @@ export default class UserRepository {
         });
     }
 
-    static getAllAvailableCategories(): string[] {
-        return types.slice();
+    static getAllAvailableCategories(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(types.slice());
+            }, Math.random() * 1000);
+        });
     }
 
-    static getAllAvailableEngagementTypes(): string[] {
-        return engagementTypes.slice();
+    static getAllAvailableEngagementTypes(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(engagementTypes.slice());
+            }, Math.random() * 1000);
+        });
     }
 
     static userEngagementForType(type: string) {

@@ -97,7 +97,8 @@ export default class UserService {
     }
 
     static getAllAvailableCategories(): string[] {
-        return UserRepository.getAllAvailableCategories();
+        //return UserRepository.getAllAvailableCategories();
+        return [];
     }
 
     static getRecommendedConnections(count: number, notify?: Function) {
