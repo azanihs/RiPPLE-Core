@@ -39,6 +39,8 @@ import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
 import PropUpdate from "../mixins/PropUpdate";
 import UserBadge from "../util/UserBadge.vue";
 import BadgeService from "../../services/BadgeService";
+import CacheService from "../../services/CacheService";
+
 
 @Component({
     components: {
@@ -52,18 +54,21 @@ export default class CollectedBadges extends PropUpdate {
 
     @Lifecycle
     created() {
-        let subscription = undefined;
-        let param = undefined;
-
         if (this.topic == "all") {
-            subscription = BadgeService.getAllAvailableBadges;
+            CacheService.subscribe(BadgeService.getAllAvailableBadges, (badges: Badge[]) => {
+                this.availableBadges = badges.filter(x => x.category === this.topic);
+            });
         } else if (this.topic == "closest") {
-            subscription = BadgeService.getClosestUserBadges;
+            CacheService.subscribe(BadgeService.getClosestUserBadges, (badges: Badge[]) => {
+                this.availableBadges = badges
+            });
         } else {
-            subscription = BadgeService.getBadgeByType;
-            param = this.topic;
+            CacheService.subscribe(BadgeService.getAllAvailableBadges, (badges: Badge[]) => {
+                this.availableBadges = badges.filter(x => x.category === this.topic);
+            });
         }
-        BadgeService.subscribe(subscription, param, this.updateProp("availableBadges"));
+
+
     }
 
 }

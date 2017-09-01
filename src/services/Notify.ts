@@ -2,27 +2,27 @@ import Vue from "vue";
 
 let subscriptionCount = 0;
 
-const caches: Map<Function, string> = new Map();
+const caches: WeakMap<Function, string> = new WeakMap();
 
 type CacheLog = {
-    queue: {
-        param: any,
-        callback: Function
-    }[],
+    // queue: {
+    //     param: any,
+    //     callback: Function
+    // }[],
     cache: any[]
 };
-type CacheMap = Map<Function, CacheLog>;
+type CacheMap = WeakMap<Function, CacheLog>;
 
 const makeEmptyCache = () => {
     return {
-        queue: [],
+        // queue: [],
         cache: []
     };
 };
 
 const subscriptionLookup = (subscription: Function) => {
     if (caches.get(subscription) === undefined) {
-        caches.set(subscription, `${subscriptionCount++}_cacheEvent`);
+        caches.set(subscription, `${subscription.name}_${subscriptionCount++}`);
     }
 
     return caches.get(subscription);

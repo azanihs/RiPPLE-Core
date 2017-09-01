@@ -1,6 +1,34 @@
 import { eventBus, CacheMap, CacheLog, makeEmptyCache, subscriptionLookup } from "./Notify";
 
 
+
+export default class CacheService {
+    protected static caches: CacheMap = new WeakMap();
+
+    static subscribe(subscription: Function, callback: Function) {
+        const subscriptionName = subscriptionLookup(subscription);
+
+        // Attach client-supplied callback straight to bus
+        eventBus.$on(subscriptionName, callback);
+    }
+
+    static emit(subscription: Function, returnValue: any) {
+        const subscriptionName = subscriptionLookup(subscription);
+        eventBus.$emit(subscriptionName, returnValue);
+    }
+
+    static getCache(subscription: Function): CacheLog {
+        return this.caches.get(subscription);
+    }
+}
+
+
+
+
+
+
+
+/*
 export default class CacheService {
     protected static caches: CacheMap = new Map();
 
@@ -26,13 +54,5 @@ export default class CacheService {
             subscription();
         }
     }
-
-    static emit(subscription: Function, emitFn: Function) {
-        const subscriptionName = subscriptionLookup(subscription);
-        eventBus.$emit(subscriptionName, emitFn);
-    }
-
-    static getCache(subscription: Function): CacheLog {
-        return this.caches.get(subscription);
-    }
 }
+*/
