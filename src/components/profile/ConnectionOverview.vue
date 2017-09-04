@@ -32,39 +32,33 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component } from "av-ts";
+import { Vue, Component, Lifecycle } from "av-ts";
 
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
+import Fetcher from "../../services/Fetcher";
 
 @Component()
 export default class ConnectionOverview extends Vue {
 
-    pTopics = [];
     pPeers = [];
+    updatePeers = newPeers => {
+        this.pPeers = newPeers;
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.getUserPeers)
+            .on(this.updatePeers);
+    }
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getUserPeers)
+            .off(this.updatePeers);
+    }
 
     get peerConnections() {
-        UserService.getUserPeers(newPeers => {
-            this.pPeers = newPeers;
-        });
-
         return this.pPeers;
-    }
-
-    get profileData() {
-        return UserService.getLoggedInUser();
-    }
-
-    get topics() {
-        TopicService.getAllAvailableTopics(newTopics => {
-            this.pTopics = newTopics;
-        });
-
-        return this.pTopics;
-    }
-
-    get categories() {
-        return UserService.getAllAvailableCategories();
     }
 }
 </script>

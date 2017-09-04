@@ -120,12 +120,13 @@ import { Question as QuestionModel, Topic as TopicModel } from "../../interfaces
 import UserService from "../../services/UserService";
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
+import Fetcher from "../../services/Fetcher";
 
 import ActionButtons from "../util/ActionButtons.vue";
-import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 
 
 @Component({
@@ -140,6 +141,7 @@ import Question from "./Question.vue";
 export default class QuestionBrowser extends Vue {
 
     pTopics = [];
+    pData = {};
 
     questions: QuestionModel[] = [];
     searchedQuestions: QuestionModel[] = [];
@@ -149,16 +151,41 @@ export default class QuestionBrowser extends Vue {
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
 
+    updateTopics = topics => {
+        this.pTopics = topics;
+    };
+    updateQuestions = newQuestions => {
+        this.questions = newQuestions;
+    };
+    updateCompetencies = competency => {
+        this.pData = competency;
+    };
+
     @Lifecycle
-    async created() {
-        this.questions = await QuestionService.getRecommendedForUser(25);
+    created() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+
+        Fetcher.get(QuestionService.getRecommendedForUser)
+            .on(this.updateQuestions);
+
+        Fetcher.get(UserService.userCompetencies, {})
+            .on(this.updateCompetencies);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
+
+        Fetcher.get(QuestionService.getRecommendedForUser)
+            .off(this.updateQuestions);
+
+        Fetcher.get(UserService.userCompetencies)
+            .off(this.updateCompetencies);
     }
 
     get topics() {
-        this.pTopics = TopicService.getAllAvailableTopics(topics => {
-            this.pTopics = topics;
-        });
-
         return this.pTopics;
     }
 
@@ -202,7 +229,8 @@ export default class QuestionBrowser extends Vue {
     }
 
     generateCompetencies(itemsToInclude) {
-        return UserService.userCompetencies(itemsToInclude);
+        return this.pData;
+        //return UserService.userCompetencies(itemsToInclude, "goals");
     }
 
 }

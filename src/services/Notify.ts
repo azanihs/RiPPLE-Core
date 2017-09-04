@@ -4,20 +4,10 @@ let subscriptionCount = 0;
 
 const caches: WeakMap<Function, string> = new WeakMap();
 
-type CacheLog = {
-    // queue: {
-    //     param: any,
-    //     callback: Function
-    // }[],
-    cache: any[]
-};
-type CacheMap = WeakMap<Function, CacheLog>;
+type CacheMap = WeakMap<Function, Object[]>;
 
 const makeEmptyCache = () => {
-    return {
-        // queue: [],
-        cache: []
-    };
+    return [];
 };
 
 const subscriptionLookup = (subscription: Function) => {
@@ -30,17 +20,19 @@ const subscriptionLookup = (subscription: Function) => {
 
 const eventBus = new Vue();
 
-const pushNotify = (notify: Function, data: any) => {
-    if (typeof notify === "function") {
-        notify(data);
-    }
-};
-
 /**
  * @return <Boolean> True iff mutation happened
  */
 const mergeCache = cache => x => {
     if (cache.find(c => c.id === x.id) === undefined) {
+        cache.push(x);
+        return true;
+    }
+    return false;
+};
+
+const mergeStringCache = cache => x => {
+    if (cache.find(c => c === x) === undefined) {
         cache.push(x);
         return true;
     }
@@ -59,14 +51,13 @@ const every = forEach => cb => {
 
 
 export {
-    CacheLog,
     CacheMap,
 
     makeEmptyCache,
     subscriptionLookup,
 
-    pushNotify,
     mergeCache,
+    mergeStringCache,
     every,
     eventBus
 };

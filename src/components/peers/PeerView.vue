@@ -26,11 +26,12 @@ h1 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import UserService from "../../services/UserService";
+
 import TopicService from "../../services/TopicService";
+import Fetcher from "../../services/Fetcher";
+
 import AvailabilitySelector from "../util/AvailabilitySelector.vue";
 import RecommendationSearch from "./RecommendationSearch.vue";
-
 @Component({
     components: {
         AvailabilitySelector,
@@ -41,16 +42,23 @@ export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
     pTopics = [];
+    updateTopics = newTopics => {
+        this.pTopics = newTopics;
+    };
 
     @Lifecycle
     created() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
     }
 
     get topics() {
-        this.pTopics = TopicService.getAllAvailableTopics(topics => {
-            this.pTopics = topics;
-        });
-
         return this.pTopics;
     }
 }

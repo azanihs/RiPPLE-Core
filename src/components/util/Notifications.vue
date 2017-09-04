@@ -70,9 +70,10 @@ p+p {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 
 import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 @Component()
 export default class Notifications extends Vue {
@@ -83,8 +84,23 @@ export default class Notifications extends Vue {
     }) as number;
 
     pNotifications = [];
+    updateNotifications = newNotifications => {
+        this.pNotifications = newNotifications.slice(0, this.showCount);
+    };
 
     date = new Date();
+
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.getUserNotifications)
+            .on(this.updateNotifications);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getUserNotifications)
+            .off(this.updateNotifications);
+    }
 
     get notificationDate() {
         return `${this.date.getFullYear()}`.slice(2, 4)
@@ -99,10 +115,6 @@ export default class Notifications extends Vue {
     }
 
     get notifications() {
-        this.pNotifications = UserService.getUserNotifications(this.showCount, newNotifications => {
-            this.pNotifications = newNotifications;
-        });
-
         return this.pNotifications;
     }
 

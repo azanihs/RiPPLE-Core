@@ -72,6 +72,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 @Component()
 export default class LeaderBoard extends Vue {
@@ -83,6 +84,9 @@ export default class LeaderBoard extends Vue {
     reverse: boolean = false;
 
     pUsers = [];
+    updateUsers = newUsers => {
+        this.pUsers = newUsers;
+    };
 
     @Lifecycle
     created() {
@@ -90,7 +94,17 @@ export default class LeaderBoard extends Vue {
         this.$nextTick(() => {
             //this.$refs["pagination"]["totalItems"] = this.users.length;
         });
+
+        Fetcher.get(UserService.mostReputableUsers)
+            .on(this.updateUsers);
     }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.mostReputableUsers)
+            .off(this.updateUsers);
+    }
+
     updateShowItems(a) {
         this.itemsPerPage = a.size;
         this.pageIndex = a.page;
@@ -102,9 +116,6 @@ export default class LeaderBoard extends Vue {
     }
 
     get users() {
-        this.pUsers = UserService.mostReputableUsers(newUsers => {
-            this.pUsers = newUsers;
-        });
         return this.pUsers;
     }
 

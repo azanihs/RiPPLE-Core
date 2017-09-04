@@ -1,9 +1,7 @@
-import CacheService from "./CacheService";
 import BadgeRepository from "../repositories/BadgeRepository";
-import { pushNotify, every, mergeCache } from "./Notify";
 import { Badge } from "../interfaces/models";
 
-export default class BadgeService extends CacheService {
+export default class BadgeService {
     static badgeToIcon(badge: Badge): string {
         return [
             "alarm",
@@ -40,48 +38,26 @@ export default class BadgeService extends CacheService {
         ][badge.id] || "priority_high";
     }
 
-    static userHasBadge() {
-        const subscriptionName = BadgeService.userHasBadge;
-        const cache = BadgeService.getCache(subscriptionName).cache;
-
-        BadgeRepository.getAllUserBadges()
-            .then(badges => {
-                if (badges.every(mergeCache(cache))) {
-                    BadgeService.emit(subscriptionName, cache);
-                }
-            });
-        BadgeService.emit(subscriptionName, cache);
+    static userHasBadge({ badgeId }: { badgeId: number }) {
+        return BadgeRepository.getAllUserBadges()
+            .then(badges => badges.find(userBadge => userBadge.id === badgeId));
     }
 
     static getAllAvailableBadges() {
-        const subscriptionName = BadgeService.getAllAvailableBadges;
-        const cache = BadgeService.getCache(subscriptionName).cache;
-
-        BadgeRepository.getAllAvailableBadges()
-            .then(badges => {
-                if (every(badges)(mergeCache(cache))) {
-                    BadgeService.emit(subscriptionName, cache);
-                }
-            });
-        BadgeService.emit(subscriptionName, cache);
+        return BadgeRepository.getAllAvailableBadges();
     }
 
+    static getBadgesByCategory({ category }: { category: string }) {
+        return BadgeRepository.getAllAvailableBadges()
+            .then(badges => badges.filter(x => x.category === category));
+    }
+
+
     static getClosestUserBadges() {
-        const subscriptionName = BadgeService.getClosestUserBadges;
-        const cache = BadgeService.getCache(subscriptionName).cache;
-        BadgeRepository.getAllUserBadges()
+        return BadgeRepository.getAllUserBadges()
             .then(badges => badges.filter(x => x.progress > 0 && x.progress < 100)
                 .sort((a, b) => (b.progress - a.progress))
                 .slice(0, 3)
-                .map(x => x.badge))
-            .then(badges => {
-                if (cache.length !== badges.length || badges.every((x, i) => x !== cache[i])) {
-                    cache.splice(0, cache.length);
-                    badges.forEach(badge => cache.push(badge));
-                    BadgeService.emit(subscriptionName, cache);
-                }
-            });
-
-        BadgeService.emit(subscriptionName, cache);
+                .map(x => x.badge));
     }
 }

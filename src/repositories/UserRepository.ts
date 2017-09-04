@@ -140,6 +140,17 @@ export default class UserRepository {
         });
     }
 
+    static getUserCompetencies(): Promise<Object> {
+        return fetch(`//localhost:8000/questions/competencies/all/`)
+            .then(x => x.json())
+            .then(x => x.map(x => ({
+                source: x[0],
+                target: x[1],
+                competency: x[2],
+                attempts: x[3]
+            })));
+    }
+
     /*static userEngagementForType(type: string) {
         return userEngagementScores[type].map(x => ({
             source: x[0],

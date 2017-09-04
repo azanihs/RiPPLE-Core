@@ -86,7 +86,7 @@ import PropUpdate from "../mixins/PropUpdate";
 
 import { AcquiredBadge, Badge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
-import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 @Component()
 export default class UserBadge extends PropUpdate {
@@ -94,11 +94,22 @@ export default class UserBadge extends PropUpdate {
         required: true
     }) as Badge;
 
-    pUserHasBadge = undefined;
+    pUserBadge = undefined;
+
+    updateBadge = userBadge => {
+        this.pUserBadge = userBadge;
+    };
 
     @Lifecycle
     created() {
-        BadgeService.subscribe(BadgeService.userHasBadge, this.badge, this.updateProp("pUserHasBadge"));
+        Fetcher.get(BadgeService.userHasBadge, { badge: this.badge.id })
+            .on(this.updateBadge);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(BadgeService.userHasBadge, { badge: this.badge.id })
+            .off(this.updateBadge);
     }
 
     get badgeIcon() {
@@ -106,7 +117,7 @@ export default class UserBadge extends PropUpdate {
     }
 
     get userBadge(): AcquiredBadge {
-        return this.pUserHasBadge;
+        return this.pUserBadge;
     }
 
     get userHasBadge(): boolean {

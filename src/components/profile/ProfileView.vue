@@ -43,9 +43,9 @@
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
                 <!--<variable-data-visualiser class="componentSeparator"
-                                                  :dataCategories="engagementItems"
-                                                  :compareList="generateEngagement">
-                        </variable-data-visualiser>-->
+                                                                                                                                      :dataCategories="engagementItems"
+                                                                                                                                      :compareList="generateEngagement">
+                                                                                                            </variable-data-visualiser>-->
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -54,9 +54,9 @@
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
                 <!--<variable-data-visualiser class="componentSeparator"
-                                              :dataCategories="topics"
-                                              :compareList="generateCompetencies">
-                    </variable-data-visualiser>-->
+                                                                                                                                  :dataCategories="topics"
+                                                                                                                                  :compareList="generateCompetencies">
+                                                                                                        </variable-data-visualiser>-->
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -64,11 +64,10 @@
                     <h2>Connection Overview</h2>
                     <p>The connections overview will show you how you have connected to peers through Ripple.</p>
                 </overview-description>
-                <connectedness-heatmap v-if="profileData"
-                                       class="componentSeparator"
-                                       :user="profileData"
+                <connectedness-heatmap class="componentSeparator"
+                                       :connections="userConnections"
                                        :topics="topics"
-                                       :categories="categories"></connectedness-heatmap>
+                                       :categories="mentoringTypes"></connectedness-heatmap>
                 <connection-overview class="componentSeparator"></connection-overview>
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
@@ -181,15 +180,17 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
+
+import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 
-import Notifications from "../util/Notifications.vue";
-import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
-import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
-import ConnectionOverview from "./ConnectionOverview.vue";
-import OverviewDescription from "../util/OverviewDescription.vue";
 import CollectedBadges from "../util/CollectedBadges.vue";
+import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+import ConnectionOverview from "./ConnectionOverview.vue";
+import Notifications from "../util/Notifications.vue";
+import OverviewDescription from "../util/OverviewDescription.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 
 @Component({
     components: {
@@ -205,25 +206,63 @@ export default class DefaultView extends Vue {
 
     pTopics = [];
     pUser = undefined;
+    pEngagementItems = [];
+    pMentoringTypes = [];
+
+    updateEngagementItems = newEngagementItems => {
+        this.pEngagementItems = newEngagementItems;
+    };
+    updateMentoringTypes = newMentoringTypes => {
+        this.pMentoringTypes = newMentoringTypes;
+    };
+    updateUser = user => {
+        this.pUser = user;
+    };
+    updateTopics = topics => {
+        this.pTopics = topics;
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.getLoggedInUser)
+            .on(this.updateUser);
+        Fetcher.get(UserService.getAllAvailableEngagementTypes)
+            .on(this.updateEngagementItems);
+        Fetcher.get(UserService.getAllAvailableCategories)
+            .on(this.updateMentoringTypes);
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getLoggedInUser)
+            .off(this.updateUser);
+        Fetcher.get(UserService.getAllAvailableEngagementTypes)
+            .off(this.updateEngagementItems);
+        Fetcher.get(UserService.getAllAvailableCategories)
+            .off(this.updateMentoringTypes);
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
+    }
 
     get profileData() {
-        this.pUser = UserService.getLoggedInUser(user => {
-            this.pUser = user;
-        });
-
         return this.pUser;
     }
 
-    get topics() {
-        this.pTopics = TopicService.getAllAvailableTopics(topics => {
-            this.pTopics = topics;
-        });
+    get userConnections() {
+        if (this.pUser !== undefined) {
+            return this.pUser.connections;
+        }
+        return [];
+    }
 
+    get topics() {
         return this.pTopics;
     }
 
     get engagementItems() {
-        return UserService.getAllAvailableEngagementTypes();
+        return this.pEngagementItems;
     }
 
     get engagementSummary() {
@@ -240,15 +279,17 @@ export default class DefaultView extends Vue {
     }
 
     generateEngagement(itemsToInclude) {
-        return UserService.getEngagementScores(itemsToInclude);
+        return [];
+        // return UserService.getEngagementScores(itemsToInclude);
     }
 
     get mentoringTypes() {
-        return UserService.getAllAvailableMentoringTypes();
+        return this.pMentoringTypes;
     }
 
     generateCompetencies(itemsToInclude) {
-        return UserService.userCompetencies(itemsToInclude);
+        return [];
+        // return UserService.userCompetencies(itemsToInclude);
     }
 
 }

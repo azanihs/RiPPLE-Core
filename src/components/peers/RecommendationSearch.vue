@@ -109,7 +109,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Mixin, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
 import { Topic } from "../../interfaces/models";
 
@@ -124,7 +124,7 @@ import PropUpdate from "../mixins/PropUpdate";
         RecommendationCard
     }
 })
-export default class RecommendationSearch extends Mixin(PropUpdate) {
+export default class RecommendationSearch extends Vue {
     @Prop
     searchTypes = p<string[]>({
         required: true,
@@ -145,13 +145,13 @@ export default class RecommendationSearch extends Mixin(PropUpdate) {
 
     @Lifecycle
     created() {
-        UserService.subscribe("getRecommenedConnections", this.PropUpdate("pRecommendations"));
-        UserService.unsubscribe("getOutstandingRequests", this.PropUpdate("pRequests"));
+        //UserService.subscribe("getRecommenedConnections", this.PropUpdate("pRecommendations"));
+        //UserService.unsubscribe("getOutstandingRequests", this.PropUpdate("pRequests"));
 
-        this.competencies = UserService.userCompetencies(this.topics)
+        /*this.competencies = UserService.userCompetencies(this.topics)
             .ownScores
             .filter(x => x.source == x.target)
-            .map(x => x.competency);
+            .map(x => x.competency);*/
     }
 
     get recommendations() {

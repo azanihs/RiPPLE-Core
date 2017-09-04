@@ -145,21 +145,19 @@ export default class QuestionSearch extends Vue {
     }
 
     applyFilters() {
-        this.searchInFlight = true;
-        QuestionService.search(this.search, result => {
-            this.searchInFlight = false;
-            this.$emit("searched", result);
-        });
+        QuestionService.search(this.search)
+            .then(searchResult => {
+                this.$emit("searched", searchResult);
+            });
     }
 
     @Watch("search", { deep: true })
     searchWatch() {
-        if (this.searchInFlight !== false) {
-            return;
-        } else if (this.timeoutId !== undefined) {
+        if (this.timeoutId !== undefined) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = setTimeout(this.applyFilters, 250);
+
+        this.timeoutId = setTimeout((() => this.applyFilters()), 250);
     }
 
     @Watch("availableQuestions")

@@ -80,28 +80,27 @@ td:hover {
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component } from "av-ts";
+import { Vue, Prop, Lifecycle, Component, Watch } from "av-ts";
 
 @Component()
 export default class ConnectednessHeatmap extends Vue {
-    @Prop user;
+    @Prop connections;
     @Prop topics;
     @Prop categories;
 
     renderWeights = {};
 
     renderColor(category, topic) {
-        const max = this.user.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
+        const max = this.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
         const weight = (this.renderWeights[category] && this.renderWeights[category][topic]) || 0;
         return {
             background: `rgba(34, 85, 102, ${weight / max})`
         };
     }
 
-    @Lifecycle
-    created() {
+    updatedCategories() {
         this.categories.forEach(category => {
-            this.renderWeights[category] = this.user.connections
+            this.renderWeights[category] = this.connections
                 .filter(x => x.type == category)
                 .reduce((categoryWeight, connection) => {
                     if (categoryWeight[connection.topic] === undefined) {
@@ -112,6 +111,16 @@ export default class ConnectednessHeatmap extends Vue {
                     return categoryWeight;
                 }, {});
         });
+    }
+
+    @Watch("categories")
+    changeCategories() {
+        this.updatedCategories();
+    }
+
+    @Lifecycle
+    created() {
+        this.updatedCategories();
     }
 }
 </script>
