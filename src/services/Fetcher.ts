@@ -51,6 +51,10 @@ export default class Fetcher<T extends any> {
             });
     }
 
-    on = (callback: Function) => Fetcher.sharedBus.$on(this.identifier, callback);
+    on = (callback: Function) => {
+        Fetcher.sharedBus.$on(this.identifier, callback);
+        this.run();
+    };
+
     off = (callback: Function) => Fetcher.sharedBus.$off(this.identifier, callback);
 }

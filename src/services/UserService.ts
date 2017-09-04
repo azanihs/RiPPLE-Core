@@ -94,6 +94,6 @@ export default class UserService {
     }
 
     static getMeetingHistory() {
-        return UserRepository.getAllAvailableCategories();
+        return UserRepository.getMeetingHistory();
     }
 }

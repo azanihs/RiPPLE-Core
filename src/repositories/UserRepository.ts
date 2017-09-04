@@ -151,6 +151,14 @@ export default class UserRepository {
             })));
     }
 
+    static getMeetingHistory(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(["Toowong", "UQ", "University Of Queensland", "Kenmore", "Indro"]);
+            }, Math.random() * 1000);
+        });
+    }
+
     /*static userEngagementForType(type: string) {
         return userEngagementScores[type].map(x => ({
             source: x[0],

@@ -114,10 +114,9 @@ import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { Topic } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 import RecommendationCard from "./RecommendationCard.vue";
-
-import PropUpdate from "../mixins/PropUpdate";
 
 @Component({
     components: {
@@ -143,8 +142,20 @@ export default class RecommendationSearch extends Vue {
     pRecommendations = [];
     pRequests = [];
 
+    updateConnections(newConnections) {
+        this.pRecommendations = newConnections;
+    }
+    updateRequests(newRequests) {
+        this.pRequests = newRequests;
+    }
+
     @Lifecycle
     created() {
+        Fetcher.get(UserService.getRecommendedConnections, { count: 3 })
+            .on(this.updateConnections);
+        Fetcher.get(UserService.getOutstandingRequests, { count: 3 })
+            .on(this.updateRequests);
+
         //UserService.subscribe("getRecommenedConnections", this.PropUpdate("pRecommendations"));
         //UserService.unsubscribe("getOutstandingRequests", this.PropUpdate("pRequests"));
 
@@ -152,6 +163,10 @@ export default class RecommendationSearch extends Vue {
             .ownScores
             .filter(x => x.source == x.target)
             .map(x => x.competency);*/
+    }
+    @Lifecycle
+    destroyed() {
+
     }
 
     get recommendations() {

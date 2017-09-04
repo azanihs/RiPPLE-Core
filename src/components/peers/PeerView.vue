@@ -1,8 +1,8 @@
 <template>
-    <md-layout md-flex="100">
+    <md-layout md-flex="100"
+               class="topPadding">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <h1>Availability</h1>
             <availability-selector @change="shuffleData(null)"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
@@ -15,8 +15,8 @@
 </template>
 
 <style scoped>
-h1 {
-    width: 100%;
+.topPadding {
+    padding-top: 16px;
 }
 
 .md-tabs {
@@ -42,7 +42,7 @@ export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
     pTopics = [];
-    updateTopics = newTopics => {
+    updateTopics(newTopics) {
         this.pTopics = newTopics;
     };
 

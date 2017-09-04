@@ -23,8 +23,8 @@
             <md-input-container class="autoComplete">
                 <label>Meeting Location</label>
                 <md-autocomplete v-model="meetingLocation"
-                                 :list="meetingHistory"
-                                 :filter-list="findItem"></md-autocomplete>
+                                 :filterList="findItem"
+                                 :list="meetingHistory"></md-autocomplete>
             </md-input-container>
 
         </md-card-content>
@@ -74,10 +74,11 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { User } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
 
@@ -91,10 +92,21 @@ export default class RecommendationCard extends Vue {
         required: true
     }) as User;
 
+    pMeetingHistory = [];
+    updateMeetingHistory(newHistory) {
+        this.pMeetingHistory = newHistory;
+    }
+
     meetingLocation = "";
 
-    findItem(possibleList) {
-        return possibleList.filter(x => x.name.toLowerCase().indexOf(this.meetingLocation.toLowerCase()) >= 0);
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.getMeetingHistory)
+            .on(this.updateMeetingHistory);
+    }
+
+    findItem(list, possibleList) {
+        return possibleList.filter(x => x.toLowerCase().indexOf(this.meetingLocation.toLowerCase()) >= 0);
     }
 
     get meetingTime() {
@@ -105,8 +117,9 @@ export default class RecommendationCard extends Vue {
         const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;
         return date + " " + time;
     }
+
     get meetingHistory() {
-        return UserService.getMeetingHistory();
+        return this.pMeetingHistory;
     }
 }
 </script>

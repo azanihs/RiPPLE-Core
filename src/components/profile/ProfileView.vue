@@ -43,9 +43,9 @@
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
                 <!--<variable-data-visualiser class="componentSeparator"
-                                                                                                                                      :dataCategories="engagementItems"
-                                                                                                                                      :compareList="generateEngagement">
-                                                                                                            </variable-data-visualiser>-->
+                                                                                                                                          :dataCategories="engagementItems"
+                                                                                                                                          :compareList="generateEngagement">
+                                                                                                                </variable-data-visualiser>-->
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -54,9 +54,9 @@
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
                 <!--<variable-data-visualiser class="componentSeparator"
-                                                                                                                                  :dataCategories="topics"
-                                                                                                                                  :compareList="generateCompetencies">
-                                                                                                        </variable-data-visualiser>-->
+                                                                                                                                      :dataCategories="topics"
+                                                                                                                                      :compareList="generateCompetencies">
+                                                                                                            </variable-data-visualiser>-->
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -209,16 +209,16 @@ export default class DefaultView extends Vue {
     pEngagementItems = [];
     pMentoringTypes = [];
 
-    updateEngagementItems = newEngagementItems => {
+    updateEngagementItems(newEngagementItems) {
         this.pEngagementItems = newEngagementItems;
     };
-    updateMentoringTypes = newMentoringTypes => {
+    updateMentoringTypes(newMentoringTypes) {
         this.pMentoringTypes = newMentoringTypes;
     };
-    updateUser = user => {
+    updateUser(user) {
         this.pUser = user;
     };
-    updateTopics = topics => {
+    updateTopics(topics) {
         this.pTopics = topics;
     };
 

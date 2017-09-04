@@ -96,7 +96,7 @@ export default class UserBadge extends PropUpdate {
 
     pUserBadge = undefined;
 
-    updateBadge = userBadge => {
+    updateBadge(userBadge) {
         this.pUserBadge = userBadge;
     };
 

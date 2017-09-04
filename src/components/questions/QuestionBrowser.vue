@@ -151,13 +151,13 @@ export default class QuestionBrowser extends Vue {
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
 
-    updateTopics = topics => {
+    updateTopics(topics) {
         this.pTopics = topics;
     };
-    updateQuestions = newQuestions => {
+    updateQuestions(newQuestions) {
         this.questions = newQuestions;
     };
-    updateCompetencies = competency => {
+    updateCompetencies(competency) {
         this.pData = competency;
     };
 

@@ -42,7 +42,7 @@ import Fetcher from "../../services/Fetcher";
 export default class ConnectionOverview extends Vue {
 
     pPeers = [];
-    updatePeers = newPeers => {
+    updatePeers(newPeers) {
         this.pPeers = newPeers;
     };
 

@@ -84,7 +84,7 @@ export default class LeaderBoard extends Vue {
     reverse: boolean = false;
 
     pUsers = [];
-    updateUsers = newUsers => {
+    updateUsers(newUsers) {
         this.pUsers = newUsers;
     };
 

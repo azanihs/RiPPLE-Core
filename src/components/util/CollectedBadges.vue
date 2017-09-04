@@ -52,9 +52,9 @@ export default class CollectedBadges extends PropUpdate {
     @Prop topic = p(String);
 
     availableBadges = [];
-
     fetcherInstance = undefined;
-    updateAvailableBadges = newBadges => {
+
+    updateAvailableBadges(newBadges) {
         this.availableBadges = newBadges;
     };
 

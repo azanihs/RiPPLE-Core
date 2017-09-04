@@ -209,7 +209,7 @@ import Fetcher from "./services/Fetcher";
 export default class Main extends Vue {
 
     pUser = undefined;
-    updateUser = user => {
+    updateUser(user) {
         this.pUser = user;
     };
 

@@ -1,10 +1,10 @@
 <template>
     <md-layout>
-        <h2>
-            <md-icon>access_time</md-icon>
-            Select your weekly availability so that we can match you up with people who have similar schedules
-        </h2>
         <md-card>
+            <h2>
+                <md-icon>access_time</md-icon>
+                Select your weekly availability so that we can match you up with people who have similar schedules
+            </h2>
             <table class="table">
                 <thead>
                     <tr>
@@ -14,7 +14,7 @@
                         </th>
                     </tr>
                 </thead>
-    
+
                 <tbody>
                     <tr v-for="activity in preferenceActivities"
                         :key="activity">
@@ -38,6 +38,7 @@
 <style scoped>
 h2 {
     width: 100%;
+    min-width: 100%;
 }
 
 .table {
