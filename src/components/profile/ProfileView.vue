@@ -17,9 +17,9 @@
                     </md-layout>
                     <md-layout class="engagementSummary">
                         <md-card v-for="item in engagementSummary"
-                                 :key="item.name"
+                                 :key="item.node.id"
                                  class="engagementItem">
-                            <h3>{{item.name}}</h3>
+                            <h3>{{item.node.name}}</h3>
                             <div class="engagementScore">
                                 <div class="engagementButton">
                                     {{item.score}}
@@ -42,10 +42,10 @@
                     <h2>Engagement Overview</h2>
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
-                <!--<variable-data-visualiser class="componentSeparator"
-                                                                                                                                          :dataCategories="engagementItems"
-                                                                                                                                          :compareList="generateEngagement">
-                                                                                                                </variable-data-visualiser>-->
+                <variable-data-visualiser class="componentSeparator"
+                                          :dataCategories="engagementItems"
+                                          :compareList="generateEngagement">
+                </variable-data-visualiser>
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
             <md-tab md-label="Competencies">
@@ -53,10 +53,10 @@
                     <h2>Competency Overview</h2>
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
-                <!--<variable-data-visualiser class="componentSeparator"
-                                                                                                                                      :dataCategories="topics"
-                                                                                                                                      :compareList="generateCompetencies">
-                                                                                                            </variable-data-visualiser>-->
+                <variable-data-visualiser class="componentSeparator"
+                                          :dataCategories="topics"
+                                          :compareList="generateCompetencies">
+                </variable-data-visualiser>
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
             <md-tab md-label="Connections">
@@ -207,8 +207,12 @@ export default class DefaultView extends Vue {
     pTopics = [];
     pUser = undefined;
     pEngagementItems = [];
+    pEngagementSummary = [];
     pMentoringTypes = [];
 
+    updateEngagementSummary(newSummary) {
+        this.pEngagementSummary = newSummary;
+    };
     updateEngagementItems(newEngagementItems) {
         this.pEngagementItems = newEngagementItems;
     };
@@ -232,6 +236,8 @@ export default class DefaultView extends Vue {
             .on(this.updateMentoringTypes);
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateTopics);
+        Fetcher.get(UserService.getEngagementSummary)
+            .on(this.updateEngagementSummary);
     }
 
     @Lifecycle
@@ -244,6 +250,8 @@ export default class DefaultView extends Vue {
             .off(this.updateMentoringTypes);
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
+        Fetcher.get(UserService.getEngagementSummary)
+            .off(this.updateEngagementSummary);
     }
 
     get profileData() {
@@ -266,21 +274,11 @@ export default class DefaultView extends Vue {
     }
 
     get engagementSummary() {
-        return [];
-        /*const { ownScores } = UserService.getEngagementScores(this.engagementItems);
-
-        // Return all self-loops competencies.
-        return ownScores
-            .filter(x => x.target == x.source)
-            .map(x => ({
-                name: x.target.id,
-                score: x.competency
-            }));*/
+        return this.pEngagementSummary;
     }
 
     generateEngagement(itemsToInclude) {
-        return [];
-        // return UserService.getEngagementScores(itemsToInclude);
+        return UserService.getEngagementScores;
     }
 
     get mentoringTypes() {
@@ -288,8 +286,7 @@ export default class DefaultView extends Vue {
     }
 
     generateCompetencies(itemsToInclude) {
-        return [];
-        // return UserService.userCompetencies(itemsToInclude);
+        return UserService.userCompetencies;
     }
 
 }

@@ -6,9 +6,6 @@ import TopicRepository from "../repositories/TopicRepository";
 
 export default class UserService {
     static generateGraph(sourceData: Edge[], otherData: Edge[]) {
-        // const sourceData = data[0].map(TopicRepository.topicPointer);
-        // const otherData = data[1].map(TopicRepository.topicPointer);
-
         // Only keep edges where target && source appear in topicsToInclude
         // TODO: Move to the vue model when ready to re-implement
         /*const flattenAndFilter = topics => topics
@@ -16,11 +13,8 @@ export default class UserService {
             .filter(x => topicsToInclude.find(topic => topic == x.source)
                 && topicsToInclude.find(topic => topic == x.target));*/
 
-        //const ownScores = flattenAndFilter(topicsToInclude.map(sourceData));
-        //const userGoals = flattenAndFilter(topicsToInclude.map(otherData));
         const ownScores = sourceData;
         const userGoals = otherData;
-
         const topics = ownScores
             .map(x => x.source)
             .concat(ownScores.map(x => x.target))
@@ -44,7 +38,8 @@ export default class UserService {
     }
 
     static getEngagementScores(itemsToInclude: string[], compareTo: string) {
-        // return UserService.generateGraph(itemsToInclude, UserRepository.serverAggregate("engagement"), UserRepository.serverAggregate(compareTo));
+        return Promise.all([UserRepository.getUserEngagement(), UserRepository.getUserEngagement()])
+            .then(data => UserService.generateGraph(data[0], data[1]));
     }
 
     static getAllAvailableEngagementTypes() {
@@ -53,6 +48,14 @@ export default class UserService {
 
     static getUserPeers({ connectionCount }: { connectionCount: number }) {
         return UserRepository.getUserConnections(connectionCount);
+    }
+    static getEngagementSummary() {
+        return UserRepository.getUserEngagement()
+            .then(edges => edges.filter(x => x.target == x.source)
+                .map(x => ({
+                    node: x.target,
+                    score: x.competency
+                })));
     }
 
     static getLoggedInUser() {

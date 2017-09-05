@@ -43,23 +43,25 @@ const notifications = new Array(50).fill(0).map(x => ({
     read: !!(Math.random() < 0.5)
 }));
 
-const userEngagementScores = {};
-const engagementNodes = engagementTypes.map(x => {
-    const engagementNode = {
-        id: x,
-        name: ""
-    };
+const engagementNodes = engagementTypes.map(x => ({
+    id: x,
+    name: x
+}));
+
+const userEngagementScores = [];
+engagementNodes.forEach(engagementNode => {
     // Ensure at least one self-loop per topic
-    userEngagementScores[x] = [[engagementNode, engagementNode,
-        Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
-    return engagementNode;
-});
-engagementNodes.forEach(x => {
+    userEngagementScores.push([engagementNode, engagementNode,
+        Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+
     const randomNode = engagementNodes[Math.floor(Math.random() * engagementNodes.length)];
-    if (randomNode == x) {
+    if (randomNode == engagementNode) {
         return;
     }
-    userEngagementScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+
+    userEngagementScores.push([engagementNode, randomNode,
+        Math.floor(Math.random() * 100),
+        Math.floor(Math.random() * 100)]);
 });
 
 const makeUser = () => {
@@ -133,10 +135,10 @@ export default class UserRepository {
         });
     }
 
-    static getAllAvailableEngagementTypes(): Promise<string[]> {
+    static getAllAvailableEngagementTypes(): Promise<{ id: string, name: string }[]> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve(engagementTypes.slice());
+                resolve(engagementNodes);
             }, Math.random() * 1000);
         });
     }
@@ -153,6 +155,22 @@ export default class UserRepository {
                 };
                 return edge;
             }));
+    }
+
+    static getUserEngagement(): Promise<Edge[]> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(userEngagementScores.map(x => {
+                    const edge: Edge = {
+                        source: x[0] as Topic,
+                        target: x[1] as Topic,
+                        competency: x[2],
+                        attempts: x[3]
+                    };
+                    return edge;
+                }));
+            }, Math.random() * 1000);
+        });
     }
 
     static getMeetingHistory(): Promise<string[]> {

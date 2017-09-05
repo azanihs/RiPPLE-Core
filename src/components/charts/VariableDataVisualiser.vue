@@ -191,14 +191,13 @@ export default class VariableDataVisualiser extends Vue {
     set chart(newVal: string) {
         this.pChartType = newVal;
 
-        this.compareList()({ compareTo: "goals" })
+        this.compareList()({ compareTo: this.compare })
             .then(results => {
                 const { topics, ownScores, compareAgainst } = results;
 
                 let compareResults = compareAgainst.map(x => x);
                 let ownResults = ownScores.map(x => x);
                 let dataTopics = topics;
-
                 if (this.chart != "topicDependency") {
                     // Get all self loops from edge list, and use that competency.
                     const findOrEmpty = x => search => {
