@@ -143,7 +143,7 @@ export default class QuestionBrowser extends Vue {
     pTopics = [];
     pData = {};
 
-    questions: QuestionModel[] = [];
+    pQuestions: QuestionModel[] = [];
     searchedQuestions: QuestionModel[] = [];
 
     topicsToUse: TopicModel[] = [];
@@ -155,7 +155,7 @@ export default class QuestionBrowser extends Vue {
         this.pTopics = topics;
     };
     updateQuestions(newQuestions) {
-        this.questions = newQuestions;
+        this.pQuestions = newQuestions;
     };
     updateCompetencies(competency) {
         this.pData = competency;
@@ -191,6 +191,10 @@ export default class QuestionBrowser extends Vue {
 
     get showQuestions() {
         return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
+    }
+
+    get questions() {
+        return this.pQuestions;
     }
 
     @Watch("selectedQuestion")
@@ -229,8 +233,9 @@ export default class QuestionBrowser extends Vue {
     }
 
     generateCompetencies(itemsToInclude) {
-        return this.pData;
-        //return UserService.userCompetencies(itemsToInclude, "goals");
+        // return this.pData;
+        // return UserService.userCompetencies({ compareTo: "goals" });
+        return UserService.userCompetencies;
     }
 
 }

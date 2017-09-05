@@ -178,6 +178,8 @@ export default class VariableDataVisualiser extends Vue {
         default: "bar"
     }) as string;
 
+
+    pChartData = {};
     hiddenData = {};
     pChartType: string = "";
     pCompareAgainst: string = "Personal Goals";
@@ -185,8 +187,76 @@ export default class VariableDataVisualiser extends Vue {
     get chart() {
         return this.pChartType || this.chartType;
     }
+
     set chart(newVal: string) {
         this.pChartType = newVal;
+
+        this.compareList()({ compareTo: "goals" })
+            .then(results => {
+                const { topics, ownScores, compareAgainst } = results;
+
+                let compareResults = compareAgainst.map(x => x);
+                let ownResults = ownScores.map(x => x);
+                let dataTopics = topics;
+
+                if (this.chart != "topicDependency") {
+                    // Get all self loops from edge list, and use that competency.
+                    // TODO: Fix
+                    compareResults = compareAgainst.filter(x => x.source == x.target).map(x => x.competency);
+                    ownResults = ownScores.filter(x => x.source == x.target).map(x => x.competency);
+                    dataTopics = topics.map(x => x.id);
+                }
+
+                const ownData = {
+                    data: ownResults,
+                    label: "Your Results",
+                    backgroundColor: ownResults.map(x => this.getColour(x) + "0.4)"),
+                    borderColor: ownResults.map(x => this.getColour(x) + "1)"),
+                    borderWidth: 2
+                };
+
+                const compareData = {
+                    data: compareResults,
+                    label: this.compare,
+                    type: "line",
+                    pointStyle: "triangle",
+                    backgroundColor: "rgba(29, 50, 58, 0.6)",
+                    showLine: false,
+                    pointBorderColor: "rgba(29, 50, 58, 0.6)",
+                    pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
+                };
+
+                const chartData = {
+                    data: {
+                        labels: dataTopics,
+                        datasets: [ownData, compareData]
+                    },
+                    options: {
+                        scale: {
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                };
+                console.log(chartData);
+
+                if (this.chart == "radar") {
+                    Object.assign(compareData, {
+                        type: "radar",
+                        pointStyle: "default",
+                        backgroundColor: "rgba(0, 0, 0, 0.4)",
+                        pointBorderColor: "rgba(0, 0, 0, 0.6)",
+                        pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
+                    });
+                    Object.assign(ownData, {
+                        backgroundColor: ownData.backgroundColor[0],
+                        borderColor: ownData.borderColor[0]
+                    });
+                }
+
+                this.pChartData = chartData;
+            });
     }
 
     get compare() {
@@ -245,67 +315,7 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     get chartData() {
-        const items = this.dataCategories.filter(x => !this.isDisabled(x));
-        const { topics, ownScores, compareAgainst } = this.compareList(items);
-
-        let compareResults = compareAgainst.map(x => x);
-        let ownResults = ownScores.map(x => x);
-        let dataTopics = topics;
-        if (this.chart != "topicDependency") {
-            // Get all self loops from edge list, and use that competency.
-            compareResults = compareAgainst.filter(x => x.source == x.target).map(x => x.competency);
-            ownResults = ownScores.filter(x => x.source == x.target).map(x => x.competency);
-            dataTopics = topics.map(x => x.id);
-        }
-
-        const ownData = {
-            data: ownResults,
-            label: "Your Results",
-            backgroundColor: ownResults.map(x => this.getColour(x) + "0.4)"),
-            borderColor: ownResults.map(x => this.getColour(x) + "1)"),
-            borderWidth: 2
-        };
-
-        const compareData = {
-            data: compareResults,
-            label: this.compare,
-            type: "line",
-            pointStyle: "triangle",
-            backgroundColor: "rgba(29, 50, 58, 0.6)",
-            showLine: false,
-            pointBorderColor: "rgba(29, 50, 58, 0.6)",
-            pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
-        };
-
-        const chartData = {
-            data: {
-                labels: dataTopics,
-                datasets: [ownData, compareData]
-            },
-            options: {
-                scale: {
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        };
-
-        if (this.chart == "radar") {
-            Object.assign(compareData, {
-                type: "radar",
-                pointStyle: "default",
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                pointBorderColor: "rgba(0, 0, 0, 0.6)",
-                pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
-            });
-            Object.assign(ownData, {
-                backgroundColor: ownData.backgroundColor[0],
-                borderColor: ownData.borderColor[0]
-            });
-        }
-
-        return chartData;
+        return this.pChartData;
     }
 }
 </script>

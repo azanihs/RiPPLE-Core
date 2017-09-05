@@ -102,13 +102,13 @@ export default class UserBadge extends PropUpdate {
 
     @Lifecycle
     created() {
-        Fetcher.get(BadgeService.userHasBadge, { badge: this.badge.id })
+        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.id })
             .on(this.updateBadge);
     }
 
     @Lifecycle
     destroyed() {
-        Fetcher.get(BadgeService.userHasBadge, { badge: this.badge.id })
+        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.id })
             .off(this.updateBadge);
     }
 

@@ -40,7 +40,7 @@ export default class BadgeService {
 
     static userHasBadge({ badgeId }: { badgeId: number }) {
         return BadgeRepository.getAllUserBadges()
-            .then(badges => badges.find(userBadge => userBadge.id === badgeId));
+            .then(badges => badges.find(userBadge => userBadge.badge.id === badgeId));
     }
 
     static getAllAvailableBadges() {
