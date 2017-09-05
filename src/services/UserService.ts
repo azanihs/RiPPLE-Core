@@ -1,48 +1,46 @@
 import { every, mergeCache, mergeStringCache } from "./Notify";
 
-import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
-// import CacheService from "./CacheService";
 
 export default class UserService {
-    static generateGraph(sourceData, otherData) {
-        return Promise.all([sourceData, otherData])
-            .then(data => {
-                const sourceData = data[0].map(TopicRepository.topicPointer);
-                const otherData = data[1].map(TopicRepository.topicPointer);
+    static generateGraph(sourceData: Edge[], otherData: Edge[]) {
+        // const sourceData = data[0].map(TopicRepository.topicPointer);
+        // const otherData = data[1].map(TopicRepository.topicPointer);
 
-                // Only keep edges where target && source appear in topicsToInclude
-                /*const flattenAndFilter = topics => topics
-                    .reduce((a, b) => a.concat(b), [])
-                    .filter(x => topicsToInclude.find(topic => topic == x.source)
-                        && topicsToInclude.find(topic => topic == x.target));*/
+        // Only keep edges where target && source appear in topicsToInclude
+        // TODO: Move to the vue model when ready to re-implement
+        /*const flattenAndFilter = topics => topics
+            .reduce((a, b) => a.concat(b), [])
+            .filter(x => topicsToInclude.find(topic => topic == x.source)
+                && topicsToInclude.find(topic => topic == x.target));*/
 
-                //const ownScores = flattenAndFilter(topicsToInclude.map(sourceData));
-                //const userGoals = flattenAndFilter(topicsToInclude.map(otherData));
-                const ownScores = sourceData;
-                const userGoals = otherData;
+        //const ownScores = flattenAndFilter(topicsToInclude.map(sourceData));
+        //const userGoals = flattenAndFilter(topicsToInclude.map(otherData));
+        const ownScores = sourceData;
+        const userGoals = otherData;
 
-                const topics = ownScores
-                    .map(x => x.source)
-                    .reduce((carry, topicNode) => {
-                        if (!carry.find(x => x == topicNode)) {
-                            carry.push(topicNode);
-                        }
-                        return carry;
-                    }, []);
-                return {
-                    topics: topics, // Node List
-                    ownScores: ownScores, // Edge list of self
-                    compareAgainst: userGoals // Edge list of other
-                };
-            });
+        const topics = ownScores
+            .map(x => x.source)
+            .concat(ownScores.map(x => x.target))
+            .reduce((carry: Topic[], topicNode: Topic) => {
+                if (!carry.find(x => x == topicNode)) {
+                    carry.push(topicNode);
+                }
+                return carry;
+            }, []);
+
+        return {
+            topics: topics, // Node List
+            ownScores: ownScores, // Edge list of self
+            compareAgainst: userGoals // Edge list of other
+        };
     }
 
     static userCompetencies({ compareTo }: { compareTo: string }) {
-        return UserService.generateGraph(
-            UserRepository.getUserCompetencies(),
-            UserRepository.getUserCompetencies());
+        return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getUserCompetencies()])
+            .then(data => UserService.generateGraph(data[0], data[1]));
     }
 
     static getEngagementScores(itemsToInclude: string[], compareTo: string) {

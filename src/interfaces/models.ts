@@ -87,3 +87,10 @@ export interface Notification {
     content: string,
     read: boolean
 };
+
+export interface Edge {
+    source: Topic,
+    target: Topic,
+    competency: number,
+    attempts: number
+};

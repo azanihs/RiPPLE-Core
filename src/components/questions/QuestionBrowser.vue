@@ -233,8 +233,6 @@ export default class QuestionBrowser extends Vue {
     }
 
     generateCompetencies(itemsToInclude) {
-        // return this.pData;
-        // return UserService.userCompetencies({ compareTo: "goals" });
         return UserService.userCompetencies;
     }
 

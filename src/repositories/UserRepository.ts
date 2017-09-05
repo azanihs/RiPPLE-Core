@@ -1,4 +1,5 @@
-import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
+import TopicRepository from "./TopicRepository";
 import faker from "faker";
 
 const f: any = faker;
@@ -140,15 +141,18 @@ export default class UserRepository {
         });
     }
 
-    static getUserCompetencies(): Promise<Object> {
+    static getUserCompetencies(): Promise<Edge[]> {
         return fetch(`//localhost:8000/questions/competencies/all/`)
             .then(x => x.json())
-            .then(x => x.map(x => ({
-                source: x[0],
-                target: x[1],
-                competency: x[2],
-                attempts: x[3]
-            })));
+            .then(x => x.map(x => {
+                const edge: Edge = {
+                    source: TopicRepository.topicPointer(x[0]),
+                    target: TopicRepository.topicPointer(x[1]),
+                    competency: x[2],
+                    attempts: x[3]
+                };
+                return edge;
+            }));
     }
 
     static getMeetingHistory(): Promise<string[]> {

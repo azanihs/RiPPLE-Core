@@ -149,7 +149,7 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Topic } from "../../interfaces/models";
 
 import TopicChip from "../util/TopicChip.vue";
@@ -179,7 +179,7 @@ export default class VariableDataVisualiser extends Vue {
     }) as string;
 
 
-    pChartData = {};
+    pChartData: any = {};
     hiddenData = {};
     pChartType: string = "";
     pCompareAgainst: string = "Personal Goals";
@@ -201,10 +201,17 @@ export default class VariableDataVisualiser extends Vue {
 
                 if (this.chart != "topicDependency") {
                     // Get all self loops from edge list, and use that competency.
-                    // TODO: Fix
-                    compareResults = compareAgainst.filter(x => x.source == x.target).map(x => x.competency);
-                    ownResults = ownScores.filter(x => x.source == x.target).map(x => x.competency);
-                    dataTopics = topics.map(x => x.id);
+                    const findOrEmpty = x => search => {
+                        return search.find(s => s.source === x && s.target === x) || {
+                            target: x,
+                            source: x,
+                            competency: 5,
+                            attempts: 0
+                        };
+                    };
+                    compareResults = topics.map(topic => findOrEmpty(topic)(compareAgainst)).map(x => x.competency);
+                    ownResults = topics.map(topic => findOrEmpty(topic)(ownScores)).map(x => x.competency);
+                    dataTopics = topics.map(x => x.name);
                 }
 
                 const ownData = {
@@ -236,24 +243,16 @@ export default class VariableDataVisualiser extends Vue {
                             ticks: {
                                 beginAtZero: true
                             }
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    max: 100
+                                }
+                            }]
                         }
                     }
                 };
-                console.log(chartData);
-
-                if (this.chart == "radar") {
-                    Object.assign(compareData, {
-                        type: "radar",
-                        pointStyle: "default",
-                        backgroundColor: "rgba(0, 0, 0, 0.4)",
-                        pointBorderColor: "rgba(0, 0, 0, 0.6)",
-                        pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
-                    });
-                    Object.assign(ownData, {
-                        backgroundColor: ownData.backgroundColor[0],
-                        borderColor: ownData.borderColor[0]
-                    });
-                }
 
                 this.pChartData = chartData;
             });
@@ -296,8 +295,8 @@ export default class VariableDataVisualiser extends Vue {
         this.$el.querySelector(".chartContainer")["style"].height = dim.height + "px";
     }
 
-    @Lifecycle
-    created() {
+    @Watch("dataCategories")
+    changedDataCategories() {
         this.$emit("changeTopics", this.dataCategories);
     }
 
@@ -315,7 +314,26 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     get chartData() {
+        if (this.pChartData.data !== undefined) {
+            const ownData = this.pChartData.data.datasets[0];
+            const compareData = this.pChartData.data.datasets[1];
+            if (this.chart == "radar") {
+                Object.assign(compareData, {
+                    type: "radar",
+                    pointStyle: "default",
+                    backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    pointBorderColor: "rgba(0, 0, 0, 0.6)",
+                    pointBackgroundColor: "rgba(0, 0, 0, 0.6)"
+                });
+                delete this.pChartData.options.scales;
+                Object.assign(ownData, {
+                    backgroundColor: ownData.backgroundColor[0],
+                    borderColor: ownData.borderColor[0]
+                });
+            }
+        }
         return this.pChartData;
     }
+
 }
 </script>
