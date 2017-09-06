@@ -1,6 +1,5 @@
 <template>
-    <div v-if="type != 'topicDependency'"
-         class="chartContainer">
+    <div class="chartContainer">
         <div class="legend"
              v-if="type == 'bar' && data && data.datasets">
             <div class="legendItem">
@@ -12,14 +11,40 @@
                 <span>{{data.datasets[1].label}}</span>
             </div>
         </div>
-        <canvas class="chartjs"></canvas>
+        <div v-else-if="type == 'topicDependency'"
+             class="graphLegend">
+            <div class="legendItem ownLine">
+                <span>Edge Thickness is Number of Attempts</span>
+            </div>
+            <div class="legendItem">
+                <span class="legendLabel rect"
+                      style="background-color: pink"></span>
+                <span>Poor Competency</span>
+            </div>
+            <div class="legendItem">
+                <span class="legendLabel rect"
+                      style="background-color: #256"></span>
+                <span>Superior Competency</span>
+            </div>
+        </div>
+
+        <div v-if="type != 'topicDependency'"
+             class="chartContainer">
+            <canvas class="chartjs"></canvas>
+        </div>
+        <graph-comparator v-else
+                          :data="data"
+                          :nodes="data.labels"></graph-comparator>
     </div>
-    <graph-comparator v-else
-                      :data="data"
-                      :nodes="data.labels"></graph-comparator>
 </template>
 
 <style scoped>
+.graphContainer {
+    display: flex;
+    flex: 1;
+    height: 100%;
+}
+
 .chartjs {
     max-width: 100%;
     margin: auto;
@@ -31,10 +56,13 @@
     height: 100%;
 }
 
-.legend {
+.legend,
+.graphLegend {
     flex: 1;
     display: flex;
     justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .rect {
@@ -46,6 +74,11 @@
 
 .legendItem {
     margin: 0px 10px;
+}
+
+.ownLine {
+    flex: 0 1 100%;
+    text-align: center;
 }
 
 .legendLabel {
