@@ -1,9 +1,9 @@
 <template>
     <svg xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        ref="svg"
-        :width="width"
-        :height="height">
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         ref="svg"
+         :width="width"
+         :height="height">
     </svg>
 </template>
 
@@ -47,6 +47,7 @@ export default class Graph extends Vue {
     render() {
         const edges = this.edges.slice();
         const nodes = this.nodes.slice();
+
         const selfLoops = edges.filter(x => x.source == x.target);
 
         const minRange = 2;
@@ -75,6 +76,7 @@ export default class Graph extends Vue {
         this.graphHeight = this.height - (nodeRadius * 2);
 
         const forceLink = d3.forceLink(edges);
+
         this.simulation = d3.forceSimulation(nodes)
             .alpha(3)
             .force("collision", d3.forceCollide(3 * nodeRadius))

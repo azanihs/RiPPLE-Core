@@ -7,7 +7,8 @@
                     <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
                     <div class="chartContainer">
                         <div class="chartPanel">
-                            <chart ref="chart"
+                            <chart v-if="chartData"
+                                   ref="chart"
                                    :type="chart"
                                    :data="chartData.data"
                                    :options="chartData.options"></chart>
@@ -190,7 +191,7 @@ export default class VariableDataVisualiser extends Vue {
 
     set chart(newVal: string) {
         this.pChartType = newVal;
-
+        this.pChartData = undefined;
         this.compareList()({ compareTo: this.compare })
             .then(results => {
                 const { topics, ownScores, compareAgainst } = results;
@@ -313,7 +314,7 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     get chartData() {
-        if (this.pChartData.data !== undefined) {
+        if (this.pChartData !== undefined && this.pChartData.data !== undefined) {
             const ownData = this.pChartData.data.datasets[0];
             const compareData = this.pChartData.data.datasets[1];
             if (this.chart == "radar") {
