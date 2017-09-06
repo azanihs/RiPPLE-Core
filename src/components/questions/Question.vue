@@ -2,7 +2,8 @@
     <md-layout class="bottomSpace">
         <md-layout md-hide-xsmall
                    md-hide-small
-                   md-hide-medium>
+                   md-hide-medium
+                   class="questionNavigation">
             <action-buttons @back="closeQuestion()"></action-buttons>
         </md-layout>
         <md-layout md-flex="100">
@@ -67,6 +68,11 @@
 </template>
 
 <style scoped>
+.questionNavigation {
+    width: 100%;
+    min-width: 100%;
+}
+
 .fade-enter-active {
     transition: opacity 250ms ease;
 }

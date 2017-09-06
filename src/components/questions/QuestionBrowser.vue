@@ -13,9 +13,9 @@
                 </md-layout>
             </md-layout>
         </transition>
-        <md-layout :class="{hidden: selectedQuestion}"
-                   key="2"
-                   class="viewContainer">
+        <div :class="{hidden: selectedQuestion}"
+             key="2"
+             class="viewContainer">
             <md-layout class="headingContainer"
                        md-flex="100">
                 <variable-data-visualiser class="overview"
@@ -49,7 +49,7 @@
                                       :data="question"></question-preview>
                 </md-layout>
             </md-layout>
-        </md-layout>
+        </div>
     </div>
 </template>
 
