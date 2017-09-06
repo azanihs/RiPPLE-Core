@@ -1,11 +1,22 @@
 <template>
     <div v-if="type != 'topicDependency'"
-        class="chartContainer">
+         class="chartContainer">
+        <div class="legend"
+             v-if="type == 'bar' && data && data.datasets">
+            <div class="legendItem">
+                <span class="legendLabel rect"></span>
+                <span>{{data.datasets[0].label}}</span>
+            </div>
+            <div class="legendItem">
+                <span class="legendLabel">▲</span>
+                <span>{{data.datasets[1].label}}</span>
+            </div>
+        </div>
         <canvas class="chartjs"></canvas>
     </div>
     <graph-comparator v-else
-        :data="data"
-        :nodes="data.labels"></graph-comparator>
+                      :data="data"
+                      :nodes="data.labels"></graph-comparator>
 </template>
 
 <style scoped>
@@ -18,6 +29,27 @@
 .chartContainer {
     width: 100%;
     height: 100%;
+}
+
+.legend {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.rect {
+    height: 12px;
+    width: 36px;
+    display: inline-flex;
+    background-color: #aaa;
+}
+
+.legendItem {
+    margin: 0px 10px;
+}
+
+.legendLabel {
+    color: #999;
 }
 </style>
 
@@ -57,16 +89,20 @@ export default class Chart extends Vue {
         if (this.type == "topicDependency") {
             this.chart = {
                 destroy: () => { },
-                update: () => {
-                    this.$nextTick(() => {
-                    });
-                }
+                update: () => { }
             };
         } else {
             const chartOptions = Object.assign({
                 maintainAspectRatio: false,
                 responsive: true
             }, this.options);
+
+            if (this.type === "bar") {
+                if (chartOptions["legend"] === undefined) {
+                    chartOptions["legend"] = {};
+                }
+                chartOptions["legend"].display = false;
+            }
 
             this.chart = new ChartJS(this.$el.querySelector("canvas"), {
                 type: this.type,
@@ -79,7 +115,6 @@ export default class Chart extends Vue {
     @Lifecycle
     mounted() {
         this.mountChart();
-
         setTimeout(() => {
             this.resetChart();
         }, 10);
