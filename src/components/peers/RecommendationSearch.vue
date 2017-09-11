@@ -111,7 +111,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic } from "../../interfaces/models";
+import { Topic, UserSummary } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -136,49 +136,22 @@ export default class RecommendationSearch extends Vue {
         type: Array
     });
 
+    @Prop
+    recommendations = p<UserSummary[]>({
+        required: true,
+        type: Array
+    });
+
+    @Prop
+    requests = p<UserSummary[]>({
+        required: true,
+        type: Array
+    });
 
     competencies = [];
 
-    pRecommendations = [];
-    pRequests = [];
-
-    updateConnections(newConnections) {
-        this.pRecommendations = newConnections;
-    }
-    updateRequests(newRequests) {
-        this.pRequests = newRequests;
-    }
-
-    @Lifecycle
-    created() {
-        Fetcher.get(UserService.getRecommendedConnections, { count: 3 })
-            .on(this.updateConnections);
-        Fetcher.get(UserService.getOutstandingRequests, { count: 3 })
-            .on(this.updateRequests);
-
-        //UserService.subscribe("getRecommenedConnections", this.PropUpdate("pRecommendations"));
-        //UserService.unsubscribe("getOutstandingRequests", this.PropUpdate("pRequests"));
-
-        /*this.competencies = UserService.userCompetencies(this.topics)
-            .ownScores
-            .filter(x => x.source == x.target)
-            .map(x => x.competency);*/
-    }
-    @Lifecycle
-    destroyed() {
-
-    }
-
-    get recommendations() {
-        return this.pRecommendations;
-    }
-
-    get requests() {
-        return this.pRequests;
-    }
-
     checkboxChange() {
-
+        this.$emit("change");
     }
 
     checkboxIsDisabled(sType, topic) {

@@ -29,6 +29,19 @@
     background-color: #256 !important;
 }
 
+.md-theme-default.md-switch.md-checked.md-primary .md-switch-thumb {
+    /* Style the round section of the md-switch */
+    background-color: #256 !important;
+}
+.md-theme-default.md-switch.md-checked.md-primary .md-switch-container {
+    /* Style the switch rails */
+    background-color: rgba(34, 85, 102, 0.5) !important;
+}
+.md-theme-default.md-switch.md-checked.md-primary .md-ink-ripple {
+    /* Style the switch selection colour */
+    color: #256 !important;
+}
+
 .centerCheckbox {
     /* Centers a checkbox inside of an md-table */
     margin: auto !important;

@@ -114,7 +114,7 @@ export default class UserRepository {
     static getUserConnections(count: number): Promise<User[]> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve(userPeers.slice(0, count));
+                resolve(new Array(count).fill(0).map(makeUser));
             }, Math.random() * 1000);
         });
     }
