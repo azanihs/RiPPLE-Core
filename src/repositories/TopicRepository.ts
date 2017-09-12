@@ -1,3 +1,4 @@
+import "whatwg-fetch";
 import { Topic } from "../interfaces/models";
 
 const topics = {};

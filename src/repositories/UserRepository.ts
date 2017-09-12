@@ -1,3 +1,4 @@
+import "whatwg-fetch";
 import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import faker from "faker";

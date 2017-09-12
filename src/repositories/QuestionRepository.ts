@@ -1,3 +1,4 @@
+import "whatwg-fetch";
 import { Question, Topic } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import f from "faker";
