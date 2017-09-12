@@ -54,10 +54,10 @@ export default class PeerView extends Vue {
     };
     updateConnections(newConnections) {
         this.pRecommendations = newConnections;
-    }
+    };
     updateRequests(newRequests) {
         this.pRequests = newRequests;
-    }
+    };
 
     @Lifecycle
     created() {
@@ -87,10 +87,14 @@ export default class PeerView extends Vue {
     }
 
     shuffleData() {
-        UserService.getRecommendedConnections({ count: 3 })
-            .then(this.updateConnections);
-        UserService.getOutstandingRequests({ count: 3 })
-            .then(this.updateRequests);
+        Promise.all([
+            UserService.getRecommendedConnections({ count: 3 }),
+            UserService.getOutstandingRequests({ count: 3 })
+        ])
+            .then(data => {
+                this.updateConnections(data[0]);
+                this.updateRequests(data[1]);
+            });
     }
 }
 </script>

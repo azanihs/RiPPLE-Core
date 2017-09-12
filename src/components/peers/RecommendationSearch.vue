@@ -25,8 +25,8 @@
                             <md-checkbox class="centerCheckbox"
                                          :disabled="checkboxIsDisabled(sType, topic)"
                                          @change="checkboxChange"
-                                         :id="`${sType}_${topic}`"
-                                         :name="`${sType}_${topic}`"></md-checkbox>
+                                         :id="`${sType}_${topic.id}`"
+                                         :name="`${sType}_${topic.id}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
@@ -111,7 +111,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic, UserSummary } from "../../interfaces/models";
+import { Topic, UserSummary, Edge } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -148,7 +148,23 @@ export default class RecommendationSearch extends Vue {
         type: Array
     });
 
-    competencies = [];
+    competencies = new Map();
+
+    updateCompetencies(newCompetencies) {
+        this.competencies = newCompetencies.ownScores
+            .reduce((carry: Map<Topic, number>, x: Edge) => {
+                if (carry.get(x.source) === undefined) {
+                    carry.set(x.source, x.competency);
+                }
+                return carry;
+            }, new Map());
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.userCompetencies)
+            .on(this.updateCompetencies);
+    }
 
     checkboxChange() {
         this.$emit("change");
@@ -156,8 +172,8 @@ export default class RecommendationSearch extends Vue {
 
     checkboxIsDisabled(sType, topic) {
         if (sType == "Provide Mentorship") {
-            const weight = this.competencies[this.topics.findIndex(x => x == topic)];
-            return weight <= 85;
+            const weight = this.competencies.get(topic);
+            return weight === undefined || weight <= 85;
         }
 
         return false;
@@ -174,7 +190,7 @@ export default class RecommendationSearch extends Vue {
     };
 
     getCellWeight(topic) {
-        const weight = this.competencies[this.topics.findIndex(x => x == topic)];
+        const weight = this.competencies.get(topic);
         return {
             background: `${this.getColour(weight)}${0.4})`,
             borderColor: `${this.getColour(weight)}1)`,

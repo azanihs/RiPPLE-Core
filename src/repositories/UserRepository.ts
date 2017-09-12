@@ -99,7 +99,6 @@ const makeUser = () => {
 };
 
 const loggedInUser = makeUser();
-const userPeers = new Array(100).fill(0).map(makeUser);
 
 export default class UserRepository {
 
@@ -180,41 +179,4 @@ export default class UserRepository {
             }, Math.random() * 1000);
         });
     }
-
-    /*static userEngagementForType(type: string) {
-        return userEngagementScores[type].map(x => ({
-            source: x[0],
-            target: x[1],
-            competency: x[2],
-            attempts: x[3]
-        }));
-    }
-
-    static engagementOtherForType(type: string) {
-        return otherEngagementScores[type].map(x => ({
-            source: x[0],
-            target: x[1],
-            competency: x[2],
-            attempts: x[3]
-        }));
-    }
-
-    static userScoreForTopic(topic: Topic) {
-        return userTopicScores[topic.id].map(x => ({
-            source: x[0],
-            target: x[1],
-            competency: x[2],
-            attempts: x[3]
-        }));
-    }
-
-    static userGoalForTopic(topic: Topic) {
-        return userGoalScores[topic.id].map(x => ({
-            source: x[0],
-            target: x[1],
-            competency: x[2],
-            attempts: x[3]
-        }));
-    }*/
-
 }

@@ -6,13 +6,6 @@ import TopicRepository from "../repositories/TopicRepository";
 
 export default class UserService {
     static generateGraph(sourceData: Edge[], otherData: Edge[]) {
-        // Only keep edges where target && source appear in topicsToInclude
-        // TODO: Move to the vue model when ready to re-implement
-        /*const flattenAndFilter = topics => topics
-            .reduce((a, b) => a.concat(b), [])
-            .filter(x => topicsToInclude.find(topic => topic == x.source)
-                && topicsToInclude.find(topic => topic == x.target));*/
-
         const ownScores = sourceData;
         const userGoals = otherData;
         const topics = ownScores
@@ -49,6 +42,7 @@ export default class UserService {
     static getUserPeers({ connectionCount }: { connectionCount: number }) {
         return UserRepository.getUserConnections(connectionCount);
     }
+
     static getEngagementSummary() {
         return UserRepository.getUserEngagement()
             .then(edges => edges.filter(x => x.target == x.source)
