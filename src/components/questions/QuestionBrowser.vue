@@ -13,9 +13,9 @@
                 </md-layout>
             </md-layout>
         </transition>
-        <md-layout :class="{hidden: selectedQuestion}"
-                   key="2"
-                   class="viewContainer">
+        <div :class="{hidden: selectedQuestion}"
+             key="2"
+             class="viewContainer">
             <md-layout class="headingContainer"
                        md-flex="100">
                 <variable-data-visualiser class="overview"
@@ -49,7 +49,7 @@
                                       :data="question"></question-preview>
                 </md-layout>
             </md-layout>
-        </md-layout>
+        </div>
     </div>
 </template>
 
@@ -115,17 +115,18 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import { Question as QuestionModel } from "../../interfaces/models";
+import { Question as QuestionModel, Topic as TopicModel } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
+import Fetcher from "../../services/Fetcher";
 
 import ActionButtons from "../util/ActionButtons.vue";
-import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 
 
 @Component({
@@ -138,24 +139,62 @@ import Question from "./Question.vue";
     }
 })
 export default class QuestionBrowser extends Vue {
-    questions: QuestionModel[] = QuestionService.getRecommendedForUser(25);
 
+    pTopics = [];
+    pData = {};
+
+    pQuestions: QuestionModel[] = [];
     searchedQuestions: QuestionModel[] = [];
 
-    topicsToUse: string[] = [];
+    topicsToUse: TopicModel[] = [];
 
     selectedQuestion: QuestionModel = null;
     userIsFinished: boolean = false;
 
+    updateTopics(topics) {
+        this.pTopics = topics;
+    };
+    updateQuestions(newQuestions) {
+        this.pQuestions = newQuestions;
+    };
+    updateCompetencies(competency) {
+        this.pData = competency;
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+
+        Fetcher.get(QuestionService.getRecommendedForUser)
+            .on(this.updateQuestions);
+
+        Fetcher.get(UserService.userCompetencies, {})
+            .on(this.updateCompetencies);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
+
+        Fetcher.get(QuestionService.getRecommendedForUser)
+            .off(this.updateQuestions);
+
+        Fetcher.get(UserService.userCompetencies)
+            .off(this.updateCompetencies);
+    }
 
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        return this.pTopics;
     }
 
     get showQuestions() {
-        return this.searchedQuestions.filter(x => {
-            return x.topics.find(t => this.topicsToUse.indexOf(t) >= 0);
-        });
+        return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
+    }
+
+    get questions() {
+        return this.pQuestions;
     }
 
     @Watch("selectedQuestion")
@@ -194,7 +233,7 @@ export default class QuestionBrowser extends Vue {
     }
 
     generateCompetencies(itemsToInclude) {
-        return UserService.userCompetencies(itemsToInclude);
+        return UserService.userCompetencies;
     }
 
 }

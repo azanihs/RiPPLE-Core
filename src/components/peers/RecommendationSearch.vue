@@ -2,7 +2,6 @@
     <md-layout md-flex="100">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <!-- Plot topics -->
             <table class="table">
                 <thead>
                     <tr>
@@ -14,9 +13,9 @@
                 </thead>
                 <tbody>
                     <tr v-for="topic in topics"
-                        :key="topic">
+                        :key="topic.id">
                         <td>
-                            <span>{{ topic }}</span>
+                            <span>{{ topic.name }}</span>
                             <div class="cellOverlay"
                                  :style="getCellWeight(topic)"></div>
                         </td>
@@ -26,8 +25,8 @@
                             <md-checkbox class="centerCheckbox"
                                          :disabled="checkboxIsDisabled(sType, topic)"
                                          @change="checkboxChange"
-                                         :id="`${sType}_${topic}`"
-                                         :name="`${sType}_${topic}`"></md-checkbox>
+                                         :id="`${sType}_${topic.id}`"
+                                         :name="`${sType}_${topic.id}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
@@ -41,9 +40,9 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
-                               v-for="(recommendation, i) in generator(searchType).recommendations"
+                               v-for="(recommendation, i) in recommendations"
                                :key="i">
-                        <recommendation-card :data="recommendation">
+                        <recommendation-card :user="recommendation">
                             Request
                         </recommendation-card>
                     </md-layout>
@@ -55,9 +54,9 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
-                               v-for="(recommendation, i) in generator(searchType).requests"
+                               v-for="(recommendation, i) in requests"
                                :key="i">
-                        <recommendation-card :data="recommendation">
+                        <recommendation-card :user="recommendation">
                             Request
                         </recommendation-card>
                     </md-layout>
@@ -111,7 +110,11 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+
+import { Topic, UserSummary, Edge } from "../../interfaces/models";
+
 import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 import RecommendationCard from "./RecommendationCard.vue";
 
@@ -122,44 +125,55 @@ import RecommendationCard from "./RecommendationCard.vue";
 })
 export default class RecommendationSearch extends Vue {
     @Prop
-    searchTypes = p({
+    searchTypes = p<string[]>({
         required: true,
         type: Array
-    }) as string[];
+    });
 
     @Prop
-    generator = p({ // Function takes in arguments from searchTypes
-        required: true,
-        type: Function
-    }) as Function;
-
-    @Prop
-    topics = p({
+    topics = p<Topic[]>({
         required: true,
         type: Array
-    }) as string[];
+    });
 
-    searchType = "";
+    @Prop
+    recommendations = p<UserSummary[]>({
+        required: true,
+        type: Array
+    });
 
-    competencies = [];
+    @Prop
+    requests = p<UserSummary[]>({
+        required: true,
+        type: Array
+    });
+
+    competencies = new Map();
+
+    updateCompetencies(newCompetencies) {
+        this.competencies = newCompetencies.ownScores
+            .reduce((carry: Map<Topic, number>, x: Edge) => {
+                if (carry.get(x.source) === undefined) {
+                    carry.set(x.source, x.competency);
+                }
+                return carry;
+            }, new Map());
+    };
 
     @Lifecycle
     created() {
-        this.searchType = this.searchTypes[0];
-        this.competencies = UserService.userCompetencies(this.topics)
-            .ownScores
-            .filter(x => x.source == x.target)
-            .map(x => x.competency);
+        Fetcher.get(UserService.userCompetencies)
+            .on(this.updateCompetencies);
     }
 
     checkboxChange() {
-
+        this.$emit("change");
     }
 
     checkboxIsDisabled(sType, topic) {
         if (sType == "Provide Mentorship") {
-            const weight = this.competencies[this.topics.findIndex(x => x == topic)];
-            return weight <= 85;
+            const weight = this.competencies.get(topic);
+            return weight === undefined || weight <= 85;
         }
 
         return false;
@@ -176,7 +190,7 @@ export default class RecommendationSearch extends Vue {
     };
 
     getCellWeight(topic) {
-        const weight = this.competencies[this.topics.findIndex(x => x == topic)];
+        const weight = this.competencies.get(topic);
         return {
             background: `${this.getColour(weight)}${0.4})`,
             borderColor: `${this.getColour(weight)}1)`,

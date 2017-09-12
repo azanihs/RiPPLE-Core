@@ -1,71 +1,52 @@
+export interface Topic {
+    id: number,
+    name: string
+};
+
 export interface Question {
     id: number,
-    responses: {
-        author: Peer,
-        upVotes: number,
-        solution: number,
-        content: string
-    }[],
-
     difficulty: number,
-    difficultyRepresentation: string,
     quality: number,
 
-    topics: string[],
-    images?: string[],
+    topics: Topic[],
+
     content: string,
-
-    solution: number,
-    possibleAnswers: {
-        id: number,
-        content: string
-    }[],
     explanation: string
-}
+    solution: Distractor,
+    distractors: Distractor[],
 
-export interface Peer {
+    responses: QuestionResponse[]
+};
+export interface Distractor {
     id: number,
-    name: string,
-    bio: string,
-
-    proficiencies: string[],
-    image: string,
-    availableTimes: string[]
+    content: string,
+    isCorrect: boolean,
+    response: string
 }
+export interface QuestionResponse {
+    author: User,
+    upVotes: number,
+    solution: number,
+    content: string
+};
+
+export interface Node {
+    source: Topic,
+    target: Topic,
+    competency: number,
+    attempts: number
+};
 
 export interface User {
     id: number,
-    self: Peer,
-
-    connections: { // Should be replaced with PeerConnection[]
-        id: number,
-        type: string,
-        topic: string,
-        weight: number
-    }[]
-}
-
-export interface UserSummary {
     name: string,
+    bio: string,
     image: string,
-    reputation: number,
-    questionsContributed: number,
-    numberAnswers: number,
-    numberComments: number
-}
 
-export interface Badge {
-    id: number,
-    name: string,
-    category: "engagement" | "competencies" | "connections",
-    description: string
-}
-
-export interface AcquiredBadge {
-    badge: Badge,
-    progress: number,
-    dateAcquired: Date
-}
+    proficiencies?: string[],
+    availableTime?: Date,
+    connections: PeerConnection[]
+};
 
 export interface PeerConnection {
     edgeStart: number, // ID of edge start. Corresponds to a User ID
@@ -75,11 +56,41 @@ export interface PeerConnection {
     weight: number,
     date: Date, // Date the connection was made
     availableTime: Date
-}
+};
+
+export interface UserSummary {
+    name: string,
+    image: string,
+    reputation: number,
+    questionsContributed: number,
+    numberAnswers: number,
+    numberComments: number
+};
+
+export interface Badge {
+    id: number,
+    name: string,
+    category: "engagement" | "competencies" | "connections",
+    description: string
+};
+
+export interface AcquiredBadge {
+    id: number,
+    badge: Badge,
+    progress: number,
+    dateAcquired: Date
+};
 
 export interface Notification {
     id: number,
     type: "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting",
     content: string,
     read: boolean
-}
+};
+
+export interface Edge {
+    source: Topic,
+    target: Topic,
+    competency: number,
+    attempts: number
+};

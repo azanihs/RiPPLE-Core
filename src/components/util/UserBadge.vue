@@ -1,11 +1,19 @@
 <template>
     <div class="badgeContainer">
-        <div class="badgeProgress" :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+        <div class="badgeProgress"
+             :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
             <div class="badge">
                 <md-icon>{{badgeIcon}}</md-icon>
             </div>
-            <md-spinner v-if="userBadge && userBadge.progress >= 0" md-theme="spinner" class="badgeSpinner" :md-stroke="2" :md-progress="100"></md-spinner>
-            <md-spinner v-if="userBadge && userBadge.progress >= 0" class="progressSpinner badgeSpinner" :md-stroke="2" :md-progress="userBadge.progress"></md-spinner>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0"
+                        md-theme="spinner"
+                        class="badgeSpinner"
+                        :md-stroke="2"
+                        :md-progress="100"></md-spinner>
+            <md-spinner v-if="userBadge && userBadge.progress >= 0"
+                        class="progressSpinner badgeSpinner"
+                        :md-stroke="2"
+                        :md-progress="userBadge.progress"></md-spinner>
         </div>
         <div class="badgeDescription">
             <h4>{{badge.name}}</h4>
@@ -73,21 +81,43 @@
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component } from "av-ts";
+import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
+import PropUpdate from "../mixins/PropUpdate";
+
 import { AcquiredBadge, Badge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
-import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
 
 @Component()
-export default class UserBadge extends Vue {
-    @Prop badge: Badge;
+export default class UserBadge extends PropUpdate {
+    @Prop badge = p({
+        required: true
+    }) as Badge;
+
+    pUserBadge = undefined;
+
+    updateBadge(userBadge) {
+        this.pUserBadge = userBadge;
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.id })
+            .on(this.updateBadge);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.id })
+            .off(this.updateBadge);
+    }
 
     get badgeIcon() {
         return BadgeService.badgeToIcon(this.badge);
     }
 
     get userBadge(): AcquiredBadge {
-        return UserService.userHasBadge(this.badge.id);
+        return this.pUserBadge;
     }
 
     get userHasBadge(): boolean {

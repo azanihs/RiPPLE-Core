@@ -1,16 +1,27 @@
 <template>
-    <md-layout md-flex="100" class="header">
-        <md-layout v-for="field in searchableFields" :key="field.displayName" class="searchItem">
-            <h3 v-if="field.sort" @click="field.sort" class="sortBy">{{ field.name }}
-                <md-icon>{{reverseSortOrder ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
+    <md-layout md-flex="100"
+               class="header">
+        <md-layout v-for="field in searchableFields"
+                   :key="field.displayName"
+                   class="searchItem">
+            <h3 v-if="field.sort"
+                @click="sort"
+                class="sortBy">{{ field.name }}
+                <md-icon>{{search.sortDesc ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
             </h3>
             <h3 v-else>{{ field.name }}</h3>
-    
-            <select v-if="field.type == 'select'" @change="field.search">
-                <option v-for="option in field.options" :key="option" :value="option">{{ option }}</option>
+
+            <select v-if="field.type == 'select'"
+                    v-model="search[field.id]"
+                    @change="field.search">
+                <option v-for="option in field.options"
+                        :key="option.value"
+                        :value="option.value">{{ option.name }}</option>
             </select>
-    
-            <input v-else-if="field.type == 'text'" @keyup="field.search" type="text"></input>
+
+            <input v-else-if="field.type == 'text'"
+                   v-model="search[field.id]"
+                   type="text"></input>
         </md-layout>
     </md-layout>
 </template>
@@ -48,103 +59,110 @@ input {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Question } from "../../interfaces/models";
+import QuestionService from "../../services/QuestionService";
 
 @Component()
 export default class QuestionSearch extends Vue {
     @Prop
     availableQuestions: Question[];
 
-    reverseSortOrder: boolean = false;
-    currentFilter: string = "";
-    searchMode: string = "All Questions";
-
-    searchableFields: Object[] = [];
+    timeoutId = undefined;
+    searchInFlight = false;
 
     get uniqueQuestionTopics() {
-        return Array.from(new Set(this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b))));
+        const topics = this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b), []);
+        return Array.from(new Set(topics)).map(x => topics.find(t => t == x));
+    }
+
+    get searchableFields() {
+        return [{
+            name: "Sort By",
+            id: "sortField",
+            sort: true,
+            options: [{
+                name: "",
+                value: ""
+            }, {
+                name: "Difficulty",
+                value: "difficulty"
+            }, {
+                name: "Quality",
+                value: "quality"
+            }, {
+                name: "Created Time",
+                value: "created"
+            }, {
+                name: "Responses",
+                value: "responses"
+            }, {
+                name: "Comments",
+                value: "comments"
+            }, {
+                name: "Personalised Rating",
+                value: "personalisation"
+            }],
+            type: "select"
+        }, {
+            name: "Show",
+            id: "filterField",
+            options: [{
+                name: "All Questions",
+                value: ""
+            }, {
+                name: "Unanswered Questions",
+                value: "unanswered"
+            }, {
+                name: "Answered Questions",
+                value: "answered"
+            }, {
+                name: "Incorrectly Answered",
+                value: "wrong"
+            }],
+            type: "select"
+        }, {
+            name: "Content",
+            id: "query",
+            type: "text"
+        }];
+    }
+
+    search = {
+        sortField: "",
+        sortDesc: false,
+        filterField: "All Questions",
+        query: ""
     }
 
     @Lifecycle
     created() {
-        let textToSearch = "";
-
-        this.searchableFields = [{
-            name: "Sort By",
-            search: (e?: MouseEvent) => {
-                if (e !== null) {
-                    const itemToSortOn = (e.target as HTMLFormElement).value;
-                    this.currentFilter = itemToSortOn;
-                    this.applyFilters();
-                }
-                return x => true;
-            },
-            options: ["", "Difficulty", "Personalised Rating", "Quality", "Responses", "Number Of Comments", "Time"],
-            type: "select",
-            sort: () => {
-                this.reverseSortOrder = !this.reverseSortOrder;
-                this.applyFilters();
-            },
-            searchValue: ""
-        }, {
-            name: "Show",
-            search: (e?: MouseEvent) => {
-                if (e !== null) {
-                    this.searchMode = (e.target as HTMLFormElement).value;
-                    this.applyFilters();
-                }
-                return x => true;
-            },
-            options: ["All Questions", "Unanswered Questions", "Answered Questions", "Wrongly Answered Questions"],
-            type: "select",
-            searchValue: ""
-        }, {
-            name: "Content",
-            search: (e?: KeyboardEvent) => {
-                if (e !== null) {
-                    textToSearch = (e.target as HTMLFormElement).value.toLowerCase();
-                    this.applyFilters();
-                }
-                return x => {
-                    return x.content.toLowerCase().indexOf(textToSearch) >= 0 ||
-                        x.topics.find(t => t.toLowerCase().indexOf(textToSearch) >= 0);
-                };
-            },
-            searchValue: "",
-            type: "text"
-        }];
-
         this.$emit("searched", this.availableQuestions);
     }
 
-    filter(questions) {
-        const keyValue = q => {
-            if (this.currentFilter == "") return 0;
-            if (this.currentFilter == "Quality") return q.quality;
-            if (this.currentFilter == "Difficulty") return q.difficulty;
-            return q.responses.length;
-        };
-        if (this.searchMode !== "All Questions") {
-            questions = questions.filter(x => Math.random() <= 0.25);
-        }
-
-        if (this.reverseSortOrder) {
-            return questions.sort((a, b) => keyValue(a) - keyValue(b)).reverse();
-        } else {
-            return questions.sort((a, b) => keyValue(a) - keyValue(b));
-        };
+    sort() {
+        this.search.sortDesc = !this.search.sortDesc;
     }
 
     applyFilters() {
-        const searchResults = this.availableQuestions.filter(x => {
-            return this.searchableFields.every((searchItem: any) => {
-                if (!searchItem.search) return true;
-                return searchItem.search(null)(x);
+        QuestionService.search(this.search)
+            .then(searchResult => {
+                this.$emit("searched", searchResult);
             });
-        });
+    }
 
-        this.$emit("searched", this.filter(searchResults));
+    @Watch("search", { deep: true })
+    searchWatch() {
+        if (this.timeoutId !== undefined) {
+            clearTimeout(this.timeoutId);
+        }
+
+        this.timeoutId = setTimeout((() => this.applyFilters()), 250);
+    }
+
+    @Watch("availableQuestions")
+    handler() {
+        this.applyFilters();
     }
 }
 </script>

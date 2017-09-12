@@ -1,23 +1,25 @@
 <template>
-    <md-layout md-flex="100">
+    <md-layout md-flex="100"
+               class="topPadding">
         <md-layout md-flex="100"
-            class="componentSeparator">
-            <h1>Availability</h1>
-            <availability-selector @change="shuffleData(null)"></availability-selector>
+                   class="componentSeparator">
+            <availability-selector @change="shuffleData()"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
-                <recommendation-search :searchTypes="searchTypes"
-                    :generator="this.shuffleData"
-                    :topics="topics"></recommendation-search>
+                <recommendation-search @change="shuffleData()"
+                                       :searchTypes="searchTypes"
+                                       :recommendations="recommendations"
+                                       :requests="requests"
+                                       :topics="topics"></recommendation-search>
             </md-card>
         </md-layout>
     </md-layout>
 </template>
 
 <style scoped>
-h1 {
-    width: 100%;
+.topPadding {
+    padding-top: 16px;
 }
 
 .md-tabs {
@@ -26,12 +28,14 @@ h1 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
-import UserService from "../../services/UserService";
+import { Vue, Component, Lifecycle, Watch } from "av-ts";
+
 import TopicService from "../../services/TopicService";
+import UserService from "../../services/UserService";
+import Fetcher from "../../services/Fetcher";
+
 import AvailabilitySelector from "../util/AvailabilitySelector.vue";
 import RecommendationSearch from "./RecommendationSearch.vue";
-
 @Component({
     components: {
         AvailabilitySelector,
@@ -41,21 +45,56 @@ import RecommendationSearch from "./RecommendationSearch.vue";
 export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
+    pTopics = [];
+    pRequests = [];
+    pRecommendations = [];
+
+    updateTopics(newTopics) {
+        this.pTopics = newTopics;
+    };
+    updateConnections(newConnections) {
+        this.pRecommendations = newConnections;
+    };
+    updateRequests(newRequests) {
+        this.pRequests = newRequests;
+    };
 
     @Lifecycle
     created() {
-        this.shuffleData("all");
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+        UserService.getRecommendedConnections({ count: 3 })
+            .then(this.updateConnections);
+        UserService.getOutstandingRequests({ count: 3 })
+            .then(this.updateRequests);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
     }
 
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        return this.pTopics;
     }
 
-    shuffleData(type: string) {
-        return {
-            recommendations: UserService.getRecommendedConnections(3),
-            requests: UserService.getOutstandingRequests(3)
-        };
+    get recommendations() {
+        return this.pRecommendations;
+    }
+    get requests() {
+        return this.pRequests;
+    }
+
+    shuffleData() {
+        Promise.all([
+            UserService.getRecommendedConnections({ count: 3 }),
+            UserService.getOutstandingRequests({ count: 3 })
+        ])
+            .then(data => {
+                this.updateConnections(data[0]);
+                this.updateRequests(data[1]);
+            });
     }
 }
 </script>

@@ -4,7 +4,7 @@ import VueMaterial from "vue-material";
 
 import "vue-material/dist/vue-material.css";
 
-import { Question, Peer } from "../../../src/interfaces/models";
+import { Question, User, Distractor } from "../../../src/interfaces/models";
 import QuestionPreview from "../../../src/components/questions/QuestionPreview.vue";
 
 import { assert } from "chai";
@@ -18,16 +18,31 @@ const router = new VueRouter({
 });
 
 const peer = id => {
-    const peer: Peer = {
+    const peer: User = {
         id: id,
         name: "Test User",
         bio: "Test Bio",
 
         proficiencies: ["SSL"],
         image: "",
-        availableTimes: []
+        availableTime: new Date(),
+
+        connections: []
     };
     return peer;
+};
+
+const optionA: Distractor = {
+    id: 0,
+    content: "",
+    isCorrect: false,
+    response: "A"
+};
+const optionB: Distractor = {
+    id: 1,
+    content: "",
+    isCorrect: true,
+    response: "B"
 };
 
 const basicQuestion: Question = {
@@ -40,19 +55,11 @@ const basicQuestion: Question = {
     }],
     difficulty: 1,
     quality: 1,
-    difficultyRepresentation: "",
-    solution: 0,
-    possibleAnswers: [{
-        id: 0,
-        content: ""
-    }, {
-        id: 1,
-        content: ""
-    }],
+    solution: optionB,
+    distractors: [optionA, optionB],
     explanation: "",
     content: "Basic question content",
-    topics: ["Topic 1", "Topic 2"],
-    images: []
+    topics: [{ id: 1, name: "Topic 1" }, { id: 2, name: "Topic 2" }]
 };
 
 describe("QuestionCard.vue", () => {

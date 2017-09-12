@@ -1,14 +1,14 @@
 <template>
     <div class="graphContainer">
         <graph v-for="(item, i) in data.datasets"
-            :key="i"
-            class="graph"
-            :edges="item.data"
-            :nodes="nodes"
-            :shouldTick="i == 0"
-            @graphElements="updateGraphQueue"
-            @tick="ticked"
-            @rescale="rescale"></graph>
+               :key="i"
+               class="graph"
+               :edges="item.data"
+               :nodes="graphNodes"
+               :shouldTick="i == 0"
+               @graphElements="updateGraphQueue"
+               @tick="ticked"
+               @rescale="rescale"></graph>
     </div>
 </template>
 
@@ -47,6 +47,10 @@ export default class GraphComparator extends Vue {
     nodes;
 
     chartQueue = [];
+
+    get graphNodes() {
+        return this.nodes;
+    }
 
     clearQueue() {
         this.chartQueue = [];

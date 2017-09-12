@@ -1,28 +1,18 @@
-import { User, Peer, Badge, AcquiredBadge, UserSummary, Notification } from "../interfaces/models";
+import { every, mergeCache, mergeStringCache } from "./Notify";
+
+import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
-import PeerRepository from "../repositories/PeerRepository";
+import TopicRepository from "../repositories/TopicRepository";
 
 export default class UserService {
-
-    static getUserPeers() {
-        return PeerRepository.getMany(20 + Math.round(Math.random() * 100));
-    }
-
-    static userCompetencies(topicsToInclude: string[]) {
-        // Only keep edges where target && source appear in topicsToInclude
-        const flattenAndFilter = topics => topics
-            .reduce((a, b) => a.concat(b), [])
-            .filter(x => topicsToInclude.find(topics => topics == x.source.id)
-                && topicsToInclude.find(topics => topics == x.target.id));
-
-        const ownScores = flattenAndFilter(topicsToInclude.map(UserRepository.userScoreForTopic));
-        const userGoals = flattenAndFilter(topicsToInclude.map(UserRepository.userGoalForTopic));
-
+    static generateGraph(sourceData: Edge[], otherData: Edge[]) {
+        const ownScores = sourceData;
+        const userGoals = otherData;
         const topics = ownScores
             .map(x => x.source)
-            .reduce((carry, topicNode) => {
-                if (topicsToInclude.find(x => x == topicNode.id) &&
-                    !carry.find(x => x == topicNode)) {
+            .concat(ownScores.map(x => x.target))
+            .reduce((carry: Topic[], topicNode: Topic) => {
+                if (!carry.find(x => x == topicNode)) {
                     carry.push(topicNode);
                 }
                 return carry;
@@ -33,103 +23,72 @@ export default class UserService {
             ownScores: ownScores, // Edge list of self
             compareAgainst: userGoals // Edge list of other
         };
+    }
+
+    static userCompetencies({ compareTo }: { compareTo: string }) {
+        return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getUserCompetencies()])
+            .then(data => UserService.generateGraph(data[0], data[1]));
+    }
+
+    static getEngagementScores(itemsToInclude: string[], compareTo: string) {
+        return Promise.all([UserRepository.getUserEngagement(), UserRepository.getUserEngagement()])
+            .then(data => UserService.generateGraph(data[0], data[1]));
     }
 
     static getAllAvailableEngagementTypes() {
         return UserRepository.getAllAvailableEngagementTypes();
     }
 
-    static getEngagementScores(itemsToGet: string[]) {
-        // Only keep edges where target && source appear in topicsToInclude
-        const flattenAndFilter = topics => topics
-            .reduce((a, b) => a.concat(b), [])
-            .filter(x => itemsToGet.find(topics => topics == x.source.id)
-                && itemsToGet.find(topics => topics == x.target.id));
-
-        const ownScores = flattenAndFilter(itemsToGet.map(UserRepository.userEngagementForType));
-        const userGoals = flattenAndFilter(itemsToGet.map(UserRepository.engagementOtherForType));
-
-        const topics = ownScores
-            .map(x => x.source)
-            .reduce((carry, topicNode) => {
-                if (itemsToGet.find(x => x == topicNode.id) &&
-                    !carry.find(x => x == topicNode)) {
-                    carry.push(topicNode);
-                }
-                return carry;
-            }, []);
-
-        return {
-            topics: topics, // Node List
-            ownScores: ownScores, // Edge list of self
-            compareAgainst: userGoals // Edge list of other
-        };
+    static getUserPeers({ connectionCount }: { connectionCount: number }) {
+        return UserRepository.getUserConnections(connectionCount);
     }
 
-    static getLoggedInUser(): User {
+    static getEngagementSummary() {
+        return UserRepository.getUserEngagement()
+            .then(edges => edges.filter(x => x.target == x.source)
+                .map(x => ({
+                    node: x.target,
+                    score: x.competency
+                })));
+    }
+
+    static getLoggedInUser() {
         return UserRepository.getLoggedInUser();
     }
 
-    static getAllAvailableBadges(): Badge[] {
-        return UserRepository.getAllAvailableBadges();
-    }
-
-    static getAllUserBadges(): AcquiredBadge[] {
-        return UserRepository.getAllUserBadges();
-    }
-
-    static getAllAvailableCategories(): string[] {
+    static getAllAvailableCategories() {
         return UserRepository.getAllAvailableCategories();
     }
 
-    static getRecommendedConnections(count: number) {
-        const recommendations = PeerRepository.getMany(count) as any;
-        const categoryLength = this.getAllAvailableCategories().length;
-        recommendations.forEach(x => {
-            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
-            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
-        });
-
-        return recommendations;
+    static getRecommendedConnections({ count }: { count: number }) {
+        return UserRepository.getUserConnections(count);
     }
 
-    static getOutstandingRequests(count: number) {
-        const recommendations = PeerRepository.getMany(count) as any;
-        const categoryLength = this.getAllAvailableCategories().length;
-        recommendations.forEach(x => {
-            x.recommendationType = this.getAllAvailableCategories()[Math.floor(Math.random() * categoryLength)];
-            x.availableTime = new Date(Date.now() + (Math.random() * 1000 * 60 * 60 * 24));
-        });
-
-        return recommendations;
+    static getOutstandingRequests({ count }: { count: number }) {
+        return UserRepository.getUserConnections(count);
     }
 
-    static userHasBadge(badgeId) {
-        // TODO: This lookup is slow, a hashmap or similar would be better.
-        return UserRepository.getAllUserBadges().find(x => x.badge.id == badgeId);
+    static mostReputableUsers() {
+        return UserRepository.getUserConnections(100)
+            .then(leaders => leaders.map(x => {
+                const summary: UserSummary = {
+                    name: x.name,
+                    image: x.image,
+                    reputation: Math.floor(Math.random() * 20),
+                    questionsContributed: Math.floor(Math.random() * 20),
+                    numberAnswers: Math.floor(Math.random() * 20),
+                    numberComments: Math.floor(Math.random() * 20)
+                };
+                return summary;
+            }))
+            .then(leaders => leaders.sort((a, b) => b.reputation - a.reputation));
     }
 
-    static mostReputableUsers(): UserSummary[] {
-        return UserService.getOutstandingRequests(100).map(x => {
-            const summary: UserSummary = {
-                name: x.name,
-                image: x.image,
-                reputation: Math.floor(Math.random() * 20),
-                questionsContributed: Math.floor(Math.random() * 20),
-                numberAnswers: Math.floor(Math.random() * 20),
-                numberComments: Math.floor(Math.random() * 20)
-            };
-            return summary;
-        }).sort((a, b) => b.reputation - a.reputation);
-    }
-
-    static getUserNotifications(count: number): Notification[] {
-        return UserRepository.getUserNotifications().slice(0, count);
+    static getUserNotifications() {
+        return UserRepository.getUserNotifications();
     }
 
     static getMeetingHistory() {
-        return ["UQ", "Toowong", "Indro", "Indooroopilly"].map(x => ({
-            name: x
-        }));
+        return UserRepository.getMeetingHistory();
     }
 }

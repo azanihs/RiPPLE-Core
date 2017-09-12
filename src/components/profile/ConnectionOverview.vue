@@ -4,9 +4,9 @@
             <h2>Peer Connections</h2>
             <md-layout md-flex="100">
                 <md-image v-for="peer in peerConnections"
-                    :key="peer.id"
-                    class="connectionImage"
-                    :md-src="peer.image"></md-image>
+                          :key="peer.id"
+                          class="connectionImage"
+                          :md-src="peer.image"></md-image>
             </md-layout>
         </md-layout>
     </md-card>
@@ -32,35 +32,33 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component } from "av-ts";
-import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+import { Vue, Component, Lifecycle } from "av-ts";
 
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
+import Fetcher from "../../services/Fetcher";
 
-import OverviewDescription from "../util/OverviewDescription.vue";
-
-@Component({
-    components: {
-        "connectedness-heatmap": ConnectednessHeatmap,
-        "overview-description": OverviewDescription
-    }
-})
+@Component()
 export default class ConnectionOverview extends Vue {
 
+    pPeers = [];
+    updatePeers(newPeers) {
+        this.pPeers = newPeers;
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.getUserPeers)
+            .on(this.updatePeers);
+    }
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getUserPeers)
+            .off(this.updatePeers);
+    }
+
     get peerConnections() {
-        return UserService.getUserPeers();
-    }
-
-    get profileData() {
-        return UserService.getLoggedInUser();
-    }
-    get topics() {
-        return TopicService.getAllAvailableTopics();
-    }
-
-    get categories() {
-        return UserService.getAllAvailableCategories();
+        return this.pPeers;
     }
 }
 </script>

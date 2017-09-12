@@ -203,10 +203,22 @@ label {
 <script lang="ts">
 import { Vue, Component, Prop, Lifecycle } from "av-ts";
 import UserService from "./services/UserService";
+import Fetcher from "./services/Fetcher";
 
 @Component()
 export default class Main extends Vue {
-    personalAvatar = UserService.getLoggedInUser().self.image;
+
+    pUser = undefined;
+    updateUser(user) {
+        this.pUser = user;
+    };
+
+    get personalAvatar() {
+        if (this.pUser !== undefined) {
+            return this.pUser.image;
+        }
+        return "";
+    }
 
     @Prop
     path;
@@ -233,6 +245,7 @@ export default class Main extends Vue {
         icon: "assignment"
     }];
 
+
     get pageSize() {
         return this.mobileMode ? "mobilePage" : "largePage";
     }
@@ -255,13 +268,23 @@ export default class Main extends Vue {
     }
 
     @Lifecycle
+    created() {
+        Fetcher.get(UserService.getLoggedInUser)
+            .on(this.updateUser);
+    }
+
+    @Lifecycle
     mounted() {
         window.addEventListener("resize", this.resized);
         this.updatePageName();
         this.resized();
     }
+
     @Lifecycle
     destroyed() {
+        Fetcher.get(UserService.getLoggedInUser)
+            .off(this.updateUser);
+
         window.removeEventListener("resize", this.resized);
     }
 

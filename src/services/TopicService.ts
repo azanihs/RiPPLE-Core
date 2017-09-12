@@ -1,7 +1,8 @@
-import QuestionRepository from "../repositories/UserRepository";
+import TopicRepository from "../repositories/TopicRepository";
 
 export default class TopicService {
-    static getAllAvailableTopics(): string[] {
-        return QuestionRepository.getAllAvailableTopics();
+
+    static getAllAvailableTopics() {
+        return TopicRepository.getAllAvailableTopics();
     }
 }

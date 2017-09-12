@@ -11,15 +11,15 @@
                     <md-layout class="engagementSummary">
                         <h2>Engagement</h2>
                     </md-layout>
-    
+
                     <md-layout class="notificationSummary">
                         <notifications :showCount="5"></notifications>
                     </md-layout>
                     <md-layout class="engagementSummary">
                         <md-card v-for="item in engagementSummary"
-                                 :key="item.name"
+                                 :key="item.node.id"
                                  class="engagementItem">
-                            <h3>{{item.name}}</h3>
+                            <h3>{{item.node.name}}</h3>
                             <div class="engagementScore">
                                 <div class="engagementButton">
                                     {{item.score}}
@@ -65,9 +65,9 @@
                     <p>The connections overview will show you how you have connected to peers through Ripple.</p>
                 </overview-description>
                 <connectedness-heatmap class="componentSeparator"
-                                       :data="profileData"
+                                       :connections="userConnections"
                                        :topics="topics"
-                                       :categories="categories"></connectedness-heatmap>
+                                       :categories="mentoringTypes"></connectedness-heatmap>
                 <connection-overview class="componentSeparator"></connection-overview>
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
@@ -179,16 +179,18 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Component } from "av-ts";
+import { Vue, Component, Lifecycle } from "av-ts";
+
+import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
 
-import Notifications from "../util/Notifications.vue";
-import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
-import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
-import ConnectionOverview from "./ConnectionOverview.vue";
-import OverviewDescription from "../util/OverviewDescription.vue";
 import CollectedBadges from "../util/CollectedBadges.vue";
+import ConnectednessHeatmap from "../util/ConnectednessHeatmap.vue";
+import ConnectionOverview from "./ConnectionOverview.vue";
+import Notifications from "../util/Notifications.vue";
+import OverviewDescription from "../util/OverviewDescription.vue";
+import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 
 @Component({
     components: {
@@ -202,40 +204,89 @@ import CollectedBadges from "../util/CollectedBadges.vue";
 })
 export default class DefaultView extends Vue {
 
-    get profileData() {
-        return UserService.getLoggedInUser();
+    pTopics = [];
+    pUser = undefined;
+    pEngagementItems = [];
+    pEngagementSummary = [];
+    pMentoringTypes = [];
+
+    updateEngagementSummary(newSummary) {
+        this.pEngagementSummary = newSummary;
+    };
+    updateEngagementItems(newEngagementItems) {
+        this.pEngagementItems = newEngagementItems;
+    };
+    updateMentoringTypes(newMentoringTypes) {
+        this.pMentoringTypes = newMentoringTypes;
+    };
+    updateUser(user) {
+        this.pUser = user;
+    };
+    updateTopics(topics) {
+        this.pTopics = topics;
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(UserService.getLoggedInUser)
+            .on(this.updateUser);
+        Fetcher.get(UserService.getAllAvailableEngagementTypes)
+            .on(this.updateEngagementItems);
+        Fetcher.get(UserService.getAllAvailableCategories)
+            .on(this.updateMentoringTypes);
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+        Fetcher.get(UserService.getEngagementSummary)
+            .on(this.updateEngagementSummary);
     }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getLoggedInUser)
+            .off(this.updateUser);
+        Fetcher.get(UserService.getAllAvailableEngagementTypes)
+            .off(this.updateEngagementItems);
+        Fetcher.get(UserService.getAllAvailableCategories)
+            .off(this.updateMentoringTypes);
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
+        Fetcher.get(UserService.getEngagementSummary)
+            .off(this.updateEngagementSummary);
+    }
+
+    get profileData() {
+        return this.pUser;
+    }
+
+    get userConnections() {
+        if (this.pUser !== undefined) {
+            return this.pUser.connections;
+        }
+        return [];
+    }
+
     get topics() {
-        return TopicService.getAllAvailableTopics();
+        return this.pTopics;
     }
 
     get engagementItems() {
-        return UserService.getAllAvailableEngagementTypes();
+        return this.pEngagementItems;
     }
 
     get engagementSummary() {
-        const { ownScores } = UserService.getEngagementScores(this.engagementItems);
-
-        // Return all self-loops competencies.
-        return ownScores
-            .filter(x => x.target == x.source)
-            .map(x => ({
-                name: x.target.id,
-                score: x.competency
-            }));
+        return this.pEngagementSummary;
     }
 
     generateEngagement(itemsToInclude) {
-        return UserService.getEngagementScores(itemsToInclude);
+        return UserService.getEngagementScores;
     }
 
-    get categories() {
-        // Mentoring types
-        return UserService.getAllAvailableCategories();
+    get mentoringTypes() {
+        return this.pMentoringTypes;
     }
 
     generateCompetencies(itemsToInclude) {
-        return UserService.userCompetencies(itemsToInclude);
+        return UserService.userCompetencies;
     }
 
 }

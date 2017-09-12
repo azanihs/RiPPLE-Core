@@ -1,47 +1,60 @@
 <template>
     <md-layout md-flex="100">
-        <md-card class="componentSeparator">
-            <md-layout md-flex="100">
-                <ul class="questionResponse">
-                    <li v-for="(possibleAnswer, index) in question.possibleAnswers"
-                        :key="index"
-                        :class="getResponseStyles(possibleAnswer)">
-                        <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer"
-                             class="answerOption">
-                            <div class="answerIcon">
-                                <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
-                            </div>
-                            <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
-                        </div>
-                        <md-checkbox v-else-if="Array.isArray(question.solution)"
-                                     :disabled="!!disabledResponses.find(x => x == answer)"
-                                     :name="index"
-                                     :id="possibleAnswer.id">{{index}}</md-checkbox>
-                        <md-radio v-else
-                                  class="answerOption"
-                                  :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
-                                  :md-value="index"
-                                  v-model="questionResponse"
-                                  name="answer"
-                                  @click.native="clickedResponse"
-                                  :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
-                        </md-radio>
-                        <div class="distributionOverlay"
-                             :style="answerOptionFill(possibleAnswer)"></div>
-                    </li>
-                </ul>
-            </md-layout>
-        </md-card>
+        <ul class="questionResponse">
+            <li v-for="(possibleAnswer, index) in question.distractors"
+                :key="index"
+                :class="getResponseStyles(possibleAnswer)">
+                <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer"
+                     class="answerOption">
+                    <div class="answerIcon">
+                        <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
+                    </div>
+                    <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
+                </div>
+                <md-checkbox v-else-if="Array.isArray(question.solution)"
+                             :disabled="!!disabledResponses.find(x => x == answer)"
+                             :name="index"
+                             :id="possibleAnswer.id">{{index}}</md-checkbox>
+                <md-radio v-else
+                          class="answerOption"
+                          :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
+                          :md-value="index"
+                          v-model="questionResponse"
+                          name="answer"
+                          @click.native="clickedResponse"
+                          :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
+                </md-radio>
+                <div class="distributionOverlay"
+                     :style="answerOptionFill(possibleAnswer)"></div>
+            </li>
+        </ul>
         <transition name="feedbackGroup"
                     @enter="feedbackEnter"
                     @leave="feedbackLeave"
                     :css="false">
-            <md-card v-if="userHasCorrectAnswer"
-                     class="correctFill">
-                <h2>Explanation</h2>
-                <p>{{ question.explanation }}</p>
-                <slot></slot>
-            </md-card>
+            <md-layout md-flex="100"
+                       md-gutter="8"
+                       v-if="userHasCorrectAnswer">
+                <md-layout md-flex="100"
+                           class="componentSeparator"
+                           md-gutter>
+                    <md-card>
+                        <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
+                        <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
+                    </md-card>
+                </md-layout>
+
+                <md-layout md-flex="100"
+                           md-gutter
+                           class="componentSeparator">
+                    <md-card class="placeBetween">
+                        <question-rater icon="school"
+                                        :defaultValue="question.difficulty">Rate Difficulty</question-rater>
+                        <question-rater class="ratingCard"
+                                        :defaultValue="question.quality">Rate Quality</question-rater>
+                    </md-card>
+                </md-layout>
+            </md-layout>
         </transition>
     </md-layout>
 </template>
@@ -98,11 +111,16 @@
 
 h2 {
     margin: 0px;
+    width: 100%;
 }
 
 .correctFill {
     background-color: rgba(34, 85, 102, 0.4) !important;
     min-width: 100%;
+}
+
+.placeBetween {
+    justify-content: space-between;
 }
 </style>
 <style>
@@ -186,7 +204,7 @@ export default class QuestionResponse extends Vue {
     }
 
     set questionResponse(newValue) {
-        this.disabledResponses.push(this.question.possibleAnswers[newValue]);
+        this.disabledResponses.push(this.question.distractors[newValue]);
         this.userAnswer = newValue;
         this.$emit("userAnswer", this.userHasCorrectAnswer);
     }
@@ -204,15 +222,15 @@ export default class QuestionResponse extends Vue {
         if (Array.isArray(this.question.solution)) {
             return this.question.solution.find(x => x == solution.id) ? "done" : "clear";
         }
-        return this.question.solution == solution.id ? "done" : "clear";
+        return this.question.solution == solution ? "done" : "clear";
     }
 
     get userHasCorrectAnswer() {
-        return this.question.solution == this.questionResponse;
+        return this.question.distractors[this.questionResponse] == this.question.solution;
     }
 
     resetAnswer() {
-        this.disabledResponses.push(this.question.possibleAnswers[this.questionResponse]);
+        this.disabledResponses.push(this.question.distractors[this.questionResponse]);
         this.questionResponse = -1;
     }
 

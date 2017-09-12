@@ -35,25 +35,49 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
+import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
+import { Badge } from "../../interfaces/models";
+import PropUpdate from "../mixins/PropUpdate";
 import UserBadge from "../util/UserBadge.vue";
 import BadgeService from "../../services/BadgeService";
+import Fetcher from "../../services/Fetcher";
+
 
 @Component({
     components: {
         "user-badge": UserBadge
     }
 })
-export default class CollectedBadges extends Vue {
+export default class CollectedBadges extends PropUpdate {
     @Prop topic = p(String);
 
-    get availableBadges() {
-        if (this.topic == "all")
-            return BadgeService.getAllAvailableBadges();
-        else if (this.topic == "closest")
-            return BadgeService.getClosestUserBadges();
-        else
-            return BadgeService.getBadgeByType(this.topic);
+    availableBadges = [];
+    fetcherInstance = undefined;
+
+    updateAvailableBadges(newBadges) {
+        this.availableBadges = newBadges;
+    };
+
+    @Lifecycle
+    created() {
+        if (this.topic == "all") {
+            this.fetcherInstance = Fetcher.get(BadgeService.getAllAvailableBadges);
+        } else if (this.topic == "closest") {
+            this.fetcherInstance = Fetcher.get(BadgeService.getClosestUserBadges);
+        } else {
+            this.fetcherInstance = Fetcher.get(BadgeService.getBadgesByCategory, { category: this.topic });
+        }
+
+        this.fetcherInstance.on(this.updateAvailableBadges);
+        this.fetcherInstance.run();
     }
+
+    @Lifecycle
+    destroyed() {
+        if (this.fetcherInstance !== undefined) {
+            this.fetcherInstance.off(this.updateAvailableBadges);
+        }
+    }
+
 }
 </script>
