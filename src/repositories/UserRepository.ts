@@ -144,7 +144,7 @@ export default class UserRepository {
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
-        return fetch(`//localhost:8000/questions/competencies/all/`)
+        return fetch(`/rippleapi/questions/competencies/all/`)
             .then(x => x.json())
             .then(x => x.map(x => {
                 const edge: Edge = {

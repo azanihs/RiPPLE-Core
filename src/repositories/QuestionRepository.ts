@@ -5,7 +5,7 @@ import f from "faker";
 
 export default class QuestionRepository {
     static getMany(count: number): Promise<Question[]> {
-        return fetch("//localhost:8000/questions/all")
+        return fetch("/rippleapi/questions/all/")
             .then(questions => questions.json())
             .then(questions => questions.map(x => {
                 const question: Question = {
@@ -26,11 +26,11 @@ export default class QuestionRepository {
     }
 
     static search(sortField: string, sortOrder: string, filterField: string, query: string) {
-        return fetch(`//localhost:8000/questions/search/` +
-            `sortField/${sortField}/` +
-            `sortOrder/${sortOrder}/` +
-            `filterField/${filterField}/` +
-            `query/${query}/`)
+        return fetch(`/rippleapi/questions/search/` +
+            `sortField/${sortField || " "}/` +
+            `sortOrder/${sortOrder || " "}/` +
+            `filterField/${filterField || " "}/` +
+            `query/${query || " "}/`)
             .then(questions => questions.json())
             .then(questions => questions.map(x => {
                 const question: Question = {
