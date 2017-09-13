@@ -10,8 +10,8 @@
             <md-layout md-flex="100"
                        class="questionContainer componentSeparator">
                 <md-card>
-                    <p class="questionContent">
-                        {{question.content}}
+                    <p class="questionContent"
+                       v-html="question.content">
                     </p>
                     <question-details :question="question"></question-details>
                 </md-card>
@@ -67,6 +67,17 @@
     </md-layout>
 </template>
 
+<style>
+.questionContent img {
+    width: 50%;
+    height: auto;
+    float: left;
+    border: 1px solid #bbb;
+    margin-right: 10px;
+    box-shadow: 2px 2px 5px #aaa;
+}
+</style>
+
 <style scoped>
 .questionNavigation {
     width: 100%;
@@ -90,14 +101,7 @@
     width: 100%;
 }
 
-img {
-    width: 50%;
-    height: auto;
-    float: left;
-    border: 1px solid #bbb;
-    margin-right: 10px;
-    box-shadow: 2px 2px 5px #aaa;
-}
+
 
 h2 {
     width: 100%;

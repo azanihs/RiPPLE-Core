@@ -5,7 +5,7 @@
             <div class="leftPanel fullHeight">
                 <div ref="clamp"
                      class="clamp">
-                    <span>{{ data.content }}</span>
+                    <span v-html="data.content"></span>
                 </div>
                 <div class="bottomPanel">
                     <topic-chip v-for="topic in data.topics"
@@ -41,6 +41,17 @@
     </md-card>
 </template>
 
+<style>
+.leftPanel img {
+    width: 50%;
+    max-height: 95% !important;
+    float: left;
+    border: 1px solid #bbb;
+    margin-right: 10px;
+    box-shadow: 2px 2px 5px #aaa;
+}
+</style>
+
 <style scoped>
 .card {
     padding: 0px !important;
@@ -58,14 +69,7 @@
     border-right: 1px solid #ddd;
 }
 
-.leftPanel img {
-    width: 50%;
-    height: auto;
-    float: left;
-    border: 1px solid #bbb;
-    margin-right: 10px;
-    box-shadow: 2px 2px 5px #aaa;
-}
+
 
 .rightPanel {
     padding: 8px;
