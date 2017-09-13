@@ -25,4 +25,8 @@ export default class QuestionService {
         }
         return distribution;
     }
+
+    static submitResponse({ responseId }: { responseId: number }) {
+        return QuestionRepository.submitResponse(responseId);
+    }
 }

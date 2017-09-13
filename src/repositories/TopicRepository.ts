@@ -12,7 +12,7 @@ export default class TopicRepository {
     }
 
     static getAllAvailableTopics(): Promise<Topic[]> {
-        return fetch("/rippleapi/questions/topics/")
+        return fetch("http://localhost:8000/questions/topics/")
             .then(topics => topics.json())
             .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }

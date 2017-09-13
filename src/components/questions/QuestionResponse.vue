@@ -206,6 +206,8 @@ export default class QuestionResponse extends Vue {
     set questionResponse(newValue) {
         this.disabledResponses.push(this.question.distractors[newValue]);
         this.userAnswer = newValue;
+
+        // QuestionService.submitResponse(this.newValue)
         this.$emit("userAnswer", this.userHasCorrectAnswer);
     }
 
