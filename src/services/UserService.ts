@@ -1,5 +1,3 @@
-import { every, mergeCache, mergeStringCache } from "./Notify";
-
 import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";

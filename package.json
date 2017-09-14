@@ -16,6 +16,7 @@
         "@types/d3": "^4.9.0",
         "bulma": "^0.4.3",
         "d3": "^4.10.0",
+        "dotenv-webpack": "^1.5.4",
         "faker": "^4.1.0",
         "karma-phantomjs-shim": "^1.4.0",
         "phantomjs-shim": "^0.1.0",

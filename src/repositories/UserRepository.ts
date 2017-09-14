@@ -1,6 +1,8 @@
 import "whatwg-fetch";
 import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
+import { API } from "./APIRepository";
+
 import faker from "faker";
 
 const f: any = faker;
@@ -144,7 +146,7 @@ export default class UserRepository {
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
-        return fetch(`http://localhost:8000/questions/competencies/all/`)
+        return fetch(`${API}/questions/competencies/all/`)
             .then(x => x.json())
             .then(x => x.map(x => {
                 const edge: Edge = {

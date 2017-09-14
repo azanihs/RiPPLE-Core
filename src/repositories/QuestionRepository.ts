@@ -1,11 +1,12 @@
 import "whatwg-fetch";
+import { API } from "./APIRepository";
 import { Question, Topic } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import f from "faker";
 
 export default class QuestionRepository {
     static getMany(count: number): Promise<Question[]> {
-        return fetch("http://localhost:8000/questions/all/")
+        return fetch(`${API}/questions/all/`)
             .then(questions => questions.json())
             .then(questions => questions.map(x => {
                 const question: Question = {
@@ -26,7 +27,7 @@ export default class QuestionRepository {
     }
 
     static search(sortField: string, sortOrder: string, filterField: string, query: string) {
-        return fetch(`http://localhost:8000/questions/search/` +
+        return fetch(`${API}/questions/search/` +
             `sortField/${sortField || " "}/` +
             `sortOrder/${sortOrder || " "}/` +
             `filterField/${filterField || " "}/` +
@@ -51,7 +52,7 @@ export default class QuestionRepository {
     }
 
     static submitResponse(distractorID: number) {
-        return fetch(`http://localhost:8000/questions/respond/`, {
+        return fetch(`${API}/questions/respond/`, {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -68,7 +69,7 @@ export default class QuestionRepository {
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
-        return fetch(`http://localhost:8000/questions/rate/`, {
+        return fetch(`${API}/questions/rate/`, {
             method: "POST",
             headers: {
                 "Accept": "application/json",
