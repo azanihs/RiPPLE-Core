@@ -13,7 +13,7 @@
                                :key="option.value"
                                :value="option.value">{{ option.name }}</md-option>
                 </md-select>
-                <h3 v-if="field.sort"
+                <h3 v-if="field.sort && search[field.id] != ''"
                     @click="sort"
                     class="sortBy">{{ search.sortDesc ? "Descending" : "Ascending"}}
                     <md-icon :class="{rotate: search.sortDesc}">arrow_upward</md-icon>
