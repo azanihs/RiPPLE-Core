@@ -37,3 +37,5 @@ jspm_packages
 
 # Optional npm cache directory
 .npm
+.env.dev
+.env.prod

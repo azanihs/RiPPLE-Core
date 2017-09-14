@@ -8,6 +8,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var env = config.build.env
 var extractCSS = new ExtractTextPlugin('[name].[contenthash].css');
+var Dotenv = require('dotenv-webpack');
 
 var webpackConfig = merge(baseWebpackConfig, {
     module: {
@@ -55,8 +56,9 @@ var webpackConfig = merge(baseWebpackConfig, {
     plugins: [
         extractCSS,
         // http://vuejs.github.io/vue-loader/en/workflow/production.html
-        new webpack.DefinePlugin({
-            'process.env': env
+        new Dotenv({
+            path: './.env.prod',
+            safe: false
         }),
         new webpack.optimize.UglifyJsPlugin({
             compress: {
@@ -86,7 +88,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         // split vendor js into its own file
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
-            minChunks: function (module, count) {
+            minChunks: function(module, count) {
                 // any required modules inside node_modules are extracted to vendor
                 return (
                     module.resource &&

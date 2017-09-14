@@ -25,4 +25,14 @@ export default class QuestionService {
         }
         return distribution;
     }
+
+    static submitResponse({ responseId }: { responseId: number }) {
+        return QuestionRepository.submitResponse(responseId);
+    }
+
+    static submitRating({ responseId, rateType, rateValue }:
+        { responseId: number, rateType: string, rateValue: number }) {
+        return QuestionRepository.submitRating(responseId, rateType, rateValue);
+    }
+
 }

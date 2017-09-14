@@ -192,7 +192,9 @@ export default class VariableDataVisualiser extends Vue {
     set chart(newVal: string) {
         this.pChartType = newVal;
         this.pChartData = undefined;
-        this.compareList()({ compareTo: this.compare })
+
+        const excludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
+        this.compareList()({ compareTo: this.compare, exlude: excludeTopics })
             .then(results => {
                 const { topics, ownScores, compareAgainst } = results;
 
@@ -287,6 +289,8 @@ export default class VariableDataVisualiser extends Vue {
             this.$set(this.hiddenData, dataItem.id, true);
         }
         const topicsToShow = this.dataCategories.filter(x => !this.isDisabled(x));
+
+        this.chart = this.chart;
         this.$emit("changeTopics", topicsToShow);
     }
 

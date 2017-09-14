@@ -23,7 +23,11 @@ If you have git installed you can clone the project, otherwise you will need to 
 Once you have a copy of the project, you can use your favourite command-line software to navigate to your newly downloaded copy of the project and use the following commands to get started:
 ```
 npm install
+cp .env.example .env.dev
+cp .env.example .env.prod
 ```
+
+Next, you will need to edit the environment settings to your `dev` and `prod` environment files. This allows better interpolability between systems with different configurations. The most important thing to set is the `API_LOCATION` variable, which determines where the application will look for application data.
 
 ## Development Commands
 This project comes packaged with several convenience commands

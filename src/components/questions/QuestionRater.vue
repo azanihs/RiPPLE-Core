@@ -4,6 +4,7 @@
             <slot></slot>
         </h2>
         <rating :max="5"
+                @input="rateAction"
                 :disabled="disabled"
                 :icon="icon"
                 :defaultIndex="defaultValue"></rating>
@@ -41,6 +42,9 @@ export default class QuestionRater extends Vue {
     @Prop defaultValue = p({
         type: Number,
         default: 0
+    });
+    @Prop rateAction = p({
+        type: Function
     });
 }
 

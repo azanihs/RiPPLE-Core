@@ -232,7 +232,7 @@ export default class QuestionBrowser extends Vue {
         this.topicsToUse = topicsToUse;
     }
 
-    generateCompetencies(itemsToInclude) {
+    generateCompetencies() {
         return UserService.userCompetencies;
     }
 

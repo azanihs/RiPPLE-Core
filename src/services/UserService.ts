@@ -1,11 +1,9 @@
-import { every, mergeCache, mergeStringCache } from "./Notify";
-
 import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
 export default class UserService {
-    static generateGraph(sourceData: Edge[], otherData: Edge[]) {
+    static generateGraph(sourceData: Edge[], otherData: Edge[], exlude: number[]) {
         const ownScores = sourceData;
         const userGoals = otherData;
         const topics = ownScores
@@ -16,7 +14,8 @@ export default class UserService {
                     carry.push(topicNode);
                 }
                 return carry;
-            }, []);
+            }, [])
+            .filter(x => !exlude.find(e => e === x.id));
 
         return {
             topics: topics, // Node List
@@ -25,14 +24,14 @@ export default class UserService {
         };
     }
 
-    static userCompetencies({ compareTo }: { compareTo: string }) {
+    static userCompetencies({ compareTo, exlude }: { compareTo: string, exlude: number[] }) {
         return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getUserCompetencies()])
-            .then(data => UserService.generateGraph(data[0], data[1]));
+            .then(data => UserService.generateGraph(data[0], data[1], exlude || []));
     }
 
-    static getEngagementScores(itemsToInclude: string[], compareTo: string) {
+    static getEngagementScores({ compareTo, exlude }: { compareTo: string, exlude: number[] }) {
         return Promise.all([UserRepository.getUserEngagement(), UserRepository.getUserEngagement()])
-            .then(data => UserService.generateGraph(data[0], data[1]));
+            .then(data => UserService.generateGraph(data[0], data[1], exlude || []));
     }
 
     static getAllAvailableEngagementTypes() {

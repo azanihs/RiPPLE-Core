@@ -5,9 +5,10 @@ var utils = require('./utils')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var path = require('path')
+var Dotenv = require('dotenv-webpack');
 
 // add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
+Object.keys(baseWebpackConfig.entry).forEach(function(name) {
     baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
 })
 
@@ -50,9 +51,11 @@ module.exports = merge(baseWebpackConfig, {
     },
     devtool: false,
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env': config.dev.env
+        new Dotenv({
+            path: './.env.dev',
+            safe: false
         }),
+
         // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
