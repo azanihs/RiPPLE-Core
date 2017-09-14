@@ -1,5 +1,5 @@
 import Vue from "vue";
-type PrimitiveMap = { [key: string]: number | string | boolean };
+type PrimitiveMap = { [key: string]: number | string | boolean | number[] };
 type FetcherIdentifer = string;
 type FetcherFunctions<T> = (params?: PrimitiveMap) => Promise<T>;
 

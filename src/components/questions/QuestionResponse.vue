@@ -12,7 +12,7 @@
                     <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
                 </div>
                 <md-checkbox v-else-if="Array.isArray(question.solution)"
-                             :disabled="!!disabledResponses.find(x => x == answer)"
+                             :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
                              :name="index"
                              :id="possibleAnswer.id">{{index}}</md-checkbox>
                 <md-radio v-else
@@ -49,8 +49,10 @@
                            class="componentSeparator">
                     <md-card class="placeBetween">
                         <question-rater icon="school"
+                                        :rateAction="rate('difficulty')"
                                         :defaultValue="question.difficulty">Rate Difficulty</question-rater>
                         <question-rater class="ratingCard"
+                                        :rateAction="rate('quality')"
                                         :defaultValue="question.quality">Rate Quality</question-rater>
                     </md-card>
                 </md-layout>
@@ -204,11 +206,14 @@ export default class QuestionResponse extends Vue {
     }
 
     set questionResponse(newValue) {
-        this.disabledResponses.push(this.question.distractors[newValue]);
+        const distractor = this.question.distractors[newValue];
+        this.disabledResponses.push(distractor);
         this.userAnswer = newValue;
 
-        // QuestionService.submitResponse(this.newValue)
-        this.$emit("userAnswer", this.userHasCorrectAnswer);
+        QuestionService.submitResponse({ responseId: distractor.id })
+            .then(x => {
+                this.$emit("userAnswer", this.userHasCorrectAnswer);
+            });
     }
 
     answerOptionFill(response) {
@@ -248,6 +253,15 @@ export default class QuestionResponse extends Vue {
         }
     }
 
+    rate(rateType: string) {
+        return rateValue => {
+            QuestionService.submitRating({
+                responseId: this.question.distractors[this.userAnswer].id,
+                rateType: rateType,
+                rateValue: rateValue
+            });
+        };
+    }
 
 }
 </script>

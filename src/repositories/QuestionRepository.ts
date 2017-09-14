@@ -50,12 +50,39 @@ export default class QuestionRepository {
             }));
     }
 
-    static submitResponse(responseId: number) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve("Submitted");
-            }, Math.random() * 1000);
-        });
+    static submitResponse(distractorID: number) {
+        return fetch(`http://localhost:8000/questions/respond/`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                distractorID: distractorID
+            })
+        })
+            .then(x => {
+                return x.json()
+                    .catch(_ => x);
+            });
+    }
+
+    static submitRating(distractorID: number, rateType: string, rateValue: number) {
+        return fetch(`http://localhost:8000/questions/rate/`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                distractorID: distractorID,
+                [`${rateType}`]: rateValue
+            })
+        })
+            .then(x => {
+                return x.json()
+                    .catch(_ => x);
+            });
     }
 
 }
