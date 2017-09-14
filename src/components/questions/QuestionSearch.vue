@@ -4,32 +4,38 @@
         <md-layout v-for="field in searchableFields"
                    :key="field.displayName"
                    class="searchItem">
-            <h3 v-if="field.sort"
-                @click="sort"
-                class="sortBy">{{ field.name }}
-                <md-icon>{{search.sortDesc ? "arrow_drop_down" : "arrow_drop_up" }}</md-icon>
-            </h3>
-            <h3 v-else>{{ field.name }}</h3>
+            <md-input-container v-if="field.type == 'select'">
+                <label :for="field.name">{{field.name}}</label>
+                <md-select :name="field.name"
+                           :id="field.name"
+                           v-model="search[field.id]">
+                    <md-option v-for="option in field.options"
+                               :key="option.value"
+                               :value="option.value">{{ option.name }}</md-option>
+                </md-select>
+                <h3 v-if="field.sort"
+                    @click="sort"
+                    class="sortBy">{{ search.sortDesc ? "Descending" : "Ascending"}}
+                    <md-icon :class="{rotate: search.sortDesc}">arrow_upward</md-icon>
+                </h3>
+            </md-input-container>
 
-            <select v-if="field.type == 'select'"
-                    v-model="search[field.id]"
-                    @change="field.search">
-                <option v-for="option in field.options"
-                        :key="option.value"
-                        :value="option.value">{{ option.name }}</option>
-            </select>
-
-            <input v-else-if="field.type == 'text'"
-                   v-model="search[field.id]"
-                   type="text"></input>
+            <md-input-container v-else-if="field.type == 'text'">
+                <label>{{field.name}}</label>
+                <md-input class="searchField"
+                          v-model="search[field.id]"></md-input>
+            </md-input-container>
         </md-layout>
     </md-layout>
 </template>
 
 <style scoped>
+.rotate {
+    transform: rotate(-180deg);
+}
+
 .header {
     justify-content: space-between;
-    margin-bottom: 1em;
     width: 100%;
 }
 
@@ -41,8 +47,21 @@ h2 {
     color: #999;
 }
 
-h3.sortBy {
+.sortBy {
     cursor: pointer;
+    display: inline-flex;
+    margin-left: 25px;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.sortBy>i {
+    font-size: 16px;
+    padding-left: 6px;
+    cursor: pointer;
+    transition: 250ms ease transform;
 }
 
 h3 {
@@ -55,6 +74,10 @@ input {
     height: 25px;
     display: inline-block;
     vertical-align: middle;
+}
+
+.searchField {
+    font-size: 16px !important;
 }
 </style>
 
