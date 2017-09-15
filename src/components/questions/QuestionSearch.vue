@@ -102,6 +102,11 @@ export default class QuestionSearch extends Vue {
         default: 1
     });
 
+    @Prop
+    filterOut = p<string[]>({
+        default: []
+    });
+
     get searchableFields() {
         return [{
             name: "Sort By",
@@ -173,7 +178,7 @@ export default class QuestionSearch extends Vue {
 
     applyFilters() {
         // this.search.page = this.page;
-        const search = Object.assign({}, this.search, { page: this.page });
+        const search = Object.assign({}, this.search, { page: this.page, filterTopics: this.filterOut });
         QuestionService.search(search)
             .then(searchResult => {
                 // this.$emit("searched", searchResult);
@@ -188,6 +193,11 @@ export default class QuestionSearch extends Vue {
 
     @Watch("page")
     pageChanged(newVal, oldVal) {
+        this.startSearch();
+    }
+
+    @Watch("filterOut")
+    topicsChanged(newVal, oldVal) {
         this.startSearch();
     }
 

@@ -24,6 +24,7 @@
                                           :compareList="generateCompetencies">
                 </variable-data-visualiser>
                 <question-search :page="page"
+                                 :filterOut="topicsToFilter"
                                  @searched="changeDisplay">
                     <div class="md-table-card">
                         <md-table-pagination class="paginationControls"
@@ -196,7 +197,9 @@ export default class QuestionBrowser extends Vue {
     }
 
     get showQuestions() {
-        return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
+        return this.searchedQuestions;
+        // Server handles topic filtering now.
+        // return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
     }
 
 
@@ -214,8 +217,8 @@ export default class QuestionBrowser extends Vue {
 
     changeDisplay(searchedQuestions) {
         this.pPage = searchedQuestions.page;
-        this.pQuestionCount = searchedQuestions.totalItems;
         this.searchedQuestions = searchedQuestions.questions;
+        this.pQuestionCount = searchedQuestions.totalItems;
     }
 
     selectRandom() {
@@ -235,6 +238,10 @@ export default class QuestionBrowser extends Vue {
 
     filterQuestionTopic(topicsToUse) {
         this.topicsToUse = topicsToUse;
+    }
+
+    get topicsToFilter() {
+        return this.topics.filter(x => this.topicsToUse.indexOf(x) === -1).map(x => x.id);
     }
 
     generateCompetencies() {

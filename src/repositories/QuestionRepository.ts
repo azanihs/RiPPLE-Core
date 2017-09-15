@@ -29,6 +29,7 @@ export default class QuestionRepository {
     static search(sortField: string | undefined,
         sortOrder: string | undefined,
         filterField: string | undefined,
+        filterTopics: string[] | undefined,
         query: string | undefined,
         page: string | undefined) {
         return fetch(`${API}/questions/search/`, {
@@ -41,6 +42,7 @@ export default class QuestionRepository {
                 sortField,
                 sortOrder,
                 filterField,
+                filterTopics,
                 query,
                 page
             })
