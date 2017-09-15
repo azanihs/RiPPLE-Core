@@ -13,7 +13,7 @@ const getCategory: any = i => ["connections", "engagement", "competencies"][i];
 const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recommendations", "Social Connections",
     "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"];
 
-const topics = new Array(10).fill(0).map(x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
+const topics = Array.from({ length: 10 }, x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
 
 type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
 
@@ -39,7 +39,7 @@ const getRandomTopic = () => {
     const i = f.random.number({ min: 0, max: 3 });
     return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
 };
-const notifications = new Array(50).fill(0).map(x => ({
+const notifications = Array.from({ length: 50 }).map(x => ({
     id: Math.random(),
     type: getRandomTopic() as NotificationType,
     content: f.hacker.phrase(),
@@ -85,8 +85,8 @@ const makeUser = () => {
         };
         return connection;
     });
-    const proficiencies = new Array(f.random.number({ min: 1, max: 4 }))
-        .fill(0).map(x => f.hacker.abbreviation()) as string[];
+    const proficiencies = Array.from({ length: f.random.number({ min: 1, max: 4 }) },
+        x => f.hacker.abbreviation()) as string[];
 
     const user: User = {
         id: IDCounter++,
@@ -116,7 +116,7 @@ export default class UserRepository {
     static getUserConnections(count: number): Promise<User[]> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve(new Array(count).fill(0).map(makeUser));
+                resolve(Array.from({ length: count }, makeUser));
             }, Math.random() * 1000);
         });
     }

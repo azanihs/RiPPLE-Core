@@ -2,9 +2,9 @@ import QuestionRepository from "../repositories/QuestionRepository";
 import { Question } from "../interfaces/models";
 
 export default class QuestionService {
-    static search(searchQuery): Promise<Question[]> {
-        const { sortField, sortDesc, filterField, query } = searchQuery;
-        return QuestionRepository.search(sortField || "", sortDesc ? "DESC" : "ASC", filterField || "", query || "");
+    static search(searchQuery): Promise<{ questions: Question[], totalItems: number, page: number }> {
+        const { sortField, sortDesc, filterField, filterTopics, query, page } = searchQuery;
+        return QuestionRepository.search(sortField, sortDesc ? "DESC" : "ASC", filterField, filterTopics, query, page);
     }
 
     static getRecommendedForUser({ count }: { count: number }): Promise<Question[]> {

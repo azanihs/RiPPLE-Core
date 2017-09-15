@@ -23,8 +23,18 @@
                                           :dataCategories="topics"
                                           :compareList="generateCompetencies">
                 </variable-data-visualiser>
-                <question-search :availableQuestions="questions"
-                                 @searched="changeDisplay"></question-search>
+                <question-search :page="page"
+                                 :filterOut="topicsToFilter"
+                                 @searched="changeDisplay">
+                    <div class="md-table-card">
+                        <md-table-pagination class="paginationControls"
+                                             :md-total="totalQuestions"
+                                             :md-size="25"
+                                             :md-page="page"
+                                             @pagination="nextPage">
+                        </md-table-pagination>
+                    </div>
+                </question-search>
             </md-layout>
             <md-layout md-hide-xsmall
                        md-hide-small
@@ -49,6 +59,7 @@
                                       :data="question"></question-preview>
                 </md-layout>
             </md-layout>
+
         </div>
     </div>
 </template>
@@ -57,6 +68,10 @@
 .relative {
     position: relative;
     width: 100%;
+}
+
+.paginationControls {
+    border-top: none !important;
 }
 
 .overview {
@@ -85,7 +100,7 @@
 }
 
 .headingContainer {
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid #f2f2f2;
 }
 
 .questionPreview {
@@ -142,8 +157,9 @@ export default class QuestionBrowser extends Vue {
 
     pTopics = [];
     pData = {};
+    pPage = 1;
+    pQuestionCount = 0;
 
-    pQuestions: QuestionModel[] = [];
     searchedQuestions: QuestionModel[] = [];
 
     topicsToUse: TopicModel[] = [];
@@ -154,9 +170,6 @@ export default class QuestionBrowser extends Vue {
     updateTopics(topics) {
         this.pTopics = topics;
     };
-    updateQuestions(newQuestions) {
-        this.pQuestions = newQuestions;
-    };
     updateCompetencies(competency) {
         this.pData = competency;
     };
@@ -165,9 +178,6 @@ export default class QuestionBrowser extends Vue {
     created() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateTopics);
-
-        Fetcher.get(QuestionService.getRecommendedForUser)
-            .on(this.updateQuestions);
 
         Fetcher.get(UserService.userCompetencies, {})
             .on(this.updateCompetencies);
@@ -178,9 +188,6 @@ export default class QuestionBrowser extends Vue {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
 
-        Fetcher.get(QuestionService.getRecommendedForUser)
-            .off(this.updateQuestions);
-
         Fetcher.get(UserService.userCompetencies)
             .off(this.updateCompetencies);
     }
@@ -190,12 +197,11 @@ export default class QuestionBrowser extends Vue {
     }
 
     get showQuestions() {
-        return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
+        return this.searchedQuestions;
+        // Server handles topic filtering now.
+        // return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
     }
 
-    get questions() {
-        return this.pQuestions;
-    }
 
     @Watch("selectedQuestion")
     questionChanged() {
@@ -209,8 +215,10 @@ export default class QuestionBrowser extends Vue {
         this.selectedQuestion = null;
     }
 
-    changeDisplay(searchedQuestions: QuestionModel[]) {
-        this.searchedQuestions = searchedQuestions;
+    changeDisplay(searchedQuestions) {
+        this.pPage = searchedQuestions.page;
+        this.searchedQuestions = searchedQuestions.questions;
+        this.pQuestionCount = searchedQuestions.totalItems;
     }
 
     selectRandom() {
@@ -232,8 +240,24 @@ export default class QuestionBrowser extends Vue {
         this.topicsToUse = topicsToUse;
     }
 
+    get topicsToFilter() {
+        return this.topics.filter(x => this.topicsToUse.indexOf(x) === -1).map(x => x.id);
+    }
+
     generateCompetencies() {
         return UserService.userCompetencies;
+    }
+
+    get page() {
+        return this.pPage;
+    }
+
+    get totalQuestions() {
+        return this.pQuestionCount;
+    }
+
+    nextPage(pagination: { size: number, page: number }) {
+        this.pPage = pagination.page;
     }
 
 }

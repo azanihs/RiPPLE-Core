@@ -26,28 +26,47 @@ export default class QuestionRepository {
             }));
     }
 
-    static search(sortField: string, sortOrder: string, filterField: string, query: string) {
-        return fetch(`${API}/questions/search/` +
-            `sortField/${sortField || " "}/` +
-            `sortOrder/${sortOrder || " "}/` +
-            `filterField/${filterField || " "}/` +
-            `query/${query || " "}/`)
+    static search(sortField: string | undefined,
+        sortOrder: string | undefined,
+        filterField: string | undefined,
+        filterTopics: string[] | undefined,
+        query: string | undefined,
+        page: string | undefined) {
+        return fetch(`${API}/questions/search/`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                sortField,
+                sortOrder,
+                filterField,
+                filterTopics,
+                query,
+                page
+            })
+        })
             .then(questions => questions.json())
-            .then(questions => questions.map(x => {
-                const question: Question = {
-                    id: x.id,
-                    difficulty: x.difficulty,
-                    quality: x.quality,
-                    solution: x.distractors.find(d => d.isCorrect === true),
-                    distractors: x.distractors,
-                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                    content: x.content,
-                    explanation: x.explanation,
+            .then(searchResult => ({
+                totalItems: searchResult.totalItems,
+                questions: searchResult.items.map(x => {
+                    const question: Question = {
+                        id: x.id,
+                        difficulty: x.difficulty,
+                        quality: x.quality,
+                        solution: x.distractors.find(d => d.isCorrect === true),
+                        distractors: x.distractors,
+                        topics: x.topics.map(t => TopicRepository.topicPointer(t)),
+                        content: x.content,
+                        explanation: x.explanation,
 
-                    responses: []
-                };
+                        responses: []
+                    };
 
-                return question;
+                    return question;
+                }),
+                page: searchResult.page
             }));
     }
 
