@@ -84,20 +84,22 @@ input {
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Question } from "../../interfaces/models";
+
 import QuestionService from "../../services/QuestionService";
+
 
 @Component()
 export default class QuestionSearch extends Vue {
-    @Prop
-    availableQuestions: Question[];
 
     timeoutId = undefined;
     searchInFlight = false;
 
-    get uniqueQuestionTopics() {
-        const topics = this.availableQuestions.map(x => x.topics).reduce((a, b) => a.concat(b), []);
-        return Array.from(new Set(topics)).map(x => topics.find(t => t == x));
-    }
+    queue: Function[] = [];
+
+    @Prop
+    page = p<number>({
+        default: 1
+    });
 
     get searchableFields() {
         return [{
@@ -155,12 +157,13 @@ export default class QuestionSearch extends Vue {
         sortField: "",
         sortDesc: false,
         filterField: "All Questions",
-        query: ""
+        query: "",
+        page: 0
     }
 
     @Lifecycle
     created() {
-        this.$emit("searched", this.availableQuestions);
+        this.applyFilters();
     }
 
     sort() {
@@ -168,24 +171,43 @@ export default class QuestionSearch extends Vue {
     }
 
     applyFilters() {
-        QuestionService.search(this.search)
+        // this.search.page = this.page;
+        const search = Object.assign({}, this.search, { page: this.page });
+        QuestionService.search(search)
             .then(searchResult => {
-                this.$emit("searched", searchResult);
+                // this.$emit("searched", searchResult);
+                this.timeoutId = undefined;
+                if (this.queue.length > 0) {
+                    this.queue.pop()();
+                } else {
+                    this.$emit("searched", searchResult);
+                }
             });
+    }
+
+    @Watch("page")
+    pageChanged(newVal, oldVal) {
+        this.startSearch();
     }
 
     @Watch("search", { deep: true })
     searchWatch() {
-        if (this.timeoutId !== undefined) {
-            clearTimeout(this.timeoutId);
+        this.startSearch();
+    }
+
+    startSearch() {
+        if (this.timeoutId === undefined) {
+            this.timeoutId = setTimeout((() => this.applyFilters()), 10);
+        } else {
+            if (this.queue.length > 0) {
+                // Remove unneeded action
+                this.queue.pop();
+            }
+            this.queue.push(() => {
+                this.timeoutId = setTimeout((() => this.applyFilters()), 10);
+            });
         }
-
-        this.timeoutId = setTimeout((() => this.applyFilters()), 250);
     }
 
-    @Watch("availableQuestions")
-    handler() {
-        this.applyFilters();
-    }
 }
 </script>

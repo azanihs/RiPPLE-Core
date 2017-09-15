@@ -23,8 +23,13 @@
                                           :dataCategories="topics"
                                           :compareList="generateCompetencies">
                 </variable-data-visualiser>
-                <question-search :availableQuestions="questions"
+                <question-search :page="page"
                                  @searched="changeDisplay"></question-search>
+                <md-table-pagination :md-total="totalQuestions"
+                                     :md-size="25"
+                                     :md-page="page"
+                                     @pagination="nextPage">
+                </md-table-pagination>
             </md-layout>
             <md-layout md-hide-xsmall
                        md-hide-small
@@ -49,6 +54,7 @@
                                       :data="question"></question-preview>
                 </md-layout>
             </md-layout>
+
         </div>
     </div>
 </template>
@@ -142,8 +148,9 @@ export default class QuestionBrowser extends Vue {
 
     pTopics = [];
     pData = {};
+    pPage = 1;
+    pQuestionCount = 0;
 
-    pQuestions: QuestionModel[] = [];
     searchedQuestions: QuestionModel[] = [];
 
     topicsToUse: TopicModel[] = [];
@@ -154,9 +161,6 @@ export default class QuestionBrowser extends Vue {
     updateTopics(topics) {
         this.pTopics = topics;
     };
-    updateQuestions(newQuestions) {
-        this.pQuestions = newQuestions;
-    };
     updateCompetencies(competency) {
         this.pData = competency;
     };
@@ -166,9 +170,6 @@ export default class QuestionBrowser extends Vue {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateTopics);
 
-        Fetcher.get(QuestionService.getRecommendedForUser)
-            .on(this.updateQuestions);
-
         Fetcher.get(UserService.userCompetencies, {})
             .on(this.updateCompetencies);
     }
@@ -177,9 +178,6 @@ export default class QuestionBrowser extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
-
-        Fetcher.get(QuestionService.getRecommendedForUser)
-            .off(this.updateQuestions);
 
         Fetcher.get(UserService.userCompetencies)
             .off(this.updateCompetencies);
@@ -193,9 +191,6 @@ export default class QuestionBrowser extends Vue {
         return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
     }
 
-    get questions() {
-        return this.pQuestions;
-    }
 
     @Watch("selectedQuestion")
     questionChanged() {
@@ -209,8 +204,10 @@ export default class QuestionBrowser extends Vue {
         this.selectedQuestion = null;
     }
 
-    changeDisplay(searchedQuestions: QuestionModel[]) {
-        this.searchedQuestions = searchedQuestions;
+    changeDisplay(searchedQuestions) {
+        this.pPage = searchedQuestions.page;
+        this.pQuestionCount = searchedQuestions.totalItems;
+        this.searchedQuestions = searchedQuestions.questions;
     }
 
     selectRandom() {
@@ -234,6 +231,18 @@ export default class QuestionBrowser extends Vue {
 
     generateCompetencies() {
         return UserService.userCompetencies;
+    }
+
+    get page() {
+        return this.pPage;
+    }
+
+    get totalQuestions() {
+        return this.pQuestionCount;
+    }
+
+    nextPage(pagination: { size: number, page: number }) {
+        this.pPage = pagination.page;
     }
 
 }
