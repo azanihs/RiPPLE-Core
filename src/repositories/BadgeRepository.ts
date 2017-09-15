@@ -3,7 +3,7 @@ import faker from "faker";
 const f: any = faker;
 
 const getCategory: any = i => ["connections", "engagement", "competencies"][i];
-const badges = new Array(30).fill(0).map((x, i) => {
+const badges = Array.from({ length: 30 }, (x, i) => {
     return ({
         id: i,
         category: getCategory(f.random.number({ min: 0, max: 2 })),

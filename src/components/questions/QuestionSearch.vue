@@ -177,15 +177,16 @@ export default class QuestionSearch extends Vue {
     }
 
     applyFilters() {
-        // this.search.page = this.page;
         const search = Object.assign({}, this.search, { page: this.page, filterTopics: this.filterOut });
         QuestionService.search(search)
             .then(searchResult => {
-                // this.$emit("searched", searchResult);
                 this.timeoutId = undefined;
                 if (this.queue.length > 0) {
+                    // Clear out the searches which will be ignored anyway
+                    this.queue.splice(0, this.queue.length - 1);
                     this.queue.pop()();
                 } else {
+                    // Only bubble through the most recent search
                     this.$emit("searched", searchResult);
                 }
             });
@@ -210,10 +211,6 @@ export default class QuestionSearch extends Vue {
         if (this.timeoutId === undefined) {
             this.timeoutId = setTimeout((() => this.applyFilters()), 10);
         } else {
-            if (this.queue.length > 0) {
-                // Remove unneeded action
-                this.queue.pop();
-            }
             this.queue.push(() => {
                 this.timeoutId = setTimeout((() => this.applyFilters()), 10);
             });
