@@ -26,6 +26,7 @@
                           v-model="search[field.id]"></md-input>
             </md-input-container>
         </md-layout>
+        <slot></slot>
     </md-layout>
 </template>
 
@@ -130,7 +131,7 @@ export default class QuestionSearch extends Vue {
             }],
             type: "select"
         }, {
-            name: "Show",
+            name: "Filter",
             id: "filterField",
             options: [{
                 name: "All Questions",
@@ -147,7 +148,7 @@ export default class QuestionSearch extends Vue {
             }],
             type: "select"
         }, {
-            name: "Content",
+            name: "Search",
             id: "query",
             type: "text"
         }];

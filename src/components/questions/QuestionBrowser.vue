@@ -24,16 +24,16 @@
                                           :compareList="generateCompetencies">
                 </variable-data-visualiser>
                 <question-search :page="page"
-                                 @searched="changeDisplay"></question-search>
-
-                <div class="md-table-card">
-                    <md-table-pagination class="paginationControls"
-                                         :md-total="totalQuestions"
-                                         :md-size="25"
-                                         :md-page="page"
-                                         @pagination="nextPage">
-                    </md-table-pagination>
-                </div>
+                                 @searched="changeDisplay">
+                    <div class="md-table-card">
+                        <md-table-pagination class="paginationControls"
+                                             :md-total="totalQuestions"
+                                             :md-size="25"
+                                             :md-page="page"
+                                             @pagination="nextPage">
+                        </md-table-pagination>
+                    </div>
+                </question-search>
             </md-layout>
             <md-layout md-hide-xsmall
                        md-hide-small
@@ -99,7 +99,7 @@
 }
 
 .headingContainer {
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid #f2f2f2;
 }
 
 .questionPreview {
