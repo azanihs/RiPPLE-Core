@@ -25,11 +25,15 @@
                 </variable-data-visualiser>
                 <question-search :page="page"
                                  @searched="changeDisplay"></question-search>
-                <md-table-pagination :md-total="totalQuestions"
-                                     :md-size="25"
-                                     :md-page="page"
-                                     @pagination="nextPage">
-                </md-table-pagination>
+
+                <div class="md-table-card">
+                    <md-table-pagination class="paginationControls"
+                                         :md-total="totalQuestions"
+                                         :md-size="25"
+                                         :md-page="page"
+                                         @pagination="nextPage">
+                    </md-table-pagination>
+                </div>
             </md-layout>
             <md-layout md-hide-xsmall
                        md-hide-small
@@ -63,6 +67,10 @@
 .relative {
     position: relative;
     width: 100%;
+}
+
+.paginationControls {
+    border-top: none !important;
 }
 
 .overview {
