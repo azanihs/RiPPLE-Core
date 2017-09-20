@@ -38,8 +38,8 @@ export default class UserService {
         return UserRepository.getAllAvailableEngagementTypes();
     }
 
-    static getUserPeers({ connectionCount }: { connectionCount: number }) {
-        return UserRepository.getUserConnections(connectionCount);
+    static getUserPeers({ count }: { count: number }) {
+        return UserRepository.getUserConnections(count);
     }
 
     static getEngagementSummary() {
