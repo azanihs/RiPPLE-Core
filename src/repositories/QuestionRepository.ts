@@ -1,12 +1,11 @@
-import "whatwg-fetch";
-import { API } from "./APIRepository";
+import { apiFetch } from "./APIRepository";
 import { Question, Topic } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import f from "faker";
 
 export default class QuestionRepository {
     static getMany(count: number): Promise<Question[]> {
-        return fetch(`${API}/questions/all/`)
+        return apiFetch(`/questions/all/`)
             .then(questions => questions.json())
             .then(questions => questions.map(x => {
                 const question: Question = {
@@ -32,12 +31,12 @@ export default class QuestionRepository {
         filterTopics: string[] | undefined,
         query: string | undefined,
         page: string | undefined) {
-        return fetch(`${API}/questions/search/`, {
+        return apiFetch(`/questions/search/`, {
             method: "POST",
-            headers: {
+            headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "application/json"
-            },
+            }),
             body: JSON.stringify({
                 sortField,
                 sortOrder,
@@ -71,12 +70,12 @@ export default class QuestionRepository {
     }
 
     static submitResponse(distractorID: number) {
-        return fetch(`${API}/questions/respond/`, {
+        return apiFetch(`/questions/respond/`, {
             method: "POST",
-            headers: {
+            headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "application/json"
-            },
+            }),
             body: JSON.stringify({
                 distractorID: distractorID
             })
@@ -88,12 +87,12 @@ export default class QuestionRepository {
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
-        return fetch(`${API}/questions/rate/`, {
+        return apiFetch(`/questions/rate/`, {
             method: "POST",
-            headers: {
+            headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "application/json"
-            },
+            }),
             body: JSON.stringify({
                 distractorID: distractorID,
                 [`${rateType}`]: rateValue
