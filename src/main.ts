@@ -1,3 +1,5 @@
+import UserRepository from "./repositories/UserRepository";
+
 import Vue from "vue";
 import Router from "./routes";
 import VueMaterial from "vue-material";
@@ -20,8 +22,19 @@ appContainer.id = "main";
 appContainer.innerHTML = "<router-view></router-view>";
 document.body.appendChild(appContainer);
 
-/* eslint-disable no-new */
-new Vue({
-    el: "#main",
-    router: Router
-});
+// Fetch User token from server
+UserRepository.authenticate()
+    .catch(err => {
+        document.body.innerHTML = `<h1>Could not authenticate with server</h1><pre>
+            Message: ${err.statusText}
+            Code: ${err.status}
+            url: ${err.url}
+        </pre>`;
+    })
+    .then(x => {
+        new Vue({
+            el: "#main",
+            router: Router
+        });
+    });
+

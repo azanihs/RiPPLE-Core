@@ -1,7 +1,7 @@
-import "whatwg-fetch";
+
 import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
-import { API } from "./APIRepository";
+import { setToken, apiFetch } from "./APIRepository";
 
 import faker from "faker";
 
@@ -146,7 +146,7 @@ export default class UserRepository {
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
-        return fetch(`${API}/questions/competencies/all/`)
+        return apiFetch(`/questions/competencies/all/`)
             .then(x => x.json())
             .then(x => x.map(x => {
                 const edge: Edge = {
@@ -181,5 +181,13 @@ export default class UserRepository {
                 resolve(["Toowong", "UQ", "University Of Queensland", "Kenmore", "Indro"]);
             }, Math.random() * 1000);
         });
+    }
+
+    static authenticate(): Promise<void> {
+        return apiFetch(`/users/login/`)
+            .then(x => x.json())
+            .then(x => {
+                setToken(x.token);
+            });
     }
 }

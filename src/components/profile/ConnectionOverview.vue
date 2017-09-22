@@ -48,7 +48,7 @@ export default class ConnectionOverview extends Vue {
 
     @Lifecycle
     created() {
-        Fetcher.get(UserService.getUserPeers)
+        Fetcher.get(UserService.getUserPeers, { count: 50 })
             .on(this.updatePeers);
     }
     @Lifecycle

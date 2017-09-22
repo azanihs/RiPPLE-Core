@@ -1,6 +1,6 @@
 import "whatwg-fetch";
 import { Topic } from "../interfaces/models";
-import { API } from "./APIRepository";
+import { apiFetch } from "./APIRepository";
 
 const topics = {};
 export default class TopicRepository {
@@ -13,7 +13,7 @@ export default class TopicRepository {
     }
 
     static getAllAvailableTopics(): Promise<Topic[]> {
-        return fetch(`${API}/questions/topics/`)
+        return apiFetch(`/questions/topics/`)
             .then(topics => topics.json())
             .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
