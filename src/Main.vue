@@ -240,6 +240,10 @@ export default class Main extends Vue {
         href: "/view/peers",
         icon: "group"
     }, {
+        text: "Author",
+        href: "/view/author",
+        icon: "attach_file"
+    }, {
         text: "Leaders",
         href: "/view/leaderboard",
         icon: "assignment"
