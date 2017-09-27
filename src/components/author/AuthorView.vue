@@ -27,10 +27,10 @@
         </md-layout>
 
         <div class="uploadContainer">
-            <md-tooltip>
-                <span v-if="!uploadDone">Upload Question</span>
-                <span v-if="uploadDone">Question Uploaded</span>
-            </md-tooltip>
+            <md-tooltip v-if="!uploadDone"
+                        md-direction="top">Upload Question</md-tooltip>
+            <md-tooltip v-if="uploadDone"
+                        md-direction="top">Question Uploaded</md-tooltip>
             <md-button class="md-fab md-raised uploadButton"
                        @click="validateUpload"
                        :class="{'done': uploadDone}">
@@ -46,8 +46,6 @@
 </template>
 
 <style scoped>
-.uploadButton {}
-
 .uploadButton.done {
     background-color: #256 !important;
     color: #f2f2f2 !important;
