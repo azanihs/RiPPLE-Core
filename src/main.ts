@@ -3,12 +3,16 @@ import UserRepository from "./repositories/UserRepository";
 import Vue from "vue";
 import Router from "./routes";
 import VueMaterial from "vue-material";
-import "vue-material/dist/vue-material.css";
+import VueTinymce from "vue-tinymce";
 
+import "./tinymce";
+
+import "vue-material/dist/vue-material.css";
 import "./style/style.css";
 
 // Global scoped addons
 Vue.use(VueMaterial);
+Vue.use(VueTinymce);
 
 Vue.material.registerTheme("spinner", {
     primary: "grey",
