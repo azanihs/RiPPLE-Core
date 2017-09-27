@@ -18,4 +18,14 @@ export default class AuthorService {
             });
         });
     }
+
+    static extractImagesFromDOM(body: string): { content: string, payload: string[] } {
+        // Extracts the base64 strings from all image tags in the provided HTMLBodyElement
+        // Assigns them ID's to identify image tags with their respective content
+        // Returns this object representation ready for server upload
+        return {
+            content: "",
+            payload: []
+        };
+    }
 }

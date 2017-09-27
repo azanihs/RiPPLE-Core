@@ -295,5 +295,28 @@ export default class AuthorView extends Vue {
             }, 100);
         }
     }
+
+    prepareUpload() {
+        return {
+            question: {
+                ...AuthorService.extractImagesFromDOM(this.questionContent)
+            },
+            questionResponses: {
+                A: {
+                    ...AuthorService.extractImagesFromDOM(this.questionResponses.A)
+                },
+                B: {
+                    ...AuthorService.extractImagesFromDOM(this.questionResponses.B)
+                },
+                C: {
+                    ...AuthorService.extractImagesFromDOM(this.questionResponses.C)
+                },
+                D: {
+                    ...AuthorService.extractImagesFromDOM(this.questionResponses.D)
+                }
+            }
+        };
+    }
 }
+
 </script>
