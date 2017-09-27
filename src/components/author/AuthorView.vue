@@ -1,16 +1,67 @@
 <template>
-    <p>
-        Empty author page
-        <tinymce id="editor"
-                 v-model="editor"
-                 :options="options"
-                 @change="change"
-                 :content="''"></tinymce>
-    </p>
+    <md-layout md-flex="100">
+        <md-layout md-flex="100">
+            <h3>Question</h3>
+            <tinymce id="questionEditor"
+                     v-model="questionContent"
+                     :options="options"
+                     :content="''"></tinymce>
+        </md-layout>
+        <md-layout md-flex="100">
+            <h3>Topics</h3>
+            <topic-chip v-for="topic in topics"
+                        :key="topic.id"
+                        :disabled="!topicIsUsed(topic)"
+                        @click.native="toggleTopic(topic)">
+                {{topic.name}}
+            </topic-chip>
+        </md-layout>
+        <md-layout md-flex="100"
+                   v-for="i in ['A', 'B', 'C', 'D']"
+                   :key="i">
+            <h3>Response {{i}}</h3>
+            <tinymce :id="'editor_' + i"
+                     v-model="questionResponses[i]"
+                     :options="options"
+                     :content="''"></tinymce>
+        </md-layout>
+
+        <div class="uploadContainer">
+            <md-tooltip>
+                <span v-if="!uploadDone">Upload Question</span>
+                <span v-if="uploadDone">Question Uploaded</span>
+            </md-tooltip>
+            <md-button class="md-fab md-raised uploadButton"
+                       @click="validateUpload"
+                       :class="{'done': uploadDone}">
+                <md-icon v-if="!uploadDone">save</md-icon>
+                <md-icon v-if="uploadDone">done</md-icon>
+            </md-button>
+            <md-spinner class="progressSpinner uploadSpinner"
+                        :md-size="74"
+                        :md-stroke="3"
+                        :md-progress="uploadProgress"></md-spinner>
+        </div>
+    </md-layout>
 </template>
 
-<style>
+<style scoped>
+.uploadButton {}
 
+.uploadButton.done {
+    background-color: #256 !important;
+    color: #f2f2f2 !important;
+}
+
+.uploadContainer {
+    position: relative;
+}
+
+.uploadSpinner {
+    position: absolute;
+    top: -3px;
+    left: -1px;
+}
 </style>
 
 
@@ -21,15 +72,44 @@ import TopicService from "../../services/TopicService";
 import Fetcher from "../../services/Fetcher";
 import tinyMCEPlugins from "./plugins";
 
+import TopicChip from "../util/TopicChip.vue";
 
-@Component()
+
+@Component({
+    components: {
+        TopicChip
+    }
+})
 export default class AuthorView extends Vue {
 
     pTopics: Topic[] = [];
-    editor = "";
+    questionContent = "";
+    questionResponses = [];
 
-    change() {
+    questionTopics = [];
+    uploadDone = false;
+    uploadProgress = 0;
 
+    validateUpload() {
+        setInterval(() => {
+            this.uploadProgress += 1;
+            if (this.uploadProgress >= 100) {
+                this.uploadDone = true;
+            }
+        }, 100);
+    }
+
+    toggleTopic(topicToToggle) {
+        const topicIndex = this.questionTopics.indexOf(topicToToggle);
+        if (topicIndex == -1) {
+            this.questionTopics.push(topicToToggle);
+        } else {
+            this.questionTopics.splice(topicIndex, 1);
+        }
+    }
+
+    topicIsUsed(topic) {
+        return this.questionTopics.indexOf(topic) >= 0;
     }
 
     updateTopics(newTopics: Topic[]) {
