@@ -125,7 +125,6 @@ import tinyMCEPlugins from "./plugins";
 
 import TopicChip from "../util/TopicChip.vue";
 
-
 @Component({
     components: {
         TopicChip
@@ -147,6 +146,91 @@ export default class AuthorView extends Vue {
     networkMessage = "";
     uploadDone = false;
     uploadProgress = 0;
+
+    imageToBlobMap: Map<string, string> = new Map();
+
+    toggleTopic(topicToToggle) {
+        const topicIndex = this.questionTopics.indexOf(topicToToggle);
+        if (topicIndex == -1) {
+            this.questionTopics.push(topicToToggle);
+        } else {
+            this.questionTopics.splice(topicIndex, 1);
+        }
+    }
+
+    topicIsUsed(topic) {
+        return this.questionTopics.indexOf(topic) >= 0;
+    }
+
+    updateTopics(newTopics: Topic[]) {
+        this.pTopics = newTopics;
+    }
+
+    @Lifecycle
+    created() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateTopics);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateTopics);
+    }
+
+
+    handleFileClick(resolve, currentFieldValue, fieldMeta) {
+        if (fieldMeta.filetype != "image") {
+            return;
+        }
+
+        const input = document.createElement("input");
+        input.type = "file";
+
+        input.addEventListener("change", () => {
+            if (input.files.length != 1) {
+                return;
+            }
+            const file = input.files[0];
+            AuthorService.fileToBase64EncodeString(file)
+                .then(x => {
+                    // * tinyMCE will encode the uploaded image with an window.createObjectURL until it loses focus.
+                    // ** It will use the base64 encoding when focus is lost.
+                    // * When upload time happens, just pull all img srcs from the DOM object, and if they are not a base64 then encode the object to be so
+                    resolve(x["base64"], x["_meta"]);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        });
+
+        // Dispatch a click event
+        const clickEvent = new MouseEvent("click", {
+            "view": window,
+            "bubbles": true,
+            "cancelable": true
+        });
+        input.dispatchEvent(clickEvent);
+    }
+
+    get topics() {
+        return this.pTopics;
+    }
+
+    get options() {
+        return {
+            skin: false,
+            image_caption: true,
+            media_live_embeds: true,
+
+            plugins: tinyMCEPlugins.plugins,
+            toolbar: tinyMCEPlugins.toolbar,
+            image_advtab: true,
+            file_browser_callback_types: "image",
+            file_picker_callback: this.handleFileClick,
+            file_picker_types: "image"
+        };
+    }
 
     getBody(html) {
         const domParser = new DOMParser();
@@ -210,97 +294,6 @@ export default class AuthorView extends Vue {
                 }
             }, 100);
         }
-    }
-
-    toggleTopic(topicToToggle) {
-        const topicIndex = this.questionTopics.indexOf(topicToToggle);
-        if (topicIndex == -1) {
-            this.questionTopics.push(topicToToggle);
-        } else {
-            this.questionTopics.splice(topicIndex, 1);
-        }
-    }
-
-    topicIsUsed(topic) {
-        return this.questionTopics.indexOf(topic) >= 0;
-    }
-
-    updateTopics(newTopics: Topic[]) {
-        this.pTopics = newTopics;
-    }
-
-    @Lifecycle
-    created() {
-        Fetcher.get(TopicService.getAllAvailableTopics)
-            .on(this.updateTopics);
-    }
-
-    @Lifecycle
-    destroyed() {
-        Fetcher.get(TopicService.getAllAvailableTopics)
-            .off(this.updateTopics);
-    }
-
-    processUserFile(file: File): Promise<{ file: string, _meta: Object }> {
-        return AuthorService.fileToBase64EncodeString(file)
-            .then(encodedFilePath => ({
-                file: file.name,
-                _meta: {
-                    href: encodedFilePath,
-                    src: encodedFilePath,
-                    alt: file.name,
-                    text: file.name,
-                    title: file.name
-                }
-            }));
-    }
-
-    handleFileClick(resolve, currentFieldValue, fieldMeta) {
-        if (fieldMeta.filetype != "image") {
-            return;
-        }
-
-        const input = document.createElement("input");
-        input.type = "file";
-
-        input.addEventListener("change", () => {
-            if (input.files.length != 1) {
-                return;
-            }
-            this.processUserFile(input.files[0])
-                .then(x => {
-                    resolve(x.file, x._meta);
-                })
-                .catch(err => {
-                    console.log(err);
-                });
-        });
-
-        // Dispatch a click event
-        const clickEvent = new MouseEvent("click", {
-            "view": window,
-            "bubbles": true,
-            "cancelable": true
-        });
-        input.dispatchEvent(clickEvent);
-    }
-
-    get topics() {
-        return this.pTopics;
-    }
-
-    get options() {
-        return {
-            skin: false,
-            image_caption: true,
-            media_live_embeds: true,
-
-            plugins: tinyMCEPlugins.plugins,
-            toolbar: tinyMCEPlugins.toolbar,
-            image_advtab: true,
-            file_browser_callback_types: "file image media",
-            file_picker_callback: this.handleFileClick
-        };
     }
 }
 </script>
