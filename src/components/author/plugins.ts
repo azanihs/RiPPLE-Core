@@ -10,7 +10,6 @@ export default {
         "image",
         "link",
         "media",
-        "template",
         "table",
         "charmap",
         "hr",
@@ -25,6 +24,6 @@ export default {
         "colorpicker",
         "textpattern",
         "help"],
-    toolbar: "code | formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter" +
+    toolbar: "code | formatselect | bold italic strikethrough forecolor backcolor | image | alignleft aligncenter" +
     "alignright alignjustify  | numlist bullist outdent indent  | removeformat"
 };
