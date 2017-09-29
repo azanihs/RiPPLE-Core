@@ -36,15 +36,24 @@
                                  v-model="question.responses[i]"
                                  :options="options"
                                  :content="''"></tinymce>
-                        <md-radio v-model="question.correctIndex"
-                                  class="noBottomMargin"
-                                  :md-value="i"
-                                  name="correctQuestionGroup">Is Correct</md-radio>
                     </md-tab>
                 </md-tabs>
             </md-card>
         </md-layout>
-
+        <md-layout md-flex="100"
+                   class="cardSeparator">
+            <md-card>
+                <h3>Correct Answer</h3>
+                <md-layout md-flex="100"
+                           class="flexAround">
+                    <md-radio v-for="i in ['A', 'B', 'C', 'D']"
+                              :key="i"
+                              v-model="question.correctIndex"
+                              :md-value="i"
+                              name="correctQuestionGroup">{{i}}</md-radio>
+                </md-layout>
+            </md-card>
+        </md-layout>
         <md-layout md-flex="100"
                    class="cardSeparator">
             <md-card>
@@ -88,7 +97,8 @@
 </template>
 
 <style scoped>
-h2 {
+h2,
+h3 {
     width: 100%;
     min-width: 100%;
     margin-top: 0px;
@@ -102,12 +112,12 @@ h2 {
     margin-top: 2em
 }
 
-.noBottomMargin {
-    margin-bottom: 0px !important;
-}
-
 .rightAlign {
     justify-content: flex-end;
+}
+
+.flexAround {
+    justify-content: space-around;
 }
 
 .uploadButton.done {
