@@ -97,7 +97,7 @@ export interface Edge {
 
 export interface QuestionBuilder {
     content: string,
-    explanantion: string,
+    explanation: string,
     responses: {
         A: string,
         B: string,

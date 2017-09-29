@@ -160,7 +160,7 @@ export default class AuthorView extends Vue {
 
     question: QuestionBuilder = {
         content: "",
-        explanantion: "",
+        explanation: "",
         responses: {
             A: "",
             B: "",

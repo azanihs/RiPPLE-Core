@@ -91,7 +91,7 @@ export default class AuthorService {
             .then(questionContent => {
                 upload.question = questionContent;
             })
-            .then(() => AuthorService.extractImagesFromDOM(question.explanantion))
+            .then(() => AuthorService.extractImagesFromDOM(question.explanation))
             .then(questionExplanation => {
                 upload.explanantion = questionExplanation;
             })
@@ -117,7 +117,7 @@ export default class AuthorService {
                 args: question.content
             },
             "Question must have between 1 and 4 topics": {
-                validateFunction: topics => topics.length > 1 && topics.length < 4,
+                validateFunction: topics => topics.length >= 1 && topics.length <= 4,
                 args: question.topics
             },
             "Question response 'A' cannot be empty": {
@@ -142,7 +142,7 @@ export default class AuthorService {
             },
             "Question explanantion cannot be empty": {
                 validateFunction: this.domIsNotEmpty,
-                args: question.explanantion
+                args: question.explanation
             }
         };
 
