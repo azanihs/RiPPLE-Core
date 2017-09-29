@@ -44,6 +44,20 @@
                 </md-tabs>
             </md-card>
         </md-layout>
+
+        <md-layout md-flex="100"
+                   class="cardSeparator">
+            <md-card>
+                <md-layout md-flex="100"
+                           class="componentSeparator">
+                    <h2>Question Explanantion</h2>
+                    <tinymce id="questionExplanation"
+                             v-model="questionExplanation"
+                             :options="options"
+                             :content="''"></tinymce>
+                </md-layout>
+            </md-card>
+        </md-layout>
         <md-layout md-flex="100"
                    class="rightAlign">
             <div class="uploadContainer cardSeparator">
@@ -63,7 +77,6 @@
                             :md-progress="uploadProgress"></md-spinner>
             </div>
         </md-layout>
-
         <md-snackbar md-position="bottom center"
                      ref="snackbar"
                      md-duration="4000">
@@ -116,14 +129,15 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Topic } from "../../interfaces/models";
+import { Topic, QuestionUpload } from "../../interfaces/models";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
-
 import Fetcher from "../../services/Fetcher";
 import tinyMCEPlugins from "./plugins";
 
 import TopicChip from "../util/TopicChip.vue";
+
+declare const tinyMCE;
 
 @Component({
     components: {
@@ -134,12 +148,14 @@ export default class AuthorView extends Vue {
 
     pTopics: Topic[] = [];
     questionContent = "";
+    questionExplanation = "";
     questionResponses = {
         "A": "",
         "B": "",
         "C": "",
         "D": ""
     };
+
     correctQuestion = "";
 
     questionTopics = [];
@@ -147,7 +163,25 @@ export default class AuthorView extends Vue {
     uploadDone = false;
     uploadProgress = 0;
 
-    imageToBlobMap: Map<string, string> = new Map();
+    pDisabled = false;
+    get disabled() {
+        return this.pDisabled;
+    }
+
+    set disabled(shouldHide: boolean) {
+        this.pDisabled = shouldHide;
+        const changeEditor = mode => {
+            tinyMCE.get().forEach(editor => {
+                editor.setMode(mode);
+            });
+        };
+
+        if (shouldHide) {
+            changeEditor("readonly");
+        } else {
+            changeEditor("design");
+        }
+    }
 
     toggleTopic(topicToToggle) {
         const topicIndex = this.questionTopics.indexOf(topicToToggle);
@@ -244,6 +278,14 @@ export default class AuthorView extends Vue {
         return questionBody.length > 0;
     }
 
+    updateUploadProgress(newProgress) {
+        this.uploadProgress = newProgress;
+
+        if (this.uploadProgress >= 100) {
+            this.disabled = false;
+        }
+    }
+
     validateUpload() {
         let error = "";
         const validator = {
@@ -270,6 +312,10 @@ export default class AuthorView extends Vue {
             "You must select which question is correct": {
                 validateFunction: x => this.correctQuestion !== "",
                 args: ""
+            },
+            "Question explanantion cannot be empty": {
+                validateFunction: this.validateQuestion,
+                args: this.questionExplanation
             }
         };
 
@@ -287,35 +333,43 @@ export default class AuthorView extends Vue {
             this.networkMessage = error;
             (this.$refs.snackbar as any).open();
         } else {
-            setInterval(() => {
-                this.uploadProgress += 1;
-                if (this.uploadProgress >= 100) {
-                    this.uploadDone = true;
-                }
-            }, 100);
+            this.disabled = true;
+            this.prepareUpload()
+                .then(preparedUpload => {
+                    console.log(preparedUpload);
+                    AuthorService.uploadContent(preparedUpload, this.updateUploadProgress);
+                });
         }
     }
 
     prepareUpload() {
-        return {
-            question: {
-                ...AuthorService.extractImagesFromDOM(this.questionContent)
-            },
-            questionResponses: {
-                A: {
-                    ...AuthorService.extractImagesFromDOM(this.questionResponses.A)
-                },
-                B: {
-                    ...AuthorService.extractImagesFromDOM(this.questionResponses.B)
-                },
-                C: {
-                    ...AuthorService.extractImagesFromDOM(this.questionResponses.C)
-                },
-                D: {
-                    ...AuthorService.extractImagesFromDOM(this.questionResponses.D)
-                }
+        const upload: QuestionUpload = {
+            question: undefined,
+            explanantion: undefined,
+            responses: {
+                A: undefined,
+                B: undefined,
+                C: undefined,
+                D: undefined
             }
         };
+
+        const responseHelper = index => AuthorService.extractImagesFromDOM(this.questionResponses[index])
+            .then(response => {
+                upload.responses[index] = response;
+                upload.responses[index].isCorrect = this.correctQuestion === index;
+            });
+
+        return AuthorService.extractImagesFromDOM(this.questionContent)
+            .then(questionContent => {
+                upload.question = questionContent;
+            })
+            .then(() => AuthorService.extractImagesFromDOM(this.questionExplanation))
+            .then(questionExplanation => {
+                upload.explanantion = questionExplanation;
+            })
+            .then(() => Promise.all(["A", "B", "C", "D"].map(responseHelper)))
+            .then(() => upload);
     }
 }
 

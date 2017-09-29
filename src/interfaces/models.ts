@@ -94,3 +94,21 @@ export interface Edge {
     competency: number,
     attempts: number
 };
+
+export interface AuthorResponse {
+    content: string,
+    payloads: {
+        [id: number]: string
+    }
+};
+
+export interface QuestionUpload {
+    question: AuthorResponse,
+    explanantion: AuthorResponse,
+    responses: {
+        A: AuthorResponse,
+        B: AuthorResponse,
+        C: AuthorResponse,
+        D: AuthorResponse
+    }
+};
