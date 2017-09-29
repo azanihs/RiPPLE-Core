@@ -1,4 +1,4 @@
-import { QuestionUpload, AuthorResponse } from "../interfaces/models";
+import { QuestionUpload, AuthorResponse, QuestionBuilder } from "../interfaces/models";
 
 import { blobFetch } from "../repositories/APIRepository";
 
@@ -42,10 +42,9 @@ export default class AuthorService {
         const images = Array.from(dom.querySelectorAll("img"));
         const payloads: { [id: number]: string } = {};
 
-        return Promise.all(
-            images.map((image, i) => new Promise((resolve, reject) => {
-                const url = new URL(image.src);
-                //if (url.hostname == "" || url.hostname == window.location.hostname) {
+        return Promise.all(images.map((image, i) => new Promise((resolve, reject) => {
+            const url = new URL(image.src);
+            if (url.hostname == "" || url.hostname == window.location.hostname) {
                 if (url.protocol == "data:") {
                     // Is a base64 image already
                     payloads[i] = image.src;
@@ -53,7 +52,6 @@ export default class AuthorService {
                     resolve(payloads[i]);
                 } else if (url.protocol == "blob:") {
                     // Is a createObjectURL()
-                    console.log(url);
                     blobFetch(url.href)
                         .then(response => response.blob())
                         .then(AuthorService.fileToBase64EncodeString)
@@ -63,12 +61,99 @@ export default class AuthorService {
                             resolve(payloads[i]);
                         });
                 }
-                //}
-            }))
-        )
-            .then(_ => ({
-                content: dom.innerHTML,
-                payloads: payloads
-            }));
+            }
+        }))).then(_ => ({
+            content: dom.innerHTML,
+            payloads: payloads
+        }));
+    }
+
+
+    static prepareUpload(question: QuestionBuilder) {
+        const upload: QuestionUpload = {
+            question: undefined,
+            explanantion: undefined,
+            responses: {
+                A: undefined,
+                B: undefined,
+                C: undefined,
+                D: undefined
+            }
+        };
+
+        const responseHelper = index => AuthorService.extractImagesFromDOM(question.responses[index])
+            .then(response => {
+                upload.responses[index] = response;
+                upload.responses[index].isCorrect = question.correctIndex === index;
+            });
+
+        return AuthorService.extractImagesFromDOM(question.content)
+            .then(questionContent => {
+                upload.question = questionContent;
+            })
+            .then(() => AuthorService.extractImagesFromDOM(question.explanantion))
+            .then(questionExplanation => {
+                upload.explanantion = questionExplanation;
+            })
+            .then(() => Promise.all(["A", "B", "C", "D"].map(responseHelper)))
+            .then(() => upload);
+    }
+
+    static domIsNotEmpty(questionDOM) {
+        const getBody = (html: string) => {
+            const domParser = new DOMParser();
+            const questionDOM = domParser.parseFromString(html, "text/html");
+            return questionDOM.querySelector("body").innerHTML.trim();
+        };
+
+        const questionBody = getBody(questionDOM);
+        return questionBody.length > 0;
+    }
+
+    static validateQuestions(question: QuestionBuilder) {
+        const validator = {
+            "Question cannot be empty": {
+                validateFunction: this.domIsNotEmpty,
+                args: question.content
+            },
+            "Question must have between 1 and 4 topics": {
+                validateFunction: topics => topics.length > 1 && topics.length < 4,
+                args: question.topics
+            },
+            "Question response 'A' cannot be empty": {
+                validateFunction: this.domIsNotEmpty,
+                args: question.responses.A
+            },
+            "Question response 'B' cannot be empty": {
+                validateFunction: this.domIsNotEmpty,
+                args: question.responses.B
+            },
+            "Question response 'C' cannot be empty": {
+                validateFunction: this.domIsNotEmpty,
+                args: question.responses.C
+            },
+            "Question response 'D' cannot be empty": {
+                validateFunction: this.domIsNotEmpty,
+                args: question.responses.D
+            },
+            "You must select which question is correct": {
+                validateFunction: x => question.correctIndex !== "",
+                args: ""
+            },
+            "Question explanantion cannot be empty": {
+                validateFunction: this.domIsNotEmpty,
+                args: question.explanantion
+            }
+        };
+
+        for (let errorMessage in validator) {
+            if (validator[errorMessage] !== undefined) {
+                const args = validator[errorMessage].args;
+                if (validator[errorMessage].validateFunction(args) === false) {
+                    return errorMessage;
+                }
+            }
+        }
+        return "";
     }
 }

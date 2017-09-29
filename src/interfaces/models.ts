@@ -95,6 +95,19 @@ export interface Edge {
     attempts: number
 };
 
+export interface QuestionBuilder {
+    content: string,
+    explanantion: string,
+    responses: {
+        A: string,
+        B: string,
+        C: string,
+        D: string
+    },
+    correctIndex: string,
+    topics: Topic[]
+};
+
 export interface AuthorResponse {
     content: string,
     payloads: {

@@ -7,7 +7,7 @@
                            class="componentSeparator">
                     <h2>Question Body</h2>
                     <tinymce id="questionEditor"
-                             v-model="questionContent"
+                             v-model="question.content"
                              :options="options"
                              :content="''"></tinymce>
                 </md-layout>
@@ -33,10 +33,10 @@
                             :md-label="'Response ' + i">
                         <h3>Response {{i}}</h3>
                         <tinymce :id="'editor_' + i"
-                                 v-model="questionResponses[i]"
+                                 v-model="question.responses[i]"
                                  :options="options"
                                  :content="''"></tinymce>
-                        <md-radio v-model="correctQuestion"
+                        <md-radio v-model="question.correctIndex"
                                   class="noBottomMargin"
                                   :md-value="i"
                                   name="correctQuestionGroup">Is Correct</md-radio>
@@ -52,7 +52,7 @@
                            class="componentSeparator">
                     <h2>Question Explanantion</h2>
                     <tinymce id="questionExplanation"
-                             v-model="questionExplanation"
+                             v-model="question.explanation"
                              :options="options"
                              :content="''"></tinymce>
                 </md-layout>
@@ -129,7 +129,7 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Topic, QuestionUpload } from "../../interfaces/models";
+import { Topic, QuestionUpload, QuestionBuilder } from "../../interfaces/models";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
 import Fetcher from "../../services/Fetcher";
@@ -147,58 +147,27 @@ declare const tinyMCE;
 export default class AuthorView extends Vue {
 
     pTopics: Topic[] = [];
-    questionContent = "";
-    questionExplanation = "";
-    questionResponses = {
-        "A": "",
-        "B": "",
-        "C": "",
-        "D": ""
+
+    question: QuestionBuilder = {
+        content: "",
+        explanantion: "",
+        responses: {
+            A: "",
+            B: "",
+            C: "",
+            D: ""
+        },
+        correctIndex: "",
+        topics: []
     };
 
     correctQuestion = "";
 
-    questionTopics = [];
     networkMessage = "";
     uploadDone = false;
     uploadProgress = 0;
 
     pDisabled = false;
-    get disabled() {
-        return this.pDisabled;
-    }
-
-    set disabled(shouldHide: boolean) {
-        this.pDisabled = shouldHide;
-        const changeEditor = mode => {
-            tinyMCE.get().forEach(editor => {
-                editor.setMode(mode);
-            });
-        };
-
-        if (shouldHide) {
-            changeEditor("readonly");
-        } else {
-            changeEditor("design");
-        }
-    }
-
-    toggleTopic(topicToToggle) {
-        const topicIndex = this.questionTopics.indexOf(topicToToggle);
-        if (topicIndex == -1) {
-            this.questionTopics.push(topicToToggle);
-        } else {
-            this.questionTopics.splice(topicIndex, 1);
-        }
-    }
-
-    topicIsUsed(topic) {
-        return this.questionTopics.indexOf(topic) >= 0;
-    }
-
-    updateTopics(newTopics: Topic[]) {
-        this.pTopics = newTopics;
-    }
 
     @Lifecycle
     created() {
@@ -212,6 +181,37 @@ export default class AuthorView extends Vue {
             .off(this.updateTopics);
     }
 
+    get disabled() {
+        return this.pDisabled;
+    }
+
+    set disabled(shouldHide: boolean) {
+        this.pDisabled = shouldHide;
+        const changeEditor = mode => {
+            tinyMCE.get().forEach(editor => {
+                editor.setMode(mode);
+            });
+        };
+
+        changeEditor(shouldHide ? "readonly" : "design");
+    }
+
+    toggleTopic(topicToToggle: Topic) {
+        const topicIndex = this.question.topics.indexOf(topicToToggle);
+        if (topicIndex == -1) {
+            this.question.topics.push(topicToToggle);
+        } else {
+            this.question.topics.splice(topicIndex, 1);
+        }
+    }
+
+    topicIsUsed(topic: Topic) {
+        return this.question.topics.indexOf(topic) >= 0;
+    }
+
+    updateTopics(newTopics: Topic[]) {
+        this.pTopics = newTopics;
+    }
 
     handleFileClick(resolve, currentFieldValue, fieldMeta) {
         if (fieldMeta.filetype != "image") {
@@ -266,18 +266,6 @@ export default class AuthorView extends Vue {
         };
     }
 
-    getBody(html) {
-        const domParser = new DOMParser();
-        const questionDOM = domParser.parseFromString(html, "text/html");
-        return questionDOM.querySelector("body").innerHTML.trim();
-    }
-
-    validateQuestion(questionDOM) {
-        const questionBody = this.getBody(questionDOM);
-
-        return questionBody.length > 0;
-    }
-
     updateUploadProgress(newProgress) {
         this.uploadProgress = newProgress;
 
@@ -287,89 +275,19 @@ export default class AuthorView extends Vue {
     }
 
     validateUpload() {
-        let error = "";
-        const validator = {
-            "Question cannot be empty": {
-                validateFunction: this.validateQuestion,
-                args: this.questionContent
-            },
-            "Question response 'A' cannot be empty": {
-                validateFunction: this.validateQuestion,
-                args: this.questionResponses.A
-            },
-            "Question response 'B' cannot be empty": {
-                validateFunction: this.validateQuestion,
-                args: this.questionResponses.B
-            },
-            "Question response 'C' cannot be empty": {
-                validateFunction: this.validateQuestion,
-                args: this.questionResponses.C
-            },
-            "Question response 'D' cannot be empty": {
-                validateFunction: this.validateQuestion,
-                args: this.questionResponses.D
-            },
-            "You must select which question is correct": {
-                validateFunction: x => this.correctQuestion !== "",
-                args: ""
-            },
-            "Question explanantion cannot be empty": {
-                validateFunction: this.validateQuestion,
-                args: this.questionExplanation
-            }
-        };
-
-        for (let errorMessage in validator) {
-            if (validator[errorMessage] !== undefined) {
-                const args = validator[errorMessage].args;
-                if (validator[errorMessage].validateFunction(args) === false) {
-                    error = errorMessage;
-                    break;
-                }
-            }
-        }
+        const error = AuthorService.validateQuestions(this.question);
 
         if (error !== "") {
             this.networkMessage = error;
             (this.$refs.snackbar as any).open();
         } else {
             this.disabled = true;
-            this.prepareUpload()
+            AuthorService.prepareUpload(this.question)
                 .then(preparedUpload => {
                     console.log(preparedUpload);
                     AuthorService.uploadContent(preparedUpload, this.updateUploadProgress);
                 });
         }
-    }
-
-    prepareUpload() {
-        const upload: QuestionUpload = {
-            question: undefined,
-            explanantion: undefined,
-            responses: {
-                A: undefined,
-                B: undefined,
-                C: undefined,
-                D: undefined
-            }
-        };
-
-        const responseHelper = index => AuthorService.extractImagesFromDOM(this.questionResponses[index])
-            .then(response => {
-                upload.responses[index] = response;
-                upload.responses[index].isCorrect = this.correctQuestion === index;
-            });
-
-        return AuthorService.extractImagesFromDOM(this.questionContent)
-            .then(questionContent => {
-                upload.question = questionContent;
-            })
-            .then(() => AuthorService.extractImagesFromDOM(this.questionExplanation))
-            .then(questionExplanation => {
-                upload.explanantion = questionExplanation;
-            })
-            .then(() => Promise.all(["A", "B", "C", "D"].map(responseHelper)))
-            .then(() => upload);
     }
 }
 
