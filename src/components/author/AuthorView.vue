@@ -1,97 +1,59 @@
 <template>
     <md-layout md-flex="100">
-        <md-layout md-flex="100"
-                   class="cardSeparator">
+        <md-layout md-flex="100" class="cardSeparator">
             <md-card>
-                <md-layout md-flex="100"
-                           class="componentSeparator">
+                <md-layout md-flex="100" class="componentSeparator">
                     <h2>Question Body</h2>
-                    <tinymce id="questionEditor"
-                             v-model="question.content"
-                             :options="options"
-                             :content="''"></tinymce>
+                    <tinymce id="questionEditor" v-model="question.content" :options="options" :content="''"></tinymce>
                 </md-layout>
                 <md-layout md-flex="100">
                     <h2>Topics</h2>
-                    <topic-chip v-for="topic in topics"
-                                :key="topic.id"
-                                :disabled="!topicIsUsed(topic)"
-                                @click.native="toggleTopic(topic)">
+                    <topic-chip v-for="topic in topics" :key="topic.id" :disabled="!topicIsUsed(topic)" @click.native="toggleTopic(topic)">
                         {{topic.name}}
                     </topic-chip>
                 </md-layout>
             </md-card>
         </md-layout>
-        <md-layout md-flex="100"
-                   class="cardSeparator">
+        <md-layout md-flex="100" class="cardSeparator">
             <md-card class="removePadding">
-                <md-tabs md-fixed
-                         class="md-transparent tabContainer">
-                    <md-tab v-for="i in ['A', 'B', 'C', 'D']"
-                            :key="i"
-                            :id="'tab_' + i"
-                            :md-label="'Response ' + i">
+                <md-tabs md-fixed class="md-transparent tabContainer">
+                    <md-tab v-for="i in ['A', 'B', 'C', 'D']" :key="i" :id="'tab_' + i" :md-label="'Response ' + i">
                         <h3>Response {{i}}</h3>
-                        <tinymce :id="'editor_' + i"
-                                 v-model="question.responses[i]"
-                                 :options="options"
-                                 :content="''"></tinymce>
+                        <tinymce :id="'editor_' + i" v-model="question.responses[i]" :options="options" :content="''"></tinymce>
                     </md-tab>
                 </md-tabs>
             </md-card>
         </md-layout>
-        <md-layout md-flex="100"
-                   class="cardSeparator">
+        <md-layout md-flex="100" class="cardSeparator">
             <md-card>
                 <h3>Correct Answer</h3>
-                <md-layout md-flex="100"
-                           class="flexAround">
-                    <md-radio v-for="i in ['A', 'B', 'C', 'D']"
-                              :key="i"
-                              v-model="question.correctIndex"
-                              :md-value="i"
-                              name="correctQuestionGroup">{{i}}</md-radio>
+                <md-layout md-flex="100" class="flexAround">
+                    <md-radio v-for="i in ['A', 'B', 'C', 'D']" :key="i" v-model="question.correctIndex" :md-value="i" name="correctQuestionGroup">{{i}}</md-radio>
                 </md-layout>
             </md-card>
         </md-layout>
-        <md-layout md-flex="100"
-                   class="cardSeparator">
+        <md-layout md-flex="100" class="cardSeparator">
             <md-card>
-                <md-layout md-flex="100"
-                           class="componentSeparator">
-                    <h2>Question Explanantion</h2>
-                    <tinymce id="questionExplanation"
-                             v-model="question.explanation"
-                             :options="options"
-                             :content="''"></tinymce>
+                <md-layout md-flex="100" class="componentSeparator">
+                    <h2>Question Explanation</h2>
+                    <tinymce id="questionExplanation" v-model="question.explanation" :options="options" :content="''"></tinymce>
                 </md-layout>
             </md-card>
         </md-layout>
-        <md-layout md-flex="100"
-                   class="rightAlign">
+        <md-layout md-flex="100" class="rightAlign">
             <div class="uploadContainer cardSeparator">
-                <md-tooltip v-if="!uploadDone"
-                            md-direction="top">Upload Question</md-tooltip>
-                <md-tooltip v-if="uploadDone"
-                            md-direction="top">Question Uploaded</md-tooltip>
-                <md-button class="md-fab md-raised uploadButton"
-                           @click="validateUpload"
-                           :class="{'done': uploadDone}">
+                <md-tooltip v-if="!uploadDone" md-direction="top">Upload Question</md-tooltip>
+                <md-tooltip v-if="uploadDone" md-direction="top">Question Uploaded</md-tooltip>
+                <md-button class="md-fab md-raised uploadButton" @click="validateUpload" :class="{'done': uploadDone}">
                     <md-icon v-if="!uploadDone">save</md-icon>
                     <md-icon v-if="uploadDone">done</md-icon>
                 </md-button>
-                <md-spinner class="progressSpinner uploadSpinner"
-                            :md-size="74"
-                            :md-stroke="3"
-                            :md-progress="uploadProgress"></md-spinner>
+                <md-spinner class="progressSpinner uploadSpinner" :md-size="74" :md-stroke="3" :md-progress="uploadProgress"></md-spinner>
             </div>
         </md-layout>
-        <md-snackbar md-position="bottom center"
-                     ref="snackbar"
-                     md-duration="4000">
+        <md-snackbar md-position="bottom center" ref="snackbar" md-duration="4000">
             <span>{{networkMessage}}</span>
-            <md-button class="md-accent"
-                       @click="$refs.snackbar.close()">Close</md-button>
+            <md-button class="md-accent" @click="$refs.snackbar.close()">Close</md-button>
         </md-snackbar>
     </md-layout>
 </template>

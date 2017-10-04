@@ -117,11 +117,12 @@ export interface AuthorResponse {
 
 export interface QuestionUpload {
     question: AuthorResponse,
-    explanantion: AuthorResponse,
+    explanation: AuthorResponse,
     responses: {
         A: AuthorResponse,
         B: AuthorResponse,
         C: AuthorResponse,
         D: AuthorResponse
-    }
+    },
+    topics: Topic[]
 };

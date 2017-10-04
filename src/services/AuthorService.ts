@@ -72,13 +72,14 @@ export default class AuthorService {
     static prepareUpload(question: QuestionBuilder) {
         const upload: QuestionUpload = {
             question: undefined,
-            explanantion: undefined,
+            explanation: undefined,
             responses: {
                 A: undefined,
                 B: undefined,
                 C: undefined,
                 D: undefined
-            }
+            },
+            topics: question.topics
         };
 
         const responseHelper = index => AuthorService.extractImagesFromDOM(question.responses[index])
@@ -93,7 +94,7 @@ export default class AuthorService {
             })
             .then(() => AuthorService.extractImagesFromDOM(question.explanation))
             .then(questionExplanation => {
-                upload.explanantion = questionExplanation;
+                upload.explanation = questionExplanation;
             })
             .then(() => Promise.all(["A", "B", "C", "D"].map(responseHelper)))
             .then(() => upload);
@@ -140,7 +141,7 @@ export default class AuthorService {
                 validateFunction: x => question.correctIndex !== "",
                 args: ""
             },
-            "Question explanantion cannot be empty": {
+            "Question explanation cannot be empty": {
                 validateFunction: this.domIsNotEmpty,
                 args: question.explanation
             }
