@@ -5,39 +5,39 @@
                 :key="index"
                 :class="getResponseStyles(possibleAnswer)">
                 <div v-if="disabledResponses.find(x => x == possibleAnswer) || userHasCorrectAnswer"
-                     class="answerOption">
+                    class="answerOption">
                     <div class="answerIcon">
                         <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
                     </div>
-                    <span>{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}</span>
+                    <span v-html="String.fromCharCode('A'.charCodeAt(0) + index) + '. ' + possibleAnswer.content"></span>
                 </div>
                 <md-checkbox v-else-if="Array.isArray(question.solution)"
-                             :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
-                             :name="index"
-                             :id="possibleAnswer.id">{{index}}</md-checkbox>
+                    :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
+                    :name="index"
+                    :id="possibleAnswer.id">{{index}}</md-checkbox>
                 <md-radio v-else
-                          class="answerOption"
-                          :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
-                          :md-value="index"
-                          v-model="questionResponse"
-                          name="answer"
-                          @click.native="clickedResponse"
-                          :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
+                    class="answerOption"
+                    :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
+                    :md-value="index"
+                    v-model="questionResponse"
+                    name="answer"
+                    @click.native="clickedResponse"
+                    :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
                 </md-radio>
                 <div class="distributionOverlay"
-                     :style="answerOptionFill(possibleAnswer)"></div>
+                    :style="answerOptionFill(possibleAnswer)"></div>
             </li>
         </ul>
         <transition name="feedbackGroup"
-                    @enter="feedbackEnter"
-                    @leave="feedbackLeave"
-                    :css="false">
+            @enter="feedbackEnter"
+            @leave="feedbackLeave"
+            :css="false">
             <md-layout md-flex="100"
-                       md-gutter="8"
-                       v-if="userHasCorrectAnswer">
+                md-gutter="8"
+                v-if="userHasCorrectAnswer">
                 <md-layout md-flex="100"
-                           class="componentSeparator"
-                           md-gutter>
+                    class="componentSeparator"
+                    md-gutter>
                     <md-card>
                         <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
                         <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
@@ -45,15 +45,15 @@
                 </md-layout>
 
                 <md-layout md-flex="100"
-                           md-gutter
-                           class="componentSeparator">
+                    md-gutter
+                    class="componentSeparator">
                     <md-card class="placeBetween">
                         <question-rater icon="school"
-                                        :rateAction="rate('difficulty')"
-                                        :defaultValue="question.difficulty">Rate Difficulty</question-rater>
+                            :rateAction="rate('difficulty')"
+                            :defaultValue="question.difficulty">Rate Difficulty</question-rater>
                         <question-rater class="ratingCard"
-                                        :rateAction="rate('quality')"
-                                        :defaultValue="question.quality">Rate Quality</question-rater>
+                            :rateAction="rate('quality')"
+                            :defaultValue="question.quality">Rate Quality</question-rater>
                     </md-card>
                 </md-layout>
             </md-layout>
