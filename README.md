@@ -1,6 +1,8 @@
 # RiPPLE Client
-Recommendation in a Personalised Peer Learning Environment
-The client component of RiPPLE
+The client component of RiPPLE (Recommendation in Personalised Peer Learning Environments).
+
+A demo of the platform can be viewed at https://hkhosrav.github.io/RiPPLE-Client-side/
+
 
 # Technology Stack
 * Development
