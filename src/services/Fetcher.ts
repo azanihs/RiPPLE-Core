@@ -15,6 +15,13 @@ export default class Fetcher<T extends any> {
     private readonly fn: Function;
     private readonly params: PrimitiveMap;
 
+    static forceUpdate() {
+        // Fire all functions on event bus
+        Fetcher.functionParamMap.forEach((value, key) => {
+            value.run();
+        });
+    }
+
     static subscriptionLookup(subscription: Function) {
         if (Fetcher.functionIdentifiers.get(subscription) === undefined) {
             Fetcher.functionIdentifiers.set(subscription, `${subscription.name}_${subscriptionCount++}`);

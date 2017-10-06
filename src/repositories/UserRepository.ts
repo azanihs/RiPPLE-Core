@@ -100,17 +100,18 @@ const makeUser = () => {
     };
     return user;
 };
-
-const loggedInUser = makeUser();
+const userConnections = makeUser().connections;
+let _courseCode = "";
 
 export default class UserRepository {
-
     static getLoggedInUser(): Promise<User> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(loggedInUser);
-            }, Math.random() * 1000);
-        });
+        return apiFetch(`/users/me`)
+            .then(x => x.json());
+    }
+
+    static getUserCourses(): Promise<{ courseCode: string, courseName: string }[]> {
+        return apiFetch(`/users/courses`)
+            .then(x => x.json());
     }
 
     static getUserConnections(count: number): Promise<User[]> {
@@ -183,11 +184,24 @@ export default class UserRepository {
         });
     }
 
-    static authenticate(): Promise<void> {
-        return apiFetch(`/users/login/`)
+    static getCurrentCourse(courseCode: string) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(courseCode);
+            }, Math.random() * 1000);
+        });
+    }
+
+    static setCurrentCourse(courseCode: string) {
+        _courseCode = courseCode;
+    }
+
+    static authenticate(courseCode?: string): Promise<void> {
+        return apiFetch(`/users/login/${courseCode || " "}`)
             .then(x => x.json())
             .then(x => {
                 setToken(x.token);
+                UserRepository.setCurrentCourse(x.courseCode);
             });
     }
 }

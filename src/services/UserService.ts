@@ -90,4 +90,8 @@ export default class UserService {
     static getMeetingHistory() {
         return UserRepository.getMeetingHistory();
     }
+
+    static getUserCourses() {
+        return UserRepository.getUserCourses();
+    }
 }

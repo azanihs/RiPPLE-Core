@@ -81,14 +81,24 @@ td:hover {
 
 <script lang="ts">
 import { Vue, Prop, Lifecycle, Component, Watch } from "av-ts";
+import Fetcher from "../../services/Fetcher";
+import UserService from "../../services/UserService";
 
 @Component()
 export default class ConnectednessHeatmap extends Vue {
-    @Prop connections;
     @Prop topics;
     @Prop categories;
 
     renderWeights = {};
+    pConnections = [];
+
+    updateConnections(newConnections) {
+        this.pConnections = newConnections;
+    }
+
+    get connections() {
+        return this.pConnections;
+    };
 
     renderColor(category, topic) {
         const max = this.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
@@ -120,7 +130,15 @@ export default class ConnectednessHeatmap extends Vue {
 
     @Lifecycle
     created() {
+        Fetcher.get(UserService.getUserPeers)
+            .on(this.updateConnections);
         this.updatedCategories();
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getUserPeers)
+            .off(this.updateConnections);
     }
 }
 </script>

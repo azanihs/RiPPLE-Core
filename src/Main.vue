@@ -1,37 +1,43 @@
 <template>
     <md-layout>
         <md-layout class="offset"
-                   ref="isVisible"
-                   md-hide-medium-and-up></md-layout>
+            ref="isVisible"
+            md-hide-medium-and-up></md-layout>
         <md-layout md-hide-medium-and-up
-                   class="menuContainer">
+            class="menuContainer">
             <h2>{{ pageTitle }}</h2>
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
-                       ref="menuButton"
-                       @click="toggleSideNav">
+                ref="menuButton"
+                @click="toggleSideNav">
                 <md-icon>{{menuIcon}}</md-icon>
             </md-button>
         </md-layout>
         <md-layout ref="sidenavContainer"
-                   class="sideNavContainer"
-                   :class="pageSize"
-                   md-hide-xsmall
-                   md-hide-small>
+            class="sideNavContainer"
+            :class="pageSize"
+            md-hide-xsmall
+            md-hide-small>
             <div class="profileContainer">
                 <div class="imageContainer">
                     <img :src="personalAvatar" />
                 </div>
-                <h5>Your Name</h5>
-                <h4>Course Name</h4>
+                <h5>{{userFullName}}</h5>
+                <select v-model="courseCode">
+                    <option v-for="course in userCourses"
+                        :key="course.courseCode"
+                        :value="course.courseCode">
+                        {{course.courseCode}}
+                    </option>
+                </select>
             </div>
             <ul>
                 <li v-for="link in links"
                     :key="link.href">
                     <router-link :to="link.href"
-                                 @click.native="toggleSideNav"
-                                 class="md-button routerLink">
+                        @click.native="toggleSideNav"
+                        class="md-button routerLink">
                         <span>{{ link.text }}</span>
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
@@ -40,7 +46,7 @@
             </ul>
         </md-layout>
         <md-layout class="pageContent"
-                   :class="pageSize">
+            :class="pageSize">
             <router-view></router-view>
         </md-layout>
     </md-layout>
@@ -127,7 +133,7 @@
 
 .imageContainer img {
     width: 100%;
-    height: auto;
+    height: 100%;
     border-radius: 100%;
 }
 
@@ -202,22 +208,53 @@ label {
 </style>
 <script lang="ts">
 import { Vue, Component, Prop, Lifecycle } from "av-ts";
+import { User } from "./interfaces/models";
+
+// Special case where main.vue needs to refresh application
+import UserRepository from "./repositories/UserRepository";
 import UserService from "./services/UserService";
 import Fetcher from "./services/Fetcher";
 
 @Component()
 export default class Main extends Vue {
 
-    pUser = undefined;
+    pUser: {
+        user: User,
+        course: {
+            courseCode: string,
+            courseName: string
+        }
+    } = undefined;
+    pCourseCode = "";
+    pCourses = [];
+
     updateUser(user) {
         this.pUser = user;
+        this.pCourseCode = user.course.courseCode;
     };
 
     get personalAvatar() {
         if (this.pUser !== undefined) {
-            return this.pUser.image;
+            return this.pUser.user.image;
         }
+
         return "";
+    }
+
+    get userFullName() {
+        if (this.pUser === undefined) {
+            return "Loading...";
+        }
+
+        return this.pUser.user.name;
+    }
+
+    updateCourses(newCourses) {
+        this.pCourses = newCourses;
+    }
+
+    get userCourses() {
+        return this.pCourses;
     }
 
     @Prop
@@ -254,6 +291,7 @@ export default class Main extends Vue {
         return this.mobileMode ? "mobilePage" : "largePage";
     }
 
+
     resized() {
         const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
         const isVisible = (this.$refs.isVisible as any).$el as HTMLElement;
@@ -267,6 +305,7 @@ export default class Main extends Vue {
             container.style.transform = "translate3d(0,0,0)";
         }
     }
+
     updatePageName() {
         this.pageTitle = this.links.find(x => x.href == this.path).text + " Page";
     }
@@ -275,6 +314,8 @@ export default class Main extends Vue {
     created() {
         Fetcher.get(UserService.getLoggedInUser)
             .on(this.updateUser);
+        Fetcher.get(UserService.getUserCourses)
+            .on(this.updateCourses);
     }
 
     @Lifecycle
@@ -290,6 +331,19 @@ export default class Main extends Vue {
             .off(this.updateUser);
 
         window.removeEventListener("resize", this.resized);
+    }
+
+    get courseCode() {
+        return this.pCourseCode;
+    }
+
+    set courseCode(newCourseCode) {
+        this.pCourseCode = newCourseCode;
+
+        UserRepository.authenticate(newCourseCode)
+            .then(newToken => {
+                Fetcher.forceUpdate();
+            });
     }
 
     toggleSideNav() {

@@ -1,10 +1,10 @@
 <template>
     <md-layout>
         <md-tabs md-fixed
-                 class="md-transparent">
+            class="md-transparent">
             <md-tab md-label="Overview">
                 <md-layout md-flex="100"
-                           class="componentSeparator overview">
+                    class="componentSeparator overview">
                     <md-layout class="notificationSummary">
                         <h2>Notifications</h2>
                     </md-layout>
@@ -17,20 +17,20 @@
                     </md-layout>
                     <md-layout class="engagementSummary">
                         <md-card v-for="item in engagementSummary"
-                                 :key="item.node.id"
-                                 class="engagementItem">
+                            :key="item.node.id"
+                            class="engagementItem">
                             <h3>{{item.node.name}}</h3>
                             <div class="engagementScore">
                                 <div class="engagementButton">
                                     {{item.score}}
                                 </div>
                                 <md-spinner md-theme="spinner"
-                                            class="engagementScoreProgress"
-                                            :md-stroke="2"
-                                            :md-progress="100"></md-spinner>
+                                    class="engagementScoreProgress"
+                                    :md-stroke="2"
+                                    :md-progress="100"></md-spinner>
                                 <md-spinner class="progressSpinner engagementScoreProgress"
-                                            :md-stroke="2"
-                                            :md-progress="item.score"></md-spinner>
+                                    :md-stroke="2"
+                                    :md-progress="item.score"></md-spinner>
                             </div>
                         </md-card>
                     </md-layout>
@@ -43,8 +43,8 @@
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
                 <variable-data-visualiser class="componentSeparator"
-                                          :dataCategories="engagementItems"
-                                          :compareList="generateEngagement">
+                    :dataCategories="engagementItems"
+                    :compareList="generateEngagement">
                 </variable-data-visualiser>
                 <collected-badges topic='engagement'></collected-badges>
             </md-tab>
@@ -54,8 +54,8 @@
                     <p>The competency overview will show how your are progressing towards your goals</p>
                 </overview-description>
                 <variable-data-visualiser class="componentSeparator"
-                                          :dataCategories="topics"
-                                          :compareList="generateCompetencies">
+                    :dataCategories="topics"
+                    :compareList="generateCompetencies">
                 </variable-data-visualiser>
                 <collected-badges topic='competencies'></collected-badges>
             </md-tab>
@@ -65,9 +65,8 @@
                     <p>The connections overview will show you how you have connected to peers through Ripple.</p>
                 </overview-description>
                 <connectedness-heatmap class="componentSeparator"
-                                       :connections="userConnections"
-                                       :topics="topics"
-                                       :categories="mentoringTypes"></connectedness-heatmap>
+                    :topics="topics"
+                    :categories="mentoringTypes"></connectedness-heatmap>
                 <connection-overview class="componentSeparator"></connection-overview>
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
@@ -77,11 +76,11 @@
                     <p>The achievement overview tracks noteable feats you have accomplished in Ripple, and shows you your progress towards those you have not yet achieved.</p>
                 </overview-description>
                 <collected-badges class="componentSeparator"
-                                  topic='closest'></collected-badges>
+                    topic='closest'></collected-badges>
                 <collected-badges class="componentSeparator"
-                                  topic='engagement'></collected-badges>
+                    topic='engagement'></collected-badges>
                 <collected-badges class="componentSeparator"
-                                  topic='competencies'></collected-badges>
+                    topic='competencies'></collected-badges>
                 <collected-badges topic='connections'></collected-badges>
             </md-tab>
             <md-tab md-label="Notifications">
@@ -256,13 +255,6 @@ export default class DefaultView extends Vue {
 
     get profileData() {
         return this.pUser;
-    }
-
-    get userConnections() {
-        if (this.pUser !== undefined) {
-            return this.pUser.connections;
-        }
-        return [];
     }
 
     get topics() {
