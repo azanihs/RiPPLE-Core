@@ -16,7 +16,7 @@ export default class Fetcher<T extends any> {
     private readonly params: PrimitiveMap;
 
     static forceUpdate() {
-        // Fire all functions on event bus
+        // Cause a refresh of all async data by firing all functions on event bus
         Fetcher.functionParamMap.forEach((value, key) => {
             value.run();
         });
