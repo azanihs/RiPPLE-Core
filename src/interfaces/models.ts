@@ -94,3 +94,35 @@ export interface Edge {
     competency: number,
     attempts: number
 };
+
+export interface QuestionBuilder {
+    content: string,
+    explanation: string,
+    responses: {
+        A: string,
+        B: string,
+        C: string,
+        D: string
+    },
+    correctIndex: string,
+    topics: Topic[]
+};
+
+export interface AuthorResponse {
+    content: string,
+    payloads: {
+        [id: number]: string
+    }
+};
+
+export interface QuestionUpload {
+    question: AuthorResponse,
+    explanation: AuthorResponse,
+    responses: {
+        A: AuthorResponse,
+        B: AuthorResponse,
+        C: AuthorResponse,
+        D: AuthorResponse
+    },
+    topics: Topic[]
+};
