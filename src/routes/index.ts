@@ -17,11 +17,13 @@ const routes = [{
     path: "/",
     component: Main,
     props: x => ({
-        path: x.path
+        path: x.name,
+        token: x.query.token,
+        initCourseCode: x.query.course_code
     }),
     children: [{
         path: "/",
-        name: "main",
+        name: "profile",
         component: ProfileView
     }, {
         path: "/view/questions",

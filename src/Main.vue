@@ -217,6 +217,7 @@ import Fetcher from "./services/Fetcher";
 
 @Component()
 export default class Main extends Vue {
+    @Prop path;
 
     pUser: {
         user: User,
@@ -256,9 +257,6 @@ export default class Main extends Vue {
     get userCourses() {
         return this.pCourses;
     }
-
-    @Prop
-    path;
 
     menuIcon = "menu";
     mobileMode = false;
@@ -307,7 +305,10 @@ export default class Main extends Vue {
     }
 
     updatePageName() {
-        this.pageTitle = this.links.find(x => x.href == this.path).text + " Page";
+        const link = this.links.find(x => x.text.toLowerCase() == this.path);
+        if (link !== undefined) {
+            this.pageTitle = link.text + " Page";
+        }
     }
 
     @Lifecycle

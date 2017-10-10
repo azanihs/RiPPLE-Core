@@ -105,12 +105,12 @@ let _courseCode = "";
 
 export default class UserRepository {
     static getLoggedInUser(): Promise<User> {
-        return apiFetch(`/users/me`)
+        return apiFetch(`/users/me/`)
             .then(x => x.json());
     }
 
     static getUserCourses(): Promise<{ courseCode: string, courseName: string }[]> {
-        return apiFetch(`/users/courses`)
+        return apiFetch(`/users/courses/`)
             .then(x => x.json());
     }
 
@@ -194,6 +194,10 @@ export default class UserRepository {
 
     static setCurrentCourse(courseCode: string) {
         _courseCode = courseCode;
+    }
+
+    static setCurrentToken(token: string) {
+        setToken(token);
     }
 
     static authenticate(courseCode?: string): Promise<void> {

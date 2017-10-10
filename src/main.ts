@@ -10,6 +10,16 @@ import "./tinymce";
 import "vue-material/dist/vue-material.css";
 import "./style/style.css";
 
+// From https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/901144#901144
+function getParameterByName(name, url) {
+    name = name.replace(/[\[\]]/g, "\\$&");
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    let results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return "";
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 // Global scoped addons
 Vue.use(VueMaterial);
 Vue.use(VueTinymce);
@@ -21,21 +31,49 @@ Vue.material.registerTheme("spinner", {
     background: "grey"
 });
 
-const appContainer = document.createElement("div");
-appContainer.id = "main";
-appContainer.innerHTML = "<router-view></router-view>";
-document.body.appendChild(appContainer);
-
+class AuthenticationError {
+    constructor(public statusText: string, public status: string, public url: string) {
+    }
+}
 // Fetch User token from server
-UserRepository.authenticate()
+new Promise((resolve, reject) => {
+    const token = getParameterByName("token", window.location.href);
+    const courseCode = getParameterByName("course_code", window.location.href);
+    if (token && courseCode) {
+        setTimeout(() => {
+            UserRepository.setCurrentCourse(courseCode);
+            UserRepository.setCurrentToken(token);
+            resolve(UserRepository.authenticate(courseCode));
+        }, 4000);
+    } else {
+        resolve(UserRepository.authenticate());
+    }
+    /*if (!token) {
+        throw new AuthenticationError(
+            "Missing token. Can not authenticate with server",
+            "BAD",
+            window.location.href
+        );
+    } else if (!courseCode) {
+        throw new AuthenticationError(
+            "Missing course code",
+            "BAD",
+            window.location.href
+        );
+    }*/
+})
     .catch(err => {
         document.body.innerHTML = `<h1>Could not authenticate with server</h1><pre>
-            Message: ${err.statusText}
-            Code: ${err.status}
-            url: ${err.url}
-        </pre>`;
+                Message: ${err.statusText}
+                Code: ${err.status}
+                url: ${err.url}
+            </pre>`;
     })
     .then(x => {
+        const appContainer = document.createElement("div");
+        appContainer.id = "main";
+        appContainer.innerHTML = "<router-view></router-view>";
+        document.body.appendChild(appContainer);
         new Vue({
             el: "#main",
             router: Router
