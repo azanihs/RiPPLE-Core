@@ -20,10 +20,12 @@
         "faker": "^4.1.0",
         "karma-phantomjs-shim": "^1.4.0",
         "phantomjs-shim": "^0.1.0",
+        "tinymce": "^4.6.7",
         "vue": "2.4.2",
         "vue-bulma-chartjs": "^1.0.4",
         "vue-material": "^0.7.4",
         "vue-router": "^2.5.3",
+        "vue-tinymce": "^1.0.5",
         "whatwg-fetch": "^2.0.3"
     },
     "devDependencies": {

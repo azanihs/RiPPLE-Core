@@ -2,61 +2,61 @@
     <div class="relative">
         <transition name="fade">
             <md-layout v-if="selectedQuestion"
-                       key="1"
-                       class="viewContainer">
+                key="1"
+                class="viewContainer">
                 <md-layout md-flex="100"
-                           class="questionContainer">
+                    class="questionContainer">
                     <question @userAnswer="setUserIsFinished"
-                              @newQuestion="selectRandom"
-                              class="question"
-                              :question="selectedQuestion"></question>
+                        @newQuestion="selectRandom"
+                        class="question"
+                        :question="selectedQuestion"></question>
                 </md-layout>
             </md-layout>
         </transition>
         <div :class="{hidden: selectedQuestion}"
-             key="2"
-             class="viewContainer">
+            key="2"
+            class="viewContainer">
             <md-layout class="headingContainer"
-                       md-flex="100">
+                md-flex="100">
                 <variable-data-visualiser class="overview"
-                                          @changeTopics="filterQuestionTopic"
-                                          :dataCategories="topics"
-                                          :compareList="generateCompetencies">
+                    @changeTopics="filterQuestionTopic"
+                    :dataCategories="topics"
+                    :compareList="generateCompetencies">
                 </variable-data-visualiser>
                 <question-search :page="page"
-                                 :filterOut="topicsToFilter"
-                                 @searched="changeDisplay">
+                    :filterOut="topicsToFilter"
+                    @searched="changeDisplay">
                     <div class="md-table-card">
                         <md-table-pagination class="paginationControls"
-                                             :md-total="totalQuestions"
-                                             :md-size="25"
-                                             :md-page="page"
-                                             @pagination="nextPage">
+                            :md-total="totalQuestions"
+                            :md-size="25"
+                            :md-page="page"
+                            @pagination="nextPage">
                         </md-table-pagination>
                     </div>
                 </question-search>
             </md-layout>
             <md-layout md-hide-xsmall
-                       md-hide-small
-                       md-hide-medium>
+                md-hide-small
+                md-hide-medium>
                 <md-layout v-for="question in showQuestions"
-                           md-flex="33"
-                           md-gutter
-                           :key="question.id"
-                           class="questionPreview"
-                           @click.native="openQuestionPreview(question)">
+                    md-flex="33"
+                    md-gutter
+                    :key="question.id"
+                    class="questionPreview"
+                    @click.native="openQuestionPreview(question)">
                     <question-preview class="questionCard"
-                                      :data="question"></question-preview>
+                        :data="question"></question-preview>
                 </md-layout>
             </md-layout>
             <md-layout md-hide-large-and-up>
                 <md-layout v-for="question in showQuestions"
-                           md-flex="100"
-                           :key="question.id"
-                           class="mobileQuestionPreview"
-                           @click.native="openQuestionPreview(question)">
+                    md-flex="100"
+                    :key="question.id"
+                    class="mobileQuestionPreview"
+                    @click.native="openQuestionPreview(question)">
                     <question-preview class="mobileQuestionCard"
-                                      :data="question"></question-preview>
+                        :data="question"></question-preview>
                 </md-layout>
             </md-layout>
 
@@ -198,8 +198,6 @@ export default class QuestionBrowser extends Vue {
 
     get showQuestions() {
         return this.searchedQuestions;
-        // Server handles topic filtering now.
-        // return this.searchedQuestions.filter(x => x.topics.find(t => this.topicsToUse.indexOf(t) >= 0));
     }
 
 

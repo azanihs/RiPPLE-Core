@@ -7,6 +7,7 @@ import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import PeerView from "../components/peers/PeerView.vue";
 import LeaderBoard from "../components/leaderboard/LeaderBoard.vue";
+import AuthorView from "../components/author/AuthorView.vue";
 
 import WIP from "../components/WIP.vue";
 
@@ -16,11 +17,13 @@ const routes = [{
     path: "/",
     component: Main,
     props: x => ({
-        path: x.path
+        path: x.name,
+        token: x.query.token,
+        initCourseCode: x.query.course_code
     }),
     children: [{
         path: "/",
-        name: "main",
+        name: "profile",
         component: ProfileView
     }, {
         path: "/view/questions",
@@ -38,6 +41,10 @@ const routes = [{
         path: "/view/leaderboard",
         name: "leaderboard",
         component: LeaderBoard
+    }, {
+        path: "/view/author",
+        name: "author",
+        component: AuthorView
     }, {
         path: "*",
         name: "error",
