@@ -1,34 +1,34 @@
 <template>
     <md-layout>
         <md-layout class="offset"
-            ref="isVisible"
-            md-hide-medium-and-up></md-layout>
+                   ref="isVisible"
+                   md-hide-medium-and-up></md-layout>
         <md-layout md-hide-medium-and-up
-            class="menuContainer">
+                   class="menuContainer">
             <h2>{{ pageTitle }}</h2>
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
-                ref="menuButton"
-                @click="toggleSideNav">
+                       ref="menuButton"
+                       @click="toggleSideNav">
                 <md-icon>{{menuIcon}}</md-icon>
             </md-button>
         </md-layout>
         <md-layout ref="sidenavContainer"
-            class="sideNavContainer"
-            :class="pageSize"
-            md-hide-xsmall
-            md-hide-small>
+                   class="sideNavContainer"
+                   :class="pageSize"
+                   md-hide-xsmall
+                   md-hide-small>
             <div class="profileContainer">
                 <div class="imageContainer">
                     <img :src="personalAvatar" />
                 </div>
                 <h5>{{userFullName}}</h5>
-                <select v-model="courseCode">
-                    <option v-for="course in userCourses"
-                        :key="course.courseCode"
-                        :value="course.courseCode">
-                        {{course.courseCode}}
+                <select v-model="course">
+                    <option v-for="enrolledCourse in userCourses"
+                            :key="enrolledCourse.courseCode"
+                            :value="enrolledCourse">
+                        {{enrolledCourse.courseCode}}
                     </option>
                 </select>
             </div>
@@ -36,8 +36,8 @@
                 <li v-for="link in links"
                     :key="link.href">
                     <router-link :to="link.href"
-                        @click.native="toggleSideNav"
-                        class="md-button routerLink">
+                                 @click.native="toggleSideNav"
+                                 class="md-button routerLink">
                         <span>{{ link.text }}</span>
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
@@ -46,7 +46,7 @@
             </ul>
         </md-layout>
         <md-layout class="pageContent"
-            :class="pageSize">
+                   :class="pageSize">
             <router-view></router-view>
         </md-layout>
     </md-layout>
@@ -208,7 +208,7 @@ label {
 </style>
 <script lang="ts">
 import { Vue, Component, Prop, Lifecycle } from "av-ts";
-import { User } from "./interfaces/models";
+import { User, Course } from "./interfaces/models";
 
 // Special case where main.vue needs to refresh application
 import UserRepository from "./repositories/UserRepository";
@@ -219,24 +219,21 @@ import Fetcher from "./services/Fetcher";
 export default class Main extends Vue {
     @Prop path;
 
-    pUser: {
-        user: User,
-        course: {
-            courseCode: string,
-            courseName: string
-        }
-    } = undefined;
-    pCourseCode = "";
+    pUser: User = undefined;
+    pCourse: Course = undefined;
+
     pCourses = [];
 
-    updateUser(user) {
-        this.pUser = user;
-        this.pCourseCode = user.course.courseCode;
+    updateUser(courseUser: { user: User, course: Course }) {
+        this.pUser = courseUser.user;
+        if (this.pCourse === undefined) {
+            this.pCourse = courseUser.course;
+        }
     };
 
     get personalAvatar() {
         if (this.pUser !== undefined) {
-            return this.pUser.user.image;
+            return this.pUser.image;
         }
 
         return "";
@@ -247,11 +244,14 @@ export default class Main extends Vue {
             return "Loading...";
         }
 
-        return this.pUser.user.name;
+        return this.pUser.name;
     }
 
     updateCourses(newCourses) {
         this.pCourses = newCourses;
+        if (this.pCourse === undefined && newCourses.length > 0) {
+            this.pCourse = newCourses[0];
+        }
     }
 
     get userCourses() {
@@ -262,33 +262,50 @@ export default class Main extends Vue {
     mobileMode = false;
     pageTitle = "";
 
-    links = [{
-        text: "Profile",
-        href: "/",
-        icon: "widgets"
-    }, {
-        text: "Answer",
-        href: "/view/questions",
-        icon: "lightbulb_outline"
-    }, {
-        text: "Connect",
-        href: "/view/peers",
-        icon: "group"
-    }, {
-        text: "Author",
-        href: "/view/author",
-        icon: "attach_file"
-    }, {
-        text: "Leaders",
-        href: "/view/leaderboard",
-        icon: "assignment"
-    }];
+    get links() {
+        const profileLink = {
+            text: "Profile",
+            href: "/",
+            icon: "widgets"
+        };
+        const adminLink = {
+            text: "Admin",
+            href: "/admin",
+            icon: "widgets"
+        };
+        const leaderLink = {
+            text: "Leaders",
+            href: "/view/leaderboard",
+            icon: "assignment"
+        };
 
+        const baseLinks = [{
+            text: "Answer",
+            href: "/view/questions",
+            icon: "lightbulb_outline"
+        }, {
+            text: "Connect",
+            href: "/view/peers",
+            icon: "group"
+        }, {
+            text: "Author",
+            href: "/view/author",
+            icon: "attach_file"
+        }];
+
+        if (this.course !== undefined && this.course.userRole == "instructor") {
+            baseLinks.unshift(adminLink);
+            window.location.href = "/#/admin";
+        } else {
+            baseLinks.unshift(profileLink);
+            baseLinks.push(leaderLink);
+        }
+        return baseLinks;
+    }
 
     get pageSize() {
         return this.mobileMode ? "mobilePage" : "largePage";
     }
-
 
     resized() {
         const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
@@ -334,14 +351,15 @@ export default class Main extends Vue {
         window.removeEventListener("resize", this.resized);
     }
 
-    get courseCode() {
-        return this.pCourseCode;
+    get course() {
+        return this.pCourse;
     }
 
-    set courseCode(newCourseCode) {
-        this.pCourseCode = newCourseCode;
+    set course(newCourse) {
+        if (newCourse === undefined) return;
 
-        UserRepository.authenticate(newCourseCode)
+        this.pCourse = newCourse;
+        UserRepository.authenticate(newCourse.courseCode)
             .then(newToken => {
                 Fetcher.forceUpdate();
             });

@@ -37,6 +37,12 @@ export interface Node {
     attempts: number
 };
 
+export interface Course {
+    courseCode: string,
+    courseName: string,
+    userRole: string
+};
+
 export interface User {
     id: number,
     name: string,

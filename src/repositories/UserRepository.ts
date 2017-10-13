@@ -1,5 +1,5 @@
 
-import { User, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
+import { User, Course, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
 
@@ -104,12 +104,12 @@ const userConnections = makeUser().connections;
 let _courseCode = "";
 
 export default class UserRepository {
-    static getLoggedInUser(): Promise<User> {
+    static getLoggedInUser(): Promise<{ user: User, course: Course }> {
         return apiFetch(`/users/me/`)
             .then(x => x.json());
     }
 
-    static getUserCourses(): Promise<{ courseCode: string, courseName: string }[]> {
+    static getUserCourses(): Promise<Course[]> {
         return apiFetch(`/users/courses/`)
             .then(x => x.json());
     }
