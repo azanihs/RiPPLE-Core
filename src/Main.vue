@@ -1,24 +1,24 @@
 <template>
     <md-layout>
         <md-layout class="offset"
-                   ref="isVisible"
-                   md-hide-medium-and-up></md-layout>
+            ref="isVisible"
+            md-hide-medium-and-up></md-layout>
         <md-layout md-hide-medium-and-up
-                   class="menuContainer">
+            class="menuContainer">
             <h2>{{ pageTitle }}</h2>
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
-                       ref="menuButton"
-                       @click="toggleSideNav">
+                ref="menuButton"
+                @click="toggleSideNav">
                 <md-icon>{{menuIcon}}</md-icon>
             </md-button>
         </md-layout>
         <md-layout ref="sidenavContainer"
-                   class="sideNavContainer"
-                   :class="pageSize"
-                   md-hide-xsmall
-                   md-hide-small>
+            class="sideNavContainer"
+            :class="pageSize"
+            md-hide-xsmall
+            md-hide-small>
             <div class="profileContainer">
                 <div class="imageContainer">
                     <img :src="personalAvatar" />
@@ -26,8 +26,8 @@
                 <h5>{{userFullName}}</h5>
                 <select v-model="course">
                     <option v-for="enrolledCourse in userCourses"
-                            :key="enrolledCourse.courseCode"
-                            :value="enrolledCourse">
+                        :key="enrolledCourse.courseCode"
+                        :value="enrolledCourse">
                         {{enrolledCourse.courseCode}}
                     </option>
                 </select>
@@ -36,8 +36,8 @@
                 <li v-for="link in links"
                     :key="link.href">
                     <router-link :to="link.href"
-                                 @click.native="toggleSideNav"
-                                 class="md-button routerLink">
+                        @click.native="toggleSideNav"
+                        class="md-button routerLink">
                         <span>{{ link.text }}</span>
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
@@ -46,7 +46,7 @@
             </ul>
         </md-layout>
         <md-layout class="pageContent"
-                   :class="pageSize">
+            :class="pageSize">
             <router-view></router-view>
         </md-layout>
     </md-layout>
@@ -58,7 +58,6 @@
     left: 0px;
     top: 0px;
     width: 100%;
-    z-index: 1000;
     height: 54px;
     background-color: #fff;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
@@ -78,7 +77,6 @@
     position: fixed;
     left: 0px;
     top: 0px;
-    z-index: 1002;
 }
 
 .offset {
@@ -96,7 +94,6 @@
     position: fixed;
     left: 0px;
     top: 0px;
-    z-index: 1001;
     width: 16.25%;
 }
 
@@ -208,7 +205,7 @@ label {
 </style>
 <script lang="ts">
 import { Vue, Component, Prop, Lifecycle } from "av-ts";
-import { User, Course } from "./interfaces/models";
+import { User, Course, CourseUser } from "./interfaces/models";
 
 // Special case where main.vue needs to refresh application
 import UserRepository from "./repositories/UserRepository";
@@ -219,13 +216,15 @@ import Fetcher from "./services/Fetcher";
 export default class Main extends Vue {
     @Prop path;
 
+    courseRoles: string[] = [];
     pUser: User = undefined;
     pCourse: Course = undefined;
 
     pCourses = [];
 
-    updateUser(courseUser: { user: User, course: Course }) {
+    updateUser(courseUser: CourseUser) {
         this.pUser = courseUser.user;
+        this.courseRoles = courseUser.roles;
         if (this.pCourse === undefined) {
             this.pCourse = courseUser.course;
         }
@@ -293,7 +292,7 @@ export default class Main extends Vue {
             icon: "attach_file"
         }];
 
-        if (this.course !== undefined && this.course.userRole == "instructor") {
+        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
             baseLinks.unshift(adminLink);
             window.location.href = "/#/admin";
         } else {

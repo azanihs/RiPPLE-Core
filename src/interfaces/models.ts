@@ -40,7 +40,9 @@ export interface Node {
 export interface Course {
     courseCode: string,
     courseName: string,
-    userRole: string
+    start: number,
+    end: number,
+    available: boolean
 };
 
 export interface User {
@@ -52,6 +54,12 @@ export interface User {
     proficiencies?: string[],
     availableTime?: Date,
     connections: PeerConnection[]
+};
+
+export interface CourseUser {
+    user: User,
+    course: Course,
+    roles: string[]
 };
 
 export interface PeerConnection {

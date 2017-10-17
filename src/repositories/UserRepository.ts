@@ -1,5 +1,8 @@
 
-import { User, Course, Badge, AcquiredBadge, Notification, Topic, PeerConnection, Edge } from "../interfaces/models";
+import {
+    CourseUser, User, Course, Badge, AcquiredBadge,
+    Notification, Topic, PeerConnection, Edge
+} from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
 
@@ -85,7 +88,8 @@ const makeUser = () => {
         };
         return connection;
     });
-    const proficiencies = Array.from({ length: f.random.number({ min: 1, max: 4 }) },
+    const proficienciesLength = f.random.number({ min: 1, max: 4 });
+    const proficiencies = Array.from({ length: proficienciesLength },
         x => f.hacker.abbreviation()) as string[];
 
     const user: User = {
@@ -104,7 +108,7 @@ const userConnections = makeUser().connections;
 let _courseCode = "";
 
 export default class UserRepository {
-    static getLoggedInUser(): Promise<{ user: User, course: Course }> {
+    static getLoggedInUser(): Promise<CourseUser> {
         return apiFetch(`/users/me/`)
             .then(x => x.json());
     }
@@ -207,5 +211,17 @@ export default class UserRepository {
                 setToken(x.token);
                 UserRepository.setCurrentCourse(x.courseCode);
             });
+    }
+
+    static updateCourse(course: Course) {
+        return apiFetch(`/users/courses/update/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(course)
+        })
+            .then(x => x.json());
     }
 }

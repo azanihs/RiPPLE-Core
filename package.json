@@ -23,6 +23,7 @@
         "tinymce": "^4.6.7",
         "vue": "2.4.2",
         "vue-bulma-chartjs": "^1.0.4",
+        "vue-flatpickr-component": "^4.0.0",
         "vue-material": "^0.7.4",
         "vue-router": "^2.5.3",
         "vue-tinymce": "^1.0.5",
