@@ -10,7 +10,8 @@
         "lint": "node lint.js -c .eslintrc.json --ext .js,.vue,.ts src/ test/",
         "unit": "karma start test/unit/karma.conf.js",
         "e2e": "node test/e2e/runner.js",
-        "test": "npm run unit && npm run e2e"
+        "test": "npm run unit && npm run e2e",
+        "stats": "webpack --config=build/webpack.prod.conf.js --json > stats.json"
     },
     "dependencies": {
         "@types/d3": "^4.9.0",

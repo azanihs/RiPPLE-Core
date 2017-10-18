@@ -11,12 +11,12 @@
                     <label>Teaching End: {{this.teachingEnd}}</label>
                     <date-picker v-model="teachingEnd"></date-picker>
                 </md-input-container>
-                <div>
-                    <topic-chip v-for="topic in topics"
-                        :key="topic.id">{{topic.name}}</topic-chip>
-                </div>
+                <md-chips v-model="editableTopics"
+                    @change="topicsEdited"
+                    md-input-placeholder="Course Topics">
+                </md-chips>
                 <md-button class="md-fab md-primary"
-                    :disabled="courseIsAvailable">
+                    @click="openDialog()">
                     <md-icon>save</md-icon>
                 </md-button>
             </md-card>
@@ -36,7 +36,8 @@
             :md-esc-to-close="false">
             <md-dialog-title>Create new course</md-dialog-title>
             <md-dialog-content>
-                <p>Your course: {{courseCode}} does not appear to exist.</p>
+                <p v-if="courseIsAvailable">Your course: {{courseCode}} does not appear to exist.</p>
+                <p v-else>Updating course: {{courseCode}}</p>
             </md-dialog-content>
             <md-dialog-content>
                 <span>{{networkError}}</span>
@@ -54,14 +55,18 @@
                         <date-picker v-model="teachingEnd"></date-picker>
                     </md-input-container>
                     <md-chips v-model="editableTopics"
+                        @change="topicsEdited"
                         md-input-placeholder="Course Topics">
                     </md-chips>
                 </form>
             </md-dialog-content>
 
             <md-dialog-actions>
+                <md-button v-if="courseIsAvailable"
+                    class="md-primary"
+                    @click="closeDialog()">Close</md-button>
                 <md-button class="md-primary"
-                    @click="closeDialog()">Create</md-button>
+                    @click="saveCourseInformation()">{{courseIsAvailable ? "Upadte" : "Create"}}</md-button>
             </md-dialog-actions>
         </md-dialog>
     </md-layout>
@@ -98,8 +103,8 @@ export default class AdminView extends Vue {
     pTopics = [];
     courseCode = "";
 
-    teachingStart: number | undefined = undefined;
-    teachingEnd: number | undefined = undefined;
+    teachingStart: string | undefined = undefined;
+    teachingEnd: string | undefined = undefined;
 
     pUser: User = undefined;
     pCourse: Course = undefined;
@@ -116,18 +121,23 @@ export default class AdminView extends Vue {
         }
 
         if (this.pCourse.start) {
-            this.teachingStart = this.pCourse.start;
+            this.teachingStart = this.serverToLocal(this.pCourse.start);
         }
         if (this.pCourse.end) {
-            this.teachingEnd = this.pCourse.end;
+            this.teachingEnd = this.serverToLocal(this.pCourse.end);
         }
     }
 
     get topics() {
         return this.pTopics;
     }
+
     get editableTopics() {
         return this.pTopics.map(x => x.name);
+    }
+
+    topicsEdited(newTopics: string[]) {
+        this.editableTopics = newTopics;
     }
 
     set editableTopics(newTopics: (Topic | string)[]) {
@@ -156,6 +166,7 @@ export default class AdminView extends Vue {
     get course() {
         return this.pCourse;
     }
+
     get courseIsAvailable() {
         return this.course && this.course.available;
     }
@@ -180,25 +191,42 @@ export default class AdminView extends Vue {
         (this.$refs[_MODAL_NAME] as any).open();
     };
 
-    localToUTC(date: string) {
-        const [year, month, day] = date.split("-");
+    localToUTC(date?: string) {
+        if (date === undefined) return undefined;
 
+        const [year, month, day] = date.split("-");
+        // Convert to UTC and from milliseconds to seconds
+        return Date.UTC(+year, +month, +day) / 1000;
     }
 
+    serverToLocal(UTCTimestamp: number) {
+        const date = new Date(0);
+        date.setUTCSeconds(UTCTimestamp);
+
+        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+
+
     closeDialog() {
+        (this.$refs[_MODAL_NAME] as any).close();
+    }
+
+    saveCourseInformation() {
         UserService.updateCourse({
-            courseCode: this.courseCode,
-            courseName: this.pCourse.courseName,
-            start: this.teachingStart,
-            end: this.teachingEnd,
-            available: true
+            course: {
+                courseCode: this.courseCode,
+                courseName: this.pCourse.courseName,
+                start: this.localToUTC(this.teachingStart),
+                end: this.localToUTC(this.teachingEnd),
+                available: true
+            },
+            topics: this.topics
         })
             .then(x => {
                 if (x.error !== undefined) {
                     return this.networkError = x.error;
                 }
-
-                (this.$refs[_MODAL_NAME] as any).close();
+                this.closeDialog();
             })
             .catch(err => {
                 this.networkError = err;

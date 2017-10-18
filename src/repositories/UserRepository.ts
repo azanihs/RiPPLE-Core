@@ -213,14 +213,17 @@ export default class UserRepository {
             });
     }
 
-    static updateCourse(course: Course) {
+    static updateCourse(course: Course, topics: Topic[]) {
         return apiFetch(`/users/courses/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "application/json"
             }),
-            body: JSON.stringify(course)
+            body: JSON.stringify({
+                course: course,
+                topics: topics
+            })
         })
             .then(x => x.json());
     }

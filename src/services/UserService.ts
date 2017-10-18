@@ -95,7 +95,7 @@ export default class UserService {
         return UserRepository.getUserCourses();
     }
 
-    static updateCourse(course: Course) {
-        return UserRepository.updateCourse(course);
+    static updateCourse(data: { course: Course, topics: Topic[] }) {
+        return UserRepository.updateCourse(data.course, data.topics);
     }
 }
