@@ -5,6 +5,8 @@ import Router from "./routes";
 import VueMaterial from "vue-material";
 import VueTinymce from "vue-tinymce";
 
+import "flatpickr/dist/flatpickr.css";
+
 import "./tinymce";
 
 import "vue-material/dist/vue-material.css";
@@ -40,27 +42,12 @@ new Promise((resolve, reject) => {
     const token = getParameterByName("token", window.location.href);
     const courseCode = getParameterByName("course_code", window.location.href);
     if (token && courseCode) {
-        setTimeout(() => {
-            UserRepository.setCurrentCourse(courseCode);
-            UserRepository.setCurrentToken(token);
-            resolve(UserRepository.authenticate(courseCode));
-        }, 4000);
+        UserRepository.setCurrentCourse(courseCode);
+        UserRepository.setCurrentToken(token);
+        resolve(UserRepository.authenticate(courseCode));
     } else {
         resolve(UserRepository.authenticate());
     }
-    /*if (!token) {
-        throw new AuthenticationError(
-            "Missing token. Can not authenticate with server",
-            "BAD",
-            window.location.href
-        );
-    } else if (!courseCode) {
-        throw new AuthenticationError(
-            "Missing course code",
-            "BAD",
-            window.location.href
-        );
-    }*/
 })
     .catch(err => {
         document.body.innerHTML = `<h1>Could not authenticate with server</h1><pre>

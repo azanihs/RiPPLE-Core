@@ -1,4 +1,4 @@
-import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge, Course } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
@@ -93,5 +93,9 @@ export default class UserService {
 
     static getUserCourses() {
         return UserRepository.getUserCourses();
+    }
+
+    static updateCourse(data: { course: Course, topics: Topic[] }) {
+        return UserRepository.updateCourse(data.course, data.topics);
     }
 }

@@ -24,11 +24,11 @@
                     <img :src="personalAvatar" />
                 </div>
                 <h5>{{userFullName}}</h5>
-                <select v-model="courseCode">
-                    <option v-for="course in userCourses"
-                        :key="course.courseCode"
-                        :value="course.courseCode">
-                        {{course.courseCode}}
+                <select v-model="course">
+                    <option v-for="enrolledCourse in userCourses"
+                        :key="enrolledCourse.courseCode"
+                        :value="enrolledCourse">
+                        {{enrolledCourse.courseCode}}
                     </option>
                 </select>
             </div>
@@ -58,7 +58,6 @@
     left: 0px;
     top: 0px;
     width: 100%;
-    z-index: 1000;
     height: 54px;
     background-color: #fff;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
@@ -78,7 +77,6 @@
     position: fixed;
     left: 0px;
     top: 0px;
-    z-index: 1002;
 }
 
 .offset {
@@ -96,7 +94,6 @@
     position: fixed;
     left: 0px;
     top: 0px;
-    z-index: 1001;
     width: 16.25%;
 }
 
@@ -208,7 +205,7 @@ label {
 </style>
 <script lang="ts">
 import { Vue, Component, Prop, Lifecycle } from "av-ts";
-import { User } from "./interfaces/models";
+import { User, Course, CourseUser } from "./interfaces/models";
 
 // Special case where main.vue needs to refresh application
 import UserRepository from "./repositories/UserRepository";
@@ -219,24 +216,23 @@ import Fetcher from "./services/Fetcher";
 export default class Main extends Vue {
     @Prop path;
 
-    pUser: {
-        user: User,
-        course: {
-            courseCode: string,
-            courseName: string
-        }
-    } = undefined;
-    pCourseCode = "";
+    courseRoles: string[] = [];
+    pUser: User = undefined;
+    pCourse: Course = undefined;
+
     pCourses = [];
 
-    updateUser(user) {
-        this.pUser = user;
-        this.pCourseCode = user.course.courseCode;
+    updateUser(courseUser: CourseUser) {
+        this.pUser = courseUser.user;
+        this.courseRoles = courseUser.roles;
+        if (this.pCourse === undefined) {
+            this.pCourse = courseUser.course;
+        }
     };
 
     get personalAvatar() {
         if (this.pUser !== undefined) {
-            return this.pUser.user.image;
+            return this.pUser.image;
         }
 
         return "";
@@ -247,11 +243,14 @@ export default class Main extends Vue {
             return "Loading...";
         }
 
-        return this.pUser.user.name;
+        return this.pUser.name;
     }
 
     updateCourses(newCourses) {
         this.pCourses = newCourses;
+        if (this.pCourse === undefined && newCourses.length > 0) {
+            this.pCourse = newCourses[0];
+        }
     }
 
     get userCourses() {
@@ -262,33 +261,50 @@ export default class Main extends Vue {
     mobileMode = false;
     pageTitle = "";
 
-    links = [{
-        text: "Profile",
-        href: "/",
-        icon: "widgets"
-    }, {
-        text: "Answer",
-        href: "/view/questions",
-        icon: "lightbulb_outline"
-    }, {
-        text: "Connect",
-        href: "/view/peers",
-        icon: "group"
-    }, {
-        text: "Author",
-        href: "/view/author",
-        icon: "attach_file"
-    }, {
-        text: "Leaders",
-        href: "/view/leaderboard",
-        icon: "assignment"
-    }];
+    get links() {
+        const profileLink = {
+            text: "Profile",
+            href: "/",
+            icon: "widgets"
+        };
+        const adminLink = {
+            text: "Admin",
+            href: "/admin",
+            icon: "widgets"
+        };
+        const leaderLink = {
+            text: "Leaders",
+            href: "/view/leaderboard",
+            icon: "assignment"
+        };
 
+        const baseLinks = [{
+            text: "Answer",
+            href: "/view/questions",
+            icon: "lightbulb_outline"
+        }, {
+            text: "Connect",
+            href: "/view/peers",
+            icon: "group"
+        }, {
+            text: "Author",
+            href: "/view/author",
+            icon: "attach_file"
+        }];
+
+        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
+            baseLinks.unshift(adminLink);
+            window.location.href = "/#/admin";
+        } else {
+            baseLinks.unshift(profileLink);
+            baseLinks.push(leaderLink);
+        }
+        return baseLinks;
+    }
 
     get pageSize() {
         return this.mobileMode ? "mobilePage" : "largePage";
     }
-
 
     resized() {
         const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
@@ -334,14 +350,15 @@ export default class Main extends Vue {
         window.removeEventListener("resize", this.resized);
     }
 
-    get courseCode() {
-        return this.pCourseCode;
+    get course() {
+        return this.pCourse;
     }
 
-    set courseCode(newCourseCode) {
-        this.pCourseCode = newCourseCode;
+    set course(newCourse) {
+        if (newCourse === undefined) return;
 
-        UserRepository.authenticate(newCourseCode)
+        this.pCourse = newCourse;
+        UserRepository.authenticate(newCourse.courseCode)
             .then(newToken => {
                 Fetcher.forceUpdate();
             });

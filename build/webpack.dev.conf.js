@@ -49,7 +49,7 @@ module.exports = merge(baseWebpackConfig, {
             }
         }]
     },
-    devtool: false,
+    devtool: "source-map",
     plugins: [
         new Dotenv({
             path: './.env.dev',
