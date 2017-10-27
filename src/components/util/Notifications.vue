@@ -102,8 +102,7 @@ export default class Notifications extends Vue {
 
     pNotifications = [];
     updateNotifications(newNotifications) {
-        // this.pNotifications = newNotifications.slice(0, this.showCount);
-        this.pNotifications = [];
+        this.pNotifications = newNotifications.slice(0, this.showCount);
     };
 
     date = new Date();

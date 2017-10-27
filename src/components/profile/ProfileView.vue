@@ -13,7 +13,7 @@
                     </md-layout>
 
                     <md-layout class="notificationSummary">
-                        <notifications :showCount="5"></notifications>
+                        <notifications :showCount="10"></notifications>
                     </md-layout>
                     <md-layout class="engagementSummary">
                         <md-card v-for="item in engagementSummary"
