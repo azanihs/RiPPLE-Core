@@ -295,7 +295,7 @@ export default class Main extends Vue {
 
         if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
             baseLinks.unshift(adminLink);
-            window.location.href = "/#/admin";
+            this.$router.push("admin");
         } else {
             baseLinks.unshift(profileLink);
             baseLinks.push(leaderLink);
