@@ -3,6 +3,8 @@ import VueRouter from "vue-router";
 import Main from "../main";
 
 import AdminView from "../components/admin/AdminView.vue";
+import ErrorPermission from "../components/error/ErrorPermission.vue";
+
 import ProfileView from "../components/profile/ProfileView.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
@@ -50,6 +52,10 @@ const routes = [{
         path: "/admin",
         name: "admin",
         component: AdminView
+    }, {
+        path: "/error/403",
+        name: "error",
+        component: ErrorPermission
     }, {
         path: "*",
         name: "error",

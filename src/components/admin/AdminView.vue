@@ -111,6 +111,10 @@ export default class AdminView extends Vue {
     networkError: string = "";
 
     updateUserCourse(courseUser: CourseUser) {
+        if (courseUser.roles.indexOf("Instructor") == -1) {
+            this.$router.push("error/403");
+        }
+
         this.pUser = courseUser.user;
         this.pCourse = courseUser.course;
 
