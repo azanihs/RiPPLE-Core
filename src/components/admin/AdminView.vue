@@ -110,7 +110,7 @@ export default class AdminView extends Vue {
     pCourse: Course = undefined;
     networkError: string = "";
 
-    updateUserCourse(courseUser: CourseUser) {
+    updateCourseUser(courseUser: CourseUser) {
         if (courseUser.roles.indexOf("Instructor") == -1) {
             this.$router.push("error/403");
         }
@@ -178,7 +178,7 @@ export default class AdminView extends Vue {
     @Lifecycle
     created() {
         Fetcher.get(UserService.getLoggedInUser)
-            .on(this.updateUserCourse);
+            .on(this.updateCourseUser);
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateCourseTopics);
     }
@@ -186,13 +186,16 @@ export default class AdminView extends Vue {
     @Lifecycle
     destroyed() {
         Fetcher.get(UserService.getLoggedInUser)
-            .off(this.updateUserCourse);
+            .off(this.updateCourseUser);
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateCourseTopics);
     }
 
     openDialog() {
-        (this.$refs[_MODAL_NAME] as any).open();
+        const modal = this.$refs[_MODAL_NAME] as any;
+        if (modal) {
+            requestAnimationFrame(() => modal.open());
+        }
     };
 
     localToUTC(date?: string) {
@@ -230,6 +233,7 @@ export default class AdminView extends Vue {
                 if (x.error !== undefined) {
                     return this.networkError = x.error;
                 }
+                this.updateCourseUser(x);
                 this.closeDialog();
             })
             .catch(err => {
