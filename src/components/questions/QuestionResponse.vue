@@ -22,7 +22,8 @@
                     v-model="questionResponse"
                     name="answer"
                     @click.native="clickedResponse"
-                    :id="'' + possibleAnswer.id">{{String.fromCharCode('A'.charCodeAt(0) + index)}}. {{possibleAnswer.content}}
+                    :id="'' + possibleAnswer.id">
+                        {{String.fromCharCode('A'.charCodeAt(0) + index)}}. <span style="display: inline-block" v-html="possibleAnswer.content"></span>
                 </md-radio>
                 <div class="distributionOverlay"
                     :style="answerOptionFill(possibleAnswer)"></div>
@@ -40,7 +41,7 @@
                     md-gutter>
                     <md-card>
                         <h2>{{userHasCorrectAnswer ? "Correct" : "Incorrect"}}</h2>
-                        <p v-if="userHasCorrectAnswer">{{ question.explanation }}</p>
+                        <p v-if="userHasCorrectAnswer"><span v-html="question.explanation"></span></p>
                     </md-card>
                 </md-layout>
 
@@ -61,6 +62,11 @@
     </md-layout>
 </template>
 
+<style>
+.answerOption .answerIcon + span > * {
+    display: inline-block;
+}
+</style>
 <style scoped>
 .questionResponse {
     list-style: none;
@@ -246,6 +252,8 @@ export default class QuestionResponse extends Vue {
         const target = e.target as HTMLElement;
         if (target.tagName != "LABEL" && target.tagName != "INPUT") {
             const input = target.querySelector("input");
+            if (input === null) return;
+
             const event = new MouseEvent("click", {
                 bubbles: true
             });
