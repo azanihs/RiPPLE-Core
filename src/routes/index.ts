@@ -54,7 +54,7 @@ const routes = [{
         component: AdminView
     }, {
         path: "/error/403",
-        name: "error",
+        name: "errorPermission",
         component: ErrorPermission
     }, {
         path: "*",
