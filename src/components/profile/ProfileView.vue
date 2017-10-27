@@ -96,17 +96,17 @@
 
 <style scoped>
 .overview {
-    align-items: flex-start;
+    align-items: stretch;
 }
 
 .notificationSummary {
-    align-items: flex-start;
+    align-items: stretch;
     min-width: 48.75%;
     flex: 0 1 48.75%;
 }
 
 .engagementSummary {
-    align-items: flex-start;
+    align-items: stretch;
     min-width: 48.75%;
     flex: 0 1 48.75%;
     margin-left: 2.5%;
@@ -124,7 +124,6 @@ h2 {
     align-items: center;
     justify-content: space-between;
     background-color: #f9f9f9;
-    margin-bottom: 2em;
     border: 1px solid #f2f2f2;
     overflow: hidden;
 }
