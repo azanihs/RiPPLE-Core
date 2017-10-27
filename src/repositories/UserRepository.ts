@@ -213,7 +213,7 @@ export default class UserRepository {
             });
     }
 
-    static updateCourse(course: Course, topics: Topic[]) {
+    static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {
         return apiFetch(`/users/courses/update/`, {
             method: "POST",
             headers: new Headers({

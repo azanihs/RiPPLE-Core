@@ -347,7 +347,8 @@ export default class Main extends Vue {
     destroyed() {
         Fetcher.get(UserService.getLoggedInUser)
             .off(this.updateUser);
-
+        Fetcher.get(UserService.getUserCourses)
+            .off(this.updateCourses);
         window.removeEventListener("resize", this.resized);
     }
 

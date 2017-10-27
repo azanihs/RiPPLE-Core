@@ -109,7 +109,7 @@
     align-items: flex-start;
     min-width: 48.75%;
     flex: 0 1 48.75%;
-    margin-left: 2.5%
+    margin-left: 2.5%;
 }
 
 h2 {
