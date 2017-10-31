@@ -60,7 +60,8 @@
     width: 100%;
     height: 54px;
     background-color: #fff;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14),
+        0 3px 1px -2px rgba(0, 0, 0, 0.12);
 
     justify-content: flex-end;
 }
@@ -153,7 +154,7 @@ ul {
     width: 100%;
 }
 
-ul>li {
+ul > li {
     list-style: none;
     padding: 0px;
     margin: 0px !important;
@@ -174,7 +175,7 @@ ul>li {
     border-bottom: 1px solid #274550;
 }
 
-.routerLink>i {
+.routerLink > i {
     margin-left: 0px;
     margin-right: 0px;
     color: #4d656d;
@@ -355,12 +356,18 @@ export default class Main extends Vue {
     }
 
     set course(newCourse) {
+        let oldCourseCode = undefined;
+        if (this.pCourse && this.pCourse.courseCode) {
+            oldCourseCode = this.pCourse.courseCode;
+        }
+
         if (newCourse === undefined) return;
 
         this.pCourse = newCourse;
         UserRepository.authenticate(newCourse.courseCode)
             .then(newToken => {
-                Fetcher.forceUpdate();
+                const preserveCache = !(oldCourseCode == newCourse.courseCode);
+                Fetcher.forceUpdate(preserveCache);
             });
     }
 
