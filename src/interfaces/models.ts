@@ -59,7 +59,9 @@ export interface User {
 export interface CourseUser {
     user: User,
     course: Course,
-    roles: string[]
+    roles: string[],
+
+    error?: string
 };
 
 export interface PeerConnection {

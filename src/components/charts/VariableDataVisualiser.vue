@@ -114,7 +114,6 @@ h3 {
     position: relative;
 }
 
-
 .chartOption {
     flex: 1;
     display: flex;
@@ -123,7 +122,7 @@ h3 {
 }
 
 .chartOption::before {
-    font-family: 'Material Icons';
+    font-family: "Material Icons";
     margin-right: 5px;
 }
 
@@ -139,12 +138,11 @@ h3 {
     content: "\E8C3";
 }
 
-
 .settingsContainer {
     margin: auto;
 }
 
-.visualisationMenu>h3 {
+.visualisationMenu > h3 {
     margin-top: 0px;
 }
 </style>
@@ -325,7 +323,7 @@ export default class VariableDataVisualiser extends Vue {
     @Lifecycle
     destroyed() {
         window.removeEventListener("resize", this.updateChart);
-        Fetcher.get(this.compareList as any)
+        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
             .off(this.updateChartData);
     }
 

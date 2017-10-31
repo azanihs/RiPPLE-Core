@@ -1,5 +1,5 @@
 <template>
-    <md-layout md-flex="100">
+    <md-layout v-if="notifications.length > 0" md-flex="100">
         <div class="notification"
              v-for="notification in notifications"
              :key="notification.id">
@@ -17,9 +17,26 @@
             </md-card>
         </div>
     </md-layout>
+    <md-layout v-else md-flex="100">
+        <md-card class="centre">
+            <div class="content">
+                <h2>No notifications available</h2>
+                <md-icon>alarm</md-icon>
+            </div>
+        </md-card>
+    </md-layout>
 </template>
 
 <style scoped>
+.centre {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.content > h2,
+.content > i {
+    color: #ccc;
+}
 h3 {
     color: #666;
     margin: 0px;
@@ -30,7 +47,7 @@ p {
     margin-bottom: 0px;
 }
 
-p+p {
+p + p {
     margin-top: 1em;
 }
 

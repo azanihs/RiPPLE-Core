@@ -42,11 +42,12 @@ const getRandomTopic = () => {
     const i = f.random.number({ min: 0, max: 3 });
     return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
 };
-const notifications = Array.from({ length: 50 }).map(x => ({
+const notificationCount = Math.random() < 0.5 ? 50 : 0;
+const notifications = Array.from({ length: notificationCount }).map(x => ({
     id: Math.random(),
     type: getRandomTopic() as NotificationType,
     content: f.hacker.phrase(),
-    read: !!(Math.random() < 0.5)
+    read: Math.random() < 0.5
 }));
 
 const engagementNodes = engagementTypes.map(x => ({
@@ -213,7 +214,7 @@ export default class UserRepository {
             });
     }
 
-    static updateCourse(course: Course, topics: Topic[]) {
+    static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {
         return apiFetch(`/users/courses/update/`, {
             method: "POST",
             headers: new Headers({
