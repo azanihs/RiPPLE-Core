@@ -5,6 +5,12 @@ type FetcherFunctions<T> = (params?: PrimitiveMap) => Promise<T>;
 
 let subscriptionCount = 0;
 
+
+const cache: Map<FetcherIdentifer, {
+    timestamp: number,
+    value: undefined | any
+}> = new Map();
+
 export default class Fetcher<T extends any> {
     private static functionIdentifiers: WeakMap<Function, string> = new WeakMap();
     private static functionParamMap: Map<FetcherIdentifer, Fetcher<any>> = new Map();
@@ -15,7 +21,10 @@ export default class Fetcher<T extends any> {
     private readonly fn: Function;
     private readonly params: PrimitiveMap;
 
-    static forceUpdate() {
+    static forceUpdate(clearCache: boolean = true) {
+        if (clearCache) {
+            cache.clear();
+        }
         // Cause a refresh of all async data by firing all functions on event bus
         Fetcher.functionParamMap.forEach((value, key) => {
             value.run();
@@ -52,8 +61,23 @@ export default class Fetcher<T extends any> {
     }
 
     run() {
+        const hasRequestedBefore = cache.get(this.identifier);
+        if (hasRequestedBefore !== undefined && (hasRequestedBefore.timestamp + 100000) > Date.now()) {
+            if (hasRequestedBefore.value !== undefined) {
+                Fetcher.sharedBus.$emit(this.identifier, hasRequestedBefore.value);
+                return;
+            }
+            // Wait for in-flight request to complete
+            return;
+        }
+        const cacheResult = {
+            timestamp: Date.now(),
+            value: undefined
+        };
+        cache.set(this.identifier, cacheResult);
         this.fn(this.params)
             .then(x => {
+                cacheResult.value = x;
                 Fetcher.sharedBus.$emit(this.identifier, x);
             });
     }
