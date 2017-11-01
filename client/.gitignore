@@ -1,0 +1,42 @@
+# OS generated files #
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Vuejs build result and test reports
+dist/
+test/unit/coverage
+test/e2e/report
+
+# Editor Files #
+*~
+*.swp
+.editorconfig
+.vs/
+.vscode/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary image ignore
+*.jpg
+*.png
+
+# Dependency directories
+node_modules
+jspm_packages
+
+# Optional npm cache directory
+.npm
+.env.dev
+.env.prod
+

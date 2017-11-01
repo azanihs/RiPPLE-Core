@@ -1,0 +1,6 @@
+*.pyc
+src/*.db
+src/*.db-journal
+
+*.env
+!.example.env
