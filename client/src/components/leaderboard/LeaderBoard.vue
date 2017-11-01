@@ -41,9 +41,9 @@
                     </md-table-cell>
                     <md-table-cell>{{ user.name }}</md-table-cell>
                     <md-table-cell>{{ user.reputation }}</md-table-cell>
-                    <md-table-cell>{{ user.questionsContributed }}</md-table-cell>
-                    <md-table-cell>{{ user.numberAnswers }}</md-table-cell>
-                    <md-table-cell>{{ user.numberComments }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsAuthored }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsAnswered }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsCommented }}</md-table-cell>
                 </md-table-row>
             </md-table-body>
         </md-table>
