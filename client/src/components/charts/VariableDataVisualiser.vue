@@ -27,14 +27,10 @@
                                 <md-select name="visualisationType"
                                     id="visualisationType"
                                     v-model="chart">
-                                    <md-option value="bar">
-                                        <div class="chartOption barChart">Bar Chart</div>
-                                    </md-option>
-                                    <md-option value="radar">
-                                        <div class="chartOption radarChart">Radar Chart</div>
-                                    </md-option>
-                                    <md-option value="topicDependency">
-                                        <div class="chartOption topicDependency">Topic Dependency Chart</div>
+                                    <md-option v-for="option in allowedChartTypes"
+                                        :key="option.value"
+                                        :value="option.value">
+                                        <div :class="getChartClass(option.value)">{{option.name}}</div>
                                     </md-option>
                                 </md-select>
                             </md-input-container>
@@ -155,6 +151,11 @@ import Fetcher from "../../services/Fetcher";
 import TopicChip from "../util/TopicChip.vue";
 import Chart from "./Chart.vue";
 
+interface IChartType {
+    name: string,
+    value: string
+};
+
 @Component({
     components: {
         Chart,
@@ -167,10 +168,25 @@ export default class VariableDataVisualiser extends Vue {
         required: true
     }) as Topic[];
 
-    // Dataset to compare against. Function to access that data based on dataType
+    // Subscribable function to provide access to dataset for chartType
     @Prop
     compareList = p<Function>({
         required: true
+    });
+
+    @Prop
+    allowedChartTypes = p<IChartType[]>({
+        required: false,
+        default: () => [{
+            name: "Bar Chart",
+            value: "bar"
+        }, {
+            name: "Radar Chart",
+            value: "radar"
+        }, {
+            name: "Topic Dependency Chart",
+            value: "topicDependency"
+        }]
     });
 
     @Prop
@@ -318,6 +334,7 @@ export default class VariableDataVisualiser extends Vue {
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
         Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
             .on(this.updateChartData);
+        this.$emit("changeTopics", this.dataCategories);
     }
 
     @Lifecycle
@@ -339,6 +356,15 @@ export default class VariableDataVisualiser extends Vue {
 
     isDisabled(dataItem) {
         return !!this.hiddenData[dataItem.id];
+    }
+
+    getChartClass(chartValue: string) {
+        return {
+            "chartOption": true,
+            "barChart": chartValue == "bar",
+            "radarChart": chartValue == "radar",
+            "topicDependency": chartValue == "topicDependency"
+        };
     }
 
     get chartData() {
