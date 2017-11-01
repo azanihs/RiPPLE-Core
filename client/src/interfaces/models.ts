@@ -78,9 +78,15 @@ export interface UserSummary {
     name: string,
     image: string,
     reputation: number,
-    questionsContributed: number,
-    numberAnswers: number,
-    numberComments: number
+
+    questionsAuthored: number,
+    questionsAnswered: number,
+    questionsCommented: number,
+    questionsViewed: number,
+    questionsRated: number,
+
+    connectionsMade: number,
+    logins: number
 };
 
 export interface Badge {

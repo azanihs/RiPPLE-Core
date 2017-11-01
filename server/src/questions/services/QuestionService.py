@@ -4,6 +4,28 @@ from questions.models import CourseUser
 from django.core.exceptions import ObjectDoesNotExist
 from ripple.util import util
 
+import random
+
+
+def get_course_leaders(course, limit=25):
+    course_users = CourseUser.objects.filter(course=course)
+    leaderboard_users = [{
+        "name": u.user.first_name,
+        "image": u.user.image,
+        "reputation": random.randint(0, 100),
+        "questionsAuthored": random.randint(0, 100),
+        "questionsAnswered": random.randint(0, 100),
+        "questionsCommented": random.randint(0, 100),
+        "questionsViewed": random.randint(0, 100),
+        "questionsRated": random.randint(0, 100),
+
+        "connectionsMade": random.randint(0, 100),
+        "logins": random.randint(0, 100)
+    } for u in course_users]
+    if limit == -1:
+        return leaderboard_users
+    return leaderboard_users[0:limit]
+
 
 def all_questions():
     return Question.objects.all()

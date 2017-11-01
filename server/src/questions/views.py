@@ -88,6 +88,15 @@ def competencies(request):
     return JsonResponse(user_competencies, safe=False)
 
 
+def leaderboard(request):
+    logged_in_user = UserService.logged_in_user(request)
+    user_roles = (str(x) for x in logged_in_user.roles.all())
+    limit = -1 if "Instructor" in user_roles else 20
+    leaderboard_scores = QuestionService.get_course_leaders(
+        logged_in_user.course, limit)
+    return JsonResponse(leaderboard_scores, safe=False)
+
+
 def all(request):
     logged_in_user = UserService.logged_in_user(request)
     all_questions = [x.toJSON()
