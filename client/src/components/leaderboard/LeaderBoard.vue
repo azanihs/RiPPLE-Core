@@ -17,15 +17,15 @@
                         <md-icon>star</md-icon>
                         <span>Reputation</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="questionsContributed">
+                    <md-table-head md-sort-by="questionsAuthored">
                         <md-icon>library_add</md-icon>
                         <span>Questions Contributed</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="numberAnswers">
+                    <md-table-head md-sort-by="questionsAnswered">
                         <md-icon>reply</md-icon>
                         <span>Questions Answered</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="numberComments">
+                    <md-table-head md-sort-by="questionsCommented">
                         <md-icon>message</md-icon>
                         <span>Comments</span>
                     </md-table-head>
@@ -80,7 +80,7 @@ export default class LeaderBoard extends Vue {
     itemsPerPage = 10;
     pageIndex = 1;
 
-    sortType: string = "";
+    sortType: string = "reputation";
     reverse: boolean = false;
 
     pUsers = [];
