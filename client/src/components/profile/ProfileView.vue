@@ -43,6 +43,8 @@
                     <p>The engagement overview will show you how your engagments with Ripple compare with the rest of your cohort</p>
                 </overview-description>
                 <variable-data-visualiser class="componentSeparator"
+                    chartType="radar"
+                    :allowedChartTypes="[{name: 'Radar Chart', value: 'radar'}]"
                     :dataCategories="engagementItems"
                     :compareList="generateEngagement">
                 </variable-data-visualiser>
