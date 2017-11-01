@@ -22,12 +22,13 @@
             </md-card>
         </md-layout>
         <leader-board class="componentSeparator"
+            @userData="generateCSVString"
             v-if="courseIsAvailable"></leader-board>
         <md-layout v-if="courseIsAvailable"
             class="componentSeparator"
             md-flex="100">
             <md-card>
-                <md-button class="md-raised">Download Spreadsheet Results</md-button>
+                <md-button @click="downloadCSVString" class="md-raised">Download Spreadsheet Results</md-button>
                 <md-button class="md-raised">Download Database Dump</md-button>
             </md-card>
         </md-layout>
@@ -80,8 +81,10 @@
 
 <script lang="ts">
 import DatePicker from "vue-flatpickr-component";
+import Papa from "papaparse";
+
 import { Vue, Component, Lifecycle } from "av-ts";
-import { User, Course, CourseUser, Topic } from "../../interfaces/models";
+import { UserSummary, User, Course, CourseUser, Topic } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -108,6 +111,7 @@ export default class AdminView extends Vue {
 
     pUser: User = undefined;
     pCourse: Course = undefined;
+    pCsvString: string = "";
     networkError: string = "";
 
     updateCourseUser(courseUser: CourseUser) {
@@ -240,5 +244,35 @@ export default class AdminView extends Vue {
                 this.networkError = err;
             });
     };
+
+    generateCSVString(userData: UserSummary[]) {
+        this.pCsvString = Papa.unparse(userData, {
+            quotes: true,
+            quoteChar: `"`,
+            delimiter: ",",
+            header: true,
+            newline: "\r\n"
+        });
+    }
+
+    downloadCSVString(e: MouseEvent) {
+        // Encode the CSV string as a URI
+        const uri = encodeURI("data:text/csv;charset=utf-8," + this.pCsvString);
+        // Create a mock anchor element and point it at the CSV URI
+        const _a = document.createElement("a");
+        _a.target = "_blank";
+        _a.href = uri;
+        _a.download = this.pCourse.courseCode + "_ripple_export_" + Date.now() + ".csv";
+        _a.style.opacity = "0";
+
+        // Add the anchor tag to the DOM and programmically click it
+        document.body.appendChild(_a);
+        _a.dispatchEvent(new MouseEvent("click", {
+            bubbles: false
+        }));
+
+        // Remove the anchor element from the DOM after it has been clicked
+        document.body.removeChild(_a);
+    }
 }
 </script>

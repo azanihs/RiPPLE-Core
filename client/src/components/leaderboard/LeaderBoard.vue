@@ -71,6 +71,8 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
+import { UserSummary } from "../../interfaces/models";
+
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
@@ -84,17 +86,13 @@ export default class LeaderBoard extends Vue {
     reverse: boolean = false;
 
     pUsers = [];
-    updateUsers(newUsers) {
+    updateUsers(newUsers: UserSummary[]) {
         this.pUsers = newUsers;
+        this.$emit("userData", newUsers);
     };
 
     @Lifecycle
     created() {
-        // TODO: Ew. Pagination component does not update totalItems on mount.
-        this.$nextTick(() => {
-            //this.$refs["pagination"]["totalItems"] = this.users.length;
-        });
-
         Fetcher.get(UserService.mostReputableUsers)
             .on(this.updateUsers);
     }
