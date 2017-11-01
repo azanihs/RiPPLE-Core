@@ -1,6 +1,6 @@
 from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore
+from users.models import Token
 from questions.models import CourseUser
-
 from django.core.exceptions import ObjectDoesNotExist
 from ripple.util import util
 
@@ -9,18 +9,19 @@ import random
 
 def get_course_leaders(course, limit=25):
     course_users = CourseUser.objects.filter(course=course)
+    # TODO: Aggregate this generation for efficiency
     leaderboard_users = [{
         "name": u.user.first_name,
         "image": u.user.image,
         "reputation": random.randint(0, 100),
-        "questionsAuthored": random.randint(0, 100),
-        "questionsAnswered": random.randint(0, 100),
+        "questionsAuthored": Question.objects.filter(author=u).count(),
+        "questionsAnswered": QuestionResponse.objects.filter(user=u).count(),
         "questionsCommented": random.randint(0, 100),
         "questionsViewed": random.randint(0, 100),
-        "questionsRated": random.randint(0, 100),
+        "questionsRated": QuestionRating.objects.filter(user=u).count(),
 
         "connectionsMade": random.randint(0, 100),
-        "logins": random.randint(0, 100)
+        "logins": Token.objects.filter(user=u).count()
     } for u in course_users]
     if limit == -1:
         return leaderboard_users
