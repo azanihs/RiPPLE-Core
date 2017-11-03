@@ -109,7 +109,7 @@ h3 {
 }
 
 .cardSeparator {
-    margin-top: 2em
+    margin-top: 2em;
 }
 
 .rightAlign {
@@ -142,6 +142,7 @@ import { Vue, Component, Lifecycle } from "av-ts";
 import { Topic, QuestionUpload, QuestionBuilder } from "../../interfaces/models";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
+import ImageService from "../../services/ImageService";
 import Fetcher from "../../services/Fetcher";
 import tinyMCEPlugins from "./plugins";
 
@@ -236,7 +237,7 @@ export default class AuthorView extends Vue {
                 return;
             }
             const file = input.files[0];
-            AuthorService.fileToBase64EncodeString(file)
+            ImageService.fileToBase64EncodeString(file)
                 .then(x => {
                     // * tinyMCE will encode the uploaded image with an window.createObjectURL until it loses focus.
                     // ** It will use the base64 encoding when focus is lost.
