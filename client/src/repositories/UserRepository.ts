@@ -228,4 +228,16 @@ export default class UserRepository {
         })
             .then(x => x.json());
     }
+
+    static updateUserImage(newImage: string): Promise<User> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const _u = UserRepository.getLoggedInUser()
+                    .then(user => {
+                        user.user.image = newImage;
+                        resolve(user.user);
+                    });
+            }, Math.random() * 1000);
+        });
+    }
 }
