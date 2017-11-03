@@ -19,19 +19,7 @@
             :class="pageSize"
             md-hide-xsmall
             md-hide-small>
-            <div class="profileContainer">
-                <div class="imageContainer">
-                    <img :src="personalAvatar" />
-                </div>
-                <h5>{{userFullName}}</h5>
-                <select v-model="course">
-                    <option v-for="enrolledCourse in userCourses"
-                        :key="enrolledCourse.courseCode"
-                        :value="enrolledCourse">
-                        {{enrolledCourse.courseCode}}
-                    </option>
-                </select>
-            </div>
+                <user-container :user="user" :course="course" @changeUser="updateUser" @changeCourse="updateCourse"></user-container>
             <ul>
                 <li v-for="link in links"
                     :key="link.href">
@@ -116,38 +104,6 @@
     flex: 0 1 97.5%;
 }
 
-.profileContainer {
-    text-align: center;
-    margin: auto;
-    margin-bottom: 1em;
-}
-
-.profileContainer .imageContainer {
-    width: 100px;
-    height: 100px;
-    padding: 10px;
-    margin: auto;
-}
-
-.imageContainer img {
-    width: 100%;
-    height: 100%;
-    border-radius: 100%;
-}
-
-.profileContainer h5 {
-    font-weight: normal;
-    font-size: 1em;
-    margin: 0px auto;
-}
-
-.profileContainer h4 {
-    font-size: 1em;
-    margin: 0px;
-    padding: 0px;
-    color: #aaa;
-}
-
 ul {
     margin: 0px;
     padding: 0px;
@@ -205,7 +161,7 @@ label {
 }
 </style>
 <script lang="ts">
-import { Vue, Component, Prop, Lifecycle } from "av-ts";
+import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
 import { User, Course, CourseUser } from "./interfaces/models";
 
 // Special case where main.vue needs to refresh application
@@ -213,50 +169,38 @@ import UserRepository from "./repositories/UserRepository";
 import UserService from "./services/UserService";
 import Fetcher from "./services/Fetcher";
 
-@Component()
+import UserContainer from "./components/UserContainer.vue";
+
+@Component({
+    components: {
+        UserContainer
+    }
+})
 export default class Main extends Vue {
-    @Prop path;
+    @Prop path = p<string>({
+        required: true
+    });
 
     courseRoles: string[] = [];
     pUser: User = undefined;
     pCourse: Course = undefined;
 
-    pCourses = [];
+    get user() {
+        return this.pUser;
+    }
 
-    updateUser(courseUser: CourseUser) {
-        this.pUser = courseUser.user;
+    updateUser(newUser: User) {
+        this.pUser = newUser;
+    }
+
+    updateCourseUser(courseUser: CourseUser) {
+        this.updateUser(courseUser.user);
         this.courseRoles = courseUser.roles;
+
         if (this.pCourse === undefined) {
             this.pCourse = courseUser.course;
         }
     };
-
-    get personalAvatar() {
-        if (this.pUser !== undefined) {
-            return this.pUser.image;
-        }
-
-        return "";
-    }
-
-    get userFullName() {
-        if (this.pUser === undefined) {
-            return "Loading...";
-        }
-
-        return this.pUser.name;
-    }
-
-    updateCourses(newCourses) {
-        this.pCourses = newCourses;
-        if (this.pCourse === undefined && newCourses.length > 0) {
-            this.pCourse = newCourses[0];
-        }
-    }
-
-    get userCourses() {
-        return this.pCourses;
-    }
 
     menuIcon = "menu";
     mobileMode = false;
@@ -331,9 +275,7 @@ export default class Main extends Vue {
     @Lifecycle
     created() {
         Fetcher.get(UserService.getLoggedInUser)
-            .on(this.updateUser);
-        Fetcher.get(UserService.getUserCourses)
-            .on(this.updateCourses);
+            .on(this.updateCourseUser);
     }
 
     @Lifecycle
@@ -346,9 +288,8 @@ export default class Main extends Vue {
     @Lifecycle
     destroyed() {
         Fetcher.get(UserService.getLoggedInUser)
-            .off(this.updateUser);
-        Fetcher.get(UserService.getUserCourses)
-            .off(this.updateCourses);
+            .off(this.updateCourseUser);
+
         window.removeEventListener("resize", this.resized);
     }
 
@@ -356,7 +297,7 @@ export default class Main extends Vue {
         return this.pCourse;
     }
 
-    set course(newCourse) {
+    updateCourse(newCourse: Course) {
         let oldCourseCode = undefined;
         if (this.pCourse && this.pCourse.courseCode) {
             oldCourseCode = this.pCourse.courseCode;

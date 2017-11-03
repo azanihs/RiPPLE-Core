@@ -67,6 +67,10 @@ export default class UserService {
         return UserRepository.getUserConnections(count);
     }
 
+    static updateUserImage({ newImage }: { newImage: string }) {
+        return UserRepository.updateUserImage(newImage);
+    }
+
     static mostReputableUsers() {
         return UserRepository.getUserConnections(100)
             .then(leaders => leaders.map(x => {
