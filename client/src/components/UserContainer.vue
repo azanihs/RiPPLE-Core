@@ -67,7 +67,7 @@ import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { User, Course } from "../interfaces/models";
 
 import UserService from "../services/UserService";
-import AuthorService from "../services/AuthorService";
+import ImageService from "../services/ImageService";
 
 import Fetcher from "../services/Fetcher";
 
@@ -124,7 +124,7 @@ export default class UserContainer extends Vue {
                 // Snackbar err
                 document.body.removeChild(input);
             } else {
-                AuthorService.fileToBase64EncodeString(newImages[0])
+                ImageService.fileToBase64EncodeString(newImages[0])
                     .then(file => UserService.updateUserImage({
                         newImage: (file as any).base64 as string
                     }))

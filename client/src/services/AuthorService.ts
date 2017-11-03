@@ -1,6 +1,7 @@
 import { QuestionUpload, AuthorResponse, QuestionBuilder } from "../interfaces/models";
 
 import { blobFetch } from "../repositories/APIRepository";
+import ImageService from "./ImageService";
 
 export default class AuthorService {
 
@@ -11,25 +12,6 @@ export default class AuthorService {
                 updateFunction(i++);
             }
         }, 100);
-    }
-
-    static fileToBase64EncodeString(file: File): Promise<Object> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.addEventListener("loadend", () => {
-                resolve({
-                    file: file.name,
-                    base64: reader.result,
-                    _meta: {
-                        src: URL.createObjectURL(file),
-                        alt: file.name,
-                        text: file.name,
-                        title: file.name
-                    }
-                });
-            });
-        });
     }
 
     static extractImagesFromDOM(body: string): Promise<AuthorResponse> {
@@ -54,7 +36,7 @@ export default class AuthorService {
                     // Is a createObjectURL()
                     blobFetch(url.href)
                         .then(response => response.blob())
-                        .then(AuthorService.fileToBase64EncodeString)
+                        .then(ImageService.fileToBase64EncodeString)
                         .then(file => {
                             payloads[i] = file.base64;
                             image.src = "#:" + i;
