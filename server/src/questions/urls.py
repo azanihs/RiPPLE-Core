@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^id/(.*)/$', views.id),
     url(r'^page/(.*)/$', views.page),
     url(r'^competencies/all/$', views.competencies),
+    url(r'^leaderboard/$', views.leaderboard),
     url(r'^search/$', views.search)
 ]

@@ -1,8 +1,49 @@
 from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore
+from users.models import Token
 from questions.models import CourseUser
-
 from django.core.exceptions import ObjectDoesNotExist
 from ripple.util import util
+
+from django.db.models import Count
+import random
+
+
+def get_course_leaders(course, limit=25):
+    def lookup_total(fieldName, user_id, data):
+        for dict_item in data:
+            entry = dict_item.get(fieldName, None)
+            if entry == user_id:
+                return dict_item.get("total", 0)
+        return 0
+
+    course_users = CourseUser.objects.filter(course=course)
+    # Cache database calls
+    question_counts = [x for x in Question.objects.values(
+        "author_id").annotate(total=Count("author_id"))]
+    response_counts = [x for x in QuestionResponse.objects.values(
+        "user_id").annotate(total=Count("user_id"))]
+    rating_counts = [x for x in QuestionRating.objects.values(
+        "user_id").annotate(total=Count("user_id"))]
+    login_counts = [x for x in Token.objects.values(
+        "user_id").annotate(total=Count("user_id"))]
+
+    leaderboard_users = [{
+        "name": u.user.first_name,
+        "image": u.user.image,
+        "reputation": random.randint(0, 100),
+        "questionsAuthored": lookup_total("author_id", u.id, question_counts),
+        "questionsAnswered": lookup_total("user_id", u.id, response_counts),
+        "questionsCommented": random.randint(0, 100),
+        "questionsViewed": random.randint(0, 100),
+        "questionsRated": lookup_total("user_id", u.id, rating_counts),
+
+        "connectionsMade": random.randint(0, 100),
+        "logins": lookup_total("user_id", u.id, login_counts)
+    } for u in course_users]
+
+    if limit == -1:
+        return leaderboard_users
+    return leaderboard_users[0:limit]
 
 
 def all_questions():
