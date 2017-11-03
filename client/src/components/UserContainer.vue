@@ -13,6 +13,10 @@
                 {{enrolledCourse.courseCode}}
             </option>
         </select>
+          <md-snackbar md-position="bottom center" ref="snackbar" :md-duration="6000">
+                <span>{{errorMessage}}</span>
+                <md-button class="md-primary" @click="$refs.snackbar.close()">Close</md-button>
+        </md-snackbar>
     </div>
 </template>
 
@@ -82,6 +86,7 @@ export default class UserContainer extends Vue {
 
     pCourse: Course = undefined;
     pCourses: Course[] = [];
+    errorMessage: string = "";
 
     set currentCourse(newCourse: Course) {
         this.pCourse = newCourse;
@@ -123,13 +128,24 @@ export default class UserContainer extends Vue {
             if (newImages.length == 0) {
                 // Snackbar err
                 document.body.removeChild(input);
+                this.showMessage("No file selected");
             } else {
                 ImageService.fileToBase64EncodeString(newImages[0])
                     .then(file => UserService.updateUserImage({
                         newImage: (file as any).base64 as string
                     }))
                     .then((user: User) => {
-                        this.$emit("changeUser", user);
+                        if (Math.random() < 0.5) {
+                            this.$emit("changeUser", user);
+                            this.showMessage("Profile image changed");
+                        } else {
+                            this.showMessage("Image too large");
+                        }
+                        document.body.removeChild(input);
+                    })
+                    .catch(err => {
+                        this.showMessage(err);
+                        document.body.removeChild(input);
                     });
             }
         };
@@ -144,6 +160,11 @@ export default class UserContainer extends Vue {
         input.dispatchEvent(new MouseEvent("click", {
             bubbles: false
         }));
+    }
+
+    showMessage(message: string) {
+        this.errorMessage = message;
+        (this.$refs["snackbar"] as any).open();
     }
 
     @Lifecycle
