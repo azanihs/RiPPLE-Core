@@ -1,7 +1,7 @@
 
 import {
     CourseUser, User, Course, Badge, AcquiredBadge,
-    Notification, Topic, PeerConnection, Edge
+    Notification, Topic, PeerConnection, Edge, UserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
@@ -149,6 +149,11 @@ export default class UserRepository {
                 resolve(engagementNodes);
             }, Math.random() * 1000);
         });
+    }
+
+    static getUserLeaderboard(): Promise<UserSummary[]> {
+        return apiFetch(`/questions/leaderboard/`)
+            .then(x => x.json());
     }
 
     static getUserCompetencies(): Promise<Edge[]> {

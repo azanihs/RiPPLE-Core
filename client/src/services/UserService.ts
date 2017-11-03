@@ -1,4 +1,4 @@
-import { User, Badge, AcquiredBadge, UserSummary, Notification, Topic, Edge, Course } from "../interfaces/models";
+import { User, Badge, AcquiredBadge, Notification, Topic, Edge, Course } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
@@ -68,19 +68,7 @@ export default class UserService {
     }
 
     static mostReputableUsers() {
-        return UserRepository.getUserConnections(100)
-            .then(leaders => leaders.map(x => {
-                const summary: UserSummary = {
-                    name: x.name,
-                    image: x.image,
-                    reputation: Math.floor(Math.random() * 20),
-                    questionsContributed: Math.floor(Math.random() * 20),
-                    numberAnswers: Math.floor(Math.random() * 20),
-                    numberComments: Math.floor(Math.random() * 20)
-                };
-                return summary;
-            }))
-            .then(leaders => leaders.sort((a, b) => b.reputation - a.reputation));
+        return UserRepository.getUserLeaderboard();
     }
 
     static getUserNotifications() {
