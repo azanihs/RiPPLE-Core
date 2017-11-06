@@ -8,7 +8,7 @@ class Day(models.Model):
 
     def toJSON(self):
         return {
-            "day": self.day.toJSON()
+            "day": self.day
         }
 
 class Time(models.Model):
@@ -17,8 +17,8 @@ class Time(models.Model):
 
     def toJSON(self):
         return {
-            "start": self.start.toJSON(),
-            "end": self.end.toJSON()
+            "start": self.start,
+            "end": self.end
         }
 
 class Availability(models.Model):
@@ -28,7 +28,7 @@ class Availability(models.Model):
 
     def toJSON(self):
         return {
-            "course_user": self.course_user,
-            "day": self.day,
-            "time": self.time
+            "course_user": self.course_user.toJSON(),
+            "day": self.day.toJSON(),
+            "time": self.time.toJSON()
         }
