@@ -1,0 +1,8 @@
+from django.conf.urls import url
+from . import views
+
+urlpatterns = [
+    url(r'^availability/all/$', views.course_availability)
+    url(r'^availability/$', views.user_availability)
+    url(r'^availability/update/$', views.update)
+]
