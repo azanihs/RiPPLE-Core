@@ -14,9 +14,11 @@ def user_availability(request):
     return JsonResponse(availability, safe=False)
 
 def course_availability(request):
-    logged_in_user = UserService.logged_in_user(request)
+    course = UserService.logged_in_user(request).course
+    counts = AvailabilityService.get_course_availability(course)
+
     # Get the count of each user in the course
-    return None
+    return JsonResponse(counts, safe=False)
 
 def update(request):
     # HTTP.POST is required for this.
