@@ -14,8 +14,20 @@ export default class QuestionRepository {
             body: JSON.stringify(question)
         })
             .then(x => x.json())
-            .then(response => {
-                console.log(response);
+            .then(x => x["question"])
+            .then(x => {
+                const question: Question = {
+                    id: x.id,
+                    difficulty: x.difficulty,
+                    quality: x.quality,
+                    solution: x.distractors.find(d => d.isCorrect === true),
+                    distractors: x.distractors,
+                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
+                    content: x.content,
+                    explanation: x.explanation,
+                    responses: x.responses
+                };
+                return question;
             });
     }
 
@@ -32,8 +44,7 @@ export default class QuestionRepository {
                     topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                     content: x.content,
                     explanation: x.explanation,
-
-                    responses: []
+                    responses: x.responses
                 };
 
                 return question;
@@ -74,8 +85,7 @@ export default class QuestionRepository {
                         topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                         content: x.content,
                         explanation: x.explanation,
-
-                        responses: []
+                        responses: x.responses
                     };
 
                     return question;

@@ -82,7 +82,7 @@ def add_question(question_request, host, user):
                 questionObj.delete()
                 return {"state": "Error", "error": "Invalid Distractor Image"}
 
-    return {"state": "Question Added", "question": questionObj.id}
+    return {"state": "Question Added", "question": questionObj.toJSON()}
 
 
 def decodeImages(id, images, type, host):
