@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0065)https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&op=3 -->
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<title>Admin - Display questions</title>
+	<link type="text/css" media="screen" rel="stylesheet" href="./questions_files/style_290713.css">
+
+</head>
+
+<body>
+
+<div id="container">
+
+	<h1>INFS1200 (Sem 2, 2017)</h1>
+
+	
+
+	
+
+	<h2>PeerWise question export</h2>
+
+	<p class="spread">
+	Export performed by <b>nickjoseph</b> at <b>1:39pm, 08&nbsp;Nov 2017</b>.  
+	<br>
+	Exporting <b>10</b> questions in <b>decreasing order of quality rating</b>.
+	</p>
+
+	<p class="spread">
+	<a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=3&amp;limit=10&amp;order=1&amp;format=0&amp;additional=0" class="buttonLook">Return to export options&nbsp;»</a>
+	</p>
+
+	
+
+	
+
+	
+	<div style="padding-top: 15px;"><a name="2927823"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2927823">2927823</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">2:15pm, 28&nbsp;Oct 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>consider the table MORTYS_MIND_BLOWERS [<span style="text-decoration: underline;">morty_id, event</span>, colour, description]</p>
+<p>For those who dont watch the show a mind blower is a little memory stored in a tube. Morty re-watches the memories. The memories come from rick who removes them from mortys brain whenever morty's mind has been 'blown'</p>
+<p>&nbsp;</p>
+<p>Which query would select the morty_id's who have been proposed to by mr poopy butthole and have beaten rick in checkers.</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>SELECT morty_id FROM MORTYS_MIND_BLOWERS</p>
+<p>WHERE event = 'proposed to by mr poopy butthole'</p></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><p>SELECT DISTINCT morty_id FROM MORTYS_MIND_BLOWERS&nbsp;</p>
+<p>WHERE&nbsp;event = 'proposed to by mr poopy butthole' AND&nbsp;event = 'beat rick in checkers'</p></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><p>SELECT DISTINCT morty_id FROM MORTYS_MIND_BLOWERS</p>
+<p>WHERE morty_id IN&nbsp;</p>
+<p>&nbsp; &nbsp; (SELECT morty_id FROM&nbsp;MORTYS_MIND_BLOWERS</p>
+<p>&nbsp; &nbsp; WHERE event = 'proposed to by mr poopy butthole')</p>
+<p>AND morty_id NOT IN</p>
+<p>&nbsp; &nbsp; (SELECT morty_id FROM MORTYS_MIND_BLOWERS<br>&nbsp; &nbsp; WHERE event = 'beat rick in checkers')</p></td></tr><tr><td class="leftClear">*D*</td><td class="middleClear"><p>SELECT DISTINCT morty_id FROM MORTYS_MIND_BLOWERS<br>WHERE morty_id IN<br>&nbsp; &nbsp; (SELECT morty_id FROM MORTYS_MIND_BLOWERS<br>&nbsp; &nbsp; WHERE event = 'proposed to by mr poopy butthole')</p>
+<p>AND&nbsp;event = 'beat rick in checkers'</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>A: only checks for one of the two events</p>
+<p>B: checks if the event is equal to two different things at the same time</p>
+<p>C: would be correct but selects mortys who have been proposed to and havent beaten rick in checkers</p>
+<p>D is correct. First it checks if the morty_id is one in which that has been proposed to by mr poopy butthole. It then checks the event of the current tuple its checking. If this is beat rick in checkers it will select the id. Therefore that morty has had both events.</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">SQL</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">s4434125 (s4434125)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">4.6700</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.6667</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">3</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2815180"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2815180">2815180</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">9:15pm, 10&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>AFL Finals are here!!!<br>The AFL board has decided that it is time for them to review their database for the AFL Finals Series. They have enlisted you to help them.</p>
+<p>They have given you the following relational schema.</p>
+<p>&nbsp;</p>
+<p><strong>AFL</strong><br><img src="./questions_files/view.php" alt="no description"></p>
+<p>&nbsp;</p>
+<p>And set of functional dependencies.</p>
+<p>&nbsp;</p>
+<p>FD1: &nbsp; &nbsp;PlayerID &#8594; {Name, Position, Club}<br>FD2: &nbsp; &nbsp;GameID &#8594; {HomeTeam, AwayTeam, Date, Result}<br>FD3: &nbsp; &nbsp;VenueID &#8594; {VenueName, Address}<br>FD4: &nbsp; &nbsp;HomeTeam &#8594; {VenueID, Club}<br>FD5: &nbsp; &nbsp;AwayTeam &#8594; Club<br>FD6: &nbsp; &nbsp;{PlayerID, GameID} &#8594; Statistics</p>
+<p>&nbsp;</p>
+<p>(Note: this uses the assumption that there is only one team per club and a home team has a set and unique venue)</p>
+<p>&nbsp;</p>
+<p>Find the highest normal form of this relation and decompose this relation to achieve BCNF.</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>1NF</p>
+<p>&nbsp;</p>
+<p><strong>R0</strong></p>
+<p><strong><img src="./questions_files/view(1).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R1</strong></p>
+<p><strong><img src="./questions_files/view(2).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R2</strong></p>
+<p><strong><img src="./questions_files/view(3).php" alt="no description"></strong></p></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><p>2NF</p>
+<p>&nbsp;</p>
+<p><strong>R0</strong></p>
+<p><strong><img src="./questions_files/view(4).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R1</strong></p>
+<p><strong><img src="./questions_files/view(5).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R2</strong></p>
+<p><strong><img src="./questions_files/view(6).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R3</strong></p>
+<p><strong><img src="./questions_files/view(7).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R4</strong></p>
+<p><strong><img src="./questions_files/view(8).php" alt="no description"></strong></p></td></tr><tr><td class="leftClear">*C*</td><td class="middleClear"><p>1NF</p>
+<p>&nbsp;</p>
+<p><strong>R0</strong></p>
+<p><img src="./questions_files/view(9).php" alt="no description"></p>
+<p>&nbsp;</p>
+<p><strong>R1</strong></p>
+<p><strong><img src="./questions_files/view(10).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R2</strong></p>
+<p><strong><img src="./questions_files/view(11).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R3</strong></p>
+<p><img src="./questions_files/view(12).php" alt="no description"></p>
+<p>&nbsp;</p>
+<p><strong>R4</strong></p>
+<p><img src="./questions_files/view(13).php" alt="no description"></p>
+<p>&nbsp;</p>
+<p><strong>R5</strong></p>
+<p><img src="./questions_files/view(14).php" alt="no description"></p></td></tr><tr><td class="leftClear">D</td><td class="middleClear"><p>2NF</p>
+<p>&nbsp;</p>
+<p><strong>R0</strong></p>
+<p><strong><img src="./questions_files/view(15).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R1</strong></p>
+<p><strong><img src="./questions_files/view(16).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R2</strong></p>
+<p><strong><img src="./questions_files/view(17).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R3</strong></p>
+<p><strong><img src="./questions_files/view(18).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R4</strong></p>
+<p><strong><img src="./questions_files/view(19).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R5</strong></p>
+<p><strong><img src="./questions_files/view(20).php" alt="no description"></strong></p></td></tr><tr><td class="leftClear">E</td><td class="middleClear"><p>3NF</p>
+<p>&nbsp;</p>
+<p><strong>R0</strong></p>
+<p><strong><img src="./questions_files/view(21).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R1</strong></p>
+<p><img src="./questions_files/view(22).php" alt="no description"></p>
+<p>&nbsp;</p>
+<p><strong>R2</strong></p>
+<p><strong><img src="./questions_files/view(23).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R3</strong></p>
+<p><strong><img src="./questions_files/view(24).php" alt="no description"></strong></p>
+<p>&nbsp;</p>
+<p><strong>R4</strong></p>
+<p><strong><img src="./questions_files/view(25).php" alt="no description"></strong></p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>The highest normal form is 1NF because the key is being partially used in functional dependencies (failing 2NF).</p>
+<p>In this case to decompose to BCNF, it is enough to simply put the functional dependencies into separate tables.</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">Relational_Model, BCNF, Normalization, Partial Dependency, Functional_Dependancies</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">alec (s4431066)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">4.0000</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.8519</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">27</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2823262"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2823262">2823262</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">7:39am, 14&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>How would you map the ternary relationship below, taking note of the cardinality?&nbsp;</p>
+<p>&nbsp;</p>
+<p><img src="./questions_files/view(26).php" alt="no description"></p>
+<p>&nbsp;</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><ul>
+<li>Create a new relation between the entities participating in the ternary relation i.e. (E1, E2, E3) -&gt; R[]</li>
+<li>Add the a primary keys of all entities to the new relation. i.e. R[A,C,G]</li>
+<li>The combination of primary keys from entities become the primary key for the new relation&nbsp; R[<span style="text-decoration: underline;">A,C,G</span>]</li>
+<li>Reference the newly added attributes as foreign keys to the original entity i.e. R.A references E1.A, R.C references E2.C, R.G references E3.G</li>
+<li>Add any simple attributes from the ternary relationship into the new relation i.e. R[<span style="text-decoration: underline;">A,C,G</span>,H ]</li>
+</ul></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><ul>
+<li>Add the primary keys from the entities with a cardinality of many, to the entity with cardinality 1 i.e. E3[<span style="text-decoration: underline;">G</span>, F, E, A, C]</li>
+<li>Reference the newly added attributes as foreign keys from the entities they came from E3.A references E1.A, E3.C references E2.C</li>
+<li>Add any simple attributes from the ternary relation to the entity with cardinality 1 E3[<span style="text-decoration: underline;">G</span>, F, E, A, C, H]</li>
+</ul></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><ul>
+<li>Create a new relation between the entities participating in the ternary relation i.e. (E1, E2, E3) -&gt; R[]</li>
+<li>Add the a primary keys of entities with cardinality of many to the new relation. i.e. R[A,C]</li>
+<li>The combination of primary keys from entities become the primary key for the new relation R[<span style="text-decoration: underline;">A,C</span>]</li>
+<li>Reference the newly added attributes as foreign keys to the original entity i.e. R.A references E1.A, R.C references E2.C</li>
+<li>Add any simple attributes from the ternary relationship into the new relation i.e. R[<span style="text-decoration: underline;">A,C</span>,H ]</li>
+</ul></td></tr><tr><td class="leftClear">*D*</td><td class="middleClear"><ul>
+<li>Create a new relation between the entities participating in the ternary relation i.e. (E1, E2, E3) -&gt; R[]</li>
+<li>Add the a primary keys of all entities with to the new relation. i.e. R[A,C,G]</li>
+<li>Reference the newly added attributes as foreign keys to the original entity i.e. R.A references E1.A, R.C references E2.C, R.G references E3.G</li>
+<li>The combination of primary keys from entities with a cardinality of Many become the primary key for the new relation (E1, E2 are many to many-&gt; R[<span style="text-decoration: underline;">A,C</span>,G]</li>
+<li>Add any simple attributes from the ternary relationship into the new relation i.e. R[<span style="text-decoration: underline;">A,C</span>,G,H ]</li>
+</ul></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>Answer D is the answer for mapping a ternary relation of the <strong>given cardinality.</strong></p>
+<p>&nbsp;</p>
+<p>Answer A would be correct if the ternary relationship had a cardinality of Many to Many to Many. However, when the relationship has cardinality of 1 to Many to Many, the entity with cardinality one does not need to be part of the primary key in the new relation, however, it does need to be added to the relation.</p>
+<p>&nbsp;</p>
+<p><em>See Module 5 slide 32 -33</em></p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">ER to Relational Mapping, Ternary_Relationships, ER_Diagrams</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">dan (s4430340)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.8500</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.8500</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">20</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2809633"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2809633">2809633</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">3:37pm, 06&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>A set of attributes that can uniquely identify any tuple in the relationship.</p>
+<p>&nbsp;</p>
+<p>What question <strong>best</strong> suits the above definition?</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>What is a candidate key?</p></td></tr><tr><td class="leftClear">*B*</td><td class="middleClear"><p>What is a super key?</p></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><p>What is a primary key?</p></td></tr><tr><td class="leftClear">D</td><td class="middleClear"><p>What is a functional dependency?</p></td></tr><tr><td class="leftClear">E</td><td class="middleClear"><p>What is a foreign key?</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>A set of attributes that uniquely identifies any tuple is called a super key. Candidate and primary key are not the best solution because they are considered the minimal amount of attributes to identify any tuple which was not specified in the description.</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">Keys, Super_keys</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">brianstewart (s4449366)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.7500</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.2083</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">24</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2814999"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2814999">2814999</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">5:12pm, 10&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>During the mapping process from an ER diagram to a relational schema, what&nbsp;are the components that <strong>strictly</strong> require making a new relation in the schema?</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>Entity<br>Binary 1:N Relationship<br>Binary M:N Relationship<br>Multi-valued Attribute<br>N-ary Relationship</p></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><p>Entity<br>Weak Entity<br>Binary M:N Relationship<br>Multi-valued Attribute<br>Sub-classes</p></td></tr><tr><td class="leftClear">*C*</td><td class="middleClear"><p>Entity<br>Weak Entity<br>Binary M:N Relationship<br>Multi-valued Attribute<br>N-ary Relationship</p></td></tr><tr><td class="leftClear">D</td><td class="middleClear"><p>Entity<br>Weak Entity<br>Binary M:N Relationship<br>Composite Attribute<br>N-ary Relationship</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>There are 8 steps during the mapping process (see Module 5 slides):</p>
+<p>1. Entity Mapping<br>2. Weak Entity Mapping<br>3. Binary 1:1 Relationship Mapping<br>4. Binary 1:N Relationship Mapping<br>5. Binary M:N Relationship Mapping<br>6. Multi-valued Attribute Mapping<br>7. N-ary Relationship Mapping<br>8. Super &amp; Sub-classes Mapping</p>
+<p>&nbsp;</p>
+<p>One easy way to remember what to do during each step is:</p>
+<p>All components in the ER diagram, except for Binary 1:N and 1:1 Relationships, require a new relation during the mapping process.</p>
+<p>&nbsp;</p>
+<p>However, for sub-classes, creating a new relation is not <strong>strictly</strong> required. This depends on the relationship between the superclass and its sub-classes (overlapping or disjoint, total or partial participation). In many cases, the sub-classes' attributes&nbsp;can be merged into the relation of the superclass for reducing redundancy.</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">ER to Relational Mapping</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">s4453333 (s4453333)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.7100</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.5484</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">31</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2773453"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2773453">2773453</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">7:42pm, 12&nbsp;Aug 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>Mos Eisley Cantina is setting up an online reservation system to manage reservations for the establishments renowned VIP lounge. During signup, a user must enter a username which is unique, first name, last name, home world, occupation and email address which is also unique. &#8232;&#8232;Which of the following statements correctly identifies the keys in the table?</p>
+<p>&nbsp;</p>
+<p><img src="./questions_files/view(27).php" alt="no description"></p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>Super Keys:<br>{username, firstname , lastname, occupation}<br>{username, email, firstname , lastname, occupation}</p>
+<p>&nbsp;</p>
+<p>Candidate Keys:<br>{email} <br>{username, firstname}</p>
+<p>&nbsp;</p>
+<p>Primary Key:<br>{username}</p></td></tr><tr><td class="leftClear">*B*</td><td class="middleClear"><p>Super Keys:</p>
+<p>{username, firstname , lastname, occupation}</p>
+<p>{username, email, firstname , lastname, occupation}<br><br>Candidate Keys: <br>{email} <br>{username} <br><br>&#8232;Primary Key:</p>
+<p>{username}<br><br></p></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><p>Super Keys:<br>{username, firstname , lastname, occupation}<br>{username, email, firstname , lastname, occupation}</p>
+<p><br>Candidate Keys:<br>{email} <br>{username}</p>
+<p><br>Primary Key:<br>{firstname, lastname, occupation}</p></td></tr><tr><td class="leftClear">D</td><td class="middleClear"><p>Super Keys:<br>{username, firstname , lastname, occupation}<br>{homeworld, email, firstname , lastname, occupation}</p>
+<p><br>Candidate Keys:<br>{email,username}</p>
+<p><br>Primary Key:<br>{username}</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p><strong>B - Correct</strong><br><br>A superkey is any set of attributes which can uniquely identify a tuple. It is possible for a superkey to contain extra attributes which on their own are not unique. If a superkey includes all attributes it can be referred to more specifically as a trivial superkey.&#8232;&#8232;&nbsp;It is possible to have more than one superkey.</p>
+<p>&nbsp;</p>
+<p>A candidate key contains&nbsp;the minimum set of attributes which uniquely identify a tuple. Candidate keys differ&nbsp;from superkeys&nbsp;in that they&nbsp;must not include any attributes which do not contribute to uniquely identifying a tuple. A candidate key is a subset of superkeys and also called a minimal superkey. It is possible to have more than one candidate key.</p>
+<p>&nbsp;</p>
+<p>The primary key is chosen from one of the identified&nbsp;candidate keys. In the given example this could be either {username} or {email} which one is chosen is a design decision. While a primary key can be composed of more than one attribute there can only be one primary key.</p>
+<p>&nbsp;</p>
+<p>Generally speaking, the candidate key whose values are expected to not change is chosen as the primary key although this does not need to be the case.</p>
+<p>&nbsp;</p>
+<p>Also refer&nbsp;to:&nbsp;<br>Ref: <br>Chapter 5 of R.Elmasri and S.B.Navathe, Fundamentals of Database Systems 7th Global Edition. Page 188 - Section 5.3.2<br>Chapter 14 of R.Elmasri and S.B.Navathe, Fundamentals of Database Systems 7th Global Edition. Page 506 - Section 14.3.3<br><br><strong>A - NOT CORRECT:</strong><br>The candidate key {username, firstname}&nbsp;includes the attribute "firstname". <br>"firstname" is not required to uniquely identify a tuple, thus disqualifying this attribute set from being a valid candidate key. Candidate keys must be minimal keys, meaning they must only contain the minimum required attributes necessary to&nbsp;uniquely identify a tuple.&nbsp;<br><br><strong>C - NOT CORRECT<br></strong>The chosen primary key {firstname, lastname, occupation}&nbsp;does not&nbsp;uniquely identify a tuple.</p>
+<p>&nbsp;</p>
+<p><strong>D - NOT CORRECT</strong></p>
+<p>The super key&nbsp;{homeworld, email, firstname , lastname, occupation} does not uniquely identify a tuple.<br><br><br><br><br><iframe title="YouTube video player" width="425" height="350" src="./questions_files/JiSS5xn_0fc.html" frameborder="0"></iframe></p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">Keys, Super_keys</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">gomoku (s4497802)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.5900</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.7838</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">37</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2817508"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2817508">2817508</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">10:00pm, 11&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>&nbsp;Consider the Following Chess Players and Tournaments:</p>
+<p><img src="./questions_files/view(28).php" alt="no description" width="417" height="250"></p>
+<p>&nbsp;</p>
+<p>The player's name in 'PLAYER' must contain both their first and last name. Additionally, ratings below 2000 are not accepted.</p>
+<p>&nbsp;</p>
+<p>Suppose the Table 'WINNER' is supposed to record the player who wins a given tournament in a given year.</p>
+<p>WINNER [ <span style="text-decoration: underline;"><strong>Player ID</strong></span>,<span style="text-decoration: underline;"><strong>Tournament Name</strong></span>, <span style="text-decoration: underline;"><strong>Year</strong></span>, Prize Money]</p>
+<p>&nbsp;</p>
+<p>Select the insertion/s below which do not violate any integrity restraints.</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>PLAYER &lt;10, Anand, 2000, Indian, 37&gt;</p>
+<p>TOURNAMENT &lt;UQ chess comp, Gatton&gt;</p>
+<p>WINNER&lt;15, Australian Open, 1999, $10&gt;</p></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><p>PLAYER &lt;15, Anand Viswanathan, 2754, Indian, 37&gt;<br>TOURNAMENT &lt;UQ chess comp, Gatton&gt;<br>WINNER&lt;19, Fischer Memorial, 2001, $6&gt;</p></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><p>PLAYER &lt;16, Anand Viswanathan, 2754, Indian, 37&gt;<br>TOURNAMENT &lt;UQ chess comp, Gatton&gt;<br>WINNER&lt;18, Fischer Memorial, 2016, $900&gt;</p></td></tr><tr><td class="leftClear">*D*</td><td class="middleClear"><p>PLAYER &lt;16, Anand Viswanathan, 2754, Indian, 37&gt;<br>TOURNAMENT &lt;INFS1200 Chess Trial, Great Court&gt;<br>WINNER&lt;22, Fischer Memorial, 2016, $900&gt;</p></td></tr><tr><td class="leftClear">E</td><td class="middleClear"><p>PLAYER &lt;Anand Viswanathan, 2754, Indian, 37&gt;<br>TOURNAMENT &lt;INFS1200 Chess Trial, Great Court&gt;<br>WINNER&lt;22, Fischer Memorial, 2016, $900&gt;</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>A: Both first and last name of player must be given: Domain Constraint.</p>
+<p>B: The player ID 15 is already occupied by 'Magnus Carlsen': Key Constraint.</p>
+<p>C: Player ID in winner is not valid: Referential Constraint.</p>
+<p>E: Player ID in PLAYER must be given since it is a key: Entity Constraint.</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">Integrity_Constraints, Keys, Foreign_Keys</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">fishlet (s4479962)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.5600</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.6667</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">18</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2799167"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2799167">2799167</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">12:29pm, 29&nbsp;Aug 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>The council of ricks wanted to create a database which tracked the locations each rick was travelling to with his portal gun. The database tracks which morty the rick had at the time of use so they could determine which adventures were the most successfull and thus choose which mortys to get for themselves. However, when it came to mapping the rest of the relational schema the citadel's security was comprimised and thus they could not finish. The first half of the relational schema is as below.</p>
+<p>&nbsp;</p>
+<p>RICK [BAC, <span style="text-decoration: underline;">rickID</span>, age, homeDimension]</p>
+<p>PORTALGUN[Dimension, universe, co-ordinates, <span style="text-decoration: underline;">portalGunID</span>]</p>
+<p>&nbsp;</p>
+<p>A morty is defined by a unique ID number and has a number of attributes. Assuming a morty can exist without being attached to a rick, and each adventure is a ternary relationship which also stores if it was a success(1) or failure (0) in the outcome attribute. Which two tables correctly finishes the relational schema?</p>
+<p>&nbsp;</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>MORTY[mortyID, statusWithJessica, age]</p>
+<p>ADVENTURE[<span style="text-decoration: underline;">rickID</span>, <span style="text-decoration: underline;">portalGunID</span>, <span style="text-decoration: underline;">mortyID</span>, outcome]</p></td></tr><tr><td class="leftClear">*B*</td><td class="middleClear"><p>MORTY[<span style="text-decoration: underline;">mortyID</span>, statusWithJessica, age]</p>
+<p>ADVENTURE[<span style="text-decoration: underline;">rickID</span>, <span style="text-decoration: underline;">portalGunID</span>, <span style="text-decoration: underline;">mortyID</span>, outcome]</p></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><p>MORTY[<span style="text-decoration: underline;">mortyID</span>, statusWithJessica, age]</p>
+<p>ADVENTURE[<span style="text-decoration: underline;">rickID</span>, <span style="text-decoration: underline;">portalGunID</span>, <span style="text-decoration: underline;">mortyID</span>]</p></td></tr><tr><td class="leftClear">D</td><td class="middleClear"><p>MORTY[mortyID, <span style="text-decoration: underline;">statusWithJessica</span>, age]</p>
+<p>ADVENTURE[rickID, portalGunID, mortyID]</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>The answer is a mapped ternary relationship between Morty, rick and the portal gun.</p>
+<p>The key trick in this question is reading the answer carefully.</p>
+<p>A: is incorrect because MORTY is not uniquely identified.</p>
+<p>B: is correct</p>
+<p>C: is incorrect as the UoD stated that the relationship also has an outcome attribute to determine if the adventure was a success</p>
+<p>D: is not uniquely identified by an ID as stated in the UoD</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">Ternary_Relationships, Relational_Model</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">s4434125 (s4434125)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.5500</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.4516</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">31</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2808516"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2808516">2808516</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">9:16pm, 05&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>A relation R has multiple functional dependencies in the form X --&gt; A. For the relation schema R to be in 3NF (Third Normal Form), it is <strong>required</strong> that for each of these functional dependencies:</p>
+<p>&nbsp;</p>
+<p>(note assume that the relation R has already passed the 1NF test)</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p>both X needs to be a candidate key of R <strong>and</strong> A to be a prime attribute of R</p></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><p>both X needs to be a prime attribute of R&nbsp;<strong>and</strong> A to be a superkey of R</p></td></tr><tr><td class="leftClear">C</td><td class="middleClear"><p>either X needs to be a primary key of R<strong> or</strong> A to be a superkey of R</p></td></tr><tr><td class="leftClear">*D*</td><td class="middleClear"><p>either X needs to be a superkey of R <strong>or </strong>A to be a prime attribute of R</p></td></tr><tr><td class="leftClear">E</td><td class="middleClear"><p>both X needs to be a primary key of R <strong>and</strong> A to be a superkey of R</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>To be in 3NF form the relation schema R needs to be:</p>
+<p>In 1NF - This is given at the start of the question</p>
+<p>In 2NF - This is true if it is in 1NF and every non-prime attribute is fully functionally dependent on every key</p>
+<p>In 3NF - This is true if it is in 2NF and no non-prime attribute is transitively dependent on every key</p>
+<p>&nbsp;</p>
+<p>To satisfy both the 2NF and 3NF rules we can check that for every functional dependency X --&gt; A of R, either&nbsp;X is a superkey of R or A is a prime attribute of R.</p>
+<p>&nbsp;</p>
+<p>Reference slide 63 of module 6</p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">3NF, Normal_Forms, Normalization</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">brianstewart (s4449366)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.5300</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.6000</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">30</td></tr></tbody></table></div><div style="padding-top: 15px;"><a name="2814668"></a><table id="displayQuestionTable" cellspacing="0"><tbody><tr><td class="leftHeading">Field</td><td class="middleHeading">Value</td></tr><tr><td class="leftClear">ID</td><td class="middleClear"><a href="https://peerwise.cs.auckland.ac.nz/course/main.php?cmd=admin&amp;op=4&amp;id=2814668">2814668</a></td></tr><tr><td class="leftClear">Created</td><td class="middleClear">11:26am, 10&nbsp;Sep 2017</td></tr><tr><td class="leftClear">Question</td><td class="middleClear"><p>How to decompose the following relation to achieve BCNF:</p>
+<p>&nbsp;</p>
+<p><strong>PURCHASE</strong> (CustomerID, CustomerName, Address, PostCode, State, ItemID, ItemName, Price, Quantity, Date)</p>
+<p>&nbsp;</p>
+<p>FD = {</p>
+<ul>
+<li>CustomerID &nbsp; -&gt; &nbsp; CustomerName, Address, PostCode, State</li>
+<li>ItemID &nbsp; -&gt; &nbsp; ItemName, Price</li>
+<li>CustomerID, ItemID &nbsp; -&gt; &nbsp;Date, Quantity</li>
+<li>PostCode &nbsp; -&gt; &nbsp; State</li>
+</ul>
+<p>}</p>
+<p>&nbsp;</p></td></tr><tr><td class="leftClear">A</td><td class="middleClear"><p><strong>CUSTOMER</strong> (CustomerID, CustomerName, Address, PostCode, State)<br><strong>ITEM</strong> (ItemID, ItemName, Price)<br><strong>ORDER</strong> (ItemID, CustomerID, Quantity, Date)</p></td></tr><tr><td class="leftClear">B</td><td class="middleClear"><p><strong>CUSTOMER</strong> (CustomerID, CustomerName, Address, PostCode, State)<br><strong>ITEM</strong> (ItemID, ItemName, Price, Quantity)<br><strong>ORDER</strong> (ItemID, CustomerID, Date)</p></td></tr><tr><td class="leftClear">*C*</td><td class="middleClear"><p><strong>CUSTOMER</strong> (CustomerID, CustomerName, Address, PostCode)<br><strong>STATE</strong> (PostCode, State)<br><strong>ITEM</strong> (ItemID, ItemName, Price)<br><strong>ORDER</strong> (ItemID, CustomerID, Quantity, Date)</p></td></tr><tr><td class="leftClear">D</td><td class="middleClear"><p><strong>CUSTOMER</strong> (CustomerID, CustomerName, PostCode)<br><strong>STATE</strong> (PostCode, State, Address)<br><strong>ITEM</strong> (ItemID, ItemName, Price)<br><strong>ORDER</strong> (ItemID, CustomerID, Quantity, Date)</p></td></tr><tr><td class="leftClear">Explanation</td><td class="middleClear"><p>Candidate Keys: (CustomerID, ItemID)</p>
+<p>&nbsp;</p>
+<p><strong>Partial Dependencies (2NF violated)</strong></p>
+<ul>
+<li>CustomerID -&gt; CustomerName, Address, PostCode, State</li>
+<li>ItemID -&gt; ItemName, Price</li>
+</ul>
+<p><span style="text-decoration: underline;">Decompose to achive 2NF:</span></p>
+<p><strong>CUSTOMER</strong> (CustomerID, CustomerName, Address, PostCode, State)<br><strong>ITEM</strong> (ItemID, ItemName, Price, Quantity)<br><strong>ORDER</strong> (ItemID, CustomerID, Date)</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>Transitive Dependencies (3NF violated)</strong></p>
+<ul>
+<li>PostCode -&gt; State</li>
+</ul>
+<p><span style="text-decoration: underline;">Decompose to achive 3NF:</span><strong><br>CUSTOMER</strong> (CustomerID, CustomerName, Address, PostCode)<br><strong>STATE</strong> (PostCode, State)<br><strong>ITEM</strong> (ItemID, ItemName, Price)<br><strong>ORDER</strong> (ItemID, CustomerID, Quantity, Date)</p>
+<p>&nbsp;</p>
+<p><span style="text-decoration: underline;">These relations already satisfied BCNF</span></p></td></tr><tr><td class="leftClear">Tags</td><td class="middleClear">Functional_Dependancies, Normalization</td></tr><tr><td class="leftClear">Author</td><td class="middleClear">s4490763 (s4490763)</td></tr><tr><td class="leftClear">Avg Rating</td><td class="middleClear">3.4600</td></tr><tr><td class="leftClear">Avg Difficulty</td><td class="middleClear">0.4167</td></tr><tr><td class="leftClear">Total ratings</td><td class="middleClear">24</td></tr></tbody></table></div>
+
+
+
+
+</div>
+
+
+
+
+</body></html>
