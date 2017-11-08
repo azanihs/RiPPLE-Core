@@ -2,16 +2,12 @@ import { QuestionUpload, AuthorResponse, QuestionBuilder } from "../interfaces/m
 
 import { blobFetch } from "../repositories/APIRepository";
 import ImageService from "./ImageService";
+import QuestionRepository from "../repositories/QuestionRepository";
 
 export default class AuthorService {
 
     static uploadContent(upload: QuestionUpload, updateFunction: (newProgress: number) => void) {
-        let i = 0;
-        setInterval(() => {
-            if (i <= 100) {
-                updateFunction(i++);
-            }
-        }, 100);
+        QuestionRepository.uploadQuestion(upload);
     }
 
     static extractImagesFromDOM(body: string): Promise<AuthorResponse> {
@@ -45,7 +41,7 @@ export default class AuthorService {
                 }
             }
         }))).then(_ => ({
-            content: dom.innerHTML,
+            content: dom.outerHTML,
             payloads: payloads
         }));
     }
@@ -86,7 +82,7 @@ export default class AuthorService {
         const getBody = (html: string) => {
             const domParser = new DOMParser();
             const questionDOM = domParser.parseFromString(html, "text/html");
-            return questionDOM.querySelector("body").innerHTML.trim();
+            return questionDOM.querySelector("body").outerHTML.trim();
         };
 
         const questionBody = getBody(questionDOM);
