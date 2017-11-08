@@ -22,4 +22,19 @@ def course_availability(request):
 
 def update(request):
     # HTTP.POST is required for this.
-    return None
+    if request.method != "POST":
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    logged_in_user = UserService.logged_in_user(request)
+
+    post_request = loads(request.body.decode("utf-8"))
+    day = post_request.get("day", None)
+    time = post_request.get("time", None)
+    available = post_request.get("available", None)
+
+    if AvailabilityService.update_availability(logged_in_user, day, time, available) is None:
+        return JsonResponse({"error": "Invalid day/time/availability combination"}, status=422)
+    else:
+        return HttpResponse(status=204)
