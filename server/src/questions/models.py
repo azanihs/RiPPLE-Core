@@ -102,3 +102,18 @@ class CompetencyMap(models.Model):
 
     user = models.ForeignKey(CourseUser)
     for_competency = models.ForeignKey(Competency)
+
+
+class QuestionImage(models.Model):
+    image = models.ImageField(upload_to='question_photo')
+    question = models.ForeignKey(Question, on_delete=None)
+
+
+class ExplanationImage(models.Model):
+    image = models.ImageField(upload_to='question_photo')
+    question = models.ForeignKey(Question, on_delete=None)
+
+
+class DistractorImage(models.Model):
+    image = models.ImageField(upload_to='question_photo')
+    distractor = models.ForeignKey(Distractor, on_delete=None)

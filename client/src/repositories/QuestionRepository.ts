@@ -1,9 +1,24 @@
 import { apiFetch } from "./APIRepository";
-import { Question, Topic } from "../interfaces/models";
+import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import f from "faker";
 
 export default class QuestionRepository {
+    static uploadQuestion(question: QuestionUpload): Promise<Question> {
+        return apiFetch(`/questions/add/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(question)
+        })
+            .then(x => x.json())
+            .then(response => {
+                console.log(response);
+            });
+    }
+
     static getMany(count: number): Promise<Question[]> {
         return apiFetch(`/questions/all/`)
             .then(questions => questions.json())
