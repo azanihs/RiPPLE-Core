@@ -43,6 +43,7 @@ class Question(models.Model):
             "difficultyCount": self.difficultyCount,
             "qualityCount": self.qualityCount,
             "topics": [x.toJSON() for x in self.topics.all()],
+            "responses": [],
             "distractors": [x.toJSON() for x in self.distractor_set.all()]
         }
 

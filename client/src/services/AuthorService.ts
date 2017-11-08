@@ -6,8 +6,8 @@ import QuestionRepository from "../repositories/QuestionRepository";
 
 export default class AuthorService {
 
-    static uploadContent(upload: QuestionUpload, updateFunction: (newProgress: number) => void) {
-        QuestionRepository.uploadQuestion(upload);
+    static uploadContent(upload: QuestionUpload) {
+        return QuestionRepository.uploadQuestion(upload);
     }
 
     static extractImagesFromDOM(body: string): Promise<AuthorResponse> {
