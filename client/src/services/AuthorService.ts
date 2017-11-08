@@ -42,7 +42,8 @@ export default class AuthorService {
             }
         }))).then(_ => ({
             content: dom.outerHTML,
-            payloads: payloads
+            payloads: payloads,
+            isCorrect: false
         }));
     }
 
@@ -62,8 +63,8 @@ export default class AuthorService {
 
         const responseHelper = index => AuthorService.extractImagesFromDOM(question.responses[index])
             .then(response => {
+                response.isCorrect = question.correctIndex === index;
                 upload.responses[index] = response;
-                upload.responses[index].isCorrect = question.correctIndex === index;
             });
 
         return AuthorService.extractImagesFromDOM(question.content)
