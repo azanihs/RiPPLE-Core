@@ -43,9 +43,10 @@ def get_course_leaders(course, sort_field, sort_order, limit=25):
         "logins": lookup_total("user_id", u.id, login_counts)
     } for u in course_users]
 
-    should_reverse = sort_order == "DESC"
-    leaderboard_users = sorted(
-        leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
+    if len(leaderboard_users) > 0 and sort_field in leaderboard_users[0]:
+        should_reverse = sort_order == "DESC"
+        leaderboard_users = sorted(
+            leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
 
     if limit == -1:
         return leaderboard_users
