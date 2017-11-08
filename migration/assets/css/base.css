@@ -1,0 +1,68 @@
+/*base.css*/
+
+#db_populate_success, #db_populate_error{
+	display: none;
+}
+
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  background: red;
+  cursor: inherit;
+  display: block;
+}
+
+input[readonly] {
+  background-color: white !important;
+  cursor: text !important;
+}
+
+/*
+.quiz_topic_select {
+	width: 33%;
+}
+*/
+
+.answer_select {
+	width: 10%;
+}
+
+.content_left{
+  border-right: 1px solid #eee;
+}
+
+#question_display {
+  padding-bottom: 130px;
+  padding-top: 10px;
+}
+
+
+.selectize-control.single .selectize-input, .selectize-dropdown.single{
+  font-size: 15px;
+}
+
+.modal-dialog {
+  width: 60%;
+}
+
+.voffset  { margin-top: 2px; }
+.voffset1 { margin-top: 5px; }
+.voffset2 { margin-top: 10px; }
+.voffset3 { margin-top: 15px; }
+.voffset4 { margin-top: 30px; }
+.voffset5 { margin-top: 40px; }
+.voffset6 { margin-top: 60px; }
+.voffset7 { margin-top: 80px; }
+.voffset8 { margin-top: 100px; }
+.voffset9 { margin-top: 150px; }
