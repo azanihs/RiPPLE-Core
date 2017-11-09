@@ -41,7 +41,7 @@ export default class AuthorService {
                 }
             }
         }))).then(_ => ({
-            content: dom.outerHTML,
+            content: dom.innerHTML,
             payloads: payloads,
             isCorrect: false
         }));
@@ -83,7 +83,7 @@ export default class AuthorService {
         const getBody = (html: string) => {
             const domParser = new DOMParser();
             const questionDOM = domParser.parseFromString(html, "text/html");
-            return questionDOM.querySelector("body").outerHTML.trim();
+            return questionDOM.querySelector("body").innerHTML.trim();
         };
 
         const questionBody = getBody(questionDOM);
