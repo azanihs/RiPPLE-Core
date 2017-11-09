@@ -137,7 +137,7 @@ def newSource(urls, content, host):
     for i in range(0, len(urls)):
         images[i]['src'] = "http://" + host + urls[i]
 
-    immediate_children = soup.find("body").findChildren(recursive=False)
+    immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
 
 
