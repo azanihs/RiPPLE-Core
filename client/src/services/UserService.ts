@@ -71,8 +71,8 @@ export default class UserService {
         return UserRepository.updateUserImage(newImage);
     }
 
-    static mostReputableUsers() {
-        return UserRepository.getUserLeaderboard();
+    static getMostReputableUsers({ sortField, sortOrder }: { sortField: string, sortOrder: "DESC" | "ASC" }) {
+        return UserRepository.getUserLeaderboard(sortField, sortOrder);
     }
 
     static getUserNotifications() {
