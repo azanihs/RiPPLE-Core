@@ -165,7 +165,7 @@
         	processData: false,
     		contentType: false,
     		cache: false,
-         	success: function (data) {		
+         	success: function (data) {
          		console.log(data);
            		var res = JSON.parse(data);
            		if(res.result == "success"){

@@ -10,6 +10,13 @@
         var $alternative_d;
         var $alternative_e;
 
+        var $question_image;
+        var $explanation_image;
+        var $alternative_a_image;
+        var $alternative_b_image;
+        var $alternative_c_image;
+        var $alternative_d_image;
+
         var $correct_alternative;
 
         var $explanation;
@@ -161,16 +168,16 @@
             }
             $keys = rtrim($keys, ",");
             $bindings = rtrim($bindings, ",");
-            echo "KEYS:\n".$keys."\nBINDINGS:\n ".$bindings."\n";
+            //echo "KEYS:\n".$keys."\nBINDINGS:\n ".$bindings."\n";
             $query .= "( " . $keys . " )";
             $query .= " VALUES ( " . $bindings . " )";
-            echo "QUERY:\n".$query."\n";
+            //echo "QUERY:\n".$query."\n";
             $stmt = $db->prepare( $query );
 
 
             foreach ($schema as $colname => $coltype) {
                 $value = $this->get_colvalue($colname);
-                echo "VALUE:\n".$value."\n";
+                //echo "VALUE:\n".$value."\n";
                 $stmt->bindValue( ':' . $colname, $value, $coltype);
             }
 
@@ -181,24 +188,33 @@
         }
 
         public function question_as_json($schema) {
-            $questionJSON = array("question" => mv_str_replace($this->get_colvalue("question"),
-                    "explanation" => $this->get_colvalue("explanation"),
+            $this->extract_images();
+            $questionJSON = array("question" => 
+                        array("content" => $this->get_colvalue("question"),
+                            "payloads" => $this->question_image),
+                    "explanation" => 
+                        array("content" => $this->get_colvalue("explanation"),
+                            "payloads" => $this->explanation_image),
                     "responses" => $this->get_responses($schema),
-                    "topics" => $this->get_colvalue("tags"));
+                    "topics" => $this->get_topics($this->get_colvalue("tags")));
 
-            echo json_encode($questionJSON)."\n\n\n\n";
+            echo json_encode($questionJSON, JSON_UNESCAPED_UNICODE, JSON_FORCE_OBJECT)."\n\n\n\n";
         }
 
         public function get_responses() {
             $correct = $this->get_colvalue("correct_alternative");
 
             $arr = array("A" => array("content" => $this->get_colvalue("alternative_a"),
+                        "payloads" => $this->alternative_a_image,
                         "isCorrect" => "false"),
                 "B" => array("content" => $this->get_colvalue("alternative_b"),
+                        "payloads" => $this->alternative_b_image,
                         "isCorrect" => "false"),
                 "C" => array("content" => $this->get_colvalue("alternative_c"),
+                        "payloads" => $this->alternative_c_image,
                         "isCorrect" => "false"),
                 "D" => array("content" => $this->get_colvalue("alternative_d"),
+                        "payloads" => $this->alternative_d_image,
                         "isCorrect" => "false"));
 
             $arr[$correct]["isCorrect"] = "true";
@@ -206,8 +222,54 @@
             return $arr;
 
         }
+
+        public function get_topics($tags) {
+            $tag_list = array();
+            foreach (explode(", ", $tags) as $i) {
+
+                //Not complete
+                $tag = array("name" => $i,
+                    "id" => 0);
+
+                array_push($tag_list, $tag);
+            }
+        }
+
+        public function extract_images() {
+            $doc = new domDocument();
+            $arr = array("question","explanation","alternative_a","alternative_b",
+                    "alternative_c","alternative_d");
+            foreach ($arr as $obj) {
+                $image_field = $obj."_image";
+                $doc->loadHTML($this->$obj);
+                $imgs = $doc->getElementsByTagName('img');
+                $i = 0;
+                foreach ($imgs as $img) {
+                    if ($this->$image_field == null) {
+                        $this->$image_field = new stdClass();
+                    }
+                    $src = $img->getAttribute("src");
+                    $img->setAttribute("src", "#:".$i);
+                    $this->$obj = $this->innerHTML($doc->getElementsByTagName("body")[0]);
+                    $phpPath = str_replace("png", "php", $src);
+                    $data = file_get_contents(getcwd()."/../".$phpPath);
+                    $base64 = "data:image/png;base64,".base64_encode($data);
+                    $this->$image_field->$i = $base64;
+                    echo "IMAGE: ".$image_field.": ".$this->$image_field->$i."\n\n";
+                    $i++;
+                }
+                if ($i == 0) {
+                    $this->$image_field = new stdClass();
+                }
+            }
+
+        }
+
+        public function innerHTML($node) {
+            return implode(array_map([$node->ownerDocument,"saveHTML"],
+                iterator_to_array($node->childNodes)));
+        }
+
         
 }
-
-
 ?>
