@@ -3,7 +3,7 @@
         
 
         $url = "http://localhost:8000/questions/add/";
-        $auth = "1SqfRUH37ZLCUHETpURLtnPAYCYiSrPo";
+        $auth = "B45JJmX6wOFpYawMWCcVSWWyZ6pBo0GY";
         $options = [
             "http" => [
                 "header" => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: $auth",
@@ -13,7 +13,6 @@
         ];
         $context = stream_context_create($options);
         $result = file_get_contents($url,false,$context);
-        //var_dump($result);
     }
 
     class Question {
@@ -211,7 +210,6 @@
                             "payloads" => $this->explanation_image),
                     "responses" => $this->get_responses($schema),
                     "topics" => $this->get_topics($this->get_colvalue("tags")));
-            //sendJSON($questionJSON);
             sendJSON(json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         }
 
@@ -267,7 +265,7 @@
                     }
                     $src = $img->getAttribute("src");
                     $img->setAttribute("src", "#:".$i);
-                    $this->$obj = $this->get_inner_html($doc->getElementsByTagName("body")[0]);
+                    $this->$obj = $this->get_inner_html($doc->getElementsByTagName("body")->item(0));
                     $phpPath = str_replace("png", "php", $src);
                     $data = file_get_contents(getcwd()."/../".$phpPath);
                     $base64 = "data:image/png;base64,".base64_encode($data);
