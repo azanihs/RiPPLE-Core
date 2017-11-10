@@ -7,7 +7,28 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ripple.util.util import is_number
 from users.services import UserService
-from questions.services import QuestionService, SearchService
+from questions.services import QuestionService, SearchService, AuthorService
+
+
+def add(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    host = request.get_host()
+    post_request = loads(request.body.decode("utf-8"))
+
+    if post_request is None:
+        return JsonResponse({"error": "Missing question in request"}, status=422)
+
+    response = AuthorService.add_question(
+        post_request, host, UserService.logged_in_user(request))
+
+    if response['state'] == "Error":
+        return JsonResponse({"error": response['error']}, status=422)
+    else:
+        return JsonResponse({"question": response['question']}, status=200)
 
 
 def respond(request):
@@ -88,12 +109,20 @@ def competencies(request):
     return JsonResponse(user_competencies, safe=False)
 
 
-def leaderboard(request):
+def leaderboard_default(request):
+    return leaderboard(request, "reputation", "DESC")
+
+
+def leaderboard(request, sort_field, sort_order):
     logged_in_user = UserService.logged_in_user(request)
     user_roles = (str(x) for x in logged_in_user.roles.all())
     limit = -1 if "Instructor" in user_roles else 20
+
+    if sort_order != "DESC" and sort_order != "ASC":
+        sort_order = "ASC"
+
     leaderboard_scores = QuestionService.get_course_leaders(
-        logged_in_user.course, limit)
+        logged_in_user.course, sort_field, sort_order, limit)
     return JsonResponse(leaderboard_scores, safe=False)
 
 
