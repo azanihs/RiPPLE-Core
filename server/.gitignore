@@ -3,5 +3,7 @@ src/*.db
 src/*.db-journal
 src/media/
 
+.env*
+!.env.example
 *.env
 !.example.env
