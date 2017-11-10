@@ -151,8 +151,8 @@ export default class UserRepository {
         });
     }
 
-    static getUserLeaderboard(): Promise<UserSummary[]> {
-        return apiFetch(`/questions/leaderboard/`)
+    static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
+        return apiFetch(`/questions/leaderboard/${sortField}/${sortOrder}/`)
             .then(x => x.json());
     }
 
