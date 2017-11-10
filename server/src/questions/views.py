@@ -109,12 +109,20 @@ def competencies(request):
     return JsonResponse(user_competencies, safe=False)
 
 
-def leaderboard(request):
+def leaderboard_default(request):
+    return leaderboard(request, "reputation", "DESC")
+
+
+def leaderboard(request, sort_field, sort_order):
     logged_in_user = UserService.logged_in_user(request)
     user_roles = (str(x) for x in logged_in_user.roles.all())
     limit = -1 if "Instructor" in user_roles else 20
+
+    if sort_order != "DESC" and sort_order != "ASC":
+        sort_order = "ASC"
+
     leaderboard_scores = QuestionService.get_course_leaders(
-        logged_in_user.course, limit)
+        logged_in_user.course, sort_field, sort_order, limit)
     return JsonResponse(leaderboard_scores, safe=False)
 
 
