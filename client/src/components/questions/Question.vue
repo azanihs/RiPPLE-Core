@@ -39,7 +39,8 @@
                 </md-layout>
             </question-response>
         </md-layout>
-        <md-speed-dial md-open="hover"
+        <md-speed-dial v-if="showSpeedDial"
+                       md-open="hover"
                        class="md-fab-bottom-right floatingAction">
             <md-button class="md-fab md-primary"
                        @click="nextQuestion"
@@ -101,8 +102,6 @@
     width: 100%;
 }
 
-
-
 h2 {
     width: 100%;
 }
@@ -161,7 +160,7 @@ h2 {
     right: 16px !important;
 }
 
-.floatingAction>button {
+.floatingAction > button {
     background-color: #1d323a !important;
 }
 
@@ -190,9 +189,13 @@ import QuestionService from "../../services/QuestionService";
     }
 })
 export default class Question extends Vue {
-    @Prop question = p({
+    @Prop question = p<QuestionModel>({
         required: true
-    }) as QuestionModel;
+    });
+
+    @Prop showSpeedDial = p<boolean>({
+        default: true
+    });
 
     userIsFinishedWithQuestion: boolean = false;
 
