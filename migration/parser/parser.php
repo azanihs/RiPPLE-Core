@@ -75,8 +75,10 @@ foreach ($questionTable as $node) {
 		}
 	}
 
+
+
 	if ($question->question_as_json($schema) == TRUE) {
-		echo 'ha';
+		echo "ha";		
 	}
 	/*if( $question->save_to_db($db, $schema) == TRUE){
 		
@@ -87,6 +89,10 @@ foreach ($questionTable as $node) {
 }
 
 echo json_encode( array('totalSaveCount' => $totalSaveCount, 'result' => 'success' ) );
+
+
+
+
 
 function setupDatabaseOrig(){
 	$db = new SQLite3(__DIR__."/../pw_orig.db");

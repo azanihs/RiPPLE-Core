@@ -1,4 +1,21 @@
 <?php
+    function sendJSON($json) {    
+        
+
+        $url = "http://localhost:8000/questions/add/";
+        $auth = "1SqfRUH37ZLCUHETpURLtnPAYCYiSrPo";
+        $options = [
+            "http" => [
+                "header" => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: $auth",
+                "method" => "POST",
+                "content" => $json
+            ]
+        ];
+        $context = stream_context_create($options);
+        $result = file_get_contents($url,false,$context);
+        //var_dump($result);
+    }
+
     class Question {
         var $peerwise_id;
         var $created_on;
@@ -168,16 +185,13 @@
             }
             $keys = rtrim($keys, ",");
             $bindings = rtrim($bindings, ",");
-            //echo "KEYS:\n".$keys."\nBINDINGS:\n ".$bindings."\n";
             $query .= "( " . $keys . " )";
             $query .= " VALUES ( " . $bindings . " )";
-            //echo "QUERY:\n".$query."\n";
             $stmt = $db->prepare( $query );
 
 
             foreach ($schema as $colname => $coltype) {
                 $value = $this->get_colvalue($colname);
-                //echo "VALUE:\n".$value."\n";
                 $stmt->bindValue( ':' . $colname, $value, $coltype);
             }
 
@@ -197,8 +211,8 @@
                             "payloads" => $this->explanation_image),
                     "responses" => $this->get_responses($schema),
                     "topics" => $this->get_topics($this->get_colvalue("tags")));
-
-            echo json_encode($questionJSON, JSON_UNESCAPED_UNICODE, JSON_FORCE_OBJECT)."\n\n\n\n";
+            //sendJSON($questionJSON);
+            sendJSON(json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         }
 
         public function get_responses() {
@@ -206,18 +220,18 @@
 
             $arr = array("A" => array("content" => $this->get_colvalue("alternative_a"),
                         "payloads" => $this->alternative_a_image,
-                        "isCorrect" => "false"),
+                        "isCorrect" => false),
                 "B" => array("content" => $this->get_colvalue("alternative_b"),
                         "payloads" => $this->alternative_b_image,
-                        "isCorrect" => "false"),
+                        "isCorrect" => false),
                 "C" => array("content" => $this->get_colvalue("alternative_c"),
                         "payloads" => $this->alternative_c_image,
-                        "isCorrect" => "false"),
+                        "isCorrect" => false),
                 "D" => array("content" => $this->get_colvalue("alternative_d"),
                         "payloads" => $this->alternative_d_image,
-                        "isCorrect" => "false"));
+                        "isCorrect" => false));
 
-            $arr[$correct]["isCorrect"] = "true";
+            $arr[$correct]["isCorrect"] = true;
 
             return $arr;
 
@@ -225,14 +239,17 @@
 
         public function get_topics($tags) {
             $tag_list = array();
+            $used_tags = array();
             foreach (explode(", ", $tags) as $i) {
-
-                //Not complete
-                $tag = array("name" => $i,
-                    "id" => 0);
-
-                array_push($tag_list, $tag);
+                $id = $this->get_tag($i);
+                if (array_search($id, $used_tags)===FALSE) {
+                    $tag = array("name" => $i,
+                        "id" => $id);
+                    array_push($tag_list,$tag);
+                    array_push($used_tags, $id);
+                }
             }
+            return array_values($tag_list);
         }
 
         public function extract_images() {
@@ -241,7 +258,7 @@
                     "alternative_c","alternative_d");
             foreach ($arr as $obj) {
                 $image_field = $obj."_image";
-                $doc->loadHTML($this->$obj);
+                $doc->loadHTML(mb_convert_encoding($this->$obj, 'HTML-ENTITIES', 'UTF-8'));
                 $imgs = $doc->getElementsByTagName('img');
                 $i = 0;
                 foreach ($imgs as $img) {
@@ -250,12 +267,11 @@
                     }
                     $src = $img->getAttribute("src");
                     $img->setAttribute("src", "#:".$i);
-                    $this->$obj = $this->innerHTML($doc->getElementsByTagName("body")[0]);
+                    $this->$obj = $this->get_inner_html($doc->getElementsByTagName("body")[0]);
                     $phpPath = str_replace("png", "php", $src);
                     $data = file_get_contents(getcwd()."/../".$phpPath);
                     $base64 = "data:image/png;base64,".base64_encode($data);
                     $this->$image_field->$i = $base64;
-                    echo "IMAGE: ".$image_field.": ".$this->$image_field->$i."\n\n";
                     $i++;
                 }
                 if ($i == 0) {
@@ -266,10 +282,49 @@
         }
 
         public function innerHTML($node) {
-            return implode(array_map([$node->ownerDocument,"saveHTML"],
+            return implode(array_map([$node->ownerDocument,"saveXML"],
                 iterator_to_array($node->childNodes)));
         }
 
+        public function get_tag($tag) {
+            if ($tag == "Data_Flow_Diagram") {
+                return 0;
+            } elseif ($tag == "ER_Diagrams" || $tag == "Conceptual_Modelling" ||
+                $tag == "Participation_Constraints" || $tag == "Cardinality_Constraints" ||
+                $tag == "Recursive_Relationships" || $tag == "Weak_Entities" ||
+                $tag == "Ternary_Relationships") {
+                return 1;
+            } elseif ($tag == "Integrity_Constraints" || $tag == "Relational Model" || 
+                $tag == "Foreign_Keys") {
+                return 2;
+            } elseif ($tag == "Super_keys" || $tag == "Keys" || $tag == "Functional_Dependancies") {
+                return 3;
+            } elseif ($tag == "Transitive_Dependency" || $tag == "Normalization" ||
+                $tag == "Normal_Forms" || $tag == "BCNF" || $tag == "3NF") {
+                return 4;
+            } elseif ($tag == "SQL" || $tag == "Correlated_Queries" || $tag == "DDL" ||
+                $tag == "DML" || $tag == "Nested_Queries" || $tag == "Group_by" ||
+                $tag == "Aggregation") {
+                return 5;
+            } else {
+                return 5;
+            }
+        }
+
+        function get_inner_html( $node ) 
+        {
+            $innerHTML= '';
+            $children = $node->childNodes;
+             
+            foreach ($children as $child)
+            {
+                $innerHTML .= $child->ownerDocument->saveXML( $child );
+            }
+             
+            return $innerHTML;
+        }
+
+        
         
 }
 ?>
