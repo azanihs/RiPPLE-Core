@@ -1,4 +1,7 @@
 from django.conf.urls import url
+from django.conf.urls.static import static
+from django.conf import settings
+
 from . import views
 
 urlpatterns = [
@@ -12,6 +15,9 @@ urlpatterns = [
     url(r'^id/(.*)/$', views.id),
     url(r'^page/(.*)/$', views.page),
     url(r'^competencies/all/$', views.competencies),
-    url(r'^leaderboard/$', views.leaderboard),
+    url(r'^add/$', views.add),
+
+    url(r'^leaderboard/$', views.leaderboard_default),
+    url(r'^leaderboard/(.*)/(.*)/$', views.leaderboard),
     url(r'^search/$', views.search)
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

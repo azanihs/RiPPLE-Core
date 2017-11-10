@@ -32,7 +32,7 @@
                 </md-table-row>
             </md-table-header>
             <md-table-body>
-                <md-table-row v-for="user in sortedUsers"
+                <md-table-row v-for="user in users"
                               :key="user.id">
                     <md-table-cell>
                         <md-image class="avatar"
@@ -93,14 +93,10 @@ export default class LeaderBoard extends Vue {
 
     @Lifecycle
     created() {
-        Fetcher.get(UserService.mostReputableUsers)
-            .on(this.updateUsers);
-    }
-
-    @Lifecycle
-    destroyed() {
-        Fetcher.get(UserService.mostReputableUsers)
-            .off(this.updateUsers);
+        UserService.getMostReputableUsers({
+            sortField: "reputation",
+            sortOrder: "DESC"
+        }).then(this.updateUsers);
     }
 
     updateShowItems(a) {
@@ -109,28 +105,14 @@ export default class LeaderBoard extends Vue {
     }
 
     sort(item) {
-        this.sortType = item.name;
-        this.reverse = item.type == "desc";
+        UserService.getMostReputableUsers({
+            sortField: item.name,
+            sortOrder: item.type.toUpperCase()
+        }).then(this.updateUsers);
     }
 
     get users() {
         return this.pUsers;
-    }
-
-    get sortedUsers() {
-        const users = this.users;
-        const sortKey = this.sortType || "reputation";
-
-        const sortMethod = (a, b) => {
-            if (Number.isNaN(+a[sortKey])) {
-                return a[sortKey].localeCompare(b[sortKey]);
-            }
-            return a[sortKey] - b[sortKey];
-        };
-
-        const sortedUsers = this.reverse ? users.sort().reverse() : users.sort(sortMethod);
-        const startIndex = (this.pageIndex - 1) * this.itemsPerPage;
-        return sortedUsers.slice(startIndex, startIndex + this.itemsPerPage);
     }
 }
 </script>
