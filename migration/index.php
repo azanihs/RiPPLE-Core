@@ -1,11 +1,5 @@
-<?php
-	/*shell_exec("chmod 755 parser");
-	shell_exec("chmod 755 parser/");
-	shell_exec("chmod 755 parser/parser.php");	
-	shell_exec("chmod 755 parser/question.php");	*/
-?>
 <html>
-<!-- options.php -->
+<!-- index.php -->
 <head>
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/css/base.css">
