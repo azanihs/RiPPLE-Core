@@ -7,7 +7,28 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ripple.util.util import is_number
 from users.services import UserService
-from questions.services import QuestionService, SearchService
+from questions.services import QuestionService, SearchService, AuthorService
+
+
+def add(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    host = request.get_host()
+    post_request = loads(request.body.decode("utf-8"))
+
+    if post_request is None:
+        return JsonResponse({"error": "Missing question in request"}, status=422)
+
+    response = AuthorService.add_question(
+        post_request, host, UserService.logged_in_user(request))
+
+    if response['state'] == "Error":
+        return JsonResponse({"error": response['error']}, status=422)
+    else:
+        return JsonResponse({"question": response['question']}, status=200)
 
 
 def respond(request):
