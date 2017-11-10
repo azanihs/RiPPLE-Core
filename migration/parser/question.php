@@ -1,20 +1,4 @@
 <?php
-    function sendJSON($json) {    
-        
-
-        $url = "http://localhost:8000/questions/add/";
-        $auth = "B45JJmX6wOFpYawMWCcVSWWyZ6pBo0GY";
-        $options = [
-            "http" => [
-                "header" => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: $auth",
-                "method" => "POST",
-                "content" => $json
-            ]
-        ];
-        $context = stream_context_create($options);
-        $result = file_get_contents($url,false,$context);
-    }
-
     class Question {
         var $peerwise_id;
         var $created_on;
@@ -172,35 +156,7 @@
             }
         }
 
-        
-        public function save_to_db($db, $schema){
-            $query = "INSERT INTO peerwise_questions ";
-
-            $keys = '';
-            $bindings = '';
-            foreach ($schema as $colname => $coltype) {
-                $keys .= $colname . ',';
-                $bindings .= ':' . $colname . ',';
-            }
-            $keys = rtrim($keys, ",");
-            $bindings = rtrim($bindings, ",");
-            $query .= "( " . $keys . " )";
-            $query .= " VALUES ( " . $bindings . " )";
-            $stmt = $db->prepare( $query );
-
-
-            foreach ($schema as $colname => $coltype) {
-                $value = $this->get_colvalue($colname);
-                $stmt->bindValue( ':' . $colname, $value, $coltype);
-            }
-
-            $result = $stmt->execute();
-            if($result != FALSE){
-                return TRUE;
-            }
-        }
-
-        public function question_as_json($schema) {
+        public function question_as_json() {
             $this->extract_images();
             $questionJSON = array("question" => 
                         array("content" => $this->get_colvalue("question"),
@@ -208,9 +164,9 @@
                     "explanation" => 
                         array("content" => $this->get_colvalue("explanation"),
                             "payloads" => $this->explanation_image),
-                    "responses" => $this->get_responses($schema),
+                    "responses" => $this->get_responses(),
                     "topics" => $this->get_topics($this->get_colvalue("tags")));
-            sendJSON(json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            return json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         public function get_responses() {
@@ -232,7 +188,6 @@
             $arr[$correct]["isCorrect"] = true;
 
             return $arr;
-
         }
 
         public function get_topics($tags) {
@@ -279,11 +234,6 @@
 
         }
 
-        public function innerHTML($node) {
-            return implode(array_map([$node->ownerDocument,"saveXML"],
-                iterator_to_array($node->childNodes)));
-        }
-
         public function get_tag($tag) {
             if ($tag == "Data_Flow_Diagram") {
                 return 0;
@@ -309,20 +259,15 @@
             }
         }
 
-        function get_inner_html( $node ) 
-        {
+        function get_inner_html( $node ) {
             $innerHTML= '';
             $children = $node->childNodes;
-             
+
             foreach ($children as $child)
             {
                 $innerHTML .= $child->ownerDocument->saveXML( $child );
-            }
-             
+            }       
             return $innerHTML;
-        }
-
-        
-        
+        }     
 }
 ?>
