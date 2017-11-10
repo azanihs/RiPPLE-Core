@@ -5,7 +5,7 @@ import re
 
 from ripple.load_env import init_env
 
-init_env('../.current.env')
+init_env('../.env.current')
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ripple.settings")
