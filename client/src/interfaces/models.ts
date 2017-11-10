@@ -148,3 +148,20 @@ export interface QuestionUpload {
     },
     topics: Topic[]
 };
+
+export interface Day {
+    id: number,
+    day: string
+}
+
+export interface Time {
+    id: number,
+    start: string,
+    end: string
+}
+
+export interface Availability {
+  id: number,
+  day: Day,
+  time: Time
+}
