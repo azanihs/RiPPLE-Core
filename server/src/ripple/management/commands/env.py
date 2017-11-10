@@ -3,7 +3,7 @@ import shutil
 from django.core.management.base import BaseCommand
 
 
-ALLOWED_ENVIRONMENTS = ["production", "testing", "development"]
+ALLOWED_ENVIRONMENTS = ["prod", "test", "dev"]
 
 
 class Command(BaseCommand):
@@ -11,13 +11,13 @@ class Command(BaseCommand):
 
     def copy_to(self, environment_name):
         new_config = path.abspath(path.dirname(
-            __file__) + '../../../../.' + environment_name + '.env')
+            __file__) + '../../../../' + '.env.' + environment_name)
 
         if not path.isfile(new_config):
             raise Exception("File: '" + new_config + "' not found")
 
         target_location = path.abspath(path.dirname(
-            __file__) + '../../../../.current.env')
+            __file__) + '../../../../.env.current')
 
         shutil.copyfile(new_config, target_location)
 
