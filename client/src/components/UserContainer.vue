@@ -135,12 +135,9 @@ export default class UserContainer extends Vue {
                         newImage: (file as any).base64 as string
                     }))
                     .then((user: User) => {
-                        if (Math.random() < 0.5) {
-                            this.$emit("changeUser", user);
-                            this.showMessage("Profile image changed");
-                        } else {
-                            this.showMessage("Image too large");
-                        }
+                        this.$emit("changeUser", user);
+                        this.showMessage("Profile image changed");
+                        Fetcher.forceUpdate();
                         document.body.removeChild(input);
                     })
                     .catch(err => {
