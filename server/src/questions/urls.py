@@ -19,5 +19,6 @@ urlpatterns = [
 
     url(r'^leaderboard/$', views.leaderboard_default),
     url(r'^leaderboard/(.*)/(.*)/$', views.leaderboard),
+  
     url(r'^search/$', views.search)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

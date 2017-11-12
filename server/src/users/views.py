@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from json import loads
-
+import base64
+import imghdr
 from django.http import JsonResponse
-from users.services.UserService import logged_in_user, user_courses, update_course
+from django.core.files.base import ContentFile
+from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
 from users.services.TokenService import token_valid, generate_token, token_to_user_course
 
 
@@ -47,3 +49,20 @@ def login(request, course_code):
         return JsonResponse(generate_token(user=user_course.user, course_code=course_code), safe=False)
 
     return JsonResponse(generate_token())
+
+
+def image_update(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+    post_request = loads(request.body.decode("utf-8"))
+    new_image = post_request.get("image", None)
+    if new_image is None:
+        return JsonResponse({
+            "error": "Missing image payload"
+        }, status=405)
+
+    course_user = logged_in_user(request)
+    root_path = request.get_host()
+    return JsonResponse(update_user_image(course_user.user, root_path, new_image))
