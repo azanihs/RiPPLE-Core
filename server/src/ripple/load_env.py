@@ -22,7 +22,7 @@ def init_env(try_path):
         os.path.dirname(__file__), try_path))
     if not os.path.isfile(dotenv_path):
         print("Could not load " + dotenv_path + "!")
-        print("Would you like to initialise .current.env to example values? (Y/N)")
+        print("Would you like to initialise .env.current to example values? (Y/N)")
         user_answer = input("> ")
         if user_answer == "Y":
             with open(dotenv_path, "w") as config_file:
