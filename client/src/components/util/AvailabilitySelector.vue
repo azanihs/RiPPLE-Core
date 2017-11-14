@@ -23,12 +23,13 @@
                 <tbody>
                     <tr v-for="activity in pAvailableDays"
                         :key="activity">
-                        <td>{{ preferenceActivities[activity] }}</td>
+                        <td>{{ preferenceActivities[activity - 1] }}</td>
                         <td v-for="time in pAvailableTimes"
                             :key="time"
                             class="centerAlign"
                             :style="getCellShade(activity, time)">
-                            <md-checkbox class="centerCheckbox"
+                            <md-checkbox :value="checkbox(activity, time)"
+                                         class="centerCheckbox"
                                          @change="checkboxChange"
                                          :id="`${activity}_${time}`"
                                          :name="`${activity}_${time}`"></md-checkbox>
@@ -97,11 +98,28 @@ export default class AvailabilitySelector extends Vue {
         }
     });
 
+    @Prop user = p({
+        type: Array,
+        default: () => {
+            return [];
+        }
+    });
+
     get showAvailability() {
         return this.pShowAvailability;
     }
     set showAvailability(newVal) {
         this.pShowAvailability = newVal;
+    }
+
+    checkbox(day, time) {
+        for (let i = 0; i < this.user.length; i++) {
+            const entry = this.user[i];
+            if (entry.day.id == day && entry.time.id == time) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -150,7 +168,7 @@ export default class AvailabilitySelector extends Vue {
     }
 
     @Watch("course")
-    handleAvailabilityChange() {
+    handleCourseChange() {
         for (let i = 0; i < this.course.length; i++) {
             if (this.course[i].entries > this.pMaxAvailable) {
                 this.pMaxAvailable = this.course[i].entries;
