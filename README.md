@@ -1,4 +1,4 @@
-# RiPPLE-Client-side
+# RiPPLE
 Recommendation in a Personalised Peer Learning Environment
 
 A demo of the RiPPLE platform can be viewed at https://hkhosrav.github.io/RiPPLE-Core
