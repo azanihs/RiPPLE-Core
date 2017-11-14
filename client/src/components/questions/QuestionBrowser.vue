@@ -239,7 +239,7 @@ export default class QuestionBrowser extends Vue {
     }
 
     get topicsToFilter() {
-        return this.topics.filter(x => this.topicsToUse.indexOf(x) === -1).map(x => x.id);
+        return this.topics.filter(x => this.topicsToUse.indexOf(x) != -1).map(x => x.id);
     }
 
     generateCompetencies() {
