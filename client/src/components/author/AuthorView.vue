@@ -37,6 +37,7 @@
             class="cardSeparator">
             <md-card class="removePadding">
                 <md-tabs md-fixed
+                    :mdNavigation="false"
                     class="md-transparent tabContainer">
                     <md-tab v-for="i in ['A', 'B', 'C', 'D']"
                         :key="i"

@@ -1,6 +1,7 @@
 <template>
     <md-layout>
         <md-tabs md-fixed
+            :mdNavigation="false"
             class="md-transparent">
             <md-tab md-label="Overview">
                 <md-layout md-flex="100"
