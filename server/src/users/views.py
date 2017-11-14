@@ -4,7 +4,7 @@ from json import loads
 
 from django.http import JsonResponse
 from users.services.UserService import logged_in_user, user_courses, update_course
-from users.services.TokenService import token_valid, generate_token, token_to_user_course
+from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 
 
 def index(request):
@@ -47,3 +47,9 @@ def login(request, course_code):
         return JsonResponse(generate_token(user=user_course.user, course_code=course_code), safe=False)
 
     return JsonResponse(generate_token())
+
+def getUser(request, course_code=None):
+    if course_code != "":
+        return JsonResponse(get_user(course_code))
+
+    return JsonResponse({"error": "Course not provided"})

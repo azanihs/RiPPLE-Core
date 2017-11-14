@@ -61,9 +61,16 @@
 		<div class="voffset4"></div>
 
 		<form id="import_form">
+			
+			Course Code: <input id="course_name" name="course_name" type="text"><br>
+
+			<div class="voffset4"></div>
+			
 			<input id="html_file_input" name="file" class="btn-primary" type="file" title="Select a file to import" accept=".html, .htm" required>
 			
-			<div class="voffset4"></div>
+			<dic class="voffset4"></div>
+
+			
 
 			<button id="confirm_import" type="submit" class="btn btn-lg btn-success" >Confirm Import</button>
 		</form>	
@@ -116,6 +123,7 @@
     		contentType: false,
     		cache: false,
          	success: function (data) {
+				console.log(data);
            		var res = JSON.parse(data);
            		if(res.result == "success"){
            			hide_all_alerts();
