@@ -7,8 +7,10 @@ from django.db.models import Count, Subquery, OuterRef, Func, F
 class SearchService(object):
     def __init__(self, course):
         super(SearchService, self).__init__()
+        #Some questions occur multiple times due to some having multiple tags
+        #Make distinct
         self._query = Question.objects.filter(
-            author__in=CourseUser.objects.filter(course=course))
+            author__in=CourseUser.objects.filter(course=course)).order_by("id").distinct()
 
     def add_sort(self, sort_field, sort_order):
         if sort_order == "DESC":
@@ -54,7 +56,7 @@ class SearchService(object):
         self._query = self._query.filter(content__contains=text_query)
 
     def add_topic_filter(self, topics):
-        self._query = self._query.exclude(topics__in=topics)
+        self._query = self._query.filter(topics__in=topics)
 
     def execute(self):
         return self._query
