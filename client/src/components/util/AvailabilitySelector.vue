@@ -14,20 +14,20 @@
                 <thead>
                     <tr>
                         <th>Day</th>
-                        <th v-for="time in preferenceTimes"
+                        <th v-for="time in pAvailableTimes"
                             :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr v-for="activity in preferenceActivities"
+                    <tr v-for="activity in pAvailableDays"
                         :key="activity">
-                        <td>{{ activity }}</td>
-                        <td v-for="time in preferenceTimes"
+                        <td>{{ preferenceActivities[activity] }}</td>
+                        <td v-for="time in pAvailableTimes"
                             :key="time"
                             class="centerAlign"
-                            :style="getCellShade(time)">
+                            :style="getCellShade(activity, time)">
                             <md-checkbox class="centerCheckbox"
                                          @change="checkboxChange"
                                          :id="`${activity}_${time}`"
@@ -75,7 +75,7 @@ h2 {}
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop } from "av-ts";
+import { Vue, Component, Watch, Lifecycle, Prop, p } from "av-ts";
 import { Question } from "../../interfaces/models";
 
 @Component()
@@ -84,6 +84,19 @@ export default class AvailabilitySelector extends Vue {
     preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
 
     pShowAvailability = true;
+
+    pAvailableDays: number[] = [1, 2, 3, 4, 5];
+    pAvailableTimes: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+
+    pMaxAvailable: number = 0;
+
+    @Prop course = p({
+        type: Array,
+        default: () => {
+            return [];
+        }
+    });
+
     get showAvailability() {
         return this.pShowAvailability;
     }
@@ -97,7 +110,7 @@ export default class AvailabilitySelector extends Vue {
     *   @return {string} Twelve hour representation of time with "am" or "pm" suffix
     */
     twentyFourHourToTwelveHourPeriod(twentyHourTime: number): string {
-        const time = +twentyHourTime;
+        const time = 7 + twentyHourTime;
         if (time == 12) {
             return `${time}pm`;
         } else if (time < 12) {
@@ -118,13 +131,30 @@ export default class AvailabilitySelector extends Vue {
         throw new Error("deleteRow not implemented");
     }
 
-    getCellShade(time) {
+    getCellShade(day, time) {
         if (this.showAvailability) {
-            const weight = Math.random() < 0.75 ? 0 : Math.random() - 0.25;
+            let weight = 0;
+            if (this.pMaxAvailable > 0) {
+                for (let i = 0; i < this.course.length; i++) {
+                    if (this.course[i].day == day && this.course[i].time == time) {
+                        weight = this.course[i].entries / this.pMaxAvailable;
+                        break;
+                    }
+                }
+            }
             // Perferably have a lookup table generated on mount
             return {
                 background: `rgba(34, 85, 102, ${weight})`
             };
+        }
+    }
+
+    @Watch("course")
+    handleAvailabilityChange() {
+        for (let i = 0; i < this.course.length; i++) {
+            if (this.course[i].entries > this.pMaxAvailable) {
+                this.pMaxAvailable = this.course[i].entries;
+            }
         }
     }
 }

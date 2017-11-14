@@ -3,7 +3,8 @@
                class="topPadding">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <availability-selector @change="shuffleData()"></availability-selector>
+            <availability-selector @change="shuffleData()"
+                                   :course=course></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
@@ -50,6 +51,7 @@ export default class PeerView extends Vue {
     pRequests = [];
     pRecommendations = [];
     pCourseAvailability = [];
+    pUserAvailability = [];
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -64,6 +66,9 @@ export default class PeerView extends Vue {
         console.log(availability);
         this.pCourseAvailability = availability;
     };
+    updateUserAvailability(availability) {
+        this.pUserAvailability = availability;
+    };
 
     @Lifecycle
     created() {
@@ -75,6 +80,8 @@ export default class PeerView extends Vue {
             .then(this.updateRequests);
         AvailabilityService.getCourseAvailability()
             .then(this.updateCourseAvailability);
+        AvailabilityService.getUserAvailability()
+            .then(this.updateUserAvailability);
     }
 
     @Lifecycle
@@ -92,6 +99,10 @@ export default class PeerView extends Vue {
     }
     get requests() {
         return this.pRequests;
+    }
+
+    get course() {
+        return this.pCourseAvailability;
     }
 
     shuffleData() {
