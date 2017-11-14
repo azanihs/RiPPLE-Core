@@ -5,7 +5,7 @@ from collections import OrderedDict
 DEFAULT_ENVS = OrderedDict([
     ['DEVELOPMENT_ENVIRONMENT', 'DEVELOPMENT'],
     ['DJANGO_KEY', 'UNIQUE_LONG_STRING'],
-    ['PROXY_LOCATION', '/'],
+    ['PROXY_LOCATION', ''],
     ['LTI_SUCCESS_REDIRECT', 'http://localhost:8080'],
     ['LTI_URL', ''],
     ['LTI_APP_KEY', ''],
