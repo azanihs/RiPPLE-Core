@@ -12,13 +12,15 @@ libxml_use_internal_errors(true);
 $doc->loadHTMLFile($file);
 libxml_clear_errors();
 
+$courseCode = $_POST['course_name'];
+
 $xpath = new DOMXPath($doc);
 $idname = 'displayQuestionTable';
 $questionTable = $xpath->query("//table[@id='" . $idname . "']");
 
-function sendJSON($json) {  
+function sendJSON($json, $courseCode) {  
 	$url = "http://localhost:8000/questions/add/";
-	$auth = "B45JJmX6wOFpYawMWCcVSWWyZ6pBo0GY";
+	$auth = get_auth($courseCode)->{"token"};
 	$options = [
 		"http" => [
 			"header" => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: $auth",
@@ -28,6 +30,19 @@ function sendJSON($json) {
 	];
 	$context = stream_context_create($options);
 	$result = file_get_contents($url,false,$context);
+}
+
+function get_auth($courseCode) {
+	$url = "http://localhost:8000/users/getUser/".$courseCode;
+	$options = [
+		"http" => [
+			"header" => "Content-Type: application/json\r\nAccept: application/json",
+			"method" => "GET"
+		]
+	];
+	$context = stream_context_create($options);
+	$result = file_get_contents($url, false, $context);
+	return json_decode($result);
 }
 
 function get_inner_html( $node ) 
@@ -65,7 +80,7 @@ foreach ($questionTable as $node) {
 
 	$json = $question->question_as_json();
 
-	sendJson($json);
+	sendJson($json, $courseCode);
 	
 	$questionsAdded++;
 }
