@@ -8,6 +8,7 @@ class Day(models.Model):
 
     def toJSON(self):
         return {
+            "id": self.id,
             "day": self.day
         }
 
@@ -17,6 +18,7 @@ class Time(models.Model):
 
     def toJSON(self):
         return {
+            "id": self.id,
             "start": self.start,
             "end": self.end
         }
