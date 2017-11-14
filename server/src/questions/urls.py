@@ -15,8 +15,10 @@ urlpatterns = [
     url(r'^id/(.*)/$', views.id),
     url(r'^page/(.*)/$', views.page),
     url(r'^competencies/all/$', views.competencies),
+    url(r'^add/$', views.add),
+
     url(r'^leaderboard/$', views.leaderboard_default),
     url(r'^leaderboard/(.*)/(.*)/$', views.leaderboard),
-    url(r'^search/$', views.search),
-    url(r'^add/$', views.add)
+  
+    url(r'^search/$', views.search)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
