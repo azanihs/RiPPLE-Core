@@ -32,9 +32,8 @@ def update(request):
     post_request = loads(request.body.decode("utf-8"))
     day = post_request.get("day", None)
     time = post_request.get("time", None)
-    available = post_request.get("available", None)
 
-    if AvailabilityService.update_availability(logged_in_user, day, time, available) is None:
+    if AvailabilityService.update_availability(logged_in_user, day, time) is None:
         return JsonResponse({"error": "Invalid day/time/availability combination"}, status=422)
     else:
         return HttpResponse(status=204)

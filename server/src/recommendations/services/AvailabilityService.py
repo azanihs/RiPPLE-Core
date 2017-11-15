@@ -9,7 +9,7 @@ def get_user_availability(course_user):
 def get_course_availability(course):
     return [x for x in Availability.objects.values('day', 'time').annotate(entries=Count('id')).order_by('day_id', 'time_id')]
 
-def update_availability(course_user, day_id, time_id, available):
+def update_availability(course_user, day_id, time_id):
     # Check if availaibility exists
     try:
         availability = Availability.objects.get(course_user=course_user, day=day_id, time=time_id)
@@ -17,11 +17,11 @@ def update_availability(course_user, day_id, time_id, available):
     except ObjectDoesNotExist:
         exists = False
 
-    if not available and exists:
+    if exists:
         availability.delete()
         return True
 
-    if available and not exists:
+    if not exists:
         day = Day.objects.get(pk=day_id)
         time = Time.objects.get(pk=time_id)
         availability = Availability(course_user=course_user, day=day, time=time)

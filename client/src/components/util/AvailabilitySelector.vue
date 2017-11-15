@@ -30,7 +30,7 @@
                             :style="getCellShade(activity, time)">
                             <md-checkbox :value="checkbox(activity, time)"
                                          class="centerCheckbox"
-                                         @change="checkboxChange"
+                                         @change="checkboxChange(activity, time)"
                                          :id="`${activity}_${time}`"
                                          :name="`${activity}_${time}`"></md-checkbox>
                         </td>
@@ -137,8 +137,8 @@ export default class AvailabilitySelector extends Vue {
         return `${time - 12}pm`;
     }
 
-    checkboxChange() {
-        this.$emit("change");
+    checkboxChange(day, time) {
+        this.$emit("change", day, time);
     }
 
     addNewRow() {
