@@ -9,7 +9,7 @@ DEFAULT_ENVS = OrderedDict([
     ['LTI_SUCCESS_REDIRECT', 'http://localhost:8080'],
     ['LTI_URL', ''],
     ['LTI_APP_KEY', ''],
-    ['DATABASE_TYPE', 'mysql'],
+    ['DATABASE_TYPE', 'sqlite3'],
     ['DATABASE_NAME', 'rippledb'],
     ['DATABASE_HOST', 'localhost'],
     ['DATABASE_USER', 'ripple'],
