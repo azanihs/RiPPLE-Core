@@ -12,7 +12,8 @@ libxml_use_internal_errors(true);
 $doc->loadHTMLFile($file);
 libxml_clear_errors();
 
-$courseCode = $_POST['course_name'];
+$courseCode = $_POST['course_id'];
+$courseName = $_POST['course_name'];
 
 $xpath = new DOMXPath($doc);
 $idname = 'displayQuestionTable';
@@ -45,6 +46,7 @@ function get_auth($courseCode) {
 	return json_decode($result);
 }
 
+
 function get_inner_html( $node ) 
 {
     $innerHTML= '';
@@ -57,6 +59,36 @@ function get_inner_html( $node )
      
     return $innerHTML;
 }
+
+$topics = [];
+foreach ($questionTable as $node) {
+	$question = new Question();
+	
+	$tbody = $node->getElementsByTagName('tbody');
+	foreach ($tbody as $q) {
+		$rows = $q->getElementsByTagName('tr');
+		$numrows = $rows->length;
+		$d = new DOMDocument();
+		for ($i = 1; $i < $numrows; $i++) {
+			$row = $rows->item($i);
+
+			$key = get_inner_html($row->childNodes->item(0)); //td 1 (leftClear)
+			$value = get_inner_html($row->childNodes->item(1)); // td 2 (middleClear)
+
+			$question->assign_values($key, $value);
+		}
+	}
+
+	$json = $question->question_as_json($topics);
+
+	foreach ($json["topics"] as $topic) {
+		array_push($topics, $topic["name"]);
+	}
+
+}
+
+$topics = array_values(array_unique($topics));
+$questions = Array();
 
 $questionsAdded = 0;
 
@@ -74,16 +106,24 @@ foreach ($questionTable as $node) {
 			$key = get_inner_html($row->childNodes->item(0)); //td 1 (leftClear)
 			$value = get_inner_html($row->childNodes->item(1)); // td 2 (middleClear)
 
-			$question->assign_values($key, $value);
+			$question->assign_values($key, $value, $topics);
 		}
 	}
 
-	$json = $question->question_as_json();
-
-	sendJson($json, $courseCode);
+	$json = $question->question_as_json($topics);
+	array_push($questions, $json);
+	//sendJson($json, $courseCode);
 	
 	$questionsAdded++;
 }
 
-echo json_encode(array("result"=>"success", "questionsAdded"=>$questionsAdded));
+$result = ["topics"=>$topics,"questions"=>$questions];
+
+$jsonFile = fopen("../".$courseName.".json", "w");
+
+//echo json_encode($result,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+fwrite($jsonFile, json_encode($result));
+fclose($jsonFile);
+
+
 ?>
