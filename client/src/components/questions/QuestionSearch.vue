@@ -95,7 +95,7 @@ export default class QuestionSearch extends Vue {
     timeoutId = undefined;
     searchInFlight = false;
 
-    queue: Function[] = [];
+    nextSearchRequest: Function| undefined = undefined;
 
     @Prop
     page = p<number>({
@@ -181,10 +181,9 @@ export default class QuestionSearch extends Vue {
         QuestionService.search(search)
             .then(searchResult => {
                 this.timeoutId = undefined;
-                if (this.queue.length > 0) {
-                    // Clear out the searches which will be ignored anyway
-                    this.queue.splice(0, this.queue.length - 1);
-                    this.queue.pop()();
+                if (this.nextSearchRequest != undefined) {
+                    this.nextSearchRequest();
+                    this.nextSearchRequest = undefined;
                 } else {
                     // Only bubble through the most recent search
                     this.$emit("searched", searchResult);
@@ -211,9 +210,9 @@ export default class QuestionSearch extends Vue {
         if (this.timeoutId === undefined) {
             this.timeoutId = setTimeout((() => this.applyFilters()), 10);
         } else {
-            this.queue.push(() => {
+            this.nextSearchRequest = () => {
                 this.timeoutId = setTimeout((() => this.applyFilters()), 10);
-            });
+            };
         }
     }
 
