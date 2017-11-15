@@ -13,6 +13,7 @@ import json
 from bs4 import BeautifulSoup
 import base64
 import imghdr
+from ripple.util import util
 
 
 def chance(n):
@@ -56,8 +57,9 @@ def parse_questions(file, course_users, all_topics):
         data = json.load(data_file)
     
     questions = data["questions"]
-
     for q in questions:
+        if q["explanation"]["content"] == None:
+                q["explanation"]["content"] = " "
         question = Question(
             content = q["question"]["content"],
             explanation = q["explanation"]["content"],
@@ -83,6 +85,8 @@ def parse_questions(file, course_users, all_topics):
 
         for i in ["A", "B", "C", "D"]:
             response = q["responses"][i]
+            if response["content"] == None:
+                response["content"] = " ";
             distractor = Distractor(
                 content = response["content"],
                 response = i,
@@ -96,53 +100,49 @@ def parse_questions(file, course_users, all_topics):
 
     return distractors
 
-def decode_images(id, obj, images, objType, host):
+def decode_images(image_id, obj, images, image_type, host):
     if len(images) == 0:
         return True
     # objType q=question, d=distractor
     urls = []
-    for i in range(0, len(images)):
-        format, imgstr = images[str(i)].split(';base64,')
-        ext = format.split('/')[-1]
-        data = ContentFile(base64.b64decode(imgstr),
-                           name=objType + str(id) + "_" + str(i) + "." + ext)
-        # Validate image
-        if imghdr.what(data) != ext:
-            return False
+    database_image_types = {
+        "q": QuestionImage,
+        "d": DistractorImage,
+        "e": ExplanationImage
+    }
+    ImageToSaveClass = database_image_types.get(image_type, None)
 
-        # Save Images
-        if objType == "q":
-            content = obj.content
-            questionImage = QuestionImage(question=obj, image=data)
-            questionImage.save()
-            url = questionImage.image.url
-        elif objType == "d":
-            content = obj.content
-            distractorImage = DistractorImage(distractor=obj, image=data)
-            distractorImage.save()
-            url = distractorImage.image.url
-        else:
-            content = obj.explanation
-            explanationImage = ExplanationImage(question=obj, image=data)
-            explanationImage.save()
-            url = explanationImage.image.url
-        urls.append(url)
-
-    if objType == "e":
-        obj.explanation = new_source(urls, content, host)
+    if image_type == "q" or image_type == "e":
+        reference = Question.objects.get(pk=image_id)
     else:
-        obj.content = new_source(urls, content, host)
+        reference = Distractor.objects.get(pk=image_id)
 
-    obj.save()
+    for i, image in images.items():
+        contentfile_image = util.save_image(image, image_id)
+        # Question + Explanation in the same object
+        if image_type == "q" or image_type == "e":
+            new_image = ImageToSaveClass.objects.create(question=reference, image=contentfile_image)
+        else:
+            new_image = ImageToSaveClass.objects.create(distractor=reference, image=contentfile_image)
+        urls.append(new_image.image.name)
+
+    if image_type == "e":
+        reference.explanation = newSource(urls, reference.explanation, host)
+    else:
+        reference.content = newSource(urls, reference.content, host)
+
+    reference.save()
     return True
 
 
-def new_source(urls, content, host):
+
+def newSource(urls, content, host):
     soup = BeautifulSoup(content, "html.parser")
 
     images = soup.find_all('img')
     for i in range(0, len(urls)):
         images[i]['src'] = "http://" + host + urls[i]
+        images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
