@@ -173,7 +173,7 @@ def search(request):
         search_query.add_sort(sort_field, sort_order)
 
     if filter_field is not None:
-        search_query.add_filter(filter_field)
+        search_query.add_filter(filter_field, logged_in_user)
 
     if filter_topics is not None:
         search_query.add_topic_filter(filter_topics)
