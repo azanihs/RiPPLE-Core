@@ -25,6 +25,7 @@ export default class QuestionRepository {
                     topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                     content: x.content,
                     explanation: x.explanation,
+                    responseCount: x.responseCount,
                     responses: x.responses
                 };
                 return question;
@@ -44,9 +45,9 @@ export default class QuestionRepository {
                     topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                     content: x.content,
                     explanation: x.explanation,
+                    responseCount: x.responseCount,
                     responses: x.responses
                 };
-
                 return question;
             }));
     }
@@ -85,6 +86,7 @@ export default class QuestionRepository {
                         topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                         content: x.content,
                         explanation: x.explanation,
+                        responseCount: x.responseCount,
                         responses: x.responses
                     };
 

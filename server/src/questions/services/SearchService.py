@@ -28,6 +28,25 @@ class SearchService(object):
                 Distractor.objects.filter(question_id=OuterRef("pk"))
                 .annotate(c=Count("questionresponse")).values("c").annotate(
                     s=Func(F("c"), function="LOWER")).values("c")))
+
+            #Insert the query here in Django flavour
+            '''
+            SELECT count(*) as responseCount 
+            FROM 'questions_questionresponse' 
+            group by response_id 
+            having response_id = question_id [basically the question we are looking for]
+            '''
+
+
+            '''
+            self._query = self._query.annotate(responseCount=Subquery(
+                #Find the response count
+                QuestionResponse.objects.filter(question_id=OuterRef("pk"))
+                .annotate(c=Count("questionresponse"))
+            ).values("c"))
+            '''
+            
+            #End
             self._query = self._query.order_by(sort_modifier + sort_field)
 
     def add_filter(self, filter_field):
