@@ -15,6 +15,7 @@ export interface Question {
     solution: Distractor,
     distractors: Distractor[],
 
+    responseCount: number,
     responses: QuestionResponse[]
 };
 export interface Distractor {

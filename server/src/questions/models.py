@@ -44,6 +44,7 @@ class Question(models.Model):
             "qualityCount": self.qualityCount,
             "topics": [x.toJSON() for x in self.topics.all()],
             "responses": [],
+            "responseCount": sum((x.questionresponse_set.count() for x in self.distractor_set.all())),
             "distractors": [x.toJSON() for x in self.distractor_set.all()]
         }
 
