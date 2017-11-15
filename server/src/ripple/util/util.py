@@ -1,5 +1,11 @@
 import itertools
-
+from django.core.files.base import ContentFile
+from base64 import b64decode
+import imghdr
+try:
+    import urlparse.urljoin
+except ImportError:
+    from urllib.parse import urljoin
 
 def is_number(inStr):
     try:
@@ -29,3 +35,19 @@ def topic_weights(question_topics):
         "weight": len(x) / float(len(question_topics)),
         "topics": x
     } for x in combinations(question_topics)]
+
+
+def save_image(encoded_image, image_id):
+    image_format, base64_payload = encoded_image.split(';base64,')
+    ext = image_format.split('/')[-1]
+    data = ContentFile(b64decode(base64_payload),
+                       name="u" + image_id + "." + ext)
+    # Validate image
+    if imghdr.what(data) != ext:
+        return None
+    return data
+
+def merge_url_parts(parts, url=""):
+    if len(parts) == 0:
+        return url
+    return merge_url_parts(parts, urljoin(url, parts.pop(0)))

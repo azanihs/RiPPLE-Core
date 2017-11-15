@@ -4,8 +4,8 @@ from json import loads
 
 from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
-from ripple.util.util import is_number
+from django.conf import settings
+from ripple.util.util import is_number, merge_url_parts
 from users.services import UserService
 from questions.services import QuestionService, SearchService, AuthorService
 
@@ -16,14 +16,22 @@ def add(request):
             "error": "Must use POST to this endpoint"
         }, status=405)
 
-    host = request.get_host()
+    def _format(x):
+        if len(x) == 0: return x
+        return (x + "/") if x[-1] != "/" else x
+    root_path = merge_url_parts([
+        _format("//" + request.get_host()),
+        _format(settings.FORCE_SCRIPT_NAME),
+        _format("static")
+    ])
+
     post_request = loads(request.body.decode("utf-8"))
 
     if post_request is None:
         return JsonResponse({"error": "Missing question in request"}, status=422)
 
     response = AuthorService.add_question(
-        post_request, host, UserService.logged_in_user(request))
+        post_request, root_path, UserService.logged_in_user(request))
 
     if response['state'] == "Error":
         return JsonResponse({"error": response['error']}, status=422)

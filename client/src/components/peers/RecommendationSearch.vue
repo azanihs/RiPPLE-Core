@@ -33,6 +33,7 @@
             </table>
         </md-layout>
         <md-tabs md-fixed
+                :mdNavigation="false"
                  class="md-transparent">
             <md-tab md-label="Find"
                     class="tab">

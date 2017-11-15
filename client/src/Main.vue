@@ -252,8 +252,14 @@ export default class Main extends Vue {
     }
 
     resized() {
-        const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
-        const isVisible = (this.$refs.isVisible as any).$el as HTMLElement;
+        const sideNav = (this.$refs.sidenavContainer as Vue);
+        const visible = (this.$refs.isVisible as Vue);
+        if (!sideNav || !visible) {
+            return;
+        }
+
+        const container = sideNav.$el;
+        const isVisible = visible.$el;
         if (window.getComputedStyle(isVisible).display !== "none") {
             this.mobileMode = true;
             this.menuIcon = "menu";

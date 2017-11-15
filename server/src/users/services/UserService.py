@@ -1,11 +1,33 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import random
-from datetime import datetime
 import pytz as timezone
+import base64
+
+from datetime import datetime
+from bs4 import BeautifulSoup
+from ripple.util.util import save_image
+
 from questions.models import Topic, Competency, CompetencyMap
-from users.models import Course, CourseUser, User, Role
+from users.models import Course, CourseUser, User, Role, UserImage
 from users.services.TokenService import token_to_user_course
+from ripple.util import util
+
+def update_user_image(user, server_root, new_image):
+    saved_image = save_image(new_image, str(user.id))
+    if saved_image is None:
+        return {
+            "error": "Image is not of valid type"
+        }
+
+    profile_image = UserImage.objects.create(
+        image=saved_image,
+        user=user
+    )
+
+    user.image = util.merge_url_parts([server_root, profile_image.image.name])
+    user.save()
+    return user.toJSON()
 
 
 def logged_in_user(request):
