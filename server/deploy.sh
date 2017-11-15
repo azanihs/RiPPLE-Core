@@ -13,7 +13,7 @@ if [ $# -eq 0 ]
         rm -rf $DEPLOY_PATH
         mkdir $DEPLOY_PATH
         cp -r $SOURCE_DIR/src/* $DEPLOY_PATH
-        cp $1 $DEPLOY_PATH/.current.env
+        cp $1 $DEPLOY_PATH/.env.current
 
         cd $SOURCE_DIR
         pip install -r requirements.txt

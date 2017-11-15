@@ -8,7 +8,13 @@ from django.db.models import Count
 import random
 
 
-def get_course_leaders(course, limit=25):
+def leaderboard_sort(class_instance, user_column):
+    query = class_instance.objects.values(
+        user_column).annotate(total=Count(user_column))
+    return [x for x in query]
+
+
+def get_course_leaders(course, sort_field, sort_order, limit=25):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -18,14 +24,10 @@ def get_course_leaders(course, limit=25):
 
     course_users = CourseUser.objects.filter(course=course)
     # Cache database calls
-    question_counts = [x for x in Question.objects.values(
-        "author_id").annotate(total=Count("author_id"))]
-    response_counts = [x for x in QuestionResponse.objects.values(
-        "user_id").annotate(total=Count("user_id"))]
-    rating_counts = [x for x in QuestionRating.objects.values(
-        "user_id").annotate(total=Count("user_id"))]
-    login_counts = [x for x in Token.objects.values(
-        "user_id").annotate(total=Count("user_id"))]
+    question_counts = leaderboard_sort(Question, "author_id")
+    response_counts = leaderboard_sort(QuestionResponse, "user_id")
+    rating_counts = leaderboard_sort(QuestionRating, "user_id")
+    login_counts = leaderboard_sort(Token, "user_id")
 
     leaderboard_users = [{
         "name": u.user.first_name,
@@ -40,6 +42,11 @@ def get_course_leaders(course, limit=25):
         "connectionsMade": random.randint(0, 100),
         "logins": lookup_total("user_id", u.id, login_counts)
     } for u in course_users]
+
+    if len(leaderboard_users) > 0 and sort_field in leaderboard_users[0]:
+        should_reverse = sort_order == "DESC"
+        leaderboard_users = sorted(
+            leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
 
     if limit == -1:
         return leaderboard_users

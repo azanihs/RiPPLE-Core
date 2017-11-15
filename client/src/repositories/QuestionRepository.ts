@@ -1,9 +1,36 @@
 import { apiFetch } from "./APIRepository";
-import { Question, Topic } from "../interfaces/models";
+import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import f from "faker";
 
 export default class QuestionRepository {
+    static uploadQuestion(question: QuestionUpload): Promise<Question> {
+        return apiFetch(`/questions/add/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(question)
+        })
+            .then(x => x.json())
+            .then(x => x["question"])
+            .then(x => {
+                const question: Question = {
+                    id: x.id,
+                    difficulty: x.difficulty,
+                    quality: x.quality,
+                    solution: x.distractors.find(d => d.isCorrect === true),
+                    distractors: x.distractors,
+                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
+                    content: x.content,
+                    explanation: x.explanation,
+                    responses: x.responses
+                };
+                return question;
+            });
+    }
+
     static getMany(count: number): Promise<Question[]> {
         return apiFetch(`/questions/all/`)
             .then(questions => questions.json())
@@ -17,8 +44,7 @@ export default class QuestionRepository {
                     topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                     content: x.content,
                     explanation: x.explanation,
-
-                    responses: []
+                    responses: x.responses
                 };
 
                 return question;
@@ -59,8 +85,7 @@ export default class QuestionRepository {
                         topics: x.topics.map(t => TopicRepository.topicPointer(t)),
                         content: x.content,
                         explanation: x.explanation,
-
-                        responses: []
+                        responses: x.responses
                     };
 
                     return question;
