@@ -3,6 +3,22 @@ import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import f from "faker";
 
+function toQuestion(x: Question): Question {
+    const question: Question = {
+        id: x.id,
+        difficulty: x.difficulty,
+        quality: x.quality,
+        solution: x.distractors.find(d => d.isCorrect === true),
+        distractors: x.distractors,
+        topics: x.topics.map(t => TopicRepository.topicPointer(t)),
+        content: x.content,
+        explanation: x.explanation,
+        responses: x.responses,
+        responseCount: x.responseCount
+    };
+    return question;
+}
+
 export default class QuestionRepository {
     static uploadQuestion(question: QuestionUpload): Promise<Question> {
         return apiFetch(`/questions/add/`, {
@@ -15,40 +31,13 @@ export default class QuestionRepository {
         })
             .then(x => x.json())
             .then(x => x["question"])
-            .then(x => {
-                const question: Question = {
-                    id: x.id,
-                    difficulty: x.difficulty,
-                    quality: x.quality,
-                    solution: x.distractors.find(d => d.isCorrect === true),
-                    distractors: x.distractors,
-                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                    content: x.content,
-                    explanation: x.explanation,
-                    responses: x.responses
-                };
-                return question;
-            });
+            .then(response => toQuestion(response));
     }
 
     static getMany(count: number): Promise<Question[]> {
         return apiFetch(`/questions/all/`)
             .then(questions => questions.json())
-            .then(questions => questions.map(x => {
-                const question: Question = {
-                    id: x.id,
-                    difficulty: x.difficulty,
-                    quality: x.quality,
-                    solution: x.distractors.find(d => d.isCorrect === true),
-                    distractors: x.distractors,
-                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                    content: x.content,
-                    explanation: x.explanation,
-                    responses: x.responses
-                };
-
-                return question;
-            }));
+            .then(questions => questions.map(x => toQuestion(x)));
     }
 
     static search(sortField: string | undefined,
@@ -75,21 +64,7 @@ export default class QuestionRepository {
             .then(questions => questions.json())
             .then(searchResult => ({
                 totalItems: searchResult.totalItems,
-                questions: searchResult.items.map(x => {
-                    const question: Question = {
-                        id: x.id,
-                        difficulty: x.difficulty,
-                        quality: x.quality,
-                        solution: x.distractors.find(d => d.isCorrect === true),
-                        distractors: x.distractors,
-                        topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                        content: x.content,
-                        explanation: x.explanation,
-                        responses: x.responses
-                    };
-
-                    return question;
-                }),
+                questions: searchResult.items.map(x => toQuestion(x)),
                 page: searchResult.page
             }));
     }
