@@ -132,6 +132,7 @@ export interface QuestionBuilder {
 
 export interface AuthorResponse {
     content: string,
+    isCorrect: boolean,
     payloads: {
         [id: number]: string
     }

@@ -1,6 +1,8 @@
 *.pyc
 src/*.db
 src/*.db-journal
+src/media/
 
 *.env
-!.example.env
+.env*
+!.env.example
