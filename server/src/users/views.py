@@ -6,8 +6,8 @@ import imghdr
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
-from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image, get_user
-from users.services.TokenService import token_valid, generate_token, token_to_user_course
+from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
+from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from ripple.util import util
 
 def index(request):
