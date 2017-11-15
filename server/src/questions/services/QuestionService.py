@@ -112,13 +112,14 @@ def rate_question(distractor_id, response, user):
 
 
 def calculate_question_score(attempts, is_correct):
+
     score_map = {
         1: 1 if is_correct else -1,
         2: 0.25 if is_correct else -1,
         3: -0.25 if is_correct else -1,
         4: -0.75 if is_correct else -1
     }
-    return score_map[attempts]
+    return score_map[min(4, attempts)]
 
 
 def update_question_score(user, question, new_score):
@@ -142,7 +143,6 @@ def update_competency(user, question, response):
     """
     # Weigh each topic
     weights = util.topic_weights(question.topics.all())
-
     for i in weights:
         topics = i["topics"]
         weight = i["weight"]
