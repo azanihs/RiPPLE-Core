@@ -13,4 +13,21 @@ export default class AvailabilityRepository {
           .then(x => x.json());
     }
 
+    static updateUserAvailability(day: number, time: number) {
+        return apiFetch(`/recommendations/availability/update/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+                day: day,
+                time: time
+            })
+        })
+            .then(x => {
+                return x.json()
+                    .catch(_ => x);
+            });
+    }
 }

@@ -3,7 +3,8 @@
                class="topPadding">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <availability-selector @change="shuffleData()"
+            <availability-selector v-on:change="changeAvailability"
+                                   @change="shuffleData()"
                                    :course="course"
                                    :user="user"></availability-selector>
         </md-layout>
@@ -107,6 +108,10 @@ export default class PeerView extends Vue {
 
     get user() {
         return this.pUserAvailability;
+    }
+
+    changeAvailability(day, time) {
+        AvailabilityService.updateUserAvailability(day, time);
     }
 
     shuffleData() {
