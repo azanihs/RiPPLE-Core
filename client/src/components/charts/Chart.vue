@@ -1,5 +1,5 @@
 <template>
-    <div class="chartContainer">
+    <div class="container">
         <div class="legend"
              v-if="type == 'bar' && data && data.datasets">
             <div class="legendItem">
@@ -7,7 +7,7 @@
                 <span>{{data.datasets[0].label}}</span>
             </div>
             <div class="legendItem">
-                <span class="legendLabel">▲</span>
+                <span class="legendLabel">◯</span>
                 <span>{{data.datasets[1].label}}</span>
             </div>
         </div>
@@ -28,10 +28,7 @@
             </div>
         </div>
 
-        <div v-if="type != 'topicDependency'"
-             class="chartContainer">
-            <canvas class="chartjs"></canvas>
-        </div>
+        <canvas v-if="type != 'topicDependency'"class="chartjs"></canvas>
         <graph-comparator v-else
                           :data="data"
                           :nodes="data.labels"></graph-comparator>
@@ -51,7 +48,10 @@
     transition: width 250ms linear, height 250ms linear;
 }
 
-.chartContainer {
+.container {
+    position: absolute;
+    left: 0px;
+    top: 0px;
     width: 100%;
     height: 100%;
 }
@@ -129,28 +129,32 @@ export default class Chart extends Vue {
                 maintainAspectRatio: false,
                 responsive: true
             }, this.options);
-
             if (this.type === "bar") {
                 if (chartOptions["legend"] === undefined) {
                     chartOptions["legend"] = {};
                 }
                 chartOptions["legend"].display = false;
+            } else if (this.type == "radar") {
+                chartOptions["scale"] = {
+                    ticks: {
+                        display: false
+                    }
+                };
             }
 
-            this.chart = new ChartJS(this.$el.querySelector("canvas"), {
+            this.chart = new ChartJS(this.$el.querySelector("canvas").getContext("2d"), {
                 type: this.type,
                 data: this.data,
                 options: chartOptions
             });
+            this.chart.resize();
         }
     }
 
     @Lifecycle
     mounted() {
         this.mountChart();
-        setTimeout(() => {
-            this.resetChart();
-        }, 10);
+        window.dispatchEvent(new Event("resize"));
     }
 
     resetChart() {

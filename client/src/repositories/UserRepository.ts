@@ -156,6 +156,20 @@ export default class UserRepository {
             .then(x => x.json());
     }
 
+    static getCompareAgainst(compareTo: string): Promise<Edge[]> {
+        return apiFetch(`/questions/competencies/all/`)
+        .then(x => x.json())
+        .then(x => x.map(x => {
+            const edge: Edge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: Math.floor(Math.random() * 100),
+                attempts: Math.floor(Math.random() * 100)
+            };
+            return edge;
+        }));
+    }
+
     static getUserCompetencies(): Promise<Edge[]> {
         return apiFetch(`/questions/competencies/all/`)
             .then(x => x.json())
