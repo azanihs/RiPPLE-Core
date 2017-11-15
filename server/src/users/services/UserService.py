@@ -11,7 +11,7 @@ from ripple.util.util import save_image
 from questions.models import Topic, Competency, CompetencyMap
 from users.models import Course, CourseUser, User, Role, UserImage
 from users.services.TokenService import token_to_user_course
-
+from ripple.util import util
 
 def update_user_image(user, server_root, new_image):
     saved_image = save_image(new_image, str(user.id))
@@ -25,7 +25,7 @@ def update_user_image(user, server_root, new_image):
         user=user
     )
 
-    user.image = "http://" + server_root + profile_image.image.url
+    user.image = util.merge_url_parts([server_root, profile_image.image.name])
     user.save()
     return user.toJSON()
 

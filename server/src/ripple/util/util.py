@@ -2,7 +2,10 @@ import itertools
 from django.core.files.base import ContentFile
 from base64 import b64decode
 import imghdr
-
+try:
+    import urlparse.urljoin
+except ImportError:
+    from urllib.parse import urljoin
 
 def is_number(inStr):
     try:
@@ -43,3 +46,8 @@ def save_image(encoded_image, image_id):
     if imghdr.what(data) != ext:
         return None
     return data
+
+def merge_url_parts(parts, url=""):
+    if len(parts) == 0:
+        return url
+    return merge_url_parts(parts, urljoin(url, parts.pop(0)))

@@ -1,4 +1,4 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore, QuestionImage, ExplanationImage, DistractorImage
+from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.conf import settings
@@ -82,51 +82,39 @@ def add_question(question_request, host, user):
                 questionObj.delete()
                 return {"state": "Error", "error": "Invalid Distractor Image"}
 
-    return {"state": "Question Added", "question": questionObj.toJSON()}
+    return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
 
-def decodeImages(id, images, type, host):
-    # type q=question, d=distractor
+def decodeImages(image_id, images, image_type, host):
+    # type q=question, d=distractor, e=explanation
     urls = []
-    for i in range(0, len(images)):
-        format, imgstr = images[str(i)].split(';base64,')
-        ext = format.split('/')[-1]
-        data = ContentFile(base64.b64decode(imgstr),
-                           name=type + id + "_" + str(i) + "." + ext)
-        # Validate image
-        if imghdr.what(data) != ext:
-            return False
+    database_image_types = {
+        "q": QuestionImage,
+        "d": DistractorImage,
+        "e": ExplanationImage
+    }
+    ImageToSaveClass = database_image_types.get(image_type, None)
 
-        # Question + Explanation in the same object
-        if type == "q" or type == "e":
-            object = Question.objects.get(pk=id)
-        else:
-            object = Distractor.objects.get(pk=id)
-
-        # Save Images
-        if type == "q":
-            content = object.content
-            questionImage = QuestionImage(question=object, image=data)
-            questionImage.save()
-            url = questionImage.image.url
-        elif type == "d":
-            content = object.content
-            distractorImage = DistractorImage(distractor=object, image=data)
-            distractorImage.save()
-            url = distractorImage.image.url
-        else:
-            content = object.explanation
-            explanationImage = ExplanationImage(question=object, image=data)
-            explanationImage.save()
-            url = explanationImage.image.url
-        urls.append(url)
-
-    if type == "e":
-        object.explanation = newSource(urls, content, host)
+    if image_type == "q" or image_type == "e":
+        reference = Question.objects.get(pk=image_id)
     else:
-        object.content = newSource(urls, content, host)
+        reference = Distractor.objects.get(pk=image_id)
 
-    object.save()
+    for i, image in images.items():
+        contentfile_image = util.save_image(image, image_id)
+        # Question + Explanation in the same object
+        if image_type == "q" or image_type == "e":
+            new_image = ImageToSaveClass.objects.create(question=reference, image=contentfile_image)
+        else:
+            new_image = ImageToSaveClass.objects.create(distractor=reference, image=contentfile_image)
+        urls.append(new_image.image.name)
+
+    if image_type == "e":
+        reference.explanation = newSource(urls, reference.explanation, host)
+    else:
+        reference.content = newSource(urls, reference.content, host)
+
+    reference.save()
     return True
 
 
@@ -135,7 +123,8 @@ def newSource(urls, content, host):
 
     images = soup.find_all('img')
     for i in range(0, len(urls)):
-        images[i]['src'] = "http://" + host + urls[i]
+        images[i]['src'] = "//" + host + urls[i]
+        images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
