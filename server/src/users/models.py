@@ -40,6 +40,11 @@ class User(models.Model):
         }
 
 
+class UserImage(models.Model):
+    image = models.ImageField(upload_to='user_photo')
+    user = models.ForeignKey(User, on_delete=None)
+
+
 class Role(models.Model):
     role = models.CharField(max_length=32)
 

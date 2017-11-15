@@ -124,16 +124,17 @@ def calculate_question_score(attempts, is_correct):
 
 def update_question_score(user, question, new_score):
     """
-        Helper method to update the cached QuestionScore for a users question to new_score
+        Helper method to update the cached QuestionScore for a users question to new_score. Also increments the answer count for the question score
         Creates a QuestionScore is none exists
     """
     try:
         cached_question_score = QuestionScore.objects.get(
             user=user, question=question)
         cached_question_score.score = new_score
+        cached_question_score.number_answers += 1
         cached_question_score.save()
     except QuestionScore.DoesNotExist:
-        QuestionScore(user=user, question=question,
+        QuestionScore(user=user, question=question, number_answers=1,
                       score=new_score).save()
 
 

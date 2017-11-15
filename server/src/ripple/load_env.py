@@ -5,7 +5,7 @@ from collections import OrderedDict
 DEFAULT_ENVS = OrderedDict([
     ['DEVELOPMENT_ENVIRONMENT', 'DEVELOPMENT'],
     ['DJANGO_KEY', 'UNIQUE_LONG_STRING'],
-    ['PROXY_LOCATION', '/'],
+    ['PROXY_LOCATION', ''],
     ['LTI_SUCCESS_REDIRECT', 'http://localhost:8080'],
     ['LTI_URL', ''],
     ['LTI_APP_KEY', ''],
@@ -22,7 +22,7 @@ def init_env(try_path):
         os.path.dirname(__file__), try_path))
     if not os.path.isfile(dotenv_path):
         print("Could not load " + dotenv_path + "!")
-        print("Would you like to initialise .current.env to example values? (Y/N)")
+        print("Would you like to initialise .env.current to example values? (Y/N)")
         user_answer = input("> ")
         if user_answer == "Y":
             with open(dotenv_path, "w") as config_file:

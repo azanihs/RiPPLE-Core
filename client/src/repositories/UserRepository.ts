@@ -156,6 +156,20 @@ export default class UserRepository {
             .then(x => x.json());
     }
 
+    static getCompareAgainst(compareTo: string): Promise<Edge[]> {
+        return apiFetch(`/questions/competencies/all/`)
+        .then(x => x.json())
+        .then(x => x.map(x => {
+            const edge: Edge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: Math.floor(Math.random() * 100),
+                attempts: Math.floor(Math.random() * 100)
+            };
+            return edge;
+        }));
+    }
+
     static getUserCompetencies(): Promise<Edge[]> {
         return apiFetch(`/questions/competencies/all/`)
             .then(x => x.json())
@@ -235,14 +249,15 @@ export default class UserRepository {
     }
 
     static updateUserImage(newImage: string): Promise<User> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const _u = UserRepository.getLoggedInUser()
-                    .then(user => {
-                        user.user.image = newImage;
-                        resolve(user.user);
-                    });
-            }, Math.random() * 1000);
-        });
+        return apiFetch(`/users/me/image/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+                image: newImage
+            })
+        }).then(x => x.json());
     }
 }
