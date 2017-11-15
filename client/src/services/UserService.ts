@@ -25,7 +25,7 @@ export default class UserService {
     }
 
     static userCompetencies({ compareTo, exclude }: { compareTo: string, exclude: number[] }) {
-        return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getUserCompetencies()])
+        return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getCompareAgainst(compareTo)])
             .then(data => UserService.generateGraph(data[0], data[1], exclude || []));
     }
 
