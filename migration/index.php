@@ -62,8 +62,12 @@
 
 		<form id="import_form">
 			
-			Course Code: <input id="course_name" name="course_name" type="text"><br>
+			Course Code: <input id="course_id" name="course_id" type="text"><br>
 
+			<div class="voffset4"></div>
+
+			Course Name: <input id="course_name" name="course_name" type="text"><br>
+			
 			<div class="voffset4"></div>
 			
 			<input id="html_file_input" name="file" class="btn-primary" type="file" title="Select a file to import" accept=".html, .htm" required>

@@ -27,7 +27,7 @@
         var $average_difficulty;
         var $total_ratings;
     
-        public function assign_values($key, $value){
+        public function assign_values($key, $value) {
             switch ($key) {
                 case 'ID':
                     $d = new domDocument; 
@@ -156,7 +156,7 @@
             }
         }
 
-        public function question_as_json() {
+        public function question_as_json($topics) {
             $this->extract_images();
             $questionJSON = array("question" => 
                         array("content" => $this->get_colvalue("question"),
@@ -165,8 +165,9 @@
                         array("content" => $this->get_colvalue("explanation"),
                             "payloads" => $this->explanation_image),
                     "responses" => $this->get_responses(),
-                    "topics" => $this->get_topics($this->get_colvalue("tags")));
-            return json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                    "topics" => $this->get_topics($topics, $this->get_colvalue("tags")));
+            return $questionJSON;
+            //return json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         public function get_responses() {
@@ -190,17 +191,11 @@
             return $arr;
         }
 
-        public function get_topics($tags) {
+        public function get_topics($topics, $tags) {
             $tag_list = array();
             $used_tags = array();
             foreach (explode(", ", $tags) as $i) {
-                $id = $this->get_tag($i);
-                if (array_search($id, $used_tags)===FALSE) {
-                    $tag = array("name" => $i,
-                        "id" => $id);
-                    array_push($tag_list,$tag);
-                    array_push($used_tags, $id);
-                }
+                array_push($tag_list, array("name"=>$i,"id"=>0));
             }
             return array_values($tag_list);
         }
@@ -232,31 +227,6 @@
                 }
             }
 
-        }
-
-        public function get_tag($tag) {
-            if ($tag == "Data_Flow_Diagram") {
-                return 0;
-            } elseif ($tag == "ER_Diagrams" || $tag == "Conceptual_Modelling" ||
-                $tag == "Participation_Constraints" || $tag == "Cardinality_Constraints" ||
-                $tag == "Recursive_Relationships" || $tag == "Weak_Entities" ||
-                $tag == "Ternary_Relationships") {
-                return 1;
-            } elseif ($tag == "Integrity_Constraints" || $tag == "Relational Model" || 
-                $tag == "Foreign_Keys") {
-                return 2;
-            } elseif ($tag == "Super_keys" || $tag == "Keys" || $tag == "Functional_Dependancies") {
-                return 3;
-            } elseif ($tag == "Transitive_Dependency" || $tag == "Normalization" ||
-                $tag == "Normal_Forms" || $tag == "BCNF" || $tag == "3NF") {
-                return 4;
-            } elseif ($tag == "SQL" || $tag == "Correlated_Queries" || $tag == "DDL" ||
-                $tag == "DML" || $tag == "Nested_Queries" || $tag == "Group_by" ||
-                $tag == "Aggregation") {
-                return 5;
-            } else {
-                return 5;
-            }
         }
 
         function get_inner_html( $node ) {
