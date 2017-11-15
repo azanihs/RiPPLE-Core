@@ -88,6 +88,7 @@ class QuestionRating(models.Model):
 
 class QuestionScore(models.Model):
     score = models.FloatField()
+    number_answers = models.IntegerField()
 
     question = models.ForeignKey(Question)
     user = models.ForeignKey(CourseUser)
