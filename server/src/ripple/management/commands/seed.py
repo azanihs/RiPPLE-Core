@@ -72,13 +72,15 @@ def make_question_responses(user, distractors):
 def make_days():
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     for x in days:
-        day = Day.objects.create(day=x)
-        day.save()
+        if len(Day.objects.filter(day=x)) == 0:
+            day = Day.objects.create(day=x)
+            day.save()
 
 def make_times(times):
     for i in range(len(times) - 1):
-        time_range = Time.objects.create(start=times[i], end=times[i + 1])
-        time_range.save()
+        if len(Time.objects.filter(start=times[i], end=times[i + 1])) == 0:
+            time_range = Time.objects.create(start=times[i], end=times[i + 1])
+            time_range.save()
 
 
 class Command(BaseCommand):
