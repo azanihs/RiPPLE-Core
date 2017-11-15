@@ -3,13 +3,13 @@ from django.core.files.base import ContentFile
 from base64 import b64decode
 import imghdr
 try:
-    import urlparse.urljoin
+    from urlparse import urljoin
 except ImportError:
     from urllib.parse import urljoin
 
-def is_number(inStr):
+def is_number(test_str):
     try:
-        val = int(inStr)
+        val = int(test_str)
         return True
     except ValueError:
         return False

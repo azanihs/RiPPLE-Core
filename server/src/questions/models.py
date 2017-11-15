@@ -27,6 +27,8 @@ class Question(models.Model):
     difficultyCount = models.IntegerField()
     qualityCount = models.IntegerField()
 
+    created_time = models.DateTimeField(auto_now_add=True)
+
     topics = models.ManyToManyField(Topic)
     author = models.ForeignKey(CourseUser)
 
