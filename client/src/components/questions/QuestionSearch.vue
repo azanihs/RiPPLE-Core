@@ -123,7 +123,7 @@ export default class QuestionSearch extends Vue {
                 value: "quality"
             }, {
                 name: "Created Time",
-                value: "created"
+                value: "created_time"
             }, {
                 name: "Responses",
                 value: "responses"
