@@ -2,14 +2,6 @@ language: python
 python:
     - '3.5'
     - '2.7'
-before_script:
-    - nvm install 8.2.1
-    - cd client
-    - npm install
-    - npm run lint
-    - npm run build
-    - npm run unit
-    - cd ../
 install:
     - cd server
     - pip install -r requirements.txt
@@ -17,3 +9,11 @@ script:
     - (echo "Y" && cat) | (python manage.py migrate)
     - python manage.py seed
     - timeout 1s python manage.py runserver
+after_script:
+    - cd ../
+    - nvm install 8.2.1
+    - cd client
+    - npm install
+    - npm run lint
+    - npm run build
+    - npm run unit
