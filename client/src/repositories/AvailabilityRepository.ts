@@ -1,9 +1,9 @@
-import { Availability } from "../interfaces/models";
+import { Availability, CourseAvailability } from "../interfaces/models";
 import { setToken, apiFetch } from "./APIRepository";
 
 export default class AvailabilityRepository {
 
-    static getCourseAvailability(): Promise<Availability[]> {
+    static getCourseAvailability(): Promise<CourseAvailability[]> {
         return apiFetch("/recommendations/availability/all")
           .then(x => x.json());
     }
