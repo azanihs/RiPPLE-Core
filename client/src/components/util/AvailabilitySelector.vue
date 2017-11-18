@@ -77,7 +77,7 @@ h2 {}
 
 <script lang="ts">
 import { Vue, Component, Watch, Lifecycle, Prop, p } from "av-ts";
-import { Question } from "../../interfaces/models";
+import { Availability, CourseAvailability } from "../../interfaces/models";
 
 @Component()
 export default class AvailabilitySelector extends Vue {
@@ -91,15 +91,13 @@ export default class AvailabilitySelector extends Vue {
 
     pMaxAvailable: number = 0;
 
-    @Prop course = p({
-        type: Array,
+    @Prop courseDistribution = p<CourseAvailability[]>({
         default: () => {
             return [];
         }
     });
 
-    @Prop user = p({
-        type: Array,
+    @Prop userDistribution = p<Availability[]>({
         default: () => {
             return [];
         }
@@ -113,8 +111,8 @@ export default class AvailabilitySelector extends Vue {
     }
 
     checkbox(day, time) {
-        for (let i = 0; i < this.user.length; i++) {
-            const entry = this.user[i];
+        for (let i = 0; i < this.userDistribution.length; i++) {
+            const entry = this.userDistribution[i];
             if (entry.day.id == day && entry.time.id == time) {
                 return true;
             }
@@ -153,9 +151,9 @@ export default class AvailabilitySelector extends Vue {
         if (this.showAvailability) {
             let weight = 0;
             if (this.pMaxAvailable > 0) {
-                for (let i = 0; i < this.course.length; i++) {
-                    if (this.course[i].day == day && this.course[i].time == time) {
-                        weight = this.course[i].entries / this.pMaxAvailable;
+                for (let i = 0; i < this.courseDistribution.length; i++) {
+                    if (this.courseDistribution[i].day == day && this.courseDistribution[i].time == time) {
+                        weight = this.courseDistribution[i].entries / this.pMaxAvailable;
                         break;
                     }
                 }
@@ -167,11 +165,11 @@ export default class AvailabilitySelector extends Vue {
         }
     }
 
-    @Watch("course")
+    @Watch("courseDistribution")
     handleCourseChange() {
-        for (let i = 0; i < this.course.length; i++) {
-            if (this.course[i].entries > this.pMaxAvailable) {
-                this.pMaxAvailable = this.course[i].entries;
+        for (let i = 0; i < this.courseDistribution.length; i++) {
+            if (this.courseDistribution[i].entries > this.pMaxAvailable) {
+                this.pMaxAvailable = this.courseDistribution[i].entries;
             }
         }
     }
