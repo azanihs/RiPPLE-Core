@@ -3,8 +3,7 @@
                class="topPadding">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <availability-selector v-on:change="changeAvailability"
-                                   @change="shuffleData()"
+            <availability-selector @change="changeAvailability"
                                    :course="course"
                                    :user="user"></availability-selector>
         </md-layout>
