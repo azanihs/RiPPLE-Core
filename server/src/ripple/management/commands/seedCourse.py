@@ -71,7 +71,7 @@ def parse_questions(file, course_users, all_topics):
         )
         question.save()
         decode_images(question.id, question, q["question"]["payloads"], "q", host)
-        decode_images(question.id, question, q["explanation"]["payloads"], "e", host)
+        decode_images(question.id, question.explanation, q["explanation"]["payloads"], "e", host)
 
         q_topics = q["topics"]
         for topic in q_topics:
@@ -86,7 +86,7 @@ def parse_questions(file, course_users, all_topics):
         for i in ["A", "B", "C", "D"]:
             response = q["responses"][i]
             if response["content"] == None:
-                response["content"] = " ";
+                response["content"] = " "
             distractor = Distractor(
                 content = response["content"],
                 response = i,
@@ -112,26 +112,28 @@ def decode_images(image_id, obj, images, image_type, host):
     }
     ImageToSaveClass = database_image_types.get(image_type, None)
 
-    if image_type == "q" or image_type == "e":
+    '''if image_type == "q" or image_type == "e":
         reference = Question.objects.get(pk=image_id)
     else:
-        reference = Distractor.objects.get(pk=image_id)
+        reference = Distractor.objects.get(pk=image_id)'''
 
     for i, image in images.items():
         contentfile_image = util.save_image(image, image_id)
+        if contentfile_image is None:
+            urls.append(None)
         # Question + Explanation in the same object
         if image_type == "q" or image_type == "e":
-            new_image = ImageToSaveClass.objects.create(question=reference, image=contentfile_image)
+            new_image = ImageToSaveClass.objects.create(question=obj, image=contentfile_image)
         else:
-            new_image = ImageToSaveClass.objects.create(distractor=reference, image=contentfile_image)
+            new_image = ImageToSaveClass.objects.create(distractor=obj, image=contentfile_image)
         urls.append(new_image.image.name)
 
     if image_type == "e":
-        reference.explanation = newSource(urls, reference.explanation, host)
+        obj.explanation = newSource(urls, obj.explanation, host)
     else:
-        reference.content = newSource(urls, reference.content, host)
+        obj.content = newSource(urls, obj.content, host)
 
-    reference.save()
+    obj.save()
     return True
 
 
@@ -141,6 +143,8 @@ def newSource(urls, content, host):
 
     images = soup.find_all('img')
     for i in range(0, len(urls)):
+        if urls[i] is None:
+            continue
         images[i]['src'] = "http://" + host + urls[i]
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
@@ -151,7 +155,7 @@ def newSource(urls, content, host):
 
 class Command(BaseCommand):
     args = ''
-    help = 'Populates the Questions database using a quesiton set in a JSON file'
+    help = 'Populates the Questions database using a question set in a JSON file'
 
     def add_arguments(self, parser):
         parser.add_argument("course_name")

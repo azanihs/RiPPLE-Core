@@ -36,7 +36,6 @@ def topic_weights(question_topics):
         "topics": x
     } for x in combinations(question_topics)]
 
-######NEED TO DEAL WITH INVALID IMAGES
 def save_image(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')
     ext = image_format.split('/')[-1]
