@@ -140,7 +140,8 @@ class Command(BaseCommand):
 
         make_days()
 
-        time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(8, 22)]
+        time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
+        time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
 
         make_times(time_inputs)
 

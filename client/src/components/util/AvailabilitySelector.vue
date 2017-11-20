@@ -14,8 +14,8 @@
                 <thead>
                     <tr>
                         <th>Day</th>
-                        <th v-for="time in pAvailableTimes"
-                            :key="time">{{ twentyFourHourToTwelveHourPeriod(time) }}
+                        <th v-for="time in pTimes"
+                            :key="time.time">{{ twentyFourHourToTwelveHourPeriod(time.time) }}
                         </th>
                     </tr>
                 </thead>
@@ -24,13 +24,13 @@
                     <tr v-for="activity in pAvailableDays"
                         :key="activity">
                         <td>{{ preferenceActivities[activity - 1] }}</td>
-                        <td v-for="time in pAvailableTimes"
-                            :key="time"
+                        <td v-for="time in pTimes"
+                            :key="time.time"
                             class="centerAlign"
-                            :style="getCellShade(activity, time)">
-                            <md-checkbox :value="checkbox(activity, time)"
+                            :style="getCellShade(activity, time.time)">
+                            <md-checkbox :value="checkbox(activity, time.time)"
                                          class="centerCheckbox"
-                                         @change="checkboxChange(activity, time)"
+                                         @change="checkboxChange(activity, time.time)"
                                          :id="`${activity}_${time}`"
                                          :name="`${activity}_${time}`"></md-checkbox>
                         </td>
@@ -77,7 +77,9 @@ h2 {}
 
 <script lang="ts">
 import { Vue, Component, Watch, Lifecycle, Prop, p } from "av-ts";
-import { Availability, CourseAvailability } from "../../interfaces/models";
+import { Availability, CourseAvailability, Time } from "../../interfaces/models";
+import Fetcher from "../../services/Fetcher";
+import AvailabilityService from "../../services/AvailabilityService";
 
 @Component()
 export default class AvailabilitySelector extends Vue {
@@ -87,9 +89,9 @@ export default class AvailabilitySelector extends Vue {
     pShowAvailability = true;
 
     pAvailableDays: number[] = [1, 2, 3, 4, 5];
-    pAvailableTimes: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
     pMaxAvailable: number = 0;
+    pTimes: Time[] = [];
 
     @Prop courseDistribution = p<CourseAvailability[]>({
         default: () => {
@@ -125,8 +127,7 @@ export default class AvailabilitySelector extends Vue {
     *   @param {number} time Twenty four hour time to convert to twelve hour
     *   @return {string} Twelve hour representation of time with "am" or "pm" suffix
     */
-    twentyFourHourToTwelveHourPeriod(twentyHourTime: number): string {
-        const time = 7 + twentyHourTime;
+    twentyFourHourToTwelveHourPeriod(time: number): string {
         if (time == 12) {
             return `${time}pm`;
         } else if (time < 12) {
@@ -136,7 +137,8 @@ export default class AvailabilitySelector extends Vue {
     }
 
     checkboxChange(day, time) {
-        this.$emit("change", day, time);
+        const utcTime = this.localToUTC(time);
+        this.$emit("change", day, utcTime);
     }
 
     addNewRow() {
@@ -163,6 +165,44 @@ export default class AvailabilitySelector extends Vue {
                 background: `rgba(34, 85, 102, ${weight})`
             };
         }
+    }
+
+    localToUTC(local?: number): number {
+        if (local === undefined) return undefined;
+
+        const offset = new Date().getTimezoneOffset() / 60;
+        return (local + offset) % 24;
+    }
+
+    serverToLocal(utcTimestamp?: number): number {
+        if (utcTimestamp === undefined) return undefined;
+
+        const offset = new Date().getTimezoneOffset() / 60;
+        return (utcTimestamp - offset) % 24;
+    }
+
+    updateTimes(times: Time[]) {
+        const displayTimes = times.filter(time => {
+            const localTime = this.serverToLocal(time.start.hour);
+            return localTime >= 8 && localTime <= 20;
+        });
+
+        let timeSlots = [];
+        displayTimes.map(time => {
+            timeSlots.push( {
+                id: time.id, time: this.serverToLocal(time.start.hour)
+            });
+        });
+
+        this.pTimes = timeSlots.sort(function(a, b) {
+            return a.time - b.time;
+        });
+    };
+
+    @Lifecycle
+    created() {
+        Fetcher.get(AvailabilityService.getUTCTimeSlots)
+            .on(this.updateTimes);
     }
 
     @Watch("courseDistribution")

@@ -14,4 +14,8 @@ export default class AvailabilityService {
     static updateUserAvailability(day: number, time: number) {
         return AvailabilityRepository.updateUserAvailability(day, time);
     }
+
+    static getUTCTimeSlots() {
+        return AvailabilityRepository.getUTCTimeSlots();
+    }
 }
