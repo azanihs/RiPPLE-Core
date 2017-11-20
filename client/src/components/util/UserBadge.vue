@@ -1,7 +1,7 @@
 <template>
-    <div class="badgeContainer">
-        <div class="badgeProgress"
-             :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+    <div class="badgeContainer"
+        :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+        <div class="badgeProgress">
             <div class="badge">
                 <md-icon>{{badgeIcon}}</md-icon>
             </div>
@@ -61,28 +61,29 @@
     margin-top: 0.5em;
 }
 
-.badgeProgress:not(.obtained) {
-    color: #ddd;
+.badgeContainer:not(.obtained) {
+    color: #bbb;
 }
 
 .badge {
     padding: 0.5em;
 }
 
-.obtained {
+.obtained .badgeProgress {
     padding: 0px 1em;
 }
 
 .obtained .badge {
-    color: #256;
-    background-color: #ffcc00;
+    color: #ffcc00;
+    background-color:#256;
     border-radius: 50%;
     border: 0.3em solid #256;
 }
 
-.badgeProgress:not(.obtained).progress {
+.badgeContainer:not(.obtained).progress, .badgeContainer:not(.obtained):hover {
     color: #256;
 }
+
 </style>
 
 <script lang="ts">
