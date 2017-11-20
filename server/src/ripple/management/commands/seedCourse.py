@@ -15,9 +15,26 @@ import base64
 import imghdr
 from ripple.util import util
 
+try:
+    from urlparse import urljoin
+except ImportError:
+    from urllib.parse import urljoin
+
+    
+from django.conf import settings
+
 
 def chance(n):
     return choice(range(n)) is n - 1
+
+def _format(x):
+    if len(x) == 0: return x
+    return (x + "/") if x[-1] != "/" else x
+
+def merge_url_parts(parts, url=""):
+    if len(parts) == 0:
+        return url
+    return merge_url_parts(parts, urljoin(url, parts.pop(0)))
 
 
 def make_question_responses(user, distractors):
@@ -49,15 +66,23 @@ def get_topics(file):
         data = json.load(data_file)
     return data["topics"]
 
+
 def parse_questions(file, course_users, all_topics):
-    host = "localhost:8000"
+    host = merge_url_parts([
+        _format("//" + "localhost:8000"),
+        _format(settings.FORCE_SCRIPT_NAME),
+        _format("static")
+    ])
     distractors = []
 
     with open(file) as data_file:
         data = json.load(data_file)
     
     questions = data["questions"]
+    counter = 0
     for q in questions:
+        counter = counter+1
+        print("Adding question: " + str(counter))
         if q["explanation"]["content"] == None:
                 q["explanation"]["content"] = " "
         question = Question(
@@ -71,7 +96,7 @@ def parse_questions(file, course_users, all_topics):
         )
         question.save()
         decode_images(question.id, question, q["question"]["payloads"], "q", host)
-        decode_images(question.id, question.explanation, q["explanation"]["payloads"], "e", host)
+        decode_images(question.id, question, q["explanation"]["payloads"], "e", host)
 
         q_topics = q["topics"]
         for topic in q_topics:
@@ -179,9 +204,9 @@ class Command(BaseCommand):
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics)
-            '''distractors = []
-            for i in range(0, 50):
-                distractors.extend(make_questions(course_users, all_topics))'''
+            #distractors = []
+            #for i in range(0, 50):
+                #distractors.extend(make_questions(course_users, all_topics))
 
             print("\t-Answering and Rating Questions")
             for user in course_users:
@@ -195,7 +220,7 @@ class Command(BaseCommand):
         unique_topics = get_topics(course_file)
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image=fake.image_url())
-                 for user_id in range(5)]
+                 for user_id in range(15)]
         
         all_courses = [Course.objects.create(
             available=True,
