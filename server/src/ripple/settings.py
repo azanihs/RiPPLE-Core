@@ -32,7 +32,7 @@ CONN_MAX_AGE = None
 
 # the nginx reverse proxy path (eg. "/api/")
 FORCE_SCRIPT_NAME = os.environ.get("PROXY_LOCATION")
-ALLOW_UNAUTHENTICATED = True
+ALLOW_UNAUTHENTICATED = False
 
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True

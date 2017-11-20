@@ -13,15 +13,13 @@ import json
 from bs4 import BeautifulSoup
 import base64
 import imghdr
-from ripple.util import util
+from ripple.util import util    
+from django.conf import settings
 
 try:
     from urlparse import urljoin
 except ImportError:
     from urllib.parse import urljoin
-
-    
-from django.conf import settings
 
 
 def chance(n):
@@ -89,7 +87,7 @@ def parse_questions(file, course_users, all_topics):
             content = q["question"]["content"],
             explanation = q["explanation"]["content"],
             difficulty = randrange(0, 5),
-            quality=randrange(0, 5),
+            quality = randrange(0, 5),
             difficultyCount = randrange(0, 100),
             qualityCount = randrange(0, 100),
             author = choice(course_users)
