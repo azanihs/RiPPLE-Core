@@ -4,7 +4,7 @@
         <md-layout md-flex="100"
                    class="componentSeparator">
             <availability-selector @change="changeAvailability"
-                                   :course="course"
+                                   :courseDistribution="course"
                                    :user="user"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
