@@ -157,8 +157,14 @@ export interface Day {
 
 export interface Time {
     id: number,
-    start: string,
-    end: string
+    start: {
+      time: string,
+      hour: number
+    },
+    end: {
+      time: string,
+      hour: number
+    }
 }
 
 export interface Availability {

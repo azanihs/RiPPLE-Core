@@ -9,6 +9,9 @@ def get_user_availability(course_user):
 def get_course_availability(course):
     return [x for x in Availability.objects.values('day', 'time').annotate(entries=Count('id')).order_by('day_id', 'time_id')]
 
+def get_utc_times():
+    return Time.objects.all()
+
 def update_availability(course_user, day_id, time_id):
     # Check if availaibility exists
     try:

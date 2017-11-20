@@ -37,3 +37,8 @@ def update(request):
         return JsonResponse({"error": "Invalid day/time/availability combination"}, status=422)
     else:
         return HttpResponse(status=204)
+
+def utc_times(request):
+    times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]
+    print times
+    return JsonResponse(times, safe=False)
