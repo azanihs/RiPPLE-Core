@@ -8,11 +8,11 @@
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         md-theme="spinner"
                         class="badgeSpinner"
-                        :md-stroke="2"
+                        :md-stroke="4"
                         :md-progress="100"></md-spinner>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         class="progressSpinner badgeSpinner"
-                        :md-stroke="2"
+                        :md-stroke="4"
                         :md-progress="userBadge.progress"></md-spinner>
         </div>
         <div class="badgeDescription">
@@ -69,10 +69,15 @@
     padding: 0.5em;
 }
 
+.obtained {
+    padding: 0px 1em;
+}
+
 .obtained .badge {
-    color: #f2f2f2;
-    background-color: #256;
+    color: #256;
+    background-color: #ffcc00;
     border-radius: 50%;
+    border: 0.3em solid #256;
 }
 
 .badgeProgress:not(.obtained).progress {
