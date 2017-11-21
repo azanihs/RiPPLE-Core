@@ -8,7 +8,17 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
 from users.services.TokenService import token_valid, generate_token, token_to_user_course
+from users.models import User
 from ripple.util import util
+from rippleAchievements.engine import engine
+
+def testAch(request):
+    print(request.META)
+    user = token_to_user_course(request.META.get("HTTP_AUTHORIZATION", None))
+    print(user.user.id)
+    print(({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")}))
+    return JsonResponse({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")})
+
 
 def index(request):
     return JsonResponse({
