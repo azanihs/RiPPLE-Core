@@ -40,5 +40,4 @@ def update(request):
 
 def utc_times(request):
     times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]
-    print times
     return JsonResponse(times, safe=False)

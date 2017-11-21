@@ -1,4 +1,5 @@
 from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from django.db import IntegrityError, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.conf import settings
@@ -35,52 +36,49 @@ def add_question(question_request, host, user):
     else:
         # INVALID CONTENT
         return {"state": "Error", "error": "Invalid Question"}
+    try:
+        with transaction.atomic():
+            # Question Images
+            images = question.get("payloads", None)
+            if images:
+                if not decodeImages(str(questionObj.id), images, "q", host):
+                    raise IntegrityError("Invalid Question Image")
 
-    # Question Images
-    images = question.get("payloads", None)
-    if images:
-        if not decodeImages(str(questionObj.id), images, "q", host):
-            # INVALID IMAGE
-            questionObj.delete()
-            return {"state": "Error", "error": "Invalid Question Image"}
+            # Explanation Images
+            images = explanation.get("payloads", None)
+            if images:
+                if not decodeImages(str(questionObj.id), images, "e", host):
+                    raise IntegrityError("Invalid Explanation Image")
 
-    # Explanation Images
-    images = explanation.get("payloads", None)
-    if images:
-        if not decodeImages(str(questionObj.id), images, "e", host):
-            # INVALID IMAGE
-            questionObj.delete()
-            return {"state": "Error", "error": "Invalid Explanation Image"}
+            # Topics
+            topicList = []
+            for i in topics:
+                topicList.append(i.get("id", None))
+            questionObj.topics = topicList
 
-    # Topics
-    topicList = []
-    for i in topics:
-        topicList.append(i.get("id", None))
-    questionObj.topics = topicList
+            # Distractors
+            for i in ["A", "B", "C", "D"]:
+                distractor = Distractor(
+                    content=responses[i].get("content", None),
+                    isCorrect=responses[i].get("isCorrect", None),
+                    response=i,
+                    question=questionObj
+                )
 
-    # Distractors
-    for i in ["A", "B", "C", "D"]:
-        distractor = Distractor(
-            content=responses[i].get("content", None),
-            isCorrect=responses[i].get("isCorrect", None),
-            response=i,
-            question=questionObj
-        )
+                if verifyContent(distractor.content):
+                    distractor.save()
+                else:
+                    raise IntegrityError("Invalid Distractor")
 
-        if verifyContent(distractor.content):
-            distractor.save()
-        else:
-            # INVALID CONTENT
-            questionObj.delete()
-            return {"state": "Error", "error": "Invalid Distractor"}
-
-        # Distractor Images
-        images = responses[i].get("payloads", None)
-        if images:
-            if not decodeImages(str(distractor.id), images, "d", host):
-                # INVALID IMAGE
-                questionObj.delete()
-                return {"state": "Error", "error": "Invalid Distractor Image"}
+                # Distractor Images
+                images = responses[i].get("payloads", None)
+                if images:
+                    if not decodeImages(str(distractor.id), images, "d", host):
+                        raise IntegrityError("Invalid Distractor Image")
+    except IntegrityError as e:
+        return {"state": "Error", "error": str(e)}
+    except Exception as e:
+        return {"state": "Error", "error": str(e)}
 
     return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
@@ -102,6 +100,9 @@ def decodeImages(image_id, images, image_type, host):
 
     for i, image in images.items():
         contentfile_image = util.save_image(image, image_id)
+        if contentfile_image is None:
+            raise IntegrityError("Image is not of valid type")
+
         # Question + Explanation in the same object
         if image_type == "q" or image_type == "e":
             new_image = ImageToSaveClass.objects.create(question=reference, image=contentfile_image)
