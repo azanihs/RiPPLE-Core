@@ -25,8 +25,14 @@ def update_availability(course_user, day_id, time_id):
         return True
 
     if not exists:
-        day = Day.objects.get(pk=day_id)
-        time = Time.objects.get(pk=time_id)
+        try:
+            day = Day.objects.get(pk=day_id)
+        except ObjectDoesNotExist:
+            return False
+        try:
+            time = Time.objects.get(pk=time_id)
+        except ObjectDoesNotExist:
+            return False
         availability = Availability(course_user=course_user, day=day, time=time)
         availability.save()
         return True

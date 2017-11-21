@@ -5,7 +5,7 @@
                    class="componentSeparator">
             <availability-selector @change="changeAvailability"
                                    :courseDistribution="course"
-                                   :user="user"></availability-selector>
+                                   :userDistribution="user"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
