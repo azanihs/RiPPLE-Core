@@ -6,3 +6,5 @@ src/media/
 *.env
 .env*
 !.env.example
+
+rippledb
