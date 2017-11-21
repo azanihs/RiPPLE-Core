@@ -53,3 +53,22 @@ def generate_token(user=None, course_code=None):
 
 def token_to_user_course(token):
     return Token.objects.get(payload=token).user
+
+
+def get_user(course_code):
+    if (Course.objects.filter(course_code=course_code).count() > 0):
+        course_id = Course.objects.get(course_code=course_code).pk
+    else:
+        return {"error": "Course does not exist"}
+    count = CourseUser.objects.filter(course_id=course_id).count()
+    random_index = random.randint(0, count - 1)
+    course_user = CourseUser.objects.filter(course_id=Course.objects.get(course_code=course_code))[random_index]
+    
+    token = make_token_string()
+    new_token = Token(payload=token, user=course_user)
+    new_token.save()
+
+    return {
+        "token": new_token.payload,
+        "courseCode": new_token.user.course.course_code
+    }
