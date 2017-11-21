@@ -138,8 +138,13 @@ def user_competencies(user):
         sorted_competencies = sort_competencies(sorted_competencies, i)
 
     edges = []
+    # TODO: Retrieve threshold from data store #112
+    threshold = 5
     for competency_id, nodes in sorted_competencies.items():
         competency = user_competency_values.get(pk=competency_id)
+        if competency.confidence < threshold:
+            continue
+
         source = nodes[0]
         target = nodes[1] if len(nodes) > 1 else source
         edges.append([
