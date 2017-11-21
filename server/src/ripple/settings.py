@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rippleAchievements'
 ]
 
 MIDDLEWARE = [
@@ -165,3 +166,9 @@ STATICFILES_FINDERS = [
 STATICFILES_DIRS = [
     MEDIA_ROOT
 ]
+
+
+#==============================================================================
+# Achievements conf
+#==============================================================================
+ACHIEVEMENT_CLASSES = ['users.achievements.userAchievements']
