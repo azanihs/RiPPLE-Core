@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
 from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
-from users.services.TokenService import token_valid, generate_token, token_to_user_course
+from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from ripple.util import util
 
 def index(request):
@@ -51,6 +51,11 @@ def login(request, course_code):
 
     return JsonResponse(generate_token())
 
+def getUser(request, course_code=None):
+    if course_code != "":
+        return JsonResponse(get_user(course_code))
+
+    return JsonResponse({"error": "Course not provided"})
 
 def image_update(request):
     if request.method != 'POST':

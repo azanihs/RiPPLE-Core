@@ -39,7 +39,7 @@ def add_question(question_request, host, user):
     # Question Images
     images = question.get("payloads", None)
     if images:
-        if not decodeImages(str(questionObj.id), images, "q", host):
+        if not decodeImages(str(questionObj.id), questionObj, images, "q", host):
             # INVALID IMAGE
             questionObj.delete()
             return {"state": "Error", "error": "Invalid Question Image"}
@@ -47,7 +47,7 @@ def add_question(question_request, host, user):
     # Explanation Images
     images = explanation.get("payloads", None)
     if images:
-        if not decodeImages(str(questionObj.id), images, "e", host):
+        if not decodeImages(str(questionObj.id), questionObj, images, "e", host):
             # INVALID IMAGE
             questionObj.delete()
             return {"state": "Error", "error": "Invalid Explanation Image"}
@@ -77,7 +77,7 @@ def add_question(question_request, host, user):
         # Distractor Images
         images = responses[i].get("payloads", None)
         if images:
-            if not decodeImages(str(distractor.id), images, "d", host):
+            if not decodeImages(str(distractor.id), distractor, images, "d", host):
                 # INVALID IMAGE
                 questionObj.delete()
                 return {"state": "Error", "error": "Invalid Distractor Image"}
@@ -85,7 +85,7 @@ def add_question(question_request, host, user):
     return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
 
-def decodeImages(image_id, images, image_type, host):
+def decodeImages(image_id, obj, images, image_type, host):
     # type q=question, d=distractor, e=explanation
     urls = []
     database_image_types = {
@@ -95,26 +95,24 @@ def decodeImages(image_id, images, image_type, host):
     }
     ImageToSaveClass = database_image_types.get(image_type, None)
 
-    if image_type == "q" or image_type == "e":
-        reference = Question.objects.get(pk=image_id)
-    else:
-        reference = Distractor.objects.get(pk=image_id)
-
     for i, image in images.items():
         contentfile_image = util.save_image(image, image_id)
+        if contentfile_image == None:
+            urls.append(None)
+            continue
         # Question + Explanation in the same object
         if image_type == "q" or image_type == "e":
-            new_image = ImageToSaveClass.objects.create(question=reference, image=contentfile_image)
+            new_image = ImageToSaveClass.objects.create(question=obj, image=contentfile_image)
         else:
-            new_image = ImageToSaveClass.objects.create(distractor=reference, image=contentfile_image)
+            new_image = ImageToSaveClass.objects.create(distractor=obj, image=contentfile_image)
         urls.append(new_image.image.name)
 
     if image_type == "e":
-        reference.explanation = newSource(urls, reference.explanation, host)
+        obj.explanation = newSource(urls, obj.explanation, host)
     else:
-        reference.content = newSource(urls, reference.content, host)
+        obj.content = newSource(urls, obj.content, host)
 
-    reference.save()
+    obj.save()
     return True
 
 
@@ -123,6 +121,8 @@ def newSource(urls, content, host):
 
     images = soup.find_all('img')
     for i in range(0, len(urls)):
+        if urls[i] is None:
+            continue
         images[i]['src'] = "//" + host + urls[i]
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
