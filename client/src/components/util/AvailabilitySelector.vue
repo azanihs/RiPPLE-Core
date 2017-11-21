@@ -171,7 +171,12 @@ export default class AvailabilitySelector extends Vue {
         if (local === undefined) return undefined;
 
         const offset = new Date().getTimezoneOffset() / 60;
-        return (local + offset) % 24;
+        const time = (local + offset) % 24;
+        if (time < 0) {
+            return 24 + time;
+        } else {
+            return time;
+        }
     }
 
     serverToLocal(utcTimestamp?: number): number {
