@@ -20,6 +20,14 @@ def testAch(request):
     return JsonResponse({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")})
 
 
+from achievements.engine import engine
+
+def testAch(request):
+    user = token_to_user_course(request.META.get("HTTP_AUTHORIZATION", None))
+    print(user.user.id)
+    print(({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")}))
+    return JsonResponse({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")})
+
 def index(request):
     return JsonResponse({
         "login": "Returns a token to authenticate against the server"
@@ -29,7 +37,7 @@ def index(request):
 def me(request):
     token = request.META.get("HTTP_AUTHORIZATION", None)
     user_course = token_to_user_course(token)
-
+    
     return JsonResponse(user_course.toJSON())
 
 
