@@ -181,14 +181,17 @@ class Command(BaseCommand):
     help = 'Populates the Questions database using a question set in a JSON file'
 
     def add_arguments(self, parser):
-        parser.add_argument("course_name")
-        parser.add_argument("course_code")
-        parser.add_argument("course_file")
+        parser.add_argument("--name", nargs="+")
+        parser.add_argument("--code", nargs="+")
+        parser.add_argument("--file", nargs="+")
 
     def handle(self, *args, **options):
-        course_name = options["course_name"]
-        course_code = options["course_code"]
-        course_file = options["course_file"]
+        if(len(options["name"])!=len(options["code"]) or len(options["name"])!=len(options["file"])):
+            print("Please ensure you have a course code, name and file for each course")
+            return
+        course_names = options["name"]
+        course_codes = options["code"]
+        course_files = options["file"]
 
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
@@ -202,20 +205,17 @@ class Command(BaseCommand):
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics)
-            #distractors = []
-            #for i in range(0, 50):
-                #distractors.extend(make_questions(course_users, all_topics))
 
             print("\t-Answering and Rating Questions")
             for user in course_users:
                 for i in range(0, 10):
                     make_question_responses(user, distractors)
 
-        courses = [
-            {"courseCode": course_code, "courseName": course_name}
-        ]
+        courses = []
+        for i in range(0,len(course_names)):
+            courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
-        unique_topics = get_topics(course_file)
+        
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image=fake.image_url())
                  for user_id in range(15)]
@@ -223,6 +223,7 @@ class Command(BaseCommand):
         all_courses = [Course.objects.create(
             available=True,
             course_code=x["courseCode"], course_name=x["courseName"]) for x in courses]
-        for course in all_courses:
-            print("Populating Course: " + course.course_code)
-            populate_course(course_file, unique_topics, course, users)
+        for i in range(0,len(all_courses)):
+            unique_topics = get_topics(courses[i]["courseFile"])
+            print("Populating Course: " + all_courses[i].course_code)
+            populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
