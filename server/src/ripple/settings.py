@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "ripplelti.apps.RippleltiConfig",
     "users.apps.UsersConfig",
     "questions.apps.QuestionsConfig",
+    "recommendations.apps.RecommendationsConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
