@@ -213,7 +213,8 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     set chart(newVal: string) {
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .off(this.updateChartData);
 
         this.pChartType = newVal;
@@ -221,7 +222,8 @@ export default class VariableDataVisualiser extends Vue {
         this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
 
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .on(this.updateChartData);
     }
 
@@ -333,7 +335,8 @@ export default class VariableDataVisualiser extends Vue {
 
         this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .on(this.updateChartData);
         this.$emit("changeTopics", this.dataCategories);
     }
@@ -341,7 +344,8 @@ export default class VariableDataVisualiser extends Vue {
     @Lifecycle
     destroyed() {
         window.removeEventListener("resize", this.updateChart);
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .off(this.updateChartData);
     }
 
