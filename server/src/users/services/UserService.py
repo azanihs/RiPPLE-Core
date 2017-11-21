@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import random
 import pytz as timezone
-import base64
 
+from django.conf import settings
 from datetime import datetime
-from bs4 import BeautifulSoup
 from ripple.util.util import save_image
 
 from questions.models import Topic, Competency, CompetencyMap
@@ -138,8 +136,7 @@ def user_competencies(user):
         sorted_competencies = sort_competencies(sorted_competencies, i)
 
     edges = []
-    # TODO: Retrieve threshold from data store #112
-    threshold = 5
+    threshold = settings.RUNTIME_CONFIGURATION["min_competency_threshold"]
     for competency_id, nodes in sorted_competencies.items():
         competency = user_competency_values.get(pk=competency_id)
         if competency.confidence < threshold:

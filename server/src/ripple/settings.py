@@ -166,3 +166,7 @@ STATICFILES_FINDERS = [
 STATICFILES_DIRS = [
     MEDIA_ROOT
 ]
+
+RUNTIME_CONFIGURATION = {
+    "min_competency_threshold": 5
+}
