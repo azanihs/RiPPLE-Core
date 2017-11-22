@@ -1,21 +1,12 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import VueMaterial from "vue-material";
-
-import "vue-material/dist/vue-material.css";
+import { makeComponent } from "../componentCreationFactory";
 
 import { Question, User, Distractor } from "../../../src/interfaces/models";
 import QuestionPreview from "../../../src/components/questions/QuestionPreview.vue";
 
 import { assert } from "chai";
-
-Vue.use(VueMaterial);
-Vue.use(VueRouter);
-
-const router = new VueRouter({
-    mode: "history",
-    routes: []
-});
+declare const describe;
+declare const it;
+declare const beforeEach;
 
 const peer = id => {
     const peer: User = {
@@ -83,16 +74,15 @@ describe("QuestionCard.vue", () => {
             const testQuestion: Question = Object.assign({}, basicQuestion);
             testQuestion.difficulty = expected;
             const mountPoint = document.getElementById("mountPoint");
-            let vm = new QuestionPreview({
-                router: router
-            });
+            let vm = makeComponent<QuestionPreview>(QuestionPreview);
+
             vm.data = testQuestion;
             vm.$mount(mountPoint);
             return vm.$nextTick()
                 .then(() => {
                     const difficulty = vm.$el
                         .querySelector(".rightPanel>div:nth-child(2) span");
-                    assert.equal((difficulty as HTMLElement).innerText.trim(), expected);
+                    assert.equal((difficulty as HTMLElement).textContent.trim(), expected);
                 });
         };
         return testData.reduce((chain, testCase) =>
@@ -105,19 +95,19 @@ describe("QuestionCard.vue", () => {
             const testQuestion: Question = Object.assign({}, basicQuestion);
             testQuestion.quality = expected;
             const mountPoint = document.getElementById("mountPoint");
-            let vm = new QuestionPreview({
-                router: router
-            });
+            let vm = makeComponent<QuestionPreview>(QuestionPreview);
+
             vm.data = testQuestion;
             vm.$mount(mountPoint);
-            return Vue.nextTick()
+            return vm.$nextTick()
                 .then(() => {
                     const quality = vm.$el
                         .querySelector(".rightPanel>div:nth-child(3) span");
-                    assert.equal((quality as HTMLElement).innerText.trim(), expected);
+                    assert.equal((quality as HTMLElement).textContent.trim(), expected);
                     return;
                 });
         };
+
         return testData.reduce((chain, testCase) =>
             chain.then(runTest.bind(null, testCase)), runTest(testData.shift()));
     });

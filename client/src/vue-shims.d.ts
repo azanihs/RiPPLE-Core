@@ -1,8 +1,23 @@
 declare const API_LOCATION;
 
-declare module "*.vue" {
+/*declare module "*.vue" {
     import Vue from "vue";
     export default Vue;
+}*/
+
+declare module "vue/types/vue" {
+    interface Vue {
+        material: {
+            registerTheme(name: string | { [key: string]: ThemeType }, spec?: ThemeType): void,
+            setCurrentTheme(name: string): void
+        }
+    }
+    interface VueConstructor {
+        material: {
+            registerTheme(name: string | { [key: string]: ThemeType }, spec?: ThemeType): void,
+            setCurrentTheme(name: string): void
+        };
+    }
 }
 
 import Vue from "vue";
@@ -80,13 +95,6 @@ interface ThemeType {
     accent?: ThemeOption;
     warn?: ThemeOption;
     background?: ThemeOption;
-}
+};
 
-declare module "vue/types/vue" {
-    namespace Vue {
-        const material: {
-            registerTheme(name: string | { [key: string]: ThemeType }, spec?: ThemeType): void,
-            setCurrentTheme(name: string): void
-        };
-    }
-}
+
