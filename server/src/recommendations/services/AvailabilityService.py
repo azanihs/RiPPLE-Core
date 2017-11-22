@@ -24,7 +24,8 @@ def update_availability(course_user, day_id, time_id):
         exists = False
 
     if exists:
-        return availability.delete()
+        availability.delete()
+        return availability
 
     else:
         try:
