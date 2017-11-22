@@ -1,7 +1,6 @@
 import { apiFetch } from "./APIRepository";
 import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
-import f from "faker";
 
 export default class QuestionRepository {
     static uploadQuestion(question: QuestionUpload): Promise<Question> {

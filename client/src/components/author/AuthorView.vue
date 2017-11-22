@@ -16,10 +16,9 @@
                 <md-layout md-flex="100"
                     class="componentSeparator">
                     <h2>Question Body</h2>
-                    <tinymce id="questionEditor"
+                    <TinyMCE id="questionEditor"
                         v-model="question.content"
-                        :options="options"
-                        :content="''"></tinymce>
+                        :options="options"></TinyMCE>
                 </md-layout>
                 <md-layout md-flex="100">
                     <h2>Topics</h2>
@@ -44,10 +43,9 @@
                         :id="'tab_' + i"
                         :md-label="'Response ' + i">
                         <h3>Response {{i}}</h3>
-                        <tinymce :id="'editor_' + i"
+                        <TinyMCE :id="'editor_' + i"
                             v-model="question.responses[i]"
-                            :options="options"
-                            :content="''"></tinymce>
+                            :options="options"></TinyMCE>
                     </md-tab>
                 </md-tabs>
             </md-card>
@@ -74,10 +72,9 @@
                 <md-layout md-flex="100"
                     class="componentSeparator">
                     <h2>Question Explanation</h2>
-                    <tinymce id="questionExplanation"
+                    <TinyMCE id="questionExplanation"
                         v-model="question.explanation"
-                        :options="options"
-                        :content="''"></tinymce>
+                        :options="options"></TinyMCE>
                 </md-layout>
             </md-card>
         </md-layout>
@@ -161,13 +158,16 @@ import ImageService from "../../services/ImageService";
 import Fetcher from "../../services/Fetcher";
 import tinyMCEPlugins from "./plugins";
 
+import TinyMCE from "../util/TinyMce.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Question from "../questions/Question.vue";
 
-declare const tinyMCE;
+// Global tinymce instance
+declare const tinymce;
 
 @Component({
     components: {
+        TinyMCE,
         Question,
         TopicChip
     }
@@ -215,7 +215,7 @@ export default class AuthorView extends Vue {
     set disabled(shouldHide: boolean) {
         this.pDisabled = shouldHide;
         const changeEditor = mode => {
-            tinyMCE.get().forEach(editor => {
+            tinymce.get().forEach(editor => {
                 editor.setMode(mode);
             });
         };

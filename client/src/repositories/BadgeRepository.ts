@@ -1,15 +1,35 @@
 import { Badge, AcquiredBadge } from "../interfaces/models";
-import faker from "faker";
-const f: any = faker;
-
+const _n = i => Math.floor(Math.random() * i);
 const getCategory: any = i => ["connections", "engagement", "competencies"][i];
-const badges = Array.from({ length: 30 }, (x, i) => {
-    return ({
+
+// From: https://meta.stackexchange.com/questions/67397/list-of-all-badges-with-full-descriptions#67399
+const _badgeTitles = ["Bronze", "Gold", "Silver", "Monkey", "Spider", "Web", "Bell", "Tumbleweed", "Bugs",
+    "Consistent", "Always there", "Computer Whiz", "On It", "Lead", "Elephant"];
+const _badgeDescriptions = [
+    "Bronze; Awarded when you get three achievements",
+    "Gold; Awarded when you get ten achievements",
+    "Silver; Awarded when you get five achievements",
+    "Earnt by authoring twenty questions",
+    "Earnt by reporting fifteen questions",
+    "Answering twenty questions earns you this award",
+    "Rated at least ten questions",
+    "Was absent all semester",
+    "Collects bugs!",
+    "Answer a question each day for a week",
+    "Log on each day for a year",
+    "Authored a question",
+    "Made a social connection",
+    "Made it into the top ten on the leaderboard",
+    "Rejected a social connection"
+];
+
+const badges = _badgeTitles.map((name, i) => {
+    return {
         id: i,
-        category: getCategory(f.random.number({ min: 0, max: 2 })),
-        name: f.company.bsBuzz(),
-        description: f.company.catchPhrase()
-    });
+        category: getCategory(_n(2)),
+        name: name,
+        description: _badgeDescriptions[i]
+    };
 });
 
 const userBadges = badges

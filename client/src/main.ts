@@ -3,10 +3,7 @@ import UserRepository from "./repositories/UserRepository";
 import Vue from "vue";
 import Router from "./routes";
 import VueMaterial from "vue-material";
-import VueTinymce from "vue-tinymce";
-
 import "flatpickr/dist/flatpickr.css";
-
 import "./tinymce";
 
 import "vue-material/dist/vue-material.css";
@@ -24,7 +21,6 @@ function getParameterByName(name, url) {
 
 // Global scoped addons
 Vue.use(VueMaterial);
-Vue.use(VueTinymce);
 
 Vue.material.registerTheme("spinner", {
     primary: "grey",

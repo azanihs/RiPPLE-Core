@@ -1,4 +1,3 @@
-
 import {
     CourseUser, User, Course, Badge, AcquiredBadge,
     Notification, Topic, PeerConnection, Edge, UserSummary
@@ -6,47 +5,58 @@ import {
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
 
-import faker from "faker";
-
-const f: any = faker;
-
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
 const getCategory: any = i => ["connections", "engagement", "competencies"][i];
 const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recommendations", "Social Connections",
     "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"];
 
-const topics = Array.from({ length: 10 }, x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
+const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures", "Variables"];
 
 type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
 
+const _n = i => Math.floor(Math.random() * i);
+
 const userTopicScores = {};
-const topicNodes = topics.map((x, id) => {
+const topicNodes = _topics.map((x, id) => {
     const topicNode = {
         id: id,
         name: x
     };
     // Ensure at least one self-loop per topic
-    userTopicScores[id] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
+    userTopicScores[id] = [[topicNode, topicNode, _n(100), _n(100)]];
     return topicNode;
 });
 topicNodes.forEach(x => {
-    const randomNode = topicNodes[Math.floor(Math.random() * topicNodes.length)];
+    const randomNode = topicNodes[_n(topicNodes.length)];
     if (randomNode == x) {
         return;
     }
-    userTopicScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+    userTopicScores[x.id].push([x, randomNode, _n(100), _n(100)]);
 });
 
+const _notificationMessages = [
+    "Upcoming meeting",
+    "New achievement unlocked!",
+    "New peer recommendation",
+    "Personal goal met",
+    "Personal goals slipping",
+    "User meeting requested",
+    "User meeting accepted",
+    "New achievements made available",
+    "Achievement lost"
+];
+
 const getRandomTopic = () => {
-    const i = f.random.number({ min: 0, max: 3 });
+    const i = _n(4);
     return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
 };
+
 const notificationCount = Math.random() < 0.5 ? 50 : 0;
 const notifications = Array.from({ length: notificationCount }).map(x => ({
     id: Math.random(),
     type: getRandomTopic() as NotificationType,
-    content: f.hacker.phrase(),
+    content: _notificationMessages[_n(_notificationMessages.length)],
     read: Math.random() < 0.5
 }));
 
@@ -59,16 +69,16 @@ const userEngagementScores = [];
 engagementNodes.forEach(engagementNode => {
     // Ensure at least one self-loop per topic
     userEngagementScores.push([engagementNode, engagementNode,
-        Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+        _n(100), _n(100)]);
 
-    const randomNode = engagementNodes[Math.floor(Math.random() * engagementNodes.length)];
+    const randomNode = engagementNodes[_n(engagementNodes.length)];
     if (randomNode == engagementNode) {
         return;
     }
 
     userEngagementScores.push([engagementNode, randomNode,
-        Math.floor(Math.random() * 100),
-        Math.floor(Math.random() * 100)]);
+        _n(100),
+        _n(100)]);
 });
 
 const makeUser = () => {
@@ -76,28 +86,27 @@ const makeUser = () => {
         return types[i] as "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner";
     };
 
-    const connections = new Array(f.random.number({ min: 2, max: 10 })).fill(0).map(x => {
+    const connections = new Array(2 + _n(8)).fill(0).map(x => {
         const connection: PeerConnection = {
             edgeStart: 0,
             edgeEnd: 0,
-
-            type: getType(f.random.number({ min: 0, max: 2 })),
-            topic: f.random.number({ min: 1, max: 6 }),
-            weight: f.random.number({ min: 0, max: 10 }),
+            type: getType(_n(2)),
+            topic: _topics[_n(6)],
+            weight: _n(10),
             date: new Date(),
             availableTime: new Date()
         };
         return connection;
     });
-    const proficienciesLength = f.random.number({ min: 1, max: 4 });
+    const proficienciesLength = 1 + _n(3);
     const proficiencies = Array.from({ length: proficienciesLength },
-        x => f.hacker.abbreviation()) as string[];
+        x => _topics[_n(_topics.length)]) as string[];
 
     const user: User = {
         id: IDCounter++,
-        name: f.name.findName(),
-        bio: f.hacker.phrase() + " " + f.hacker.phrase(),
-        image: f.image.avatar(),
+        name: "_",
+        bio: "_",
+        image: "//loremflickr.com/320/240/person",
 
         availableTime: new Date(),
         proficiencies: proficiencies,
@@ -105,6 +114,7 @@ const makeUser = () => {
     };
     return user;
 };
+
 const userConnections = makeUser().connections;
 let _courseCode = "";
 
