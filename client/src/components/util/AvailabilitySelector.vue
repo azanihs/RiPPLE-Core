@@ -15,24 +15,24 @@
                     <tr>
                         <th>Day</th>
                         <th v-for="time in pTimes"
-                            :key="time.time">{{ twentyFourHourToTwelveHourPeriod(time.time) }}
+                            :key="time.time">{{twentyFourHourToTwelveHourPeriod(time.time)}}
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr v-for="activity in pAvailableDays"
-                        :key="activity">
-                        <td>{{ preferenceActivities[activity - 1] }}</td>
+                    <tr v-for="day in pDays"
+                        :key="day.id">
+                        <td>{{day.day}}</td>
                         <td v-for="time in pTimes"
                             :key="time.time"
                             class="centerAlign"
-                            :style="getCellShade(activity, time.time)">
-                            <md-checkbox :value="checkbox(activity, time.time)"
+                            :style="getCellShade(day.id, time.time)">
+                            <md-checkbox :value="checkbox(day.id, time.time)"
                                          class="centerCheckbox"
-                                         @change="checkboxChange(activity, time.time)"
-                                         :id="`${activity}_${time}`"
-                                         :name="`${activity}_${time}`"></md-checkbox>
+                                         @change="checkboxChange(day.id, time.time)"
+                                         :id="`${day.id}_${time}`"
+                                         :name="`${day.id}_${time}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
@@ -77,22 +77,12 @@ h2 {}
 
 <script lang="ts">
 import { Vue, Component, Watch, Lifecycle, Prop, p } from "av-ts";
-import { Availability, CourseAvailability, Time } from "../../interfaces/models";
+import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
 import AvailabilityService from "../../services/AvailabilityService";
 
 @Component()
 export default class AvailabilitySelector extends Vue {
-    preferenceActivities: string[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    preferenceTimes: number[] = new Array(13).fill(0).map((x, i) => i + 8);
-
-    pShowAvailability = true;
-
-    pAvailableDays: number[] = [1, 2, 3, 4, 5];
-
-    pMaxAvailable: number = 0;
-    pTimes: Time[] = [];
-
     @Prop courseDistribution = p<CourseAvailability[]>({
         default: () => {
             return [];
@@ -104,6 +94,16 @@ export default class AvailabilitySelector extends Vue {
             return [];
         }
     });
+
+    pShowAvailability = true;
+
+    pAvailableDays: number[] = [1, 2, 3, 4, 5];
+
+    pMaxAvailable: number = 0;
+
+    pDays: Day[] = [];
+
+    pTimes: Time[] = [];
 
     get showAvailability() {
         return this.pShowAvailability;
@@ -186,6 +186,10 @@ export default class AvailabilitySelector extends Vue {
         return (utcTimestamp - offset) % 24;
     }
 
+    updateDays(days: Day[]) {
+        this.pDays = days;
+    }
+
     updateTimes(times: Time[]) {
         const displayTimes = times.filter(time => {
             const localTime = this.serverToLocal(time.start.hour);
@@ -206,6 +210,9 @@ export default class AvailabilitySelector extends Vue {
 
     @Lifecycle
     created() {
+        Fetcher.get(AvailabilityService.getDays)
+            .on(this.updateDays);
+
         Fetcher.get(AvailabilityService.getUTCTimeSlots)
             .on(this.updateTimes);
     }
