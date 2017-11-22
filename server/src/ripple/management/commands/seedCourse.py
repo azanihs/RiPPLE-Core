@@ -181,9 +181,9 @@ class Command(BaseCommand):
     help = 'Populates the Questions database using a question set in a JSON file'
 
     def add_arguments(self, parser):
-        parser.add_argument("--name", nargs="+")
-        parser.add_argument("--code", nargs="+")
-        parser.add_argument("--file", nargs="+")
+        parser.add_argument("name", nargs="+")
+        parser.add_argument("code", nargs="+")
+        parser.add_argument("file", nargs="+")
 
     def handle(self, *args, **options):
         if(len(options["name"])!=len(options["code"]) or len(options["name"])!=len(options["file"])):
