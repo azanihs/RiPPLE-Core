@@ -4,8 +4,11 @@
         <md-layout md-flex="100"
                    class="componentSeparator">
             <availability-selector @change="changeAvailability"
+                                   :days="days"
+                                   :times="times"
                                    :courseDistribution="course"
-                                   :userDistribution="user"></availability-selector>
+                                   :userDistribution="user"
+                                   :maxAvailable="maxAvailable"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
@@ -31,6 +34,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
+import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
 import AvailabilityService from "../../services/AvailabilityService";
@@ -53,6 +57,10 @@ export default class PeerView extends Vue {
     pRecommendations = [];
     pCourseAvailability = [];
     pUserAvailability = [];
+    pDays: Day[] = [];
+    pTimes: Time[] = [];
+    pCourseDistribution: number[][] = [];
+    pMaxAvailable: number = 0;
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -70,6 +78,26 @@ export default class PeerView extends Vue {
         this.pUserAvailability = availability;
     };
 
+    updateAvailability(data) {
+        const courseDistribution = data[2];
+        let maxAvailable = 0;
+        let distribution = new Array(7);
+        for (let i =0; i < distribution.length; i++) {
+            distribution[i] = new Array(24).fill(0);
+        }
+        courseDistribution.map(entry => {
+            distribution[entry.day - 1][entry.time - 1] = entry.entries;
+            if (entry.entries > maxAvailable) {
+                maxAvailable = entry.entries;
+            }
+        });
+
+        this.pDays = data[0];
+        this.pTimes = data[1];
+        this.pCourseDistribution = distribution;
+        this.pMaxAvailable = maxAvailable;
+    }
+
     @Lifecycle
     created() {
         Fetcher.get(TopicService.getAllAvailableTopics)
@@ -78,10 +106,17 @@ export default class PeerView extends Vue {
             .then(this.updateConnections);
         UserService.getOutstandingRequests({ count: 3 })
             .then(this.updateRequests);
-        AvailabilityService.getCourseAvailability()
-            .then(this.updateCourseAvailability);
+
         AvailabilityService.getUserAvailability()
             .then(this.updateUserAvailability);
+
+        Promise.all([
+            AvailabilityService.getDays(),
+            AvailabilityService.getUTCTimeSlots(),
+            AvailabilityService.getCourseAvailability()
+        ]).then(data => {
+            this.updateAvailability(data);
+        });
     }
 
     @Lifecycle
@@ -101,12 +136,24 @@ export default class PeerView extends Vue {
         return this.pRequests;
     }
 
+    get days() {
+        return this.pDays;
+    }
+
+    get times() {
+        return this.pTimes;
+    }
+
     get course() {
-        return this.pCourseAvailability;
+        return this.pCourseDistribution;
     }
 
     get user() {
         return this.pUserAvailability;
+    }
+
+    get maxAvailable() {
+        return this.pMaxAvailable;
     }
 
     changeAvailability(day, time) {
