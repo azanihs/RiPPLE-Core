@@ -7,6 +7,10 @@ export default class AvailabilityService {
         return AvailabilityRepository.getCourseAvailability();
     }
 
+    static getDays() {
+        return AvailabilityRepository.getDays();
+    }
+
     static getUserAvailability() {
         return AvailabilityRepository.getUserAvailability();
     }
