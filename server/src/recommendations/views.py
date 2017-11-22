@@ -36,11 +36,11 @@ def update(request):
     post_request = loads(request.body.decode("utf-8"))
     day = post_request.get("day", None)
     time = post_request.get("time", None)
-    updatedAvailability = AvailabilityService.update_availability(logged_in_user, day, time)
-    if updatedAvailability is None:
+    updated_availability = AvailabilityService.update_availability(logged_in_user, day, time)
+    if updated_availability is None:
         return JsonResponse({"error": "Invalid day/time/availability combination"}, status=422)
     else:
-        return JsonResponse(updatedAvailability.toJSON(), status=204)
+        return JsonResponse(updated_availability.toJSON())
 
 def utc_times(request):
     times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]
