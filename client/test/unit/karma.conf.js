@@ -2,6 +2,7 @@
 //   http://karma-runner.github.io/0.13/config/configuration-file.html
 // we are also using it with karma-webpack
 //   https://github.com/webpack/karma-webpack
+process.env.NODE_ENV = "development"
 const webpackConfig = require("../../build/webpack.dev.conf");
 const path = require("path");
 
