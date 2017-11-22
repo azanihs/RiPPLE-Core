@@ -149,3 +149,33 @@ export interface QuestionUpload {
     },
     topics: Topic[]
 };
+
+export interface Day {
+    id: number,
+    day: string
+}
+
+export interface Time {
+    id: number,
+    start: {
+      time: string,
+      hour: number
+    },
+    end: {
+      time: string,
+      hour: number
+    }
+}
+
+export interface Availability {
+    id: number,
+    day: Day,
+    time: Time
+}
+
+export interface CourseAvailability {
+    courseUser: CourseUser,
+    day: Day,
+    time: Time,
+    entries: number
+}
