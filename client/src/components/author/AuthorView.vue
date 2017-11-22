@@ -158,7 +158,7 @@ import ImageService from "../../services/ImageService";
 import Fetcher from "../../services/Fetcher";
 import tinyMCEPlugins from "./plugins";
 
-import TinyMCE from "../util/TinyMce.vue";
+import TinyMCE from "../util/TinyMCE.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Question from "../questions/Question.vue";
 

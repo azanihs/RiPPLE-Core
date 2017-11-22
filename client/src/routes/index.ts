@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Main from "../main";
+import Main from "../Main.vue";
 
 import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
