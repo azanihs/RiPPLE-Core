@@ -27,12 +27,12 @@
                         <td v-for="time in pTimes"
                             :key="time.time"
                             class="centerAlign"
-                            :style="getCellShade(day.id, time.time)">
-                            <md-checkbox :value="checkbox(day.id, time.time)"
+                            :style="getCellShade(day.id, time.id)">
+                            <md-checkbox :value="checkbox(day.id, time.id)"
                                          class="centerCheckbox"
-                                         @change="checkboxChange(day.id, time.time)"
-                                         :id="`${day.id}_${time}`"
-                                         :name="`${day.id}_${time}`"></md-checkbox>
+                                         @change="checkboxChange(day.id, time.id)"
+                                         :id="`${day.id}_${time.id}`"
+                                         :name="`${day.id}_${time.id}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
