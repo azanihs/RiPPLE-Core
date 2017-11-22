@@ -14,18 +14,18 @@
                 <thead>
                     <tr>
                         <th>Day</th>
-                        <th v-for="time in pTimes"
-                            :key="time.time">{{twentyFourHourToTwelveHourPeriod(time.time)}}
+                        <th v-for="time in times"
+                            :key="time.id">{{twentyFourHourToTwelveHourPeriod(time.start.hour)}}
                         </th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr v-for="day in pDays"
+                    <tr v-for="day in days"
                         :key="day.id">
                         <td>{{day.day}}</td>
-                        <td v-for="time in pTimes"
-                            :key="time.time"
+                        <td v-for="time in times"
+                            :key="time.id"
                             class="centerAlign"
                             :style="getCellShade(day.id, time.id)">
                             <md-checkbox :value="checkbox(day.id, time.id)"
@@ -77,13 +77,25 @@ h2 {}
 
 <script lang="ts">
 import { Vue, Component, Watch, Lifecycle, Prop, p } from "av-ts";
-import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
+import { Availability, CourseAvailability, Day, DayTime, Time } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
 import AvailabilityService from "../../services/AvailabilityService";
 
 @Component()
 export default class AvailabilitySelector extends Vue {
-    @Prop courseDistribution = p<CourseAvailability[]>({
+    @Prop days = p<Day[]>({
+        default: () => {
+            return [];
+        }
+    });
+
+    @Prop times = p<Time[]>({
+        default: () => {
+            return [];
+        }
+    })
+
+    @Prop courseDistribution = p<number[][]>({
         default: () => {
             return [];
         }
@@ -95,15 +107,17 @@ export default class AvailabilitySelector extends Vue {
         }
     });
 
+    @Prop maxAvailable = p<number>({
+        default: () => {
+            return 0;
+        }
+    });
+
     pShowAvailability = true;
 
     pAvailableDays: number[] = [1, 2, 3, 4, 5];
 
-    pMaxAvailable: number = 0;
-
-    pDays: Day[] = [];
-
-    pTimes: Time[] = [];
+    pCourseDistribution: number[][] = [];
 
     get showAvailability() {
         return this.pShowAvailability;
@@ -112,7 +126,9 @@ export default class AvailabilitySelector extends Vue {
         this.pShowAvailability = newVal;
     }
 
-    checkbox(day, time) {
+    checkbox(localDay, localTime) {
+        const { day, time } = this.localToUTC(localDay, localTime);
+
         for (let i = 0; i < this.userDistribution.length; i++) {
             const entry = this.userDistribution[i];
             if (entry.day.id == day && entry.time.id == time) {
@@ -136,9 +152,9 @@ export default class AvailabilitySelector extends Vue {
         return `${time - 12}pm`;
     }
 
-    checkboxChange(day, time) {
-        const utcTime = this.localToUTC(time);
-        this.$emit("change", day, utcTime);
+    checkboxChange(localDay, localTime) {
+        const { day, time } = this.localToUTC(localDay, localTime);
+        this.$emit("change", day, time);
     }
 
     addNewRow() {
@@ -149,16 +165,14 @@ export default class AvailabilitySelector extends Vue {
         throw new Error("deleteRow not implemented");
     }
 
-    getCellShade(day, time) {
+    getCellShade(localDay, localTime) {
         if (this.showAvailability) {
             let weight = 0;
-            if (this.pMaxAvailable > 0) {
-                for (let i = 0; i < this.courseDistribution.length; i++) {
-                    if (this.courseDistribution[i].day == day && this.courseDistribution[i].time == time) {
-                        weight = this.courseDistribution[i].entries / this.pMaxAvailable;
-                        break;
-                    }
-                }
+            if (this.maxAvailable > 0) {
+                const { day, time } = this.localToUTC(localDay, localTime);
+                const courseDistributionDay = this.courseDistribution[Math.abs(day - 1) % 7];
+                const entry = courseDistributionDay[time];
+                weight = entry / this.maxAvailable;
             }
             // Perferably have a lookup table generated on mount
             return {
@@ -167,63 +181,64 @@ export default class AvailabilitySelector extends Vue {
         }
     }
 
-    localToUTC(local?: number): number {
-        if (local === undefined) return undefined;
+    convertDay(day?:number): number {
+        if (day === undefined || this.days.length == 0) return undefined;
 
-        const offset = new Date().getTimezoneOffset() / 60;
-        const time = (local + offset) % 24;
-        if (time < 0) {
-            return 24 + time;
+        if (day < 0) {
+            return this.days[this.days.length - 1].id;
+        } else if (day > this.days.length) {
+            return this.days[0].id;
         } else {
-            return time;
+            return day;
         }
     }
 
-    serverToLocal(utcTimestamp?: number): number {
-        if (utcTimestamp === undefined) return undefined;
+    convertTime(time?: number): number {
+        if (time === undefined) return undefined;
+
+        return Math.abs(time) % 24;
+    }
+
+    localToUTC(localDay?: number, localTime?: number): DayTime {
+        if (localDay === undefined || localTime === undefined) return undefined;
 
         const offset = new Date().getTimezoneOffset() / 60;
-        return (utcTimestamp - offset) % 24;
-    }
-
-    updateDays(days: Day[]) {
-        this.pDays = days;
-    }
-
-    updateTimes(times: Time[]) {
-        const displayTimes = times.filter(time => {
-            const localTime = this.serverToLocal(time.start.hour);
-            return localTime >= 8 && localTime <= 20;
-        });
-
-        let timeSlots = [];
-        displayTimes.map(time => {
-            timeSlots.push( {
-                id: time.id, time: this.serverToLocal(time.start.hour)
-            });
-        });
-
-        this.pTimes = timeSlots.sort(function(a, b) {
-            return a.time - b.time;
-        });
-    };
-
-    @Lifecycle
-    created() {
-        Fetcher.get(AvailabilityService.getDays)
-            .on(this.updateDays);
-
-        Fetcher.get(AvailabilityService.getUTCTimeSlots)
-            .on(this.updateTimes);
-    }
-
-    @Watch("courseDistribution")
-    handleCourseChange() {
-        for (let i = 0; i < this.courseDistribution.length; i++) {
-            if (this.courseDistribution[i].entries > this.pMaxAvailable) {
-                this.pMaxAvailable = this.courseDistribution[i].entries;
-            }
+        const time = localTime + offset;
+        let day = localDay;
+        if (time < 0) {
+            day--;
+        } else if (time >= 24) {
+            day++;
         }
+
+        return {
+            day: this.convertDay(day),
+            time: this.convertTime(time)
+        };
+    }
+
+    serverToLocalTime(utcTime?: number): number {
+        if (utcTime === undefined) return undefined;
+        const offset = new Date().getTimezoneOffset() / 60;
+        return Math.abs(utcTime - offset) % 24;
+    }
+
+    serverToLocal(utcDay?: number, utcTime?: number): object {
+        if (utcDay === undefined || utcTime === undefined) return undefined;
+
+        const offset = new Date().getTimezoneOffset() / 60;
+        const time = utcTime - offset;
+        let day = utcDay;
+        if (time < 0) {
+            day--;
+        } else if (time >= 24) {
+            day++;
+        }
+
+        return {
+            day: this.convertDay(day),
+            time: this.convertTime(time)
+        };
     }
 }
 </script>

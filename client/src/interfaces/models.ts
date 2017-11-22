@@ -176,7 +176,12 @@ export interface Availability {
 
 export interface CourseAvailability {
     courseUser: CourseUser,
-    day: Day,
-    time: Time,
+    day: number,
+    time: number,
     entries: number
+}
+
+export interface DayTime {
+    day: number,
+    time: number
 }
