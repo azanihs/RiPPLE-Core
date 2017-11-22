@@ -1,8 +1,9 @@
-var path = require('path')
-var config = require('../config')
-var utils = require('./utils')
-var projectRoot = path.resolve(__dirname, '../')
-var webpack = require('webpack')
+var fs = require("fs");
+var path = require('path');
+var config = require('../config');
+var utils = require('./utils');
+var projectRoot = path.resolve(__dirname, '../');
+var webpack = require('webpack');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var env = process.env.NODE_ENV
@@ -11,6 +12,22 @@ var env = process.env.NODE_ENV
 var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
 var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
+
+function placeDefaults(fileName) {
+    var exists = fs.existsSync(fileName);
+    if (!exists) {
+        console.warn("Writing default env settings to: " + fileName);
+        fs.writeFileSync(fileName, "NODE_ENV=development\nAPI_LOCATION=http://localhost:8000");
+    }
+}
+
+if (env == "development") {
+    placeDefaults("./.env.dev");
+} else if (env == "production") {
+    placeDefaults("./.env.prod");
+} else {
+    throw new Error("No environment detected")
+}
 
 module.exports = {
     entry: {
