@@ -2,6 +2,7 @@
     <div class="relative">
         <transition name="fade">
             <md-layout v-if="selectedQuestion"
+                md-gutter="8"
                 key="1"
                 class="viewContainer">
                 <md-layout md-flex="100"
@@ -15,6 +16,7 @@
         </transition>
         <div :class="{hidden: selectedQuestion}"
             key="2"
+            md-gutter="8"
             class="viewContainer">
             <md-layout class="headingContainer"
                 md-flex="100">
@@ -87,6 +89,9 @@
 .viewContainer {
     position: absolute;
     top: 8px;
+    width: 100%;
+    overflow-x: hidden;
+    padding: 8px;
 }
 
 .fade-enter-active,
