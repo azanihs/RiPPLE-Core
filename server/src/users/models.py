@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 import pytz as timezone
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 
 
 class Course(models.Model):
