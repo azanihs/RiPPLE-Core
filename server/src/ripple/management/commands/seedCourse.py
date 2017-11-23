@@ -13,7 +13,7 @@ import json
 from bs4 import BeautifulSoup
 import base64
 import imghdr
-from ripple.util import util    
+from ripple.util import util
 from django.conf import settings
 
 try:
@@ -75,7 +75,7 @@ def parse_questions(file, course_users, all_topics):
 
     with open(file) as data_file:
         data = json.load(data_file)
-    
+
     questions = data["questions"]
     counter = 0
     for q in questions:
@@ -215,9 +215,9 @@ class Command(BaseCommand):
         for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
-        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image=fake.image_url())
+        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
                  for user_id in range(15)]
-        
+
         all_courses = [Course.objects.create(
             available=True,
             course_code=x["courseCode"], course_name=x["courseName"]) for x in courses]
