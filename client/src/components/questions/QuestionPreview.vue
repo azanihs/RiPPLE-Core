@@ -18,7 +18,7 @@
             <md-layout class="rightPanel">
                 <div>
                     <md-icon>reply</md-icon>
-                    <span>{{ data.responses.length }}</span>
+                    <span>{{ data.responseCount }}</span>
                     <md-tooltip md-direction="top">Question Responses</md-tooltip>
                 </div>
                 <div>

@@ -80,14 +80,21 @@ td:hover {
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Component, Watch } from "av-ts";
+import { Vue, Prop, p, Lifecycle, Component, Watch } from "av-ts";
+
+import { Topic } from "../../interfaces/models";
+
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 
 @Component()
 export default class ConnectednessHeatmap extends Vue {
-    @Prop topics;
-    @Prop categories;
+    @Prop topics = p<Topic[]>({
+        required: true
+    });
+    @Prop categories = p<any>({
+        required: true
+    });
 
     renderWeights = {};
     pConnections = [];
