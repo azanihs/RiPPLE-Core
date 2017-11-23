@@ -199,8 +199,11 @@ export default class Question extends Vue {
 
     userIsFinishedWithQuestion: boolean = false;
 
-    updateUserAnswer(n: boolean) {
-        this.userIsFinishedWithQuestion = n;
+    updateUserAnswer(wasCorrect: boolean) {
+        this.userIsFinishedWithQuestion = wasCorrect;
+
+        // TODO: Emit an event rather than mutate own prop.
+        this.question.responseCount++;
     }
 
     nextQuestion() {
