@@ -215,8 +215,6 @@ class Command(BaseCommand):
         for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
-
-
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
                  for user_id in range(15)]
 
@@ -224,6 +222,6 @@ class Command(BaseCommand):
             available=True,
             course_code=x["courseCode"], course_name=x["courseName"]) for x in courses]
         for i in range(0,len(all_courses)):
-            unique_topics = get_topics(courses[i]["courseFile"])
             print("Populating Course: " + all_courses[i].course_code)
+            unique_topics = get_topics(courses[i]["courseFile"])            
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
