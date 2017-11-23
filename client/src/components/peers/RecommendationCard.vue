@@ -23,8 +23,8 @@
             <md-input-container class="autoComplete">
                 <label>Meeting Location</label>
                 <md-autocomplete v-model="meetingLocation"
-                                 :filterList="findItem"
-                                 :list="meetingHistory"></md-autocomplete>
+                                :fetch="meetingHistory">
+                </md-autocomplete>
             </md-input-container>
 
         </md-card-content>
@@ -88,9 +88,9 @@ import TopicChip from "../util/TopicChip.vue";
     }
 })
 export default class RecommendationCard extends Vue {
-    @Prop user = p({
+    @Prop user = p<User>({
         required: true
-    }) as User;
+    });
 
     pMeetingHistory = [];
     updateMeetingHistory(newHistory) {
@@ -105,8 +105,8 @@ export default class RecommendationCard extends Vue {
             .on(this.updateMeetingHistory);
     }
 
-    findItem(list, possibleList) {
-        return possibleList.filter(x => x.toLowerCase().indexOf(this.meetingLocation.toLowerCase()) >= 0);
+    findItem(toSearch: {name: string, id: number}[], query: string) {
+        return toSearch.filter(x => x.name.toLowerCase().indexOf(query.toLowerCase()) >= 0);
     }
 
     get meetingTime() {
@@ -119,7 +119,7 @@ export default class RecommendationCard extends Vue {
     }
 
     get meetingHistory() {
-        return this.pMeetingHistory;
+        return (a: { q: string }) => Promise.resolve(this.findItem(this.pMeetingHistory, a.q));
     }
 }
 </script>
