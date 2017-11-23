@@ -17,7 +17,7 @@ class BeginnerAuthorAchievement(object):
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
         progress = min(1, count/self.condition)
-        return {"key":self.key, "count":count,"progress":progress}
+        return {"key":self.key, "count":count, "progress":progress}
 
 class IntermediateAuthorAchievement(object):
     name = "Intermediate Question Author"
@@ -29,7 +29,7 @@ class IntermediateAuthorAchievement(object):
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
         progress = min(1, count/self.condition)
-        return {"key":self.key, "count":count,"progress":progress}
+        return {"key":self.key, "count":count, "progress":progress}
 
 class AdvancedAuthorAchievement(object):
     name = "Advanced Question Author"
@@ -41,7 +41,7 @@ class AdvancedAuthorAchievement(object):
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
         progress = min(1, count/self.condition)
-        return {"key":self.key, "count":count,"progress":progress}
+        return {"key":self.key, "count":count, "progress":progress}
 
 class BeginnerResponseAchievement(object):
     name = "Beginner Response"
@@ -54,7 +54,7 @@ class BeginnerResponseAchievement(object):
         responses = QuestionResponse.objects.filter(user=user).only('id').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
         progress = min(1, count/self.condition)
-        return {"key":self.key, "count":count,"progress":progress}
+        return {"key":self.key, "count":count, "progress":progress}
 
 class IntermediateResponseAchievement(object):
     name = "Intermediate Response"
@@ -67,7 +67,7 @@ class IntermediateResponseAchievement(object):
         responses = QuestionResponse.objects.filter(user=user).only('id').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
         progress = min(1, count/self.condition)
-        return {"key":self.key, "count":count,"progress":progress}
+        return {"key":self.key, "count":count, "progress":progress}
 
 class AdvancedResponseAchievement(object):
     name = "Advanced Response"
@@ -78,6 +78,6 @@ class AdvancedResponseAchievement(object):
 
     def evaluate(self, user, *args, **kwargs):
         responses = QuestionResponse.objects.filter(user=user).only('id').all()
-        count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
+        count = Distractor.objects.filter(id__in=responses, isCorrect=True  ).count()
         progress = min(1, count/self.condition)
-        return {"key":self.key, "count":count,"progress":progress}
+        return {"key":self.key, "count":count, "progress":progress}
