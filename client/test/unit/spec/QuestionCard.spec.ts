@@ -44,6 +44,7 @@ const basicQuestion: Question = {
         solution: 0,
         content: ""
     }],
+    responseCount: 1,
     difficulty: 1,
     quality: 1,
     solution: optionB,

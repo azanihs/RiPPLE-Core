@@ -29,6 +29,8 @@
         "collectCoverage": true,
         "coverageDirectory": "./test/unit/coverage",
         "collectCoverageFrom": [
+            "./src/**/*.vue",
+            "./src/**/*.ts",
             "!test/unit/bootstrap.ts",
             "!test/unit/componentCreationFactory.ts"
         ],

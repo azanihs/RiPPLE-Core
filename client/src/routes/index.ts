@@ -6,6 +6,11 @@ import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
 import ProfileView from "../components/profile/ProfileView.vue";
+import AchievementsView from "../components/profile/Achievements.vue";
+import CompetenciesView from "../components/profile/Competencies.vue";
+import ConnectionsView from "../components/profile/Connections.vue";
+import EngagementView from "../components/profile/Engagement.vue";
+import NotificationsView from "../components/profile/Notifications.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import PeerView from "../components/peers/PeerView.vue";
@@ -28,6 +33,26 @@ const routes = [{
         path: "/",
         name: "profile",
         component: ProfileView
+    }, {
+        path: "/profile/engagement",
+        name: "engagement",
+        component: EngagementView
+    }, {
+        path: "/profile/competencies",
+        name: "competencies",
+        component: CompetenciesView
+    }, {
+        path: "/profile/connections",
+        name: "connections",
+        component: ConnectionsView
+    }, {
+        path: "/profile/achievements",
+        name: "achievements",
+        component: AchievementsView
+    }, {
+        path: "/profile/notifications",
+        name: "notifications",
+        component: NotificationsView
     }, {
         path: "/view/questions",
         name: "questions",
