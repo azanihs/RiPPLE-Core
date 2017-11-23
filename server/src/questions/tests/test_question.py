@@ -4,19 +4,22 @@ from __future__ import unicode_literals
 from django.test import TestCase
 import random
 import math
-from .models import Topic, Question, Distractor, QuestionResponse, QuestionScore, Competency
-from users.models import User
-from .services import QuestionService
+from questions.models import Course, Topic, Question, Distractor, QuestionResponse, QuestionScore, Competency
+from users.models import CourseUser, User
+from questions.services import QuestionService
 
 # Create your tests here.
 
 
 class QuestionTestCase(TestCase):
-    def _bootstrap_topics(self):
-        [Topic(id=i, name=x).save()
+    def _bootstrap_courses(self):
+        return Course.objects.create(course_code="test_course_1", course_name="course_name")
+
+    def _bootstrap_topics(self, course):
+        [Topic(id=i, name=x, course=course).save()
          for i, x in enumerate(["t1", "t2", "t3", "t4", "t5", "t6"])]
 
-    def _bootstrap_questions(self):
+    def _bootstrap_questions(self, author):
         topic_map = [
             Topic.objects.filter(id__in=[1]),
             Topic.objects.filter(id__in=[1, 2]),
@@ -28,6 +31,7 @@ class QuestionTestCase(TestCase):
         for i in range(0, 5):
             q = Question(
                 id=i + 1,
+                author=author,
                 content="",
                 explanation="",
                 difficulty=1,
@@ -38,7 +42,7 @@ class QuestionTestCase(TestCase):
             q.save()
             q.topics.set(topic_map[i])
 
-    def _bootstrap_question_choices(self):
+    def _bootstrap_question_choices(self, correct_id):
         question_count = Question.objects.all().count()
         for i in range(0, (4 * question_count)):
             id = i + 1
@@ -46,7 +50,7 @@ class QuestionTestCase(TestCase):
                 id=id,
                 content="question " + str(i),
                 response=chr(ord('A') + id % 4),
-                isCorrect=id == 2,
+                isCorrect=id == correct_id,
                 question_id=math.ceil(id / 4.0)
             ).save()
 
@@ -57,20 +61,25 @@ class QuestionTestCase(TestCase):
 
     def test_answering_new_question_single_topic(self):
         """ New question with single topic """
-        self._bootstrap_topics()
-        self._bootstrap_questions()
-        self._bootstrap_question_choices()
+        course = self._bootstrap_courses()
         user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+        
 
-        QuestionService.respond_to_question(1, user)
+        QuestionService.respond_to_question(1, author)
 
         self.assertEqual(QuestionResponse.objects.all().count(), 1)
         user_response = QuestionResponse.objects.first()
+
         self.assertEqual(user_response.user_id, 1)
         self.assertEqual(user_response.response_id, 1)
 
         self.assertEqual(QuestionScore.objects.all().count(), 1)
         question_score = QuestionScore.objects.all().first()
+
         self.assertEqual(question_score.user_id, 1)
         self.assertEqual(question_score.question_id, 1)
         self.assertEqual(question_score.score, -1)
