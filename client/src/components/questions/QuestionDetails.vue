@@ -2,7 +2,7 @@
     <md-layout md-flex="100">
         <div class="placeBetween">
             <div>
-                <span>{{ question.responses.length }}
+                <span>{{ question.responseCount }}
                     <md-icon>reply</md-icon>
                 </span>
                 <md-tooltip md-direction="top">Question Responses</md-tooltip>

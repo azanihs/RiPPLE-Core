@@ -214,6 +214,7 @@ export default class QuestionBrowser extends Vue {
     }
 
     setUserIsFinished(newVal: boolean) {
+        // Request new data
         this.userIsFinished = newVal;
         this.selectedQuestion = null;
     }
