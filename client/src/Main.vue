@@ -24,12 +24,24 @@
                 <li v-for="link in links"
                     :key="link.href">
                     <router-link :to="link.href"
-                        @click.native="toggleSideNav"
+                        :class="submenuClassNames(link)"
+                        @click.native="toggleSideNav(link)"
                         class="md-button routerLink">
                         <span>{{ link.text }}</span>
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
                     </router-link>
+                    <div v-if="submenuIsVisible && link.text == 'Profile'">
+                            <li v-for="submenuLink in link.submenu"
+                                :key="submenuLink.href">
+                                <router-link :to="submenuLink.href"
+                                    @click.native="keepProfileActive(link)" 
+                                    class ="profileSubmenu md-button routerLink">
+                                    <span>{{ submenuLink.text }}</span>
+                                </router-link>
+                            </li>
+                        </div>
+                    </div>
                 </li>
             </ul>
         </md-layout>
@@ -52,6 +64,13 @@
         0 3px 1px -2px rgba(0, 0, 0, 0.12);
 
     justify-content: flex-end;
+}
+
+.profileSubmenu{
+    background-color: #18181b;
+    font-size: 0.8em;
+    color: #fff;
+    padding: 0px 20px !important; 
 }
 
 .menuContainer h2 {
@@ -148,7 +167,8 @@ a.routerLink:hover {
 }
 
 .router-link-exact-active.router-link-active,
-.router-link-exact-active.router-link-active:hover {
+.router-link-exact-active.router-link-active:hover,
+.submenu-active, .profileSubmenu:hover  {
     /* Sets the background colour of the currently selected item */
     background-color: #ffffff !important;
     color: #111 !important;
@@ -205,12 +225,32 @@ export default class Main extends Vue {
     menuIcon = "menu";
     mobileMode = false;
     pageTitle = "";
+    activeSubmenu = false;
 
     get links() {
         const profileLink = {
             text: "Profile",
             href: "/",
-            icon: "widgets"
+            icon: "widgets",
+            submenu: [{
+                text: "Overview",
+                href: "/"
+            }, {
+                text: "Engagement",
+                href: "/profile/engagement"
+            }, {
+                text: "Competencies",
+                href: "/profile/competencies"
+            }, {
+                text: "Connections",
+                href: "/profile/connections"
+            }, {
+                text: "Achievements",
+                href: "/profile/achievements"
+            }, {
+                text: "Notifications",
+                href: "/profile/notifications"
+            }]
         };
         const adminLink = {
             text: "Admin",
@@ -319,7 +359,19 @@ export default class Main extends Vue {
             });
     }
 
-    toggleSideNav() {
+    submenuIsVisible = true;
+
+    toggleSubmenu(link) {
+        if (link.text == "Profile") {
+            this.submenuIsVisible = true;
+        } else {
+            this.submenuIsVisible = false;
+            this.activeSubmenu = false;
+        }
+    }
+
+    toggleSideNav(link) {
+        this.toggleSubmenu(link);
         if (this.mobileMode) {
             this.updatePageName();
             const menuButton = (this.$refs["menuButton"] as any).$el as HTMLElement;
@@ -338,5 +390,17 @@ export default class Main extends Vue {
             }
         }
     }
+
+    keepProfileActive() {
+        this.activeSubmenu = true;
+    }
+
+    submenuClassNames(link ) {
+        return {
+            "submenu-active": link.text=="Profile" && this.activeSubmenu
+        };
+    }
+
+    
 }
 </script>
