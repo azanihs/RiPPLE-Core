@@ -81,6 +81,15 @@ class AchievementEngineConf(AppConf):
     def configure_classes(self, value):
         pass
 
+class View(models.Model):
+    view = models.CharField(max_length=30, unique=True)
+    url = models.CharField(max_length=30, unique=True)
+
+class Task(models.Model):
+    task = models.CharField(max_length=30, unique=True)
+    views = models.ManyToManyField(View)
+    achievements = models.ManyToManyField(Achievement)
+
 # connect to the end of the syncdb command signal to reload achievements at that time.
 if 'south' in settings.INSTALLED_APPS:
     from south.signals import post_migrate
