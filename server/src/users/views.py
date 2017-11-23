@@ -12,22 +12,6 @@ from users.models import User
 from ripple.util import util
 from rippleAchievements.engine import engine
 
-def testAch(request):
-    print(request.META)
-    user = token_to_user_course(request.META.get("HTTP_AUTHORIZATION", None))
-    print(user.user.id)
-    print(({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")}))
-    return JsonResponse({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")})
-
-
-from achievements.engine import engine
-
-def testAch(request):
-    user = token_to_user_course(request.META.get("HTTP_AUTHORIZATION", None))
-    print(user.user.id)
-    print(({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")}))
-    return JsonResponse({"achievement": engine.check_achievement(user=User.objects.get(pk=user.user.id), key="username")})
-
 def index(request):
     return JsonResponse({
         "login": "Returns a token to authenticate against the server"

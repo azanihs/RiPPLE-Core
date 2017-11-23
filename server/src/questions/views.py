@@ -53,7 +53,7 @@ def respond(request):
     if QuestionService.respond_to_question(distractor_id, UserService.logged_in_user(request)) is None:
         return JsonResponse({"error": "Invalid distractorID"}, status=422)
     else:
-        return HttpResponse(status=204)
+        return JsonResponse({}, status=200)
 
 
 def rate(request):

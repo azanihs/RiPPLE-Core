@@ -2,7 +2,7 @@ import importlib
 import logging
 
 from django.db.models.aggregates import Sum
-from rippleAchievements.models import Achievement, UserAchievement, User
+from rippleAchievements.models import Achievement, UserAchievement, CourseUser
 from rippleAchievements.signals import achievement_unlocked
 
 logger = logging.getLogger(__name__)
@@ -15,19 +15,21 @@ def get_user_score(user):
 
 def get_user_achievements(user):
     """Retrieves all the user achievements."""
-    return User.objects.get(id=user.id).achievements_set.all()
+    return CourseUser.objects.get(id=user.id).achievements_set.all()
 
 def check_achievement_plain(sender, user, key, *args, **kwargs):
     logger.debug("Check achievement called by %s" % sender)
     obj = Achievement.objects.get(key=key)
-    if evaluate_achievement_callback(user, obj, *args, **kwargs):
-        print("lalala")
+    result = evaluate_achievement_callback(user, obj, *args, **kwargs)
+    result["new"] = False
+    if result["progress"] == 1:
         (user_ach, created) = UserAchievement.objects.get_or_create(achievement=obj, user=user)
-        print(created)
         if created:
             print("Achievement %s unlocked for user %s " % (obj, user))
             logger.info("Achievement %s unlocked for user %s " % (obj, user))
             achievement_unlocked.send(sender=sender, user=user, achievement=obj, *args, **kwargs)
+            result["new"] = True
+    return result
 
 
 def evaluate_achievement_callback(user, obj, *args, **kwargs):

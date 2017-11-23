@@ -71,7 +71,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'users.middleware.TokenValidator'
+    'users.middleware.TokenValidator',
+    'users.middleware.AchievementChecker'
 ]
 ROOT_URLCONF = 'ripple.urls'
 
