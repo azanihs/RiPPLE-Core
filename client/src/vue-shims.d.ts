@@ -1,17 +1,11 @@
 declare const API_LOCATION;
 
-/*declare module "*.vue" {
+declare module "*.vue" {
     import Vue from "vue";
     export default Vue;
-}*/
+}
 
 declare module "vue/types/vue" {
-    interface Vue {
-        material: {
-            registerTheme(name: string | { [key: string]: ThemeType }, spec?: ThemeType): void,
-            setCurrentTheme(name: string): void
-        }
-    }
     interface VueConstructor {
         material: {
             registerTheme(name: string | { [key: string]: ThemeType }, spec?: ThemeType): void,
@@ -55,13 +49,6 @@ type Component = "MdCore"
     | "MdTooltip"
     | "MdWhiteframe";
 
-type Options =
-    { install: Vue.PluginFunction<never> } &
-    {[key in Component]: Vue.PluginFunction<never> };
-
-declare const options: Options;
-export default options;
-
 type Color = "red"
     | "pink"
     | "purple"
@@ -95,6 +82,4 @@ interface ThemeType {
     accent?: ThemeOption;
     warn?: ThemeOption;
     background?: ThemeOption;
-};
-
-
+}
