@@ -89,7 +89,7 @@
                 <md-button class="md-fab md-raised uploadButton"
                     @click="validateUpload"
                     :class="{'done': uploadDone}">
-                    <md-icon v-if="!uploadDone">save</md-icon>
+                    <md-icon v-if="!uploadDone">cloud_upload</md-icon>
                     <md-icon v-if="uploadDone">done</md-icon>
                 </md-button>
                 <md-spinner class="progressSpinner uploadSpinner"

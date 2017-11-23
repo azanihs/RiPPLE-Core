@@ -1,5 +1,3 @@
-import UserRepository from "./repositories/UserRepository";
-
 import Vue from "vue";
 import Router from "./routes";
 import VueMaterial from "vue-material";
@@ -8,6 +6,8 @@ import "./tinymce";
 
 import "vue-material/dist/vue-material.css";
 import "./style/style.css";
+
+import UserRepository from "./repositories/UserRepository";
 
 // From https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/901144#901144
 function getParameterByName(name, url) {
