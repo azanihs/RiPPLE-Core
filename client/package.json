@@ -37,15 +37,6 @@
             "./test/unit/bootstrap.ts"
         ]
     },
-    "babel": {
-        "env": {
-            "production": {
-                "plugins": [
-                    "transform-es2015-modules-commonjs"
-                ]
-            }
-        }
-    },
     "dependencies": {
         "chart.js": "2.7.1",
         "d3": "4.12.0",
