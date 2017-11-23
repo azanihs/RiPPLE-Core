@@ -3,7 +3,9 @@
                class="topPadding">
         <md-layout md-flex="100"
                    class="componentSeparator">
-            <availability-selector @change="shuffleData()"></availability-selector>
+            <availability-selector @change="changeAvailability"
+                                   :course="course"
+                                   :user="user"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
@@ -31,6 +33,7 @@
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
 
 import TopicService from "../../services/TopicService";
+import AvailabilityService from "../../services/AvailabilityService";
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
@@ -48,6 +51,8 @@ export default class PeerView extends Vue {
     pTopics = [];
     pRequests = [];
     pRecommendations = [];
+    pCourseAvailability = [];
+    pUserAvailability = [];
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -58,6 +63,12 @@ export default class PeerView extends Vue {
     updateRequests(newRequests) {
         this.pRequests = newRequests;
     };
+    updateCourseAvailability(availability) {
+        this.pCourseAvailability = availability;
+    };
+    updateUserAvailability(availability) {
+        this.pUserAvailability = availability;
+    };
 
     @Lifecycle
     created() {
@@ -67,6 +78,10 @@ export default class PeerView extends Vue {
             .then(this.updateConnections);
         UserService.getOutstandingRequests({ count: 3 })
             .then(this.updateRequests);
+        AvailabilityService.getCourseAvailability()
+            .then(this.updateCourseAvailability);
+        AvailabilityService.getUserAvailability()
+            .then(this.updateUserAvailability);
     }
 
     @Lifecycle
@@ -84,6 +99,18 @@ export default class PeerView extends Vue {
     }
     get requests() {
         return this.pRequests;
+    }
+
+    get course() {
+        return this.pCourseAvailability;
+    }
+
+    get user() {
+        return this.pUserAvailability;
+    }
+
+    changeAvailability(day, time) {
+        AvailabilityService.updateUserAvailability(day, time);
     }
 
     shuffleData() {
