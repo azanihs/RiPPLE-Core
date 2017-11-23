@@ -38,7 +38,7 @@ class AchievementEngine(object):
                 from rippleAchievements.tasks import check_achievement_task
                 check_achievement_task.delay(self, user, key, *args, **kwargs)
             else:
-                check_achievement_plain(self, user, key, *args, **kwargs)
+                return check_achievement_plain(self, user, key, *args, **kwargs)
         else:
             logger.info("trying to check an achievement for an un-logged user")
 

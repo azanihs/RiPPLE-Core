@@ -26,7 +26,7 @@ class Course(models.Model):
         }
 
 
-class User(AbstractUser):
+class User(models.Model):
     user_id = models.CharField(max_length=30)
     username = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=30)

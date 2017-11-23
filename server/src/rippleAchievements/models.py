@@ -4,7 +4,7 @@ import inspect
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
-from users.models import User
+from users.models import CourseUser
 from django.conf import settings
 from django.db import models
 
@@ -47,7 +47,7 @@ def load_classes(classes=settings.ACHIEVEMENT_CLASSES, *args, **kwargs):
         except ImproperlyConfigured:
             raise
         except Exception as exc:
-            logger.error("Exception catched while trying to register achievements class %s " % exc)
+            logger.error("Exception caught while trying to register achievements class %s " % exc)
             raise ImproperlyConfigured("ACHIEVEMENT_CLASSES attribute must be set properly for them to be loaded into the engine : %s" % exc)
 
 
@@ -65,7 +65,7 @@ class Achievement(models.Model):
 
 
 class UserAchievement(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(CourseUser)
     achievement = models.ForeignKey(Achievement, related_name="userachievements")
     registered_at = models.DateTimeField(auto_now_add=True)
 
