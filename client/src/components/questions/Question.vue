@@ -69,12 +69,13 @@
 </template>
 
 <style>
+.questionContent {
+    width: 100%;
+}
+
 .questionContent img {
-    width: 50%;
-    height: auto;
-    float: left;
+    /* Also used in questionResponse.vue */
     border: 1px solid #bbb;
-    margin-right: 10px;
     box-shadow: 2px 2px 5px #aaa;
 }
 </style>

@@ -1,16 +1,16 @@
 <template>
-    <md-card>
-        <md-layout>
-            <h3>{{topic}} Badges</h3>
-            <md-layout v-for="badge in availableBadges"
-                       :key="badge.id"
-                       md-flex="33"
-                       class="badgeGutter"
-                       md-gutter>
-                <user-badge :badge="badge"></user-badge>
-            </md-layout>
-        </md-layout>
-    </md-card>
+    <md-layout md-flex="100">
+        <md-card>
+                <h3>{{topic}} Badges</h3>
+                <md-layout v-for="badge in availableBadges"
+                        :key="badge.id"
+                        md-flex="33"
+                        class="badgeGutter"
+                        md-gutter>
+                    <user-badge :badge="badge"></user-badge>
+                </md-layout>
+        </md-card>
+    </md-layout>
 </template>
 
 <style scoped>

@@ -182,15 +182,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--name", nargs="+")
-        parser.add_argument("--code", nargs="+")
+        parser.add_argument("--course", nargs="+")
         parser.add_argument("--file", nargs="+")
 
     def handle(self, *args, **options):
-        if(len(options["name"])!=len(options["code"]) or len(options["name"])!=len(options["file"])):
+        if(len(options["name"])!=len(options["course"]) or len(options["name"])!=len(options["file"])):
             print("Please ensure you have a course code, name and file for each course")
             return
         course_names = options["name"]
-        course_codes = options["code"]
+        course_codes = options["course"]
         course_files = options["file"]
 
         def populate_course(file, topics, course, users):
@@ -223,5 +223,5 @@ class Command(BaseCommand):
             course_code=x["courseCode"], course_name=x["courseName"]) for x in courses]
         for i in range(0,len(all_courses)):
             print("Populating Course: " + all_courses[i].course_code)
-            unique_topics = get_topics(courses[i]["courseFile"])            
+            unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)

@@ -21,7 +21,7 @@
                     :id="'' + possibleAnswer.id">
                         <span class="distractorIndex">{{distractorIndex(index)}}.</span>
                 </md-radio>
-                <div class="questionContent" v-html="possibleAnswer.content"></div>
+                <div class="questionContent" @click="questionResponse = index" v-html="possibleAnswer.content"></div>
                 <div class="distributionOverlay"
                     :style="answerOptionFill(possibleAnswer)"></div>
             </li>

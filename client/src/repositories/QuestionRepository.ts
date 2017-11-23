@@ -1,7 +1,6 @@
 import { apiFetch } from "./APIRepository";
 import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
-import f from "faker";
 
 function toQuestion(x: Question): Question {
     const question: Question = {
