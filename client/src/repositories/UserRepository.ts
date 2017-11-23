@@ -214,10 +214,11 @@ export default class UserRepository {
         });
     }
 
-    static getMeetingHistory(): Promise<string[]> {
+    static getMeetingHistory(): Promise<{name: string, id: number }[]> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve(["Toowong", "UQ", "University Of Queensland", "Kenmore", "Indro"]);
+                resolve(["Toowong", "UQ", "University Of Queensland",
+                    "Kenmore", "Indro"].map((x, i) => ({ name: x, id: i })));
             }, Math.random() * 1000);
         });
     }

@@ -1,18 +1,10 @@
-var fs = require("fs");
+const fs = require("fs");
 const path = require('path');
-//var config = require('../config');
-// var utils = require('./utils');
-var projectRoot = path.resolve(__dirname, '../');
-var webpack = require('webpack');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+const projectRoot = path.resolve(__dirname, '../');
+const webpack = require('webpack');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-var env = process.env.NODE_ENV
-// check env & config/index.js to decide weither to enable CSS Sourcemaps for the
-// various preprocessor loaders added to vue-loader at the end of this file
-var cssSourceMapDev = false; // (env === 'development' && config.dev.cssSourceMap)
-var cssSourceMapProd = false // (env === 'production' && config.build.productionSourceMap)
-var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
-
+const env = process.env.NODE_ENV;
 function placeDefaults(fileName) {
     var exists = fs.existsSync(fileName);
     if (!exists) {

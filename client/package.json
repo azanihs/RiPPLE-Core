@@ -8,7 +8,7 @@
         "dev": "cross-env NODE_ENV=development webpack-dev-server --config=build/webpack.dev.conf.js --open --hot",
         "build": "npm run lint && cross-env NODE_ENV=production webpack -p --config=build/webpack.prod.conf",
         "lint": "node lint.js -c .eslintrc.json --ext .js,.vue,.ts src/ test/",
-        "unit": "jest --coverage",
+        "unit": "cross-env NODE_ENV=production jest --coverage",
         "e2e": "node test/e2e/runner.js",
         "test": "npm run unit && npm run e2e",
         "stats": "cross-env NODE_ENV=production webpack --config=build/webpack.prod.conf.js -p --json > stats.json"
@@ -28,6 +28,10 @@
         ],
         "collectCoverage": true,
         "coverageDirectory": "./test/unit/coverage",
+        "collectCoverageFrom": [
+            "!test/unit/bootstrap.ts",
+            "!test/unit/componentCreationFactory.ts"
+        ],
         "mapCoverage": true,
         "setupFiles": [
             "./test/unit/bootstrap.ts"
@@ -69,7 +73,7 @@
         "semver": "5.4.1",
         "style-loader": "0.19.0",
         "ts-jest": "21.2.3",
-        "ts-loader": "3.1.1",
+        "ts-loader": "3.0.5",
         "typescript": "2.6.1",
         "typescript-eslint-parser": "9.0.0",
         "url-loader": "0.6.2",
