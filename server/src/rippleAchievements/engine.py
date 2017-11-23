@@ -36,7 +36,7 @@ class AchievementEngine(object):
             if settings.ACHIEVEMENT_USE_CELERY:
                 # do not try to import if celery is not defined
                 from rippleAchievements.tasks import check_achievement_task
-                check_achievement_task.delay(self, user, key, *args, **kwargs)
+                return check_achievement_task.delay(self, user, key, *args, **kwargs)
             else:
                 return check_achievement_plain(self, user, key, *args, **kwargs)
         else:
