@@ -153,6 +153,7 @@ def update_competency(user, question, response):
 
         previous_score = 0
         attempt_count = 1
+
         if len(topics) == mapped_competencies.count():
             attempt_count = QuestionResponse.objects.filter(
                 user=user, response__in=Distractor.objects.filter(question=question)).count()
@@ -161,7 +162,6 @@ def update_competency(user, question, response):
                 pk=mapped_competencies.first().for_competency_id)
 
             if attempt_count > 1:
-                # Has not attempted question before
                 previous_score = QuestionScore.objects.get(
                     user=user, question=question).score
 
@@ -186,4 +186,5 @@ def update_competency(user, question, response):
         user_competency.save()
 
         update_question_score(user, question, question_score)
-        return user_competency
+        
+    return user_competency
