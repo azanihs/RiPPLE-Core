@@ -18,7 +18,7 @@ class TaskReference():
 ################################################
 
 def ach_earned(sender, user, achievement, *args, **kwargs):
-         #This is how to register a signal at ach earned
+         #This is the signal callback at ach earned
         pass
 achievement_unlocked.connect(ach_earned)
 

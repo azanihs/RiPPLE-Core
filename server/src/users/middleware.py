@@ -53,8 +53,8 @@ class AchievementChecker(object):
         for v in self.views:
             if pre(v.url):
                 req = v.view
-        if req is not None:
                 
+        if req is not None:     
             req = View.objects.get(view=req)
             tasks = Task.objects.filter(views = req)
 
@@ -75,15 +75,7 @@ class AchievementChecker(object):
             data['achievement'] = []
             for a in achievements:
                 data['achievement'].append(engine.check_achievement(user=user, key=a.key))
-        '''if req == "questionAuthor":
-            data['achievement'] = [engine.check_achievement(user=user, key="beginnerAuthor"),
-                engine.check_achievement(user=user, key="intermediateAuthor"),
-                engine.check_achievement(user=user, key="advancedAuthor")]
-        elif req == "questionResponse":
-            data['achievement'] = [engine.check_achievement(user=user, key="beginnerResponse"),
-                engine.check_achievement(user=user, key="intermediateResponse"),
-                engine.check_achievement(user=user, key="advancedResponse")]'''
-        
+
 
         response.content = json.dumps(data)
         return response
