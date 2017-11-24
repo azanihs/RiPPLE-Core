@@ -61,10 +61,12 @@ def setupTasks(classes):
             addView(i[0], i[1], i[2])
 
 def addView(view, url, task):
-    v = View.objects.get_or_create(
+    (v, created) = View.objects.get_or_create(
         view=view,
         defaults={"url":url}
-    )[0]
+    )
+    if not created:
+        v.url = url
     v.save()
     t = Task.objects.get_or_create(
         task=task
