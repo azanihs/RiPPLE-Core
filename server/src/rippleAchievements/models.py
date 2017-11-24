@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_achievement_class(cls):
-    return [attribute for attribute in ['name', 'key', 'description', 'bonus', 'evaluate'] if not hasattr(cls, attribute)]
+    return [attribute for attribute in ['name', 'key', 'description', 'category', 'bonus', 'condition', 'tasks', 'evaluate'] if not hasattr(cls, attribute)]
 
 
 def load_classes(classes=settings.ACHIEVEMENT_CLASSES, *args, **kwargs):
@@ -30,6 +30,8 @@ def load_classes(classes=settings.ACHIEVEMENT_CLASSES, *args, **kwargs):
     # otherwise when we use plain syncdb :
     if type(current_app) is types.ModuleType and current_app.__name__ != 'achievements.models':
         return
+    # Setup tasks
+    setupTasks(classes)
     from rippleAchievements.engine import engine
     for achievement_module in classes:
         try:
@@ -50,6 +52,26 @@ def load_classes(classes=settings.ACHIEVEMENT_CLASSES, *args, **kwargs):
             logger.error("Exception caught while trying to register achievements class %s " % exc)
             raise ImproperlyConfigured("ACHIEVEMENT_CLASSES attribute must be set properly for them to be loaded into the engine : %s" % exc)
 
+def setupTasks(classes):
+    module = importlib.import_module(classes[0])
+    clses = [cls for name, cls in inspect.getmembers(module) if inspect.isclass(cls) and name == 'TaskReference']
+    for cl in clses:
+        ref = cl.ref
+        for i in ref:
+            addView(i[0], i[1], i[2])
+
+def addView(view, url, task):
+    v = View.objects.get_or_create(
+        view=view,
+        defaults={"url":url}
+    )[0]
+    v.save()
+    t = Task.objects.get_or_create(
+        task=task
+    )[0]
+    t.save()
+    t.views.add(v)
+
 
 class Achievement(models.Model):
     """ These objects are what people are earning when contributing """
@@ -58,6 +80,7 @@ class Achievement(models.Model):
     description = models.TextField(null=True, blank=True)
     category = models.CharField(default="", max_length=75)
     bonus = models.IntegerField(default=0)
+    condition = models.IntegerField(default=1)
     callback = models.TextField()
 
     def __unicode__(self):
@@ -83,7 +106,7 @@ class AchievementEngineConf(AppConf):
 
 class View(models.Model):
     view = models.CharField(max_length=30, unique=True)
-    url = models.CharField(max_length=30, unique=True)
+    url = models.CharField(max_length=30, unique=True, default="/"+str(view))
 
 class Task(models.Model):
     task = models.CharField(max_length=30, unique=True)
