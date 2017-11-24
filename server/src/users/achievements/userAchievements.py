@@ -2,10 +2,13 @@ from rippleAchievements.signals import achievement_unlocked
 from questions.models import Question, QuestionResponse, Distractor
 from rippleAchievements.models import Task
 import sys
-if sys.version_info[0] < 3:
-    from abc import ABCMeta, abstractmethod
+import abc
+if sys.version_info >= (3, 4):
+    ABC = abc.ABC
 else:
-    from abc import ABC, abstractmethod, abstractproperty
+    ABC = abc.ABCMeta('ABC', (), {})
+abstractproperty = abc.abstractproperty
+abstractmethod = abc.abstractmethod
 
 ################################################
 # Setup reference tables linking views and tasks
@@ -28,50 +31,48 @@ achievement_unlocked.connect(ach_earned)
 
 
 # Achievements must implement the following class
-# Python 2.7 implementation is at the bottom of the file
-if (sys.version_info[0] > 3):
-    class AbstractAchievementClass(ABC):
-        @abstractproperty
-        def name(self):
-            pass
+class AbstractAchievementClass(ABC):
+    @abstractproperty
+    def name(self):
+        pass
+    
+    @abstractproperty
+    def key(self):
+        pass
+
+    @abstractproperty
+    def description(self):
+        pass
+
+    @abstractproperty
+    def category(self):
+        pass
+
+    @abstractproperty
+    def bonus(self):
+        pass
+
+    @abstractproperty
+    def condition(self):
+        pass
         
-        @abstractproperty
-        def key(self):
-            pass
+    @abstractproperty
+    def tasks(self):
+        pass
 
-        @abstractproperty
-        def description(self):
-            pass
+    @abstractmethod
+    def evaluate(self, user, *args, **kwargs):
+        pass
 
-        @abstractproperty
-        def category(self):
-            pass
+    def toJSON(self):
+        return {"name": self.name, "key": self.key, "description": self.description, 
+            "category": self.category, "bonus": self.bonus}
 
-        @abstractproperty
-        def bonus(self):
-            pass
-
-        @abstractproperty
-        def condition(self):
-            pass
-            
-        @abstractproperty
-        def tasks(self):
-            pass
-
-        @abstractmethod
-        def evaluate(self, user, *args, **kwargs):
-            pass
-
-        def toJSON(self):
-            return {"name": self.name, "key": self.key, "description": self.description, 
-                "category": self.category, "bonus": self.bonus}
-
-        def getResult(self, count, progress):
-            json = self.toJSON()
-            json["count"] = count
-            json["progress"] = progress
-            return json
+    def getResult(self, count, progress):
+        json = self.toJSON()
+        json["count"] = count
+        json["progress"] = progress
+        return json
 
 class BeginnerAuthorAchievement(AbstractAchievementClass):
     name = "Beginner Question Author"
@@ -159,50 +160,3 @@ class AdvancedResponseAchievement(AbstractAchievementClass):
         count = Distractor.objects.filter(id__in=responses, isCorrect=True  ).count()
         progress = min(1, count/self.condition)
         return self.getResult(count, progress)
-
-
-
-if sys.version_info[0] < 3:
-    class AbstractAchievementClass(object):
-        __metaclass__ = ABCMeta
-        @abstractproperty
-        def name(self):
-            pass
-        
-        @abstractproperty
-        def key(self):
-            pass
-
-        @abstractproperty
-        def description(self):
-            pass
-
-        @abstractproperty
-        def category(self):
-            pass
-
-        @abstractproperty
-        def bonus(self):
-            pass
-
-        @abstractproperty
-        def condition(self):
-            pass
-            
-        @abstractproperty
-        def tasks(self):
-            pass
-
-        @abstractmethod
-        def evaluate(self, user, *args, **kwargs):
-            pass
-
-        def toJSON(self):
-            return {"name": self.name, "key": self.key, "description": self.description, 
-                "category": self.category, "bonus": self.bonus}
-
-        def getResult(self, count, progress):
-            json = self.toJSON()
-            json["count"] = count
-            json["progress"] = progress
-            return json
