@@ -53,6 +53,8 @@ def load_classes(classes=settings.ACHIEVEMENT_CLASSES, *args, **kwargs):
             raise ImproperlyConfigured("ACHIEVEMENT_CLASSES attribute must be set properly for them to be loaded into the engine : %s" % exc)
 
 def setupTasks(classes):
+    Task.objects.all().delete()
+    View.objects.all().delete()
     module = importlib.import_module(classes[0])
     clses = [cls for name, cls in inspect.getmembers(module) if inspect.isclass(cls) and name == 'TaskReference']
     for cl in clses:
