@@ -115,10 +115,6 @@ export default class AvailabilitySelector extends Vue {
 
     pShowAvailability = true;
 
-    pAvailableDays: number[] = [1, 2, 3, 4, 5];
-
-    pCourseDistribution: number[][] = [];
-
     get showAvailability() {
         return this.pShowAvailability;
     }
@@ -128,7 +124,6 @@ export default class AvailabilitySelector extends Vue {
 
     checkbox(localDay, localTime) {
         const { day, time } = this.localToUTC(localDay, localTime);
-
         for (let i = 0; i < this.userDistribution.length; i++) {
             const entry = this.userDistribution[i];
             if (entry.day.id == day && entry.time.id == time) {
@@ -170,8 +165,8 @@ export default class AvailabilitySelector extends Vue {
             let weight = 0;
             if (this.maxAvailable > 0) {
                 const { day, time } = this.localToUTC(localDay, localTime);
-                const courseDistributionDay = this.courseDistribution[Math.abs(day - 1) % 7];
-                const entry = courseDistributionDay[time];
+                const courseDistributionDay = this.courseDistribution[day - 1];
+                const entry = courseDistributionDay[time - 1];
                 weight = entry / this.maxAvailable;
             }
             // Perferably have a lookup table generated on mount
@@ -183,11 +178,10 @@ export default class AvailabilitySelector extends Vue {
 
     convertDay(day?:number): number {
         if (day === undefined || this.days.length == 0) return undefined;
-
-        if (day < 0) {
-            return this.days[this.days.length - 1].id;
+        if (day < 1) {
+            return day + 7;
         } else if (day > this.days.length) {
-            return this.days[0].id;
+            return day - 7;
         } else {
             return day;
         }
@@ -195,41 +189,22 @@ export default class AvailabilitySelector extends Vue {
 
     convertTime(time?: number): number {
         if (time === undefined) return undefined;
-
-        return Math.abs(time) % 24;
+        if (time < 1) {
+            return time + 24;
+        } else if (time > 24) {
+            return time - 24;
+        } else {
+            return time;
+        }
     }
 
     localToUTC(localDay?: number, localTime?: number): DayTime {
         if (localDay === undefined || localTime === undefined) return undefined;
 
         const offset = new Date().getTimezoneOffset() / 60;
-        const time = localTime + offset;
+        let time = localTime + offset;
         let day = localDay;
-        if (time < 0) {
-            day--;
-        } else if (time >= 24) {
-            day++;
-        }
-
-        return {
-            day: this.convertDay(day),
-            time: this.convertTime(time)
-        };
-    }
-
-    serverToLocalTime(utcTime?: number): number {
-        if (utcTime === undefined) return undefined;
-        const offset = new Date().getTimezoneOffset() / 60;
-        return Math.abs(utcTime - offset) % 24;
-    }
-
-    serverToLocal(utcDay?: number, utcTime?: number): object {
-        if (utcDay === undefined || utcTime === undefined) return undefined;
-
-        const offset = new Date().getTimezoneOffset() / 60;
-        const time = utcTime - offset;
-        let day = utcDay;
-        if (time < 0) {
+        if (time < 1) {
             day--;
         } else if (time >= 24) {
             day++;
