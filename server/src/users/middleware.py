@@ -51,10 +51,12 @@ class AchievementChecker(object):
         req = None
         # Identify which view the request is associated with if ach attached.
         for v in self.views:
-            print(v.url)
             if pre(v.url):
-                req = v.view    
-        print(req)
+                req = v.view
+        if req is not None:
+                
+            req = View.objects.get(view=req)
+            tasks = Task.objects.filter(views = req)
 
         response=self.get_response(request)
         
@@ -67,14 +69,20 @@ class AchievementChecker(object):
         data['achievement'] = None
         user = token_to_user_course(token) 
         
-        if req == "questionAuthor":
+
+        for t in tasks:
+            achievements = t.achievements.all() 
+            data['achievement'] = []
+            for a in achievements:
+                data['achievement'].append(engine.check_achievement(user=user, key=a.key))
+        '''if req == "questionAuthor":
             data['achievement'] = [engine.check_achievement(user=user, key="beginnerAuthor"),
                 engine.check_achievement(user=user, key="intermediateAuthor"),
                 engine.check_achievement(user=user, key="advancedAuthor")]
         elif req == "questionResponse":
             data['achievement'] = [engine.check_achievement(user=user, key="beginnerResponse"),
                 engine.check_achievement(user=user, key="intermediateResponse"),
-                engine.check_achievement(user=user, key="advancedResponse")]
+                engine.check_achievement(user=user, key="advancedResponse")]'''
         
 
         response.content = json.dumps(data)
