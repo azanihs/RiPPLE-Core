@@ -180,7 +180,7 @@ export default class AvailabilitySelector extends Vue {
         if (day === undefined || this.days.length == 0) return undefined;
         if (day < 1) {
             return day + 7;
-        } else if (day > this.days.length) {
+        } else if (day > 7) {
             return day - 7;
         } else {
             return day;
