@@ -28,10 +28,6 @@ class AchievementEngine(object):
                     obj.bonus = cls.bonus
                     obj.callback = construct_callback(cls)
                     obj.save()
-                # optional category
-                if cls.__dict__.get('category', None):
-                    obj.category = cls.category
-                    obj.save()
                 for t in cls.tasks:
                     tObj = Task.objects.get(task=t)
                     tObj.achievements.add(obj)
