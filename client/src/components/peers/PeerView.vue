@@ -137,11 +137,21 @@ export default class PeerView extends Vue {
     }
 
     get days() {
-        return this.pDays;
+        if (this.pDays.length > 0) {
+            const days = this.pDays.slice(0, 5);
+            return days;
+        } else {
+            return this.pDays;
+        }
     }
 
     get times() {
-        return this.pTimes;
+        if (this.pTimes) {
+            const times = this.pTimes.slice(8, 21);
+            return times;
+        } else {
+            return this.pTimes;
+        }
     }
 
     get course() {
