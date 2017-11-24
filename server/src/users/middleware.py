@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from users.services.TokenService import token_valid, token_to_user_course
 from django.conf import settings
 from users.models import User
+from rippleAchievements.models import View, Task, Achievement
 from rippleAchievements.engine import engine
 import json
 
@@ -32,6 +33,9 @@ class TokenValidator(object):
 class AchievementChecker(object):
     def __init__(self, get_response):
         self.get_response = get_response
+        self.tasks = Task.objects.all()
+        self.achievements = Achievement.objects.all()
+        self.views = View.objects.all()        
 
     def __call__(self, request):
 
@@ -46,10 +50,11 @@ class AchievementChecker(object):
 
         req = None
         # Identify which view the request is associated with if ach attached.
-        if pre('/questions/add'):
-            req = 'questionAuthor'    
-        elif pre('/questions/respond'):
-            req = "questionResponse"
+        for v in self.views:
+            print(v.url)
+            if pre(v.url):
+                req = v.view    
+        print(req)
 
         response=self.get_response(request)
         
