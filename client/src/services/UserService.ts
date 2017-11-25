@@ -2,6 +2,20 @@ import { User, Badge, AcquiredBadge, Notification, Topic, Edge, Course } from ".
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
+function addTopicsToEdgeList(topics: Topic[], edges: Edge[]) {
+    topics.forEach(topic => {
+        if (!edges.find(ownScore => ownScore.source == topic && ownScore.target == topic)) {
+            edges = edges.concat({
+                source: topic,
+                target: topic,
+                competency: 0,
+                attempts: 0
+            });
+        }
+    });
+    return edges;
+}
+
 export default class UserService {
     static generateGraph(sourceData: Edge[], otherData: Edge[], exclude: number[]) {
         const ownScores = sourceData;
@@ -24,9 +38,19 @@ export default class UserService {
         };
     }
 
-    static userCompetencies({ compareTo, exclude }: { compareTo: string, exclude: number[] }) {
-        return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getUserCompetencies()])
-            .then(data => UserService.generateGraph(data[0], data[1], exclude || []));
+    static userCompetencies({ compareTo, excludeTopicIds }: { compareTo: string, excludeTopicIds?: number[] }) {
+        const excludeTopics = excludeTopicIds || [];
+        return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getCompareAgainst(compareTo)])
+            .then(data => UserService.generateGraph(data[0], data[1], excludeTopics))
+            .then(graph => TopicRepository.getAllAvailableTopics()
+                .then(allTopics => allTopics.filter(x => !excludeTopics.find(e => e === x.id)))
+                .then(topics => {
+                    // Add in all self-loops
+                    graph.topics = topics;
+                    graph.ownScores = addTopicsToEdgeList(topics, graph.ownScores);
+                    graph.compareAgainst = addTopicsToEdgeList(topics, graph.compareAgainst);
+                    return graph;
+                }));
     }
 
     static getEngagementScores({ compareTo, exclude }: { compareTo: string, exclude: number[] }) {

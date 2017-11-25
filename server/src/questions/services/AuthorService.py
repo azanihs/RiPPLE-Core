@@ -1,4 +1,5 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore, QuestionImage, ExplanationImage, DistractorImage
+from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from django.db import IntegrityError, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.conf import settings
@@ -35,98 +36,81 @@ def add_question(question_request, host, user):
     else:
         # INVALID CONTENT
         return {"state": "Error", "error": "Invalid Question"}
+    try:
+        with transaction.atomic():
+            # Question Images
+            images = question.get("payloads", None)
+            if images:
+                if not decodeImages(str(questionObj.id), questionObj, images, "q", host):
+                    raise IntegrityError("Invalid Question Image")
 
-    # Question Images
-    images = question.get("payloads", None)
-    if images:
-        if not decodeImages(str(questionObj.id), images, "q", host):
-            # INVALID IMAGE
-            questionObj.delete()
-            return {"state": "Error", "error": "Invalid Question Image"}
+            # Explanation Images
+            images = explanation.get("payloads", None)
+            if images:
+                if not decodeImages(str(questionObj.id), questionObj, images, "e", host):
+                    raise IntegrityError("Invalid Explanation Image")
 
-    # Explanation Images
-    images = explanation.get("payloads", None)
-    if images:
-        if not decodeImages(str(questionObj.id), images, "e", host):
-            # INVALID IMAGE
-            questionObj.delete()
-            return {"state": "Error", "error": "Invalid Explanation Image"}
+            # Topics
+            topicList = []
+            for i in topics:
+                topicList.append(i.get("id", None))
+            questionObj.topics = topicList
 
-    # Topics
-    topicList = []
-    for i in topics:
-        topicList.append(i.get("id", None))
-    questionObj.topics = topicList
+            # Distractors
+            for i in ["A", "B", "C", "D"]:
+                distractor = Distractor(
+                    content=responses[i].get("content", None),
+                    isCorrect=responses[i].get("isCorrect", None),
+                    response=i,
+                    question=questionObj
+                )
 
-    # Distractors
-    for i in ["A", "B", "C", "D"]:
-        distractor = Distractor(
-            content=responses[i].get("content", None),
-            isCorrect=responses[i].get("isCorrect", None),
-            response=i,
-            question=questionObj
-        )
+                if verifyContent(distractor.content):
+                    distractor.save()
+                else:
+                    raise IntegrityError("Invalid Distractor")
 
-        if verifyContent(distractor.content):
-            distractor.save()
-        else:
-            # INVALID CONTENT
-            questionObj.delete()
-            return {"state": "Error", "error": "Invalid Distractor"}
+                # Distractor Images
+                images = responses[i].get("payloads", None)
+                if images:
+                    if not decodeImages(str(distractor.id), distractor, images, "d", host):
+                        raise IntegrityError("Invalid Distractor Image")
+    except IntegrityError as e:
+        return {"state": "Error", "error": str(e)}
+    except Exception as e:
+        return {"state": "Error", "error": str(e)}
 
-        # Distractor Images
-        images = responses[i].get("payloads", None)
-        if images:
-            if not decodeImages(str(distractor.id), images, "d", host):
-                # INVALID IMAGE
-                questionObj.delete()
-                return {"state": "Error", "error": "Invalid Distractor Image"}
-
-    return {"state": "Question Added", "question": questionObj.toJSON()}
+    return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
 
-def decodeImages(id, images, type, host):
-    # type q=question, d=distractor
+def decodeImages(image_id, obj, images, image_type, host):
+    # type q=question, d=distractor, e=explanation
     urls = []
-    for i in range(0, len(images)):
-        format, imgstr = images[str(i)].split(';base64,')
-        ext = format.split('/')[-1]
-        data = ContentFile(base64.b64decode(imgstr),
-                           name=type + id + "_" + str(i) + "." + ext)
-        # Validate image
-        if imghdr.what(data) != ext:
-            return False
+    database_image_types = {
+        "q": QuestionImage,
+        "d": DistractorImage,
+        "e": ExplanationImage
+    }
+    ImageToSaveClass = database_image_types.get(image_type, None)
+
+    for i, image in images.items():
+        contentfile_image = util.save_image(image, image_id)
+        if contentfile_image is None:
+            raise IntegrityError("Image is not of valid type")
 
         # Question + Explanation in the same object
-        if type == "q" or type == "e":
-            object = Question.objects.get(pk=id)
+        if image_type == "q" or image_type == "e":
+            new_image = ImageToSaveClass.objects.create(question=obj, image=contentfile_image)
         else:
-            object = Distractor.objects.get(pk=id)
+            new_image = ImageToSaveClass.objects.create(distractor=obj, image=contentfile_image)
+        urls.append(new_image.image.name)
 
-        # Save Images
-        if type == "q":
-            content = object.content
-            questionImage = QuestionImage(question=object, image=data)
-            questionImage.save()
-            url = questionImage.image.url
-        elif type == "d":
-            content = object.content
-            distractorImage = DistractorImage(distractor=object, image=data)
-            distractorImage.save()
-            url = distractorImage.image.url
-        else:
-            content = object.explanation
-            explanationImage = ExplanationImage(question=object, image=data)
-            explanationImage.save()
-            url = explanationImage.image.url
-        urls.append(url)
-
-    if type == "e":
-        object.explanation = newSource(urls, content, host)
+    if image_type == "e":
+        obj.explanation = newSource(urls, obj.explanation, host)
     else:
-        object.content = newSource(urls, content, host)
+        obj.content = newSource(urls, obj.content, host)
 
-    object.save()
+    obj.save()
     return True
 
 
@@ -135,7 +119,10 @@ def newSource(urls, content, host):
 
     images = soup.find_all('img')
     for i in range(0, len(urls)):
-        images[i]['src'] = "http://" + host + urls[i]
+        if urls[i] is None:
+            continue
+        images[i]['src'] = "//" + host + urls[i]
+        images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])

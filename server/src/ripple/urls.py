@@ -25,4 +25,4 @@ urlpatterns = [
     url(r'^recommendations/', include("recommendations.urls")),
     url(r'^lti/', include("ripplelti.urls")),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

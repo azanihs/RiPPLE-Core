@@ -126,7 +126,7 @@ class Command(BaseCommand):
         unique_topics = ["Arrays", "Loops", "Recursion",
                          "Algorithms", "Data Structures", "Variables"]
 
-        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image=fake.image_url())
+        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
                  for user_id in range(50)]
 
         all_courses = [Course.objects.create(
