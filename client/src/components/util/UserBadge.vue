@@ -1,18 +1,18 @@
 <template>
-    <div class="badgeContainer">
-        <div class="badgeProgress"
-             :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+    <div class="badgeContainer"
+        :class="{obtained: userHasBadge, progress: userHasStartedBadge}">
+        <div class="badgeProgress">
             <div class="badge">
                 <md-icon>{{badgeIcon}}</md-icon>
             </div>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         md-theme="spinner"
                         class="badgeSpinner"
-                        :md-stroke="2"
+                        :md-stroke="4"
                         :md-progress="100"></md-spinner>
             <md-spinner v-if="userBadge && userBadge.progress >= 0"
                         class="progressSpinner badgeSpinner"
-                        :md-stroke="2"
+                        :md-stroke="4"
                         :md-progress="userBadge.progress"></md-spinner>
         </div>
         <div class="badgeDescription">
@@ -61,23 +61,29 @@
     margin-top: 0.5em;
 }
 
-.badgeProgress:not(.obtained) {
-    color: #ddd;
+.badgeContainer:not(.obtained) {
+    color: #bbb;
 }
 
 .badge {
     padding: 0.5em;
 }
 
-.obtained .badge {
-    color: #f2f2f2;
-    background-color: #256;
-    border-radius: 50%;
+.obtained .badgeProgress {
+    padding: 0px 1em;
 }
 
-.badgeProgress:not(.obtained).progress {
+.obtained .badge {
+    color: #ffcc00;
+    background-color:#256;
+    border-radius: 50%;
+    border: 0.3em solid #256;
+}
+
+.badgeContainer:not(.obtained).progress, .badgeContainer:not(.obtained):hover {
     color: #256;
 }
+
 </style>
 
 <script lang="ts">
