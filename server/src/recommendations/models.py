@@ -44,6 +44,7 @@ class Availability(models.Model):
 
 class StudyRole(models.Model):
     role = models.CharField(max_length=32)
+    description = models.CharField(max_length=32)
 
     def __str__(self):
         return str(self.role)
@@ -51,7 +52,8 @@ class StudyRole(models.Model):
     def toJSON(self):
         return {
             "id": self.id,
-            "role": self.role
+            "role": self.role,
+            "description": self.description
         }
 
 class AvailableRole(models.Model):

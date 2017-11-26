@@ -83,9 +83,13 @@ def make_times(times):
             time_range.save()
 
 def make_study_roles():
-    study_roles = ["mentor", "mentee", "partner"]
+    study_roles = [
+    {"role": "mentor", "description": "Provide Mentorship"},
+    {"role": "mentee", "description": "Seek Mentorship"},
+    {"role": "partner", "description": "Find Study Partners"}]
+
     for x in study_roles:
-        study_role = StudyRole.objects.create(role=x)
+        study_role = StudyRole.objects.create(role=x["role"], description=x["description"])
         study_role.save()
 
 
