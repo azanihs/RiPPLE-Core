@@ -79,10 +79,13 @@ export default class QuestionRepository {
                 distractorID: distractorID
             })
         })
-            .then(x => {
-                return x.json()
-                    .catch(_ => x);
-            });
+        .then(response => {
+            // 204 No Content
+            if (response.status == 204) {
+                return Promise.resolve({});
+            }
+            return response.json();
+        });
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
@@ -97,10 +100,18 @@ export default class QuestionRepository {
                 [`${rateType}`]: rateValue
             })
         })
-            .then(x => {
-                return x.json()
-                    .catch(_ => x);
-            });
+        .then(response => {
+            // 204 No Content
+            if (response.status == 204) {
+                return Promise.resolve({});
+            }
+            return response.json();
+        });
+    }
+
+    static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
+        return apiFetch(`/questions/distribution/${question.id}/`)
+            .then(response => response.json());
     }
 
 }
