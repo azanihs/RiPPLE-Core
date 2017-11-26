@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from django.db import models
 from users.models import CourseUser
+from questions.models import Topic
 
 class Day(models.Model):
     day = models.CharField(max_length=10, unique=True)
@@ -39,4 +40,28 @@ class Availability(models.Model):
             "course_user": self.course_user.toJSON(),
             "day": self.day.toJSON(),
             "time": self.time.toJSON()
+        }
+
+class StudyRole(models.Model):
+    role = models.CharField(max_length=32)
+
+    def __str__(self):
+        return str(self.role)
+
+    def toJSON(self):
+        return {
+            "id": self.id,
+            "role": self.role
+        }
+
+class AvailableRole(models.Model):
+    course_user = models.ForeignKey(CourseUser)
+    topic = models.ForeignKey(Topic)
+    study_role = models.ForeignKey(StudyRole)
+
+    def toJSON(self):
+        return {
+            "course_user": self.course_user.toJSON(),
+            "topic": self.topic.toJSON(),
+            "studyRole": self.study_role.toJSON()
         }

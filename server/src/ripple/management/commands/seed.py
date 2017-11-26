@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap
 from users.models import Course, User, CourseUser
-from recommendations.models import Day, Time, Availability
+from recommendations.models import Day, Time, Availability, StudyRole
 
 from questions.services import QuestionService
 
@@ -82,6 +82,12 @@ def make_times(times):
             time_range = Time.objects.create(start=times[i], end=times[i + 1])
             time_range.save()
 
+def make_study_roles():
+    study_roles = ["mentor", "mentee", "partner"]
+    for x in study_roles:
+        study_role = StudyRole.objects.create(role=x)
+        study_role.save()
+
 
 class Command(BaseCommand):
     args = ''
@@ -142,8 +148,9 @@ class Command(BaseCommand):
 
         time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
         time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
-
         make_times(time_inputs)
+
+        make_study_roles()
 
         course_users = CourseUser.objects.all()
         days = Day.objects.all()
