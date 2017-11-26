@@ -16,6 +16,8 @@ urlpatterns = [
     url(r'^competencies/all/$', views.competencies),
     url(r'^add/$', views.add),
 
+    url(r'^distribution/(.*)/$', views.distribution),
+
     url(r'^leaderboard/$', views.leaderboard_default),
     url(r'^leaderboard/(.*)/(.*)/$', views.leaderboard),
 

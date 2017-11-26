@@ -116,6 +116,9 @@ def competencies(request):
     user_competencies = UserService.user_competencies(logged_in_user)
     return JsonResponse(user_competencies, safe=False)
 
+def distribution(request, question_id):
+    question_distribution = QuestionService.question_response_distribution(question_id)
+    return JsonResponse(question_distribution)
 
 def leaderboard_default(request):
     return leaderboard(request, "reputation", "DESC")
