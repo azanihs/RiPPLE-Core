@@ -1,4 +1,5 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore
+from questions.services import CompetencyService
 from users.models import Token
 from questions.models import CourseUser
 from django.core.exceptions import ObjectDoesNotExist
@@ -148,33 +149,20 @@ def update_competency(user, question, response):
         topics = i["topics"]
         weight = i["weight"]
 
-        mapped_competencies = CompetencyMap.objects.filter(
-            user=user, topic__in=topics)
-
+        user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
         previous_score = 0
         attempt_count = 1
-        if len(topics) == mapped_competencies.count():
+
+        if user_competency is None:
+            user_competency = CompetencyService.add_competency(50, 1, user, topics)
+        else:
             attempt_count = QuestionResponse.objects.filter(
                 user=user, response__in=Distractor.objects.filter(question=question)).count()
 
-            user_competency = Competency.objects.get(
-                pk=mapped_competencies.first().for_competency_id)
-
             if attempt_count > 1:
-                # Has not attempted question before
+                # Has attempted question before
                 previous_score = QuestionScore.objects.get(
                     user=user, question=question).score
-
-        else:
-            user_competency = Competency.objects.create(
-                competency=50, confidence=1)
-
-            for topic in topics:
-                CompetencyMap(
-                    user=user,
-                    topic=topic,
-                    for_competency=user_competency
-                ).save()
 
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)

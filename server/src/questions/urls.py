@@ -13,7 +13,10 @@ urlpatterns = [
 
     url(r'^id/(.*)/$', views.id),
     url(r'^page/(.*)/$', views.page),
+
     url(r'^competencies/all/$', views.competencies),
+    url(r'^competencies/aggregate/(.*)/$', views.aggregate),
+
     url(r'^add/$', views.add),
 
     url(r'^leaderboard/$', views.leaderboard_default),
