@@ -34,7 +34,7 @@ class QuestionTestCase(TestCase):
                 author=author,
                 content="",
                 explanation="",
-                difficulty=1,
+                difficulty=i+1,
                 quality=1,
                 difficultyCount=1,
                 qualityCount=1
@@ -67,40 +67,83 @@ class QuestionTestCase(TestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
-        
+        print("FIRST TEST\n")
 
-        QuestionService.respond_to_question(1, author)
-
-        self.assertEqual(QuestionResponse.objects.all().count(), 1)
-        user_response = QuestionResponse.objects.first()
-
-        self.assertEqual(user_response.user_id, 1)
-        self.assertEqual(user_response.response_id, 1)
-
-        self.assertEqual(QuestionScore.objects.all().count(), 1)
-        question_score = QuestionScore.objects.all().first()
-
-        self.assertEqual(question_score.user_id, 1)
-        self.assertEqual(question_score.question_id, 1)
-        self.assertEqual(question_score.score, -1)
-
-        self.assertEqual(Competency.objects.all().count(), 1)
-        competency = Competency.objects.first()
-
-        # TODO: Work out comp
-        self.assertEqual(competency.competency, 50)
-        self.assertEqual(competency.confidence, 2)
+        print(0.5)
+        QuestionService.respond_to_question(3, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(4, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(3, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(3, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(3, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(3, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(3, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
 
     def test_answering_new_question_multiple_topics(self):
         """ New question with multiple topics """
-        pass
+        course = self._bootstrap_courses()
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
 
-    def test_answering_existing_question(self):
-        # Existing item in QuestionScore with single topic
-        # Existing item in QuestionScore with multiple topics
-        [Topic(name=x).save() for x in ["t3", "t4", "t5"]]
+        print("SECOND TEST\n")
 
-        self.assertEqual(Topic.objects.all().count(), 3)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        QuestionService.respond_to_question(2, author)
+        print(Competency.objects.all().first().competency)
+        
+
 
     def test_answering_multiple_questions(self):
         # New question with existing items with single topic
