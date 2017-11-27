@@ -7,6 +7,7 @@ from ripple.util import util
 from django.db.models import Count
 import random
 
+import math
 
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
@@ -164,10 +165,9 @@ def update_competency(user, question, response):
                 # Has not attempted question before
                 previous_score = QuestionScore.objects.get(
                     user=user, question=question).score
-
         else:
             user_competency = Competency.objects.create(
-                competency=50, confidence=1)
+                competency=0.5, confidence=1)
 
             for topic in topics:
                 CompetencyMap(
@@ -179,11 +179,60 @@ def update_competency(user, question, response):
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)
 
-        user_competency.competency = (
-            user_competency.competency * user_competency.confidence - previous_score + question_score) / (user_competency.confidence + weight)
+        print(response.response.isCorrect)
+        #user_competency.competency = (
+        #user_competency.competency * user_competency.confidence - previous_score + question_score) / (user_competency.confidence + weight)
+        total_correct = 0.2
+        total_incorrect = 0.2
+        
+        question_count = QuestionResponse.objects.count()
+        for response in QuestionResponse.objects.all():
+            if response.response.isCorrect:
+                total_correct += 1
+            else:
+                total_incorrect += 1
+
+        if response.response.isCorrect == False:
+            difficulty = 10 - response.response.question.difficulty
+        else:
+            difficulty = response.response.question.difficulty
+
+        weighted_features = [
+            (difficulty/10, 0.3),
+            (math.log(question_count), 0.2),
+            (math.log(total_correct), 0.3),
+            (exp_moving_avg(0.33), 0.4),
+            (exp_moving_avg(0.1), 0.3),
+            (float(total_correct / question_count), 0.4),
+            (user_competency.competency, 0.50)
+        ]
+
+        x , weight_vector = zip(*weighted_features)
+
+        scores = sum([i*j for (i, j) in zip(x, weight_vector)])
+
+        test = 1 / (1 + math.exp(-scores))
+
+        difference = abs(user_competency.competency - test)
+        if response.response.isCorrect == False:
+            user_competency.competency -= difference
+            if user_competency.competency < 0.1:
+                user_competency.competency = 0.1
+        else:
+            user_competency.competency += difference
 
         user_competency.confidence += weight
         user_competency.save()
 
         update_question_score(user, question, question_score)
         return user_competency
+
+def exp_moving_avg(weight):
+    ewma = 0.5
+    for response in QuestionResponse.objects.all():
+        correct = 0
+        if response.response.isCorrect:
+            correct += 1
+        ewma = weight * correct + (1 - weight) * ewma
+ 
+    return ewma
