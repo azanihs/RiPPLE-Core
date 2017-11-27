@@ -179,11 +179,11 @@ def update_competency(user, question, response):
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)
 
-        print(response.response.isCorrect)
+        
         #user_competency.competency = (
         #user_competency.competency * user_competency.confidence - previous_score + question_score) / (user_competency.confidence + weight)
-        total_correct = 0.2
-        total_incorrect = 0.2
+        total_correct = 1
+        total_incorrect = 1
         
         question_count = QuestionResponse.objects.count()
         for response in QuestionResponse.objects.all():
@@ -199,19 +199,24 @@ def update_competency(user, question, response):
 
         weighted_features = [
             (difficulty/10, 0.3),
-            (math.log(question_count), 0.2),
+            (math.log(question_count), 0.1),
             (math.log(total_correct), 0.3),
             (exp_moving_avg(0.33), 0.4),
             (exp_moving_avg(0.1), 0.3),
-            (float(total_correct / question_count), 0.4),
+            (float(total_correct / question_count), 0.30),
             (user_competency.competency, 0.50)
         ]
 
         x , weight_vector = zip(*weighted_features)
 
         scores = sum([i*j for (i, j) in zip(x, weight_vector)])
-
+        
+        
         test = 1 / (1 + math.exp(-scores))
+
+        # print(response.response.isCorrect)
+        # print("SCORE: " + str(scores))
+        # print("TEST: " + str(test))
 
         difference = abs(user_competency.competency - test)
         if response.response.isCorrect == False:

@@ -8,6 +8,8 @@ from questions.models import Course, Topic, Question, Distractor, QuestionRespon
 from users.models import CourseUser, User
 from questions.services import QuestionService
 
+import numpy as np
+
 # Create your tests here.
 
 
@@ -69,47 +71,12 @@ class QuestionTestCase(TestCase):
         self._bootstrap_question_choices(correct_id=2)
         print("FIRST TEST\n")
 
-        print(0.5)
-        QuestionService.respond_to_question(3, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(4, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(3, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(3, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(3, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(3, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(3, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
+        for i in range(0, 20):
+            QuestionService.respond_to_question(2, author)
+            print(Competency.objects.all().first().competency)
+            QuestionService.respond_to_question(3, author)
+            print(Competency.objects.all().first().competency)
+
 
     def test_answering_new_question_multiple_topics(self):
         """ New question with multiple topics """
@@ -122,27 +89,29 @@ class QuestionTestCase(TestCase):
 
         print("SECOND TEST\n")
 
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
-        QuestionService.respond_to_question(2, author)
-        print(Competency.objects.all().first().competency)
+        for i in range(0, 10):
+            QuestionService.respond_to_question(2, author)
+            print(Competency.objects.all().first().competency)
+      
+
+
+        # count = 10
+
+        # X = np.zeros(10)
+        # Y = np.zeros(10)
+
+        # for i in range(0, 7):
+        #     QuestionService.respond_to_question(2, author)
+        #     X[i] = Competency.objects.all().first().competency
+        #     Y[i] = i+1
         
+        # A, B = np.polyfit(X, np.log(Y),1)
+
+        # A /= (A * np.exp(B * 0.90))
+
+        # print(Competency.objects.all().first().competency)
+        # print(sorted((A * np.exp(B * 0.90), 0.0, 1.0))[1])
+
 
 
     def test_answering_multiple_questions(self):
