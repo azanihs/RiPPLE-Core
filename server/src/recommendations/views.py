@@ -39,5 +39,9 @@ def update(request):
         return HttpResponse(status=204)
 
 def utc_times(request):
-    times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]
+    times = [x.toJSON() for x in AvailabilityService.get_utc_times()]
     return JsonResponse(times, safe=False)
+
+def study_roles(request):
+    roles = [x.toJSON() for x in AvailabilityService.get_study_roles()]
+    return JsonResponse(roles, safe=False)

@@ -1,4 +1,4 @@
-import { Availability, CourseAvailability, Time } from "../interfaces/models";
+import { Availability, CourseAvailability, Time, StudyRole } from "../interfaces/models";
 import { setToken, apiFetch } from "./APIRepository";
 
 export default class AvailabilityRepository {
@@ -10,12 +10,12 @@ export default class AvailabilityRepository {
 
     static getCourseAvailability(): Promise<CourseAvailability[]> {
         return apiFetch("/recommendations/availability/all")
-          .then(x => x.json());
+            .then(x => x.json());
     }
 
     static getUserAvailability(): Promise<Availability[]> {
         return apiFetch("/recommendations/availability/")
-          .then(x => x.json());
+            .then(x => x.json());
     }
 
     static updateUserAvailability(day: number, time: number) {
@@ -33,5 +33,10 @@ export default class AvailabilityRepository {
             .then(x => {
                 return x.json();
             });
+    }
+
+    static getStudyRoles(): Promise<StudyRole[]> {
+        return apiFetch("/recommendations/roles/all")
+            .then(x => x.json());
     }
 }
