@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap
 from users.models import Course, User, CourseUser
-from recommendations.models import Day, Time, Availability, StudyRole
+from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 
 from questions.services import QuestionService
 
@@ -128,6 +128,22 @@ class Command(BaseCommand):
                     availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
                     availability.save()
 
+        def populate_available_roles(course_users, study_roles):
+            for course_user in course_users:
+                topics = Topic.objects.filter(course=course_user.course)
+                for topic in topics:
+                    role_id = randint(0, 2)
+                    if role_id > 0:
+                        study_role = study_roles[role_id - 1]
+                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+
+                    role_id = randint(0, 1)
+                    if role_id:
+                        study_role = study_roles[2]
+                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+
+
+
         courses = [
             {"courseCode": "SCIE1000", "courseName": "Intro to science"},
             {"courseCode": "CSSE1001", "courseName": "Intro to data systems"},
@@ -160,3 +176,6 @@ class Command(BaseCommand):
         days = Day.objects.all()
         times = Time.objects.all()
         populate_availability(course_users, days, times)
+
+        study_roles = StudyRole.objects.all()
+        populate_available_roles(course_users, study_roles)
