@@ -6,14 +6,15 @@ import random
 import math
 from questions.models import Course, Topic, Question, Distractor, QuestionResponse, QuestionScore, Competency
 from users.models import CourseUser, User
-from questions.services import QuestionService
+from questions.services import QuestionService, SearchService
 
 # Create your tests here.
 
 
 class QuestionTestCase(TestCase):
-    def _bootstrap_courses(self):
-        return Course.objects.create(course_code="test_course_1", course_name="course_name")
+    def _bootstrap_courses(self, id):
+        return Course.objects.create(course_code="test_course_" + str(id), course_name="course_name_" + str(id))
+            
 
     def _bootstrap_topics(self, course):
         [Topic(id=i, name=x, course=course).save()
@@ -66,7 +67,7 @@ class QuestionTestCase(TestCase):
 
     def test_answering_new_question_single_topic(self):
         """ New question with single topic """
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
@@ -89,11 +90,6 @@ class QuestionTestCase(TestCase):
         self.assertEqual(question_score.score, -1)
 
         self.assertEqual(Competency.objects.all().count(), 1)
-        #competency = Competency.objects.first()
-
-        # TODO: Work out comp
-        # self.assertEqual(competency.competency, 24.5)
-        # self.assertEqual(competency.confidence, 2)
 
     def test_answering_new_question_multiple_topics(self):
         """ New question with multiple topics """
@@ -101,7 +97,7 @@ class QuestionTestCase(TestCase):
         # The plus two selects option b by default
         distractor_id = ((question_number - 1) * 4) + 2
 
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
@@ -126,14 +122,14 @@ class QuestionTestCase(TestCase):
         self.assertEqual(question_score.score, -1)
 
         self.assertEqual(Competency.objects.all().count(), topic_count)
-    
+
     def test_answering_question_correctly(self):
         """ New question with a correct answer """
         question_number = 1
         # The plus two selects option b by default
         distractor_id = ((question_number - 1) * 4) + 2
         correct_id = 2
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
@@ -151,7 +147,7 @@ class QuestionTestCase(TestCase):
         # The plus two selects option b by default
         distractor_id = ((question_number - 1) * 4) + 2
         correct_id = 3
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
@@ -165,7 +161,7 @@ class QuestionTestCase(TestCase):
 
     def test_answering_multiple_existing_questions(self):
         """ Single user answers multiple questions created by other authors """
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         self._bootstrap_topics(course)
         number_authors = 3
         #User used for responding
@@ -193,13 +189,11 @@ class QuestionTestCase(TestCase):
             self.assertEqual(user_response.response_id, distractors[index])
             index += 1
 
-
-
     def test_answering_multiple_new_questions(self):
         """ Answer multiple questions in a row, 2 incorrect and 1 correctly """
         number_of_questions = 3
         correct_id = 2;
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
@@ -237,18 +231,10 @@ class QuestionTestCase(TestCase):
         
         self.assertEqual(QuestionScore.objects.all().count(), number_of_questions)
         self.assertEqual(Competency.objects.all().count(), len(unique_topics))
-        
-    def test_answering_existing_question(self):
-        # Existing item in QuestionScore with single topic
-        # Existing item in QuestionScore with multiple topics
-        self.assertTrue(True)
-
-    def test_answering_question_different_course(self):
-        self.assertTrue(True)
 
     def test_answering_existing_question_many_users(self):
         """ Single question one topic answered by many users """
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         number_of_responders = 4
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -259,7 +245,6 @@ class QuestionTestCase(TestCase):
             user = self._bootstrap_user(i+1)
             responder = CourseUser.objects.create(user=user, course=course)
             QuestionService.respond_to_question(i, responder)
-        #print(CourseUser.objects.all())
         self.assertEqual(QuestionResponse.objects.all().count(), number_of_responders)
         self.assertEqual(QuestionScore.objects.all().count(), number_of_responders)
         response_index = 2
@@ -275,7 +260,7 @@ class QuestionTestCase(TestCase):
         
     def test_answer_existing_questions_one_user_multiple_times(self):
         """ User different from the author answers same question many times """
-        course = self._bootstrap_courses()
+        course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
@@ -301,3 +286,46 @@ class QuestionTestCase(TestCase):
         self.assertEqual(question_score.user_id, 2)
         self.assertEqual(question_score.question_id, 1)
         self.assertEqual(question_score.number_answers, responses_count)
+
+    def test_answering_question_different_course(self):
+        """ User answers question from course they do not belong to """
+        author_course = self._bootstrap_courses(1)
+        responder_course = self._bootstrap_courses(2)
+        author_user = self._bootstrap_user(1)
+        responder_user = self._bootstrap_user(2)
+        author = CourseUser.objects.create(user=author_user, course=author_course)
+        responder = CourseUser.objects.create(user = responder_user, course = responder_course)
+        self._bootstrap_topics(author_course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+
+        self.assertRaises(ValueError, QuestionService.respond_to_question, 1, responder)
+
+        self.assertEqual(QuestionResponse.objects.all().count(), 0)
+        self.assertEqual(QuestionScore.objects.all().count(), 0)
+        self.assertEqual(Competency.objects.all().count(), 0)
+
+
+    def test_questions_available(self):
+        """ Only same course questions available to responder """
+        author_course = self._bootstrap_courses(1)
+        responder_course = self._bootstrap_courses(2)
+        author_user = self._bootstrap_user(1)
+        responder_user = self._bootstrap_user(2)
+        author = CourseUser.objects.create(user=author_user, course=author_course)
+        responder = CourseUser.objects.create(user = responder_user, course = responder_course)
+        self._bootstrap_topics(author_course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+        self._bootstrap_topics(responder_course)
+        self._bootstrap_questions(responder)
+        self._bootstrap_question_choices(correct_id=2)
+
+        search_query = SearchService.SearchService(responder.course)
+        search_result = search_query.execute()
+
+        self.assertEqual(search_result.count(), 5)
+        
+        for question in search_result:
+            self.assertEqual(question.author.course, responder_course)
+            self.assertEqual(question.topics.first().course, responder_course)
