@@ -6,5 +6,6 @@ urlpatterns = [
     url(r'^availability/times/$', views.utc_times),
     url(r'^availability/$', views.user_availability),
     url(r'^availability/update/$', views.update),
-    url(r'^roles/all', views.study_roles)
+    url(r'^roles/all', views.study_roles),
+    url(r'^roles/', views.user_roles)
 ]

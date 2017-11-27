@@ -22,4 +22,8 @@ export default class AvailabilityService {
     static getStudyRoles() {
         return AvailabilityRepository.getStudyRoles();
     }
+
+    static getUserAvailableRoles() {
+        return AvailabilityRepository.getUserAvailableRoles();
+    }
 }
