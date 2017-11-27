@@ -6,8 +6,8 @@
                 <thead>
                     <tr>
                         <th>Topics</th>
-                        <th v-for="sType in searchTypes"
-                            :key="sType">{{ sType }}
+                        <th v-for="role in studyRoles"
+                            :key="role.id">{{ role.description }}
                         </th>
                     </tr>
                 </thead>
@@ -19,14 +19,14 @@
                             <div class="cellOverlay"
                                  :style="getCellWeight(topic)"></div>
                         </td>
-                        <td v-for="sType in searchTypes"
-                            :key="sType"
+                        <td v-for="role in studyRoles"
+                            :key="role.id"
                             class="centerAlign">
                             <md-checkbox class="centerCheckbox"
-                                         :disabled="checkboxIsDisabled(sType, topic)"
+                                         :disabled="checkboxIsDisabled(role.description, topic)"
                                          @change="checkboxChange"
-                                         :id="`${sType}_${topic.id}`"
-                                         :name="`${sType}_${topic.id}`"></md-checkbox>
+                                         :id="`${role.id}_${topic.id}`"
+                                         :name="`${role.id}_${topic.id}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
@@ -112,7 +112,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic, UserSummary, Edge } from "../../interfaces/models";
+import { Topic, UserSummary, Edge, StudyRole } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -125,12 +125,6 @@ import RecommendationCard from "./RecommendationCard.vue";
     }
 })
 export default class RecommendationSearch extends Vue {
-    @Prop
-    searchTypes = p<string[]>({
-        required: true,
-        type: Array
-    });
-
     @Prop
     topics = p<Topic[]>({
         required: true,
@@ -147,6 +141,14 @@ export default class RecommendationSearch extends Vue {
     requests = p<UserSummary[]>({
         required: true,
         type: Array
+    });
+
+    @Prop
+    studyRoles = p<StudyRole[]>({
+        type: Array,
+        default: () => {
+            return [];
+        }
     });
 
     competencies = new Map();

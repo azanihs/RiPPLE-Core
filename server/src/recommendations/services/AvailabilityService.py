@@ -1,4 +1,4 @@
-from ..models import Day, Time, Availability
+from ..models import Day, Time, Availability, StudyRole
 from django.db.models import Count
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -32,3 +32,6 @@ def update_availability(course_user, day_id, time_id):
         return True
 
     return None
+
+def get_study_roles():
+    return StudyRole.objects.all()

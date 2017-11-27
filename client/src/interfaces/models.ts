@@ -179,3 +179,9 @@ export interface CourseAvailability {
     time: Time,
     entries: number
 }
+
+export interface StudyRole {
+    id: number,
+    role: string,
+    description: string
+}

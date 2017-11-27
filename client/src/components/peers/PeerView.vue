@@ -10,9 +10,9 @@
         <md-layout md-flex="100">
             <md-card>
                 <recommendation-search @change="shuffleData()"
-                                       :searchTypes="searchTypes"
                                        :recommendations="recommendations"
                                        :requests="requests"
+                                       :studyRoles="studyRoles"
                                        :topics="topics"></recommendation-search>
             </md-card>
         </md-layout>
@@ -53,6 +53,7 @@ export default class PeerView extends Vue {
     pRecommendations = [];
     pCourseAvailability = [];
     pUserAvailability = [];
+    pStudyRoles = [];
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -69,6 +70,9 @@ export default class PeerView extends Vue {
     updateUserAvailability(availability) {
         this.pUserAvailability = availability;
     };
+    updateStudyRoles(roles) {
+        this.pStudyRoles = roles;
+    }
 
     @Lifecycle
     created() {
@@ -82,6 +86,8 @@ export default class PeerView extends Vue {
             .then(this.updateCourseAvailability);
         AvailabilityService.getUserAvailability()
             .then(this.updateUserAvailability);
+        AvailabilityService.getStudyRoles()
+            .then(this.updateStudyRoles);
     }
 
     @Lifecycle
@@ -107,6 +113,10 @@ export default class PeerView extends Vue {
 
     get user() {
         return this.pUserAvailability;
+    }
+
+    get studyRoles() {
+        return this.pStudyRoles;
     }
 
     changeAvailability(day, time) {
