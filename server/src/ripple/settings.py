@@ -32,7 +32,7 @@ CONN_MAX_AGE = None
 
 # the nginx reverse proxy path (eg. "/api/")
 FORCE_SCRIPT_NAME = os.environ.get("PROXY_LOCATION")
-ALLOW_UNAUTHENTICATED = False
+ALLOW_UNAUTHENTICATED = (DEBUG is True)
 
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "ripplelti.apps.RippleltiConfig",
     "users.apps.UsersConfig",
     "questions.apps.QuestionsConfig",
+    "recommendations.apps.RecommendationsConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,6 +154,19 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
 
 
+
 # Media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder'
+]
+
+STATICFILES_DIRS = [
+    MEDIA_ROOT
+]
+
+RUNTIME_CONFIGURATION = {
+    "min_competency_threshold": 5
+}

@@ -1,7 +1,22 @@
 import { apiFetch } from "./APIRepository";
 import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
-import f from "faker";
+
+function toQuestion(x: Question): Question {
+    const question: Question = {
+        id: x.id,
+        difficulty: x.difficulty,
+        quality: x.quality,
+        solution: x.distractors.find(d => d.isCorrect === true),
+        distractors: x.distractors,
+        topics: x.topics.map(t => TopicRepository.topicPointer(t)),
+        content: x.content,
+        explanation: x.explanation,
+        responses: x.responses,
+        responseCount: x.responseCount
+    };
+    return question;
+}
 
 export default class QuestionRepository {
     static uploadQuestion(question: QuestionUpload): Promise<Question> {
@@ -15,40 +30,13 @@ export default class QuestionRepository {
         })
             .then(x => x.json())
             .then(x => x["question"])
-            .then(x => {
-                const question: Question = {
-                    id: x.id,
-                    difficulty: x.difficulty,
-                    quality: x.quality,
-                    solution: x.distractors.find(d => d.isCorrect === true),
-                    distractors: x.distractors,
-                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                    content: x.content,
-                    explanation: x.explanation,
-                    responses: x.responses
-                };
-                return question;
-            });
+            .then(response => toQuestion(response));
     }
 
     static getMany(count: number): Promise<Question[]> {
         return apiFetch(`/questions/all/`)
             .then(questions => questions.json())
-            .then(questions => questions.map(x => {
-                const question: Question = {
-                    id: x.id,
-                    difficulty: x.difficulty,
-                    quality: x.quality,
-                    solution: x.distractors.find(d => d.isCorrect === true),
-                    distractors: x.distractors,
-                    topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                    content: x.content,
-                    explanation: x.explanation,
-                    responses: x.responses
-                };
-
-                return question;
-            }));
+            .then(questions => questions.map(x => toQuestion(x)));
     }
 
     static search(sortField: string | undefined,
@@ -75,21 +63,7 @@ export default class QuestionRepository {
             .then(questions => questions.json())
             .then(searchResult => ({
                 totalItems: searchResult.totalItems,
-                questions: searchResult.items.map(x => {
-                    const question: Question = {
-                        id: x.id,
-                        difficulty: x.difficulty,
-                        quality: x.quality,
-                        solution: x.distractors.find(d => d.isCorrect === true),
-                        distractors: x.distractors,
-                        topics: x.topics.map(t => TopicRepository.topicPointer(t)),
-                        content: x.content,
-                        explanation: x.explanation,
-                        responses: x.responses
-                    };
-
-                    return question;
-                }),
+                questions: searchResult.items.map(x => toQuestion(x)),
                 page: searchResult.page
             }));
     }
@@ -105,10 +79,13 @@ export default class QuestionRepository {
                 distractorID: distractorID
             })
         })
-            .then(x => {
-                return x.json()
-                    .catch(_ => x);
-            });
+        .then(response => {
+            // 204 No Content
+            if (response.status == 204) {
+                return Promise.resolve({});
+            }
+            return response.json();
+        });
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
@@ -123,10 +100,18 @@ export default class QuestionRepository {
                 [`${rateType}`]: rateValue
             })
         })
-            .then(x => {
-                return x.json()
-                    .catch(_ => x);
-            });
+        .then(response => {
+            // 204 No Content
+            if (response.status == 204) {
+                return Promise.resolve({});
+            }
+            return response.json();
+        });
+    }
+
+    static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
+        return apiFetch(`/questions/distribution/${question.id}/`)
+            .then(response => response.json());
     }
 
 }

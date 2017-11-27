@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import random
 import pytz as timezone
-import base64
 
+from django.conf import settings
 from datetime import datetime
-from bs4 import BeautifulSoup
 from ripple.util.util import save_image
 
 from questions.models import Topic, Competency, CompetencyMap
 from users.models import Course, CourseUser, User, Role, UserImage
 from users.services.TokenService import token_to_user_course
-
+from ripple.util import util
 
 def update_user_image(user, server_root, new_image):
     saved_image = save_image(new_image, str(user.id))
@@ -25,7 +23,7 @@ def update_user_image(user, server_root, new_image):
         user=user
     )
 
-    user.image = "http://" + server_root + profile_image.image.url
+    user.image = util.merge_url_parts([server_root, profile_image.image.name])
     user.save()
     return user.toJSON()
 
@@ -138,8 +136,12 @@ def user_competencies(user):
         sorted_competencies = sort_competencies(sorted_competencies, i)
 
     edges = []
+    threshold = settings.RUNTIME_CONFIGURATION["min_competency_threshold"]
     for competency_id, nodes in sorted_competencies.items():
         competency = user_competency_values.get(pk=competency_id)
+        if competency.confidence < threshold:
+            continue
+
         source = nodes[0]
         target = nodes[1] if len(nodes) > 1 else source
         edges.append([

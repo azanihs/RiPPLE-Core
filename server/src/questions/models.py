@@ -27,6 +27,8 @@ class Question(models.Model):
     difficultyCount = models.IntegerField()
     qualityCount = models.IntegerField()
 
+    created_time = models.DateTimeField(auto_now_add=True)
+
     topics = models.ManyToManyField(Topic)
     author = models.ForeignKey(CourseUser)
 
@@ -44,6 +46,7 @@ class Question(models.Model):
             "qualityCount": self.qualityCount,
             "topics": [x.toJSON() for x in self.topics.all()],
             "responses": [],
+            "responseCount": sum((x.questionresponse_set.count() for x in self.distractor_set.all())),
             "distractors": [x.toJSON() for x in self.distractor_set.all()]
         }
 
@@ -88,6 +91,7 @@ class QuestionRating(models.Model):
 
 class QuestionScore(models.Model):
     score = models.FloatField()
+    number_answers = models.IntegerField()
 
     question = models.ForeignKey(Question)
     user = models.ForeignKey(CourseUser)

@@ -22,5 +22,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^users/', include("users.urls")),
     url(r'^questions/', include("questions.urls")),
+    url(r'^recommendations/', include("recommendations.urls")),
+    url(r'^lti/', include("ripplelti.urls")),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

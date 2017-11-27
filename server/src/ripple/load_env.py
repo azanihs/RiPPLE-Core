@@ -9,7 +9,7 @@ DEFAULT_ENVS = OrderedDict([
     ['LTI_SUCCESS_REDIRECT', 'http://localhost:8080'],
     ['LTI_URL', ''],
     ['LTI_APP_KEY', ''],
-    ['DATABASE_TYPE', 'mysql'],
+    ['DATABASE_TYPE', 'sqlite3'],
     ['DATABASE_NAME', 'rippledb'],
     ['DATABASE_HOST', 'localhost'],
     ['DATABASE_USER', 'ripple'],
@@ -22,8 +22,12 @@ def init_env(try_path):
         os.path.dirname(__file__), try_path))
     if not os.path.isfile(dotenv_path):
         print("Could not load " + dotenv_path + "!")
-        print("Would you like to initialise .current.env to example values? (Y/N)")
-        user_answer = input("> ")
+        print("Would you like to initialise .env.current to example values? (Y/N)")
+        try:
+            user_answer = raw_input("> ")
+        except NameError:
+            user_answer = input("> ")
+
         if user_answer == "Y":
             with open(dotenv_path, "w") as config_file:
                 for key, value in DEFAULT_ENVS.items():
@@ -32,3 +36,6 @@ def init_env(try_path):
             raise ImportError(
                 "Could not load application config. Please ensure you have an active development environment")
     load_dotenv(dotenv_path, verbose=True)
+    for key, value in os.environ.items():
+        os.environ[key] = str(value)
+
