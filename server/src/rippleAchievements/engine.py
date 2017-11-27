@@ -19,6 +19,7 @@ class AchievementEngine(object):
                     'category': cls.category,
                     'bonus': cls.bonus,
                     'condition': cls.condition,
+                    'icon': cls.icon,
                     'callback': construct_callback(cls)})
                 
                 if not created:

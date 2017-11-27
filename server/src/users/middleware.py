@@ -72,9 +72,12 @@ class AchievementChecker(object):
 
         for t in tasks:
             achievements = t.achievements.all() 
-            data['achievement'] = []
+            #data['achievement'] = []
             for a in achievements:
-                data['achievement'].append(engine.check_achievement(user=user, key=a.key))
+                result = engine.check_achievement(user=user, key=a.key)
+                if result["new"]:
+                    data["achievement"] = True
+                #data['achievement'].append(engine.check_achievement(user=user, key=a.key))
 
 
         response.content = json.dumps(data)

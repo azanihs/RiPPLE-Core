@@ -1,4 +1,5 @@
-import { Badge, AcquiredBadge } from "../interfaces/models";
+import { Badge } from "../interfaces/models";
+import { apiFetch } from "./APIRepository";
 const _n = i => Math.floor(Math.random() * i);
 const getCategory: any = i => ["connections", "engagement", "competencies"][i];
 
@@ -23,42 +24,62 @@ const _badgeDescriptions = [
     "Rejected a social connection"
 ];
 
-const badges = _badgeTitles.map((name, i) => {
+/*const badges = _badgeTitles.map((name, i) => {
     return {
         id: i,
         category: getCategory(_n(2)),
         name: name,
         description: _badgeDescriptions[i]
     };
-});
+});*/
 
-const userBadges = badges
+/*const userBadges = badges
     .filter((_, i) => Math.random() < 0.5)
-    .map((x: Badge, i) => {
-        const acquiredBadge: AcquiredBadge = {
-            id: i,
-            badge: x,
+    .map((x: any, i) => {
+        const acquiredBadge: Badge = {
+            id: "abc",
+            name: "badgeName",
+            category: "engagement",
             progress: Math.random() < 0.5 ? (Math.random() * 100) : -1,
-            dateAcquired: new Date()
+            percent: 0.5,
+            dateAcquired: new Date(),
+            description: "test"
         };
         return acquiredBadge;
-    });
+    });*/
+
+function toBadge(x: Badge): Badge {
+    const badge: Badge = {
+        key: x.key,
+        name: x.name,
+        category: x.category,
+        description: x.description,
+        count: x.count,
+        progress: x.progress,
+        dateAcquired: null,
+        icon: x.icon
+    };
+    return badge;
+}
+
+function toUserBadge(x: Badge): Badge {
+    const badge: Badge = {
+        key: x.key,
+        name: x.name,
+        description: x.description,
+        category: x.category,
+        count: x.count,
+        progress: x.progress,
+        icon: x.icon,
+        dateAcquired: null
+    };
+    return badge;
+}
 
 export default class BadgeRepository {
 
-    static getAllAvailableBadges(): Promise<Badge[]> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(badges.slice());
-            }, Math.random() * 1000);
-        });
-    }
-
-    static getAllUserBadges(): Promise<AcquiredBadge[]> {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve(userBadges.slice());
-            }, Math.random() * 1000);
-        });
+    static getAllUserBadges(): Promise<Badge[]> {
+        return apiFetch<Badge[]>("/users/achievements/progress/")
+            .then(x => x.map(x => toUserBadge(x)));
     }
 }
