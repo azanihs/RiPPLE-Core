@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from django.conf.urls.static import static
 from django.conf import settings
 
 from . import views
@@ -17,8 +16,10 @@ urlpatterns = [
     url(r'^competencies/all/$', views.competencies),
     url(r'^add/$', views.add),
 
+    url(r'^distribution/(.*)/$', views.distribution),
+
     url(r'^leaderboard/$', views.leaderboard_default),
     url(r'^leaderboard/(.*)/(.*)/$', views.leaderboard),
-    url(r'^search/$', views.search),
-    url(r'^add/$', views.add)
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    url(r'^search/$', views.search)
+]

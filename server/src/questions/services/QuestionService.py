@@ -13,6 +13,25 @@ def leaderboard_sort(class_instance, user_column):
         user_column).annotate(total=Count(user_column))
     return [x for x in query]
 
+def question_response_distribution(question_id):
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        return {"error": "Question ID " + str(question_id) + " does not exist"}
+
+    question_distractors = Distractor.objects.filter(question=question)
+    question_responses = QuestionResponse.objects.filter(response__in=question_distractors)
+    total_responses = question_responses.count()
+    response_distribution = {}
+
+    for i in question_distractors:
+        distractor_response_count = question_responses.filter(response=i).count()
+        if total_responses is 0:
+            response_distribution[i.id] = 0
+        else:
+            response_distribution[i.id] = (distractor_response_count / total_responses) * 100
+
+    return response_distribution
 
 def get_course_leaders(course, sort_field, sort_order, limit=25):
     def lookup_total(fieldName, user_id, data):
@@ -112,27 +131,29 @@ def rate_question(distractor_id, response, user):
 
 
 def calculate_question_score(attempts, is_correct):
+
     score_map = {
         1: 1 if is_correct else -1,
         2: 0.25 if is_correct else -1,
         3: -0.25 if is_correct else -1,
         4: -0.75 if is_correct else -1
     }
-    return score_map[attempts]
+    return score_map[min(4, attempts)]
 
 
 def update_question_score(user, question, new_score):
     """
-        Helper method to update the cached QuestionScore for a users question to new_score
+        Helper method to update the cached QuestionScore for a users question to new_score. Also increments the answer count for the question score
         Creates a QuestionScore is none exists
     """
     try:
         cached_question_score = QuestionScore.objects.get(
             user=user, question=question)
         cached_question_score.score = new_score
+        cached_question_score.number_answers += 1
         cached_question_score.save()
     except QuestionScore.DoesNotExist:
-        QuestionScore(user=user, question=question,
+        QuestionScore(user=user, question=question, number_answers=1,
                       score=new_score).save()
 
 
@@ -142,7 +163,6 @@ def update_competency(user, question, response):
     """
     # Weigh each topic
     weights = util.topic_weights(question.topics.all())
-
     for i in weights:
         topics = i["topics"]
         weight = i["weight"]

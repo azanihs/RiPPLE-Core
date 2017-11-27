@@ -72,6 +72,7 @@
     width: 100%;
     user-select: none;
     padding: 0px !important;
+    overflow: hidden;
 }
 
 .leftPanel {
@@ -196,7 +197,11 @@ export default class VariableDataVisualiser extends Vue {
     }) as string;
 
     pDataGeneratorFunction: Function | undefined = undefined;
-    pChartData: any = {};
+    pChartData: any = {
+        data: undefined,
+        options: undefined
+    };
+
     hiddenData = {};
     pChartType: string = "";
     pExcludeTopics = [];
@@ -208,7 +213,8 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     set chart(newVal: string) {
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .off(this.updateChartData);
 
         this.pChartType = newVal;
@@ -216,7 +222,8 @@ export default class VariableDataVisualiser extends Vue {
         this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
 
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .on(this.updateChartData);
     }
 
@@ -226,6 +233,7 @@ export default class VariableDataVisualiser extends Vue {
 
     set compare(newVal: string) {
         this.pCompareAgainst = newVal;
+        this.chart = this.chart;
     }
 
     toggleVisible(dataItem) {
@@ -278,11 +286,11 @@ export default class VariableDataVisualiser extends Vue {
             data: compareResults,
             label: this.compare,
             type: "line",
-            pointStyle: "triangle",
-            backgroundColor: "rgba(29, 50, 58, 0.6)",
-            showLine: false,
-            pointBorderColor: "rgba(29, 50, 58, 0.6)",
-            pointBackgroundColor: "rgba(29, 50, 58, 0.6)"
+            showLine: true,
+
+            backgroundColor: "rgba(245, 245, 245, 0.6)",
+            pointBorderColor: compareResults.map(x => this.getColour(x) + "0.4)"),
+            pointBackgroundColor: compareResults.map(x => this.getColour(x) + "0.6)")
         };
 
         const chartData = {
@@ -291,11 +299,6 @@ export default class VariableDataVisualiser extends Vue {
                 datasets: [ownData, compareData]
             },
             options: {
-                scale: {
-                    ticks: {
-                        beginAtZero: true
-                    }
-                },
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -332,7 +335,8 @@ export default class VariableDataVisualiser extends Vue {
 
         this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .on(this.updateChartData);
         this.$emit("changeTopics", this.dataCategories);
     }
@@ -340,7 +344,8 @@ export default class VariableDataVisualiser extends Vue {
     @Lifecycle
     destroyed() {
         window.removeEventListener("resize", this.updateChart);
-        Fetcher.get(this.pDataGeneratorFunction as any, { compareTo: this.compare, exclude: this.pExcludeTopics })
+        Fetcher.get(this.pDataGeneratorFunction as any,
+            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
             .off(this.updateChartData);
     }
 

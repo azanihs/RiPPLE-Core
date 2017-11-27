@@ -4,10 +4,11 @@ from json import loads
 import base64
 import imghdr
 from django.http import JsonResponse
+from django.conf import settings
 from django.core.files.base import ContentFile
 from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
-from users.services.TokenService import token_valid, generate_token, token_to_user_course
-
+from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
+from ripple.util import util
 
 def index(request):
     return JsonResponse({
@@ -50,6 +51,11 @@ def login(request, course_code):
 
     return JsonResponse(generate_token())
 
+def getUser(request, course_code=None):
+    if course_code != "":
+        return JsonResponse(get_user(course_code))
+
+    return JsonResponse({"error": "Course not provided"})
 
 def image_update(request):
     if request.method != 'POST':
@@ -63,6 +69,16 @@ def image_update(request):
             "error": "Missing image payload"
         }, status=405)
 
+    def _format(x):
+        if len(x) == 0: return x
+        return (x + "/") if x[-1] != "/" else x
+
     course_user = logged_in_user(request)
-    root_path = request.get_host()
+
+    root_path = util.merge_url_parts([
+        _format("//" + request.get_host()),
+        _format(settings.FORCE_SCRIPT_NAME),
+        _format("static")
+    ])
+
     return JsonResponse(update_user_image(course_user.user, root_path, new_image))

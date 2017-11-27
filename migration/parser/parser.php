@@ -1,48 +1,51 @@
 <?php
-
+ini_set('max_execution_time', 0);
 // Load the DOM parser
 include_once('question.php');
 
 //Make the parent dir readable
-// shell_exec("chmod 773 ..");
+
 $file = $_FILES['file']['tmp_name'];
-// $file = "data1.html";
 
 $doc = new DOMDocument();
 libxml_use_internal_errors(true);
 $doc->loadHTMLFile($file);
 libxml_clear_errors();
 
+$courseCode = $_POST['course_id'];
+$courseName = $_POST['course_name'];
+
 $xpath = new DOMXPath($doc);
-
-// $html = file_get_html('dummy-data.html');            
-// $html = file_get_html('buggy4.html');            
-$db = setupDatabaseOrig();
-$dbMod = setupDatabaseMod();
-
-$schema = array(
-	'peerwise_id' => SQLITE3_INTEGER,
-	'created_on' => SQLITE3_BLOB,	
-	'question' => SQLITE3_BLOB,
-	'alternative_a' => SQLITE3_BLOB,
-	'alternative_b' => SQLITE3_BLOB,
-	'alternative_c' => SQLITE3_BLOB,
-	'alternative_d' => SQLITE3_BLOB,	
-	'alternative_e' => SQLITE3_BLOB,
-	'correct_alternative' => SQLITE3_BLOB,
-	'explanation' => SQLITE3_BLOB,
-	'tags' => SQLITE3_BLOB,
-	'author' => SQLITE3_BLOB,
-	'average_rating' => SQLITE3_INTEGER,
-	'average_difficulty' => SQLITE3_INTEGER,
-	'total_ratings' => SQLITE3_INTEGER
-);
-
-
 $idname = 'displayQuestionTable';
 $questionTable = $xpath->query("//table[@id='" . $idname . "']");
 
-$totalSaveCount = 0;
+function sendJSON($json, $courseCode) {  
+	$url = "http://localhost:8000/questions/add/";
+	$auth = get_auth($courseCode)->{"token"};
+	$options = [
+		"http" => [
+			"header" => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: $auth",
+			"method" => "POST",
+			"content" => $json
+		]
+	];
+	$context = stream_context_create($options);
+	$result = file_get_contents($url,false,$context);
+}
+
+function get_auth($courseCode) {
+	$url = "http://localhost:8000/users/getUser/".$courseCode;
+	$options = [
+		"http" => [
+			"header" => "Content-Type: application/json\r\nAccept: application/json",
+			"method" => "GET"
+		]
+	];
+	$context = stream_context_create($options);
+	$result = file_get_contents($url, false, $context);
+	return json_decode($result);
+}
+
 
 function get_inner_html( $node ) 
 {
@@ -57,9 +60,10 @@ function get_inner_html( $node )
     return $innerHTML;
 }
 
+$topics = [];
 foreach ($questionTable as $node) {
 	$question = new Question();
-
+	
 	$tbody = $node->getElementsByTagName('tbody');
 	foreach ($tbody as $q) {
 		$rows = $q->getElementsByTagName('tr');
@@ -75,74 +79,51 @@ foreach ($questionTable as $node) {
 		}
 	}
 
+	$json = $question->question_as_json($topics);
 
-
-	if ($question->question_as_json($schema) == TRUE) {
-		echo "ha";		
+	foreach ($json["topics"] as $topic) {
+		array_push($topics, $topic["name"]);
 	}
-	/*if( $question->save_to_db($db, $schema) == TRUE){
-		
-		$question->save_to_db($dbMod, $schema);
-		
-		$totalSaveCount++;
-	}*/
+
 }
 
-echo json_encode( array('totalSaveCount' => $totalSaveCount, 'result' => 'success' ) );
+$topics = array_values(array_unique($topics));
+$questions = Array();
 
+$questionsAdded = 0;
 
+foreach ($questionTable as $node) {
+	$question = new Question();
 
+	$tbody = $node->getElementsByTagName('tbody');
+	foreach ($tbody as $q) {
+		$rows = $q->getElementsByTagName('tr');
+		$numrows = $rows->length;
+		$d = new DOMDocument();
+		for ($i = 1; $i < $numrows; $i++) {
+			$row = $rows->item($i);
 
+			$key = get_inner_html($row->childNodes->item(0)); //td 1 (leftClear)
+			$value = get_inner_html($row->childNodes->item(1)); // td 2 (middleClear)
 
-function setupDatabaseOrig(){
-	$db = new SQLite3(__DIR__."/../pw_orig.db");
+			$question->assign_values($key, $value, $topics);
+		}
+	}
 
-	$db->exec('CREATE TABLE IF NOT EXISTS peerwise_questions (
-		id 				INTEGER PRIMARY KEY AUTOINCREMENT,
-		peerwise_id 	INTEGER UNIQUE, 
-		created_on 		BLOB,
-		question 		BLOB,
-		alternative_a	BLOB,
-		alternative_b	BLOB,
-		alternative_c	BLOB,
-		alternative_d	BLOB,
-		alternative_e	BLOB,
-		correct_alternative BLOB, 
-		explanation		BLOB,
-		tags 			BLOB,
-		author 			BLOB,
-		average_rating 		INTEGER,
-		average_difficulty 	INTEGER,
-		total_ratings 		INTEGER
-		)');
-
-	return $db;
-}
-
-function setupDatabaseMod(){
-	$db = new SQLite3("../pw_mod.db");
+	$json = $question->question_as_json($topics);
+	array_push($questions, $json);
+	//sendJson($json, $courseCode);
 	
-	$db->exec('CREATE TABLE IF NOT EXISTS peerwise_questions (
-		id 				INTEGER PRIMARY KEY AUTOINCREMENT,
-		peerwise_id 	INTEGER UNIQUE, 
-		created_on 		BLOB,
-		question 		BLOB,
-		alternative_a	BLOB,
-		alternative_b	BLOB,
-		alternative_c	BLOB,
-		alternative_d	BLOB,
-		alternative_e	BLOB,
-		correct_alternative BLOB, 
-		explanation		BLOB,
-		tags 			BLOB,
-		author 			BLOB,
-		average_rating 		INTEGER,
-		average_difficulty 	INTEGER,
-		total_ratings 		INTEGER,
-		quiz_topic BLOB DEFAULT dni
-		)');
-
-	return $db;
+	$questionsAdded++;
 }
+
+$result = ["topics"=>$topics,"questions"=>$questions];
+
+$jsonFile = fopen("../".$courseName.".json", "w");
+
+//echo json_encode($result,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+fwrite($jsonFile, json_encode($result));
+fclose($jsonFile);
+
 
 ?>

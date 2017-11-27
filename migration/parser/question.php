@@ -1,21 +1,4 @@
 <?php
-    function sendJSON($json) {    
-        
-
-        $url = "http://localhost:8000/questions/add/";
-        $auth = "1SqfRUH37ZLCUHETpURLtnPAYCYiSrPo";
-        $options = [
-            "http" => [
-                "header" => "Content-Type: application/json\r\nAccept: application/json\r\nAuthorization: $auth",
-                "method" => "POST",
-                "content" => $json
-            ]
-        ];
-        $context = stream_context_create($options);
-        $result = file_get_contents($url,false,$context);
-        //var_dump($result);
-    }
-
     class Question {
         var $peerwise_id;
         var $created_on;
@@ -44,7 +27,7 @@
         var $average_difficulty;
         var $total_ratings;
     
-        public function assign_values($key, $value){
+        public function assign_values($key, $value) {
             switch ($key) {
                 case 'ID':
                     $d = new domDocument; 
@@ -173,35 +156,7 @@
             }
         }
 
-        
-        public function save_to_db($db, $schema){
-            $query = "INSERT INTO peerwise_questions ";
-
-            $keys = '';
-            $bindings = '';
-            foreach ($schema as $colname => $coltype) {
-                $keys .= $colname . ',';
-                $bindings .= ':' . $colname . ',';
-            }
-            $keys = rtrim($keys, ",");
-            $bindings = rtrim($bindings, ",");
-            $query .= "( " . $keys . " )";
-            $query .= " VALUES ( " . $bindings . " )";
-            $stmt = $db->prepare( $query );
-
-
-            foreach ($schema as $colname => $coltype) {
-                $value = $this->get_colvalue($colname);
-                $stmt->bindValue( ':' . $colname, $value, $coltype);
-            }
-
-            $result = $stmt->execute();
-            if($result != FALSE){
-                return TRUE;
-            }
-        }
-
-        public function question_as_json($schema) {
+        public function question_as_json($topics) {
             $this->extract_images();
             $questionJSON = array("question" => 
                         array("content" => $this->get_colvalue("question"),
@@ -209,10 +164,10 @@
                     "explanation" => 
                         array("content" => $this->get_colvalue("explanation"),
                             "payloads" => $this->explanation_image),
-                    "responses" => $this->get_responses($schema),
-                    "topics" => $this->get_topics($this->get_colvalue("tags")));
-            //sendJSON($questionJSON);
-            sendJSON(json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                    "responses" => $this->get_responses(),
+                    "topics" => $this->get_topics($topics, $this->get_colvalue("tags")));
+            return $questionJSON;
+            //return json_encode($questionJSON,JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         public function get_responses() {
@@ -234,20 +189,13 @@
             $arr[$correct]["isCorrect"] = true;
 
             return $arr;
-
         }
 
-        public function get_topics($tags) {
+        public function get_topics($topics, $tags) {
             $tag_list = array();
             $used_tags = array();
             foreach (explode(", ", $tags) as $i) {
-                $id = $this->get_tag($i);
-                if (array_search($id, $used_tags)===FALSE) {
-                    $tag = array("name" => $i,
-                        "id" => $id);
-                    array_push($tag_list,$tag);
-                    array_push($used_tags, $id);
-                }
+                array_push($tag_list, array("name"=>$i,"id"=>0));
             }
             return array_values($tag_list);
         }
@@ -267,7 +215,7 @@
                     }
                     $src = $img->getAttribute("src");
                     $img->setAttribute("src", "#:".$i);
-                    $this->$obj = $this->get_inner_html($doc->getElementsByTagName("body")[0]);
+                    $this->$obj = $this->get_inner_html($doc->getElementsByTagName("body")->item(0));
                     $phpPath = str_replace("png", "php", $src);
                     $data = file_get_contents(getcwd()."/../".$phpPath);
                     $base64 = "data:image/png;base64,".base64_encode($data);
@@ -281,50 +229,15 @@
 
         }
 
-        public function innerHTML($node) {
-            return implode(array_map([$node->ownerDocument,"saveXML"],
-                iterator_to_array($node->childNodes)));
-        }
-
-        public function get_tag($tag) {
-            if ($tag == "Data_Flow_Diagram") {
-                return 0;
-            } elseif ($tag == "ER_Diagrams" || $tag == "Conceptual_Modelling" ||
-                $tag == "Participation_Constraints" || $tag == "Cardinality_Constraints" ||
-                $tag == "Recursive_Relationships" || $tag == "Weak_Entities" ||
-                $tag == "Ternary_Relationships") {
-                return 1;
-            } elseif ($tag == "Integrity_Constraints" || $tag == "Relational Model" || 
-                $tag == "Foreign_Keys") {
-                return 2;
-            } elseif ($tag == "Super_keys" || $tag == "Keys" || $tag == "Functional_Dependancies") {
-                return 3;
-            } elseif ($tag == "Transitive_Dependency" || $tag == "Normalization" ||
-                $tag == "Normal_Forms" || $tag == "BCNF" || $tag == "3NF") {
-                return 4;
-            } elseif ($tag == "SQL" || $tag == "Correlated_Queries" || $tag == "DDL" ||
-                $tag == "DML" || $tag == "Nested_Queries" || $tag == "Group_by" ||
-                $tag == "Aggregation") {
-                return 5;
-            } else {
-                return 5;
-            }
-        }
-
-        function get_inner_html( $node ) 
-        {
+        function get_inner_html( $node ) {
             $innerHTML= '';
             $children = $node->childNodes;
-             
+
             foreach ($children as $child)
             {
                 $innerHTML .= $child->ownerDocument->saveXML( $child );
-            }
-             
+            }       
             return $innerHTML;
-        }
-
-        
-        
+        }     
 }
 ?>

@@ -1,6 +1,6 @@
 <template>
     <md-layout md-flex="100">
-        <ul class="questionResponse">
+        <ul class="responsesContainer">
             <li v-for="(possibleAnswer, index) in question.distractors"
                 :key="index"
                 :class="getResponseStyles(possibleAnswer)">
@@ -9,12 +9,8 @@
                     <div class="answerIcon">
                         <md-icon>{{ optionIcon(possibleAnswer) }}</md-icon>
                     </div>
-                    <span v-html="String.fromCharCode('A'.charCodeAt(0) + index) + '. ' + possibleAnswer.content"></span>
+                    <span class="distractorIndex">{{distractorIndex(index)}}.</span>
                 </div>
-                <md-checkbox v-else-if="Array.isArray(question.solution)"
-                    :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
-                    :name="index"
-                    :id="possibleAnswer.id">{{index}}</md-checkbox>
                 <md-radio v-else
                     class="answerOption"
                     :disabled="!!disabledResponses.find(x => x == possibleAnswer)"
@@ -23,8 +19,9 @@
                     name="answer"
                     @click.native="clickedResponse"
                     :id="'' + possibleAnswer.id">
-                        {{String.fromCharCode('A'.charCodeAt(0) + index)}}. <span style="display: inline-block" v-html="possibleAnswer.content"></span>
+                        <span class="distractorIndex">{{distractorIndex(index)}}.</span>
                 </md-radio>
+                <div class="questionContent" @click="questionResponse = index" v-html="possibleAnswer.content"></div>
                 <div class="distributionOverlay"
                     :style="answerOptionFill(possibleAnswer)"></div>
             </li>
@@ -62,13 +59,17 @@
     </md-layout>
 </template>
 
-<style>
-.answerOption .answerIcon + span > * {
-    display: inline-block;
-}
-</style>
 <style scoped>
-.questionResponse {
+.distractorIndex {
+    line-height: 24px;
+    font-size: 14px;
+    height: 24px;
+    flex: 1;
+    align-items: center;
+    display: flex;
+    margin-left: 0.5em;
+}
+.responsesContainer {
     list-style: none;
     margin: 0px;
     padding: 0px;
@@ -77,26 +78,46 @@
     margin-top: 1em;
 }
 
-.questionResponse li {
+.responsesContainer li {
     list-style: none;
     cursor: pointer;
     position: relative;
     transition: background-color 500ms ease;
-}
-
-.answerOption {
     width: 100%;
     cursor: pointer;
-    padding: 1em 2em;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     border: 1px solid #ddd;
     margin: 0px 8px 16px 0;
+}
+.answerOption {
+    background-color: #fafafa;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    padding: 1em;
+    margin-top: 0px;
+    margin-bottom: 16px;
+
+    display: flex;
+    flex: 1;
+    align-items: center;
+}
+.answered.incorrect .answerOption {
+    background-color: #f1dfdf;
+}
+.answered.correct .answerOption {
+    background-color: #256;
 }
 
 .answerOption .answerIcon {
     margin-left: -4px;
-    margin-right: 15px;
+    display: inline-block;
+}
+
+.questionContent {
+    padding: 1em;
 }
 
 .distributionOverlay {
@@ -134,8 +155,8 @@ h2 {
 <style>
 .answerOption .md-radio-label {
     height: auto !important;
-    padding-left: 0px;
-    margin-left: 0.5em;
+    padding-left: 0px !important;
+    margin-left: 0px !important;
 }
 
 .answerOption .md-radio-container {
@@ -146,10 +167,11 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Question } from "../../interfaces/models";
+import { Question, Distractor } from "../../interfaces/models";
 import Comment from "../util/Comment.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionService from "../../services/QuestionService";
+import Fetcher from "../../services/Fetcher";
 import * as d3 from "d3";
 
 @Component({
@@ -159,11 +181,31 @@ import * as d3 from "d3";
     }
 })
 export default class QuestionResponse extends Vue {
-    @Prop question: Question;
+    @Prop question = p<Question>({
+        required: true
+    });
 
     userAnswer: number = -1;
     hasGivenUp = false;
     disabledResponses = [];
+
+    pResponseDistribution: {[id: number]: number} = {};
+
+    updateResponseDistribution(newDistribution) {
+        this.pResponseDistribution = newDistribution;
+    }
+
+    @Lifecycle
+    created() {
+        QuestionService.distributionForQuestion(this.question)
+            .then(this.updateResponseDistribution);
+    }
+
+    @Watch("question")
+    questionChanged(oldQuestion, newQuestion) {
+        QuestionService.distributionForQuestion(this.question)
+            .then(this.updateResponseDistribution);
+    }
 
     feedbackEnter(el: HTMLElement, done) {
         el.style.height = "auto";
@@ -222,19 +264,20 @@ export default class QuestionResponse extends Vue {
             });
     }
 
-    answerOptionFill(response) {
+    answerOptionFill(response: Distractor) {
         if (this.userHasCorrectAnswer) {
             return {
-                width: (QuestionService.distributionForQuestion(this.question).get(response) * 100) + "%"
+                width: this.pResponseDistribution[response.id] + "%"
             };
         }
         return {};
     }
 
+    distractorIndex(index: number) {
+        return String.fromCharCode("A".charCodeAt(0) + index);
+    }
+
     optionIcon(solution) {
-        if (Array.isArray(this.question.solution)) {
-            return this.question.solution.find(x => x == solution.id) ? "done" : "clear";
-        }
         return this.question.solution == solution ? "done" : "clear";
     }
 

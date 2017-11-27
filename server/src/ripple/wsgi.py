@@ -11,7 +11,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 from ripple.load_env import init_env
 
-init_env('../.current.env')
+init_env('../.env.current')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ripple.settings")
 
