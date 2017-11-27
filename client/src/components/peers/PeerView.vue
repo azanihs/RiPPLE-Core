@@ -54,6 +54,7 @@ export default class PeerView extends Vue {
     pCourseAvailability = [];
     pUserAvailability = [];
     pStudyRoles = [];
+    pUserAvailableRoles = [];
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -73,6 +74,9 @@ export default class PeerView extends Vue {
     updateStudyRoles(roles) {
         this.pStudyRoles = roles;
     }
+    updateUserAvailableRoles(availableRoles) {
+        this.pUserAvailableRoles = availableRoles;
+    }
 
     @Lifecycle
     created() {
@@ -88,6 +92,8 @@ export default class PeerView extends Vue {
             .then(this.updateUserAvailability);
         AvailabilityService.getStudyRoles()
             .then(this.updateStudyRoles);
+        AvailabilityService.getUserAvailableRoles()
+            .then(this.updateUserAvailableRoles);
     }
 
     @Lifecycle

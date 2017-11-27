@@ -1,4 +1,4 @@
-import { Availability, CourseAvailability, Time, StudyRole } from "../interfaces/models";
+import { Availability, CourseAvailability, Time, StudyRole, AvailableRole } from "../interfaces/models";
 import { setToken, apiFetch } from "./APIRepository";
 
 export default class AvailabilityRepository {
@@ -39,4 +39,10 @@ export default class AvailabilityRepository {
         return apiFetch("/recommendations/roles/all")
             .then(x => x.json());
     }
+
+    static getUserAvailableRoles(): Promise<AvailableRole[]> {
+        return apiFetch("/recommendations/roles/")
+            .then(x => x.json());
+    }
+
 }

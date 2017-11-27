@@ -45,3 +45,8 @@ def utc_times(request):
 def study_roles(request):
     roles = [x.toJSON() for x in AvailabilityService.get_study_roles()]
     return JsonResponse(roles, safe=False)
+
+def user_roles(request):
+    logged_in_user = UserService.logged_in_user(request)
+    available_roles = [x.toJSON() for x in AvailabilityService.get_user_available_roles(logged_in_user)]
+    return JsonResponse(available_roles, safe=False)
