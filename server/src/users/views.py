@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from json import loads
+import json
 import base64
 import imghdr
 from django.http import JsonResponse
@@ -9,8 +10,9 @@ from django.core.files.base import ContentFile
 from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from users.models import User
-from ripple.util import util
+from rippleAchievements.models import Achievement
 from rippleAchievements.engine import engine
+from ripple.util import util
 
 def index(request):
     return JsonResponse({
@@ -53,7 +55,7 @@ def login(request, course_code):
 
     return JsonResponse(generate_token())
 
-def getUser(request, course_code=None):
+def get_user(request, course_code=None):
     if course_code != "":
         return JsonResponse(get_user(course_code))
 
@@ -84,3 +86,33 @@ def image_update(request):
     ])
 
     return JsonResponse(update_user_image(course_user.user, root_path, new_image))
+
+
+def get_all_user_achievements(request):
+    user = logged_in_user(request)
+
+    achievements = Achievement.objects.all()
+    data = []    
+    for ach in achievements:
+        data.append(engine.check_achievement(user=user, key=ach.key))
+    
+    #result = json.dumps(data)
+    print(data)
+    return JsonResponse(data, safe=False)
+
+def get_all_achievements(request):
+    user = logged_in_user(request)
+
+    achievements = Achievement.objects.all()
+
+    data = []
+    for ach in achievements:
+        data.append({"key": ach.key,
+            "name": ach.name,
+            "description": ach.description,
+            "category": ach.category,
+            "bonus": ach.bonus,
+            "condition": ach.condition,
+            "icon": ach.icon})
+    print(data)
+    return JsonResponse(data, safe=False)

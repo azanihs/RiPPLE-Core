@@ -16,8 +16,8 @@ abstractmethod = abc.abstractmethod
 
 class TaskReference():
     ### [viewName, viewURL, taskName]
-    ref = [["add", "/questions/add", "addQuestion"],
-        ["respond", "/questions/respond", "questionResponse"]
+    ref = [["add", "/questions/add", "add_question"],
+        ["respond", "/questions/respond", "question_response"]
     ]
 
 ################################################
@@ -55,6 +55,10 @@ class AbstractAchievementClass(ABC):
     @abstractproperty
     def condition(self):
         pass
+    
+    @abstractproperty
+    def icon(self):
+        pass
         
     @abstractproperty
     def tasks(self):
@@ -65,10 +69,10 @@ class AbstractAchievementClass(ABC):
         pass
 
     def toJSON(self):
-        return {"name": self.name, "key": self.key, "description": self.description, 
-            "category": self.category, "bonus": self.bonus}
+        return {"key": self.key, "name": self.name, "key": self.key, "description": self.description, 
+            "category": self.category, "icon":self.icon, "bonus": self.bonus}
 
-    def getResult(self, count, progress):
+    def get_result(self, count, progress):
         json = self.toJSON()
         json["count"] = count
         json["progress"] = progress
@@ -76,87 +80,93 @@ class AbstractAchievementClass(ABC):
 
 class BeginnerAuthorAchievement(AbstractAchievementClass):
     name = "Beginner Question Author"
-    key = "beginnerAuthor"
+    key = "beginner_author"
     description = "Awarded for authoring 5 questions"
-    category = "Engagement"
+    category = "engagement"
     bonus = 5.0
     condition = 5
-    tasks = ["addQuestion"]
+    icon = "Bronze"
+    tasks = ["add_question"]
 
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
-        progress = min(1, count/self.condition)
-        return self.getResult(count, progress)
+        progress = min(100, count/self.condition*100)
+        return self.get_result(count, progress)
 
 class IntermediateAuthorAchievement(AbstractAchievementClass):
     name = "Intermediate Question Author"
-    key = "intermediateAuthor"
+    key = "intermediate_author"
     description = "Awarded for authoring 10 questions"
-    category = "Engagement"
+    category = "engagement"
     bonus = 10.0
     condition = 10
-    tasks = ["addQuestion"]
+    icon = "Silver"
+    tasks = ["add_question"]
 
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
-        progress = min(1, count/self.condition)
-        return self.getResult(count, progress)
+        progress = min(100, count/self.condition*100)
+        return self.get_result(count, progress)
 
 class AdvancedAuthorAchievement(AbstractAchievementClass):
     name = "Advanced Question Author"
-    key = "advancedAuthor"
+    key = "advanced_author"
     description = "Awarded for authoring 20 questions"
-    category = "Engagement"
+    category = "engagement"
     bonus = 20.0
     condition = 20
-    tasks = ["addQuestion"]
+    icon = "Gold"
+    tasks = ["add_question"]
 
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
-        progress = min(1, count/self.condition)
-        return self.getResult(count, progress)
+        progress = min(100, count/self.condition*100)
+        return self.get_result(count, progress)
 
 class BeginnerResponseAchievement(AbstractAchievementClass):
     name = "Beginner Response"
-    key = "beginnerResponse"
+    key = "beginner_response"
     description = "Awarded for answering 10 questions"
-    category = "Engagement"
+    category = "engagement"
     bonus = 5.0
     condition = 10
-    tasks = ["questionResponse"]
+    icon = "Monkey"
+    tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
         responses = QuestionResponse.objects.filter(user=user).only('id').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
-        progress = min(1, count/self.condition)
-        return self.getResult(count, progress)
+        progress = min(100, count/self.condition*100)
+        return self.get_result(count, progress)
 
 class IntermediateResponseAchievement(AbstractAchievementClass):
     name = "Intermediate Response"
-    key = "intermediateResponse"
+    key = "intermediate_response"
     description = "Awarded for answering 25 questions"
-    category = "Engagement"
+    category = "engagement"
     bonus = 10.0
     condition = 25
-    tasks = ["questionResponse"]
+    icon = "Spider"
+    tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
         responses = QuestionResponse.objects.filter(user=user).only('id').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
-        progress = min(1, count/self.condition)
-        return self.getResult(count, progress)
+        progress = min(100, count/self.condition*100)
+        return self.get_result(count, progress)
 
 class AdvancedResponseAchievement(AbstractAchievementClass):
     name = "Advanced Response"
-    key = "advancedResponse"
+    key = "advanced_response"
     description = "Awarded for answering 50 questions"
-    category = "Engagement"
+    category = "engagement"
     bonus = 20.0
     condition = 50
-    tasks = ["questionResponse"]
+    icon = "Web"
+    tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
         responses = QuestionResponse.objects.filter(user=user).only('id').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True  ).count()
-        progress = min(1, count/self.condition)
-        return self.getResult(count, progress)
+        progress = min(100, count/self.condition*100)
+        return self.get_result(count, progress)

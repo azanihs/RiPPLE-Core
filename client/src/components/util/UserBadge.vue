@@ -90,12 +90,12 @@
 import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
 import PropUpdate from "../mixins/PropUpdate";
 
-import { AcquiredBadge, Badge } from "../../interfaces/models";
+import { Badge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
 import Fetcher from "../../services/Fetcher";
 
 @Component()
-export default class UserBadge extends PropUpdate {
+export default class Badges extends PropUpdate {
     @Prop badge = p({
         required: true
     }) as Badge;
@@ -108,13 +108,13 @@ export default class UserBadge extends PropUpdate {
 
     @Lifecycle
     created() {
-        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.id })
+        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.key })
             .on(this.updateBadge);
     }
 
     @Lifecycle
     destroyed() {
-        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.id })
+        Fetcher.get(BadgeService.userHasBadge, { badgeId: this.badge.key })
             .off(this.updateBadge);
     }
 
@@ -122,7 +122,7 @@ export default class UserBadge extends PropUpdate {
         return BadgeService.badgeToIcon(this.badge);
     }
 
-    get userBadge(): AcquiredBadge {
+    get userBadge():Badge {
         return this.pUserBadge;
     }
 

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_achievement_class(cls):
-    return [attribute for attribute in ['name', 'key', 'description', 'category', 'bonus', 'condition', 'tasks', 'evaluate'] if not hasattr(cls, attribute)]
+    return [attribute for attribute in ['name', 'key', 'description', 'category', 'bonus', 'condition', 'icon', 'tasks', 'evaluate'] if not hasattr(cls, attribute)]
 
 
 def load_classes(classes=settings.ACHIEVEMENT_CLASSES, *args, **kwargs):
@@ -85,6 +85,7 @@ class Achievement(models.Model):
     category = models.CharField(default="", max_length=75)
     bonus = models.IntegerField(default=0)
     condition = models.IntegerField(default=1)
+    icon = models.CharField(default="Bronze", max_length=30)
     callback = models.TextField()
 
     def __unicode__(self):

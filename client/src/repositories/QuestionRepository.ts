@@ -2,6 +2,8 @@ import { apiFetch } from "./APIRepository";
 import { Question, Topic, QuestionUpload } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
+type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
+
 function toQuestion(x: Question): Question {
     const question: Question = {
         id: x.id,
@@ -20,7 +22,7 @@ function toQuestion(x: Question): Question {
 
 export default class QuestionRepository {
     static uploadQuestion(question: QuestionUpload): Promise<Question> {
-        return apiFetch(`/questions/add/`, {
+        return apiFetch<Question>(`/questions/add/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -28,14 +30,12 @@ export default class QuestionRepository {
             }),
             body: JSON.stringify(question)
         })
-            .then(x => x.json())
             .then(x => x["question"])
             .then(response => toQuestion(response));
     }
 
     static getMany(count: number): Promise<Question[]> {
-        return apiFetch(`/questions/all/`)
-            .then(questions => questions.json())
+        return apiFetch<Question[]>(`/questions/all/`)
             .then(questions => questions.map(x => toQuestion(x)));
     }
 
@@ -45,7 +45,7 @@ export default class QuestionRepository {
         filterTopics: string[] | undefined,
         query: string | undefined,
         page: string | undefined) {
-        return apiFetch(`/questions/search/`, {
+        return apiFetch<SearchResult>(`/questions/search/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -60,7 +60,6 @@ export default class QuestionRepository {
                 page
             })
         })
-            .then(questions => questions.json())
             .then(searchResult => ({
                 totalItems: searchResult.totalItems,
                 questions: searchResult.items.map(x => toQuestion(x)),
@@ -78,11 +77,7 @@ export default class QuestionRepository {
             body: JSON.stringify({
                 distractorID: distractorID
             })
-        })
-            .then(x => {
-                return x.json()
-                    .catch(_ => x);
-            });
+        });
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
@@ -96,11 +91,7 @@ export default class QuestionRepository {
                 distractorID: distractorID,
                 [`${rateType}`]: rateValue
             })
-        })
-            .then(x => {
-                return x.json()
-                    .catch(_ => x);
-            });
+        });
     }
 
 }
