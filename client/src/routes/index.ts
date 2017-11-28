@@ -58,7 +58,7 @@ const routes = [{
         name: "questions",
         component: QuestionBrowser
     }, {
-        path: "/question/write",
+        path: "/question/create",
         name: "questions",
         component: AuthorView
     }, {
