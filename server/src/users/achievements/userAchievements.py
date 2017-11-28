@@ -257,7 +257,7 @@ class AdvancedConnectionAchievement(AbstractAchievementClass):
     category = "connections"
     bonus = 20.0
     condition = 20
-    icon = "record_voice_ver"
+    icon = "record_voice_over"
     tasks = []
 
     def evaluate(self, user, *args, **kwargs):
