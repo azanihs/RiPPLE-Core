@@ -271,13 +271,13 @@ export default class Main extends Vue {
         const baseLinks = [{
             text: "Questions",
             href: "/question/answer",
-            icon: "lightbulb_outline",
+            icon: "question_answer",
             submenu: [{
                 text: "Answer",
                 href: "/question/answer"
             }, {
-                text: "Write",
-                href: "/question/Write"
+                text: "Create",
+                href: "/question/create"
             }]
         }, {
             text: "Connect",
