@@ -35,7 +35,7 @@
                             <li v-for="submenuLink in link.submenu"
                                 :key="submenuLink.href">
                                 <router-link :to="submenuLink.href"
-                                    @click.native="keepProfileActive(link)" 
+                                    @click.native="keepProfileActive(link)"
                                     class ="profileSubmenu md-button routerLink">
                                     <span>{{ submenuLink.text }}</span>
                                 </router-link>
@@ -70,7 +70,7 @@
     background-color: #18181b;
     font-size: 0.8em;
     color: #fff;
-    padding: 0px 20px !important; 
+    padding: 0px 20px !important;
 }
 
 .menuContainer h2 {
@@ -167,12 +167,12 @@ a.routerLink:hover {
 }
 
 .router-link-exact-active.router-link-active,
-.router-link-exact-active.router-link-active:hover,
-.submenu-active, .profileSubmenu:hover  {
+.router-link-exact-active.router-link-active:hover {
     /* Sets the background colour of the currently selected item */
     background-color: #ffffff !important;
     color: #111 !important;
 }
+
 </style>
 
 <style>
@@ -401,6 +401,6 @@ export default class Main extends Vue {
         };
     }
 
-    
+
 }
 </script>

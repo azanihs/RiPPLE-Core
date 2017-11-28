@@ -41,13 +41,13 @@ def add_question(question_request, host, user):
             # Question Images
             images = question.get("payloads", None)
             if images:
-                if not decodeImages(str(questionObj.id), images, "q", host):
+                if not decodeImages(str(questionObj.id), questionObj, images, "q", host):
                     raise IntegrityError("Invalid Question Image")
 
             # Explanation Images
             images = explanation.get("payloads", None)
             if images:
-                if not decodeImages(str(questionObj.id), images, "e", host):
+                if not decodeImages(str(questionObj.id), questionObj, images, "e", host):
                     raise IntegrityError("Invalid Explanation Image")
 
             # Topics
@@ -73,7 +73,7 @@ def add_question(question_request, host, user):
                 # Distractor Images
                 images = responses[i].get("payloads", None)
                 if images:
-                    if not decodeImages(str(distractor.id), images, "d", host):
+                    if not decodeImages(str(distractor.id), distractor, images, "d", host):
                         raise IntegrityError("Invalid Distractor Image")
     except IntegrityError as e:
         return {"state": "Error", "error": str(e)}
