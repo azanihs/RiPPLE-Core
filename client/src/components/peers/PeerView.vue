@@ -107,8 +107,8 @@ export default class PeerView extends Vue {
         UserService.getOutstandingRequests({ count: 3 })
             .then(this.updateRequests);
 
-        AvailabilityService.getUserAvailability()
-            .then(this.updateUserAvailability);
+        Fetcher.get(AvailabilityService.getUserAvailability)
+            .on(this.updateUserAvailability);
 
         Promise.all([
             AvailabilityService.getDays(),
@@ -123,6 +123,8 @@ export default class PeerView extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
+        Fetcher.get(AvailabilityService.getUserAvailability)
+            .off(this.updateUserAvailability);
     }
 
     get topics() {
