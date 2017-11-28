@@ -1,32 +1,12 @@
-var config = require('../config')
-var webpack = require('webpack')
-var merge = require('webpack-merge')
-var utils = require('./utils')
-var baseWebpackConfig = require('./webpack.base.conf')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
-var path = require('path')
-var Dotenv = require('dotenv-webpack');
-
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function(name) {
-    baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
-})
+const webpack = require("webpack")
+const merge = require("webpack-merge")
+const baseWebpackConfig = require("./webpack.base.conf")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const Dotenv = require("dotenv-webpack");
 
 module.exports = merge(baseWebpackConfig, {
     module: {
-        loaders: utils.styleLoaders({
-            sourceMap: config.dev.cssSourceMap
-        }),
         rules: [{
-            test: /\.scss$/,
-            use: [{
-                loader: "style-loader" // creates style nodes from JS strings
-            }, {
-                loader: "css-loader" // translates CSS into CommonJS
-            }, {
-                loader: "sass-loader" // compiles Sass to CSS
-            }]
-        }, {
             test: /\.css$/,
             use: [{
                 loader: "style-loader"
@@ -38,9 +18,6 @@ module.exports = merge(baseWebpackConfig, {
             loader: 'vue-loader',
             options: {
                 esModule: true,
-                postLoaders: {
-                    'ts': 'istanbul-instrumenter-loader?esModules=true'
-                },
                 postcss: [
                     require('autoprefixer')({
                         browsers: ['last 2 versions']
