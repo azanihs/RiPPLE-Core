@@ -65,9 +65,9 @@ def get_topics(file):
     return data["topics"]
 
 
-def parse_questions(file, course_users, all_topics):
+def parse_questions(file, course_users, all_topics, host):
     host = merge_url_parts([
-        _format("//" + "localhost:8000"),
+        _format(host),
         _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
@@ -184,6 +184,7 @@ class Command(BaseCommand):
         parser.add_argument("--name", nargs="+")
         parser.add_argument("--course", nargs="+")
         parser.add_argument("--file", nargs="+")
+        parser.add_argument("--host")
 
     def handle(self, *args, **options):
         if(len(options["name"])!=len(options["course"]) or len(options["name"])!=len(options["file"])):
@@ -192,6 +193,7 @@ class Command(BaseCommand):
         course_names = options["name"]
         course_codes = options["course"]
         course_files = options["file"]
+        host = options["host"]
 
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
@@ -204,7 +206,7 @@ class Command(BaseCommand):
                         CourseUser.objects.create(user=user, course=course))
 
             print("\t-Making Questions")
-            distractors = parse_questions(file, course_users, all_topics)
+            distractors = parse_questions(file, course_users, all_topics, host)
 
             print("\t-Answering and Rating Questions")
             for user in course_users:
