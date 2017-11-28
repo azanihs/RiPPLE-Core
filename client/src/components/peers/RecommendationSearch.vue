@@ -34,7 +34,7 @@
         </md-layout>
         <md-tabs md-fixed
                 :mdNavigation="false"
-                 class="md-transparent">
+                class="connect-tabs">
             <md-tab md-label="Find"
                     class="tab">
                 <md-layout md-flex="100"
@@ -66,6 +66,38 @@
         </md-tabs>
     </md-layout>
 </template>
+
+<style>
+
+    .connect-tabs .md-tabs-navigation-container {
+        background-color: #4d656d; 
+    }
+
+    .connect-tabs .md-tab-header {
+        background-color: #256; 
+        border-bottom: 6px solid #f2f2f2;  
+    }
+
+    .connect-tabs .md-tab-header:hover {
+        background-color: rgba(34,85,102, 0.4);
+    }
+    
+    .connect-tabs span {
+        font-weight: bold;
+        font-family: Verdana,Arial,Helvetica,sans-serif;
+    }
+    .connect-tabs .md-active span {
+        color: #f2f2f2;   
+    }
+
+    .connect-tabs .md-tab-indicator{
+        background-color: #1d323a !important;
+        height: 6px;
+    }
+
+
+    
+</style>
 
 <style scoped>
 .tab {
