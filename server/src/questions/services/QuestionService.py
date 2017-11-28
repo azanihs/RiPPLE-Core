@@ -75,6 +75,9 @@ def respond_to_question(distractor_id, user):
     except Distractor.DoesNotExist:
         return None
 
+    if answered_option.question.author.course != user.course:
+        raise ValueError("Question course and user course do not match")
+
     response = QuestionResponse(
         user=user,
         response=answered_option
