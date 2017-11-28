@@ -12,7 +12,8 @@ export default class BadgeService {
     }
 
     static getBadgesByCategory(badges: Badge[], category: string) {
-        return badges.filter(x => x.category === category);
+        return badges.filter(x => x.category === category)
+                .sort((a, b) => b.progress - a.progress);
     }
 
     static getClosestUserBadges(badges: Badge[]) {
