@@ -1,4 +1,4 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionImage, ExplanationImage, DistractorImage
 from django.db import IntegrityError, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile

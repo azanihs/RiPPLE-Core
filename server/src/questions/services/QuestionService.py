@@ -1,4 +1,5 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore
+from questions.services import CompetencyService
 from users.models import Token
 from questions.models import CourseUser
 from django.core.exceptions import ObjectDoesNotExist
@@ -140,41 +141,32 @@ def update_question_score(user, question, new_score):
 
 def update_competency(user, question, response):
     """
-        Updates the users competency for all topic combinations in the given question
+        Updates the user's competency for all topic combinations in the given question
     """
     # Weigh each topic
-    weights = util.topic_weights(question.topics.all())
+    queryset_topics = question.topics.all()
+    weights = util.topic_weights(queryset_topics)
+
     for i in weights:
-        topics = i["topics"]
+        topics = queryset_topics.filter(id__in=[x.id for x in i["topics"]])
+        
         weight = i["weight"]
 
-        mapped_competencies = CompetencyMap.objects.filter(
-            user=user, topic__in=topics)
-
+        user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
         previous_score = 0
         attempt_count = 1
-        if len(topics) == mapped_competencies.count():
+
+        if user_competency is None or len(user_competency) == 0:
+            user_competency = CompetencyService.add_competency(50, 1, user, topics)
+        else:
+            user_competency = user_competency[0]
             attempt_count = QuestionResponse.objects.filter(
                 user=user, response__in=Distractor.objects.filter(question=question)).count()
 
-            user_competency = Competency.objects.get(
-                pk=mapped_competencies.first().for_competency_id)
-
             if attempt_count > 1:
-                # Has not attempted question before
+                # Has attempted question before
                 previous_score = QuestionScore.objects.get(
                     user=user, question=question).score
-
-        else:
-            user_competency = Competency.objects.create(
-                competency=50, confidence=1)
-
-            for topic in topics:
-                CompetencyMap(
-                    user=user,
-                    topic=topic,
-                    for_competency=user_competency
-                ).save()
 
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)

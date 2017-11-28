@@ -7,6 +7,9 @@ try:
 except ImportError:
     from urllib.parse import urljoin
 
+def mean(collection):
+    return sum((float(x) for x in collection)) / float(len(collection))
+
 def is_number(test_str):
     try:
         val = int(test_str)

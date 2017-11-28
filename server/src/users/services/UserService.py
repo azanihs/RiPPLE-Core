@@ -4,9 +4,10 @@ import pytz as timezone
 
 from django.conf import settings
 from datetime import datetime
-from ripple.util.util import save_image
+from ripple.util.util import save_image, mean
 
-from questions.models import Topic, Competency, CompetencyMap
+from questions.models import Topic, Competency
+from questions.services import CompetencyService
 from users.models import Course, CourseUser, User, Role, UserImage
 from users.services.TokenService import token_to_user_course
 from ripple.util import util
@@ -115,44 +116,54 @@ def get_course_by_id(course_code):
         return {
             "error": "Course not available"
         }
+def group_competencies(competencies):
+    def _group_competencies(carry, c):
+        if carry.get(c.topics, None) is None:
+            carry[c.topics] = []
 
-
-def user_competencies(user):
-    def sort_competencies(carry, competency):
-        if carry.get(competency.for_competency_id, None) is None:
-            carry[competency.for_competency_id] = []
-
-        carry[competency.for_competency_id].append(competency)
+        carry[c.topics].append(c)
         return carry
 
-    competency_map = CompetencyMap.objects.filter(user=user)
-    # Reduce competency map to joined competencies
-    user_competency_values = Competency.objects.filter(
-        id__in=competency_map.values("for_competency")).distinct()
+    group = {}
+    for i in competencies:
+        group = _group_competencies(group, i)
+    return group
 
-    # Reduce competency_map into an identifier mapping to topics
-    sorted_competencies = {}
-    for i in competency_map:
-        sorted_competencies = sort_competencies(sorted_competencies, i)
+def _process_competencies(competencies):
 
     edges = []
     threshold = settings.RUNTIME_CONFIGURATION["min_competency_threshold"]
-    for competency_id, nodes in sorted_competencies.items():
-        competency = user_competency_values.get(pk=competency_id)
-        if competency.confidence < threshold:
+
+    for topic_group, competency_group in group_competencies(competencies).items():
+        competency = mean([x.competency for x in competency_group])
+        confidence = 0
+        if competency < threshold:
             continue
 
-        source = nodes[0]
-        target = nodes[1] if len(nodes) > 1 else source
+        nodes = CompetencyMap.objects.filter(aggregate_id=topic_group)
+        source = nodes.first()
+        target = nodes.last()
+
         edges.append([
             source.topic.toJSON(),
             target.topic.toJSON(),
-            competency.competency,
-            competency.confidence
+            competency,
+            confidence
         ])
 
     return edges
 
+def user_competencies(user):
+    return _process_competencies(Competency.objects.filter(user=user))
+
+def aggregate_competencies(user, compare_type):
+    if compare_type == "peer":
+        competencies = Competency.objects.filter(user__in=CourseUser.objects.filter(course=user.course))
+    else:
+        # TODO: handle other compare_types
+        competencies = Competency.objects.filter(user__in=CourseUser.objects.filter(course=user.course))
+
+    return _process_competencies(competencies)
 
 def insert_course_if_not_exists(course):
     try:

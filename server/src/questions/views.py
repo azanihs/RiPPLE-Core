@@ -116,6 +116,10 @@ def competencies(request):
     user_competencies = UserService.user_competencies(logged_in_user)
     return JsonResponse(user_competencies, safe=False)
 
+def aggregate(request, compare_type):
+    logged_in_user = UserService.logged_in_user(request)
+    aggregate_competencies = UserService.aggregate_competencies(logged_in_user, compare_type)
+    return JsonResponse(aggregate_competencies, safe=False)
 
 def leaderboard_default(request):
     return leaderboard(request, "reputation", "DESC")

@@ -41,13 +41,13 @@
                                 <md-select name="visulisationCompare"
                                     id="visulisationCompare"
                                     v-model="compare">
-                                    <md-option value="Personal Goals">
+                                    <md-option value="personalGoals">
                                         Personal Goals
                                     </md-option>
-                                    <md-option value="Peers">
+                                    <md-option value="peers">
                                         Peers
                                     </md-option>
-                                    <md-option value="Previous Offerings">
+                                    <md-option value="previousOfferings">
                                         Previous Offerings
                                     </md-option>
                                 </md-select>
@@ -206,7 +206,7 @@ export default class VariableDataVisualiser extends Vue {
     pChartType: string = "";
     pExcludeTopics = [];
 
-    pCompareAgainst: string = "Personal Goals";
+    pCompareAgainst: string = "peers";
 
     get chart() {
         return this.pChartType || this.chartType;

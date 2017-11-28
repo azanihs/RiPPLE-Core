@@ -6,7 +6,8 @@ import random
 import math
 from questions.models import Course, Topic, Question, Distractor, QuestionResponse, QuestionScore, Competency
 from users.models import CourseUser, User
-from questions.services import QuestionService
+from questions.services import QuestionService, CompetencyService
+from django.db.models import Count
 
 # Create your tests here.
 
@@ -32,7 +33,7 @@ class QuestionTestCase(TestCase):
             q = Question(
                 id=i + 1,
                 author=author,
-                content="",
+                content=str(i),
                 explanation="",
                 difficulty=1,
                 quality=1,
@@ -106,3 +107,42 @@ class QuestionTestCase(TestCase):
         # New question with existing items with single topic
         # New question with existing items with multiple topics
         self.assertEqual(True, True)
+
+    def test_competency_association(self):
+        course = self._bootstrap_courses()
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+
+        u = CourseUser.objects.all().first()
+        
+        topic_map = [
+            Topic.objects.filter(id__in=[1]),
+            Topic.objects.filter(id__in=[1, 2]),
+            Topic.objects.filter(id__in=[2, 3, 4]),
+            Topic.objects.filter(id__in=[4]),
+            Topic.objects.filter(id__in=[2, 4])
+        ]
+        for i in range(0,5):
+            c = Competency(
+                competency=i,
+                confidence=i*10,
+                user=u
+            )
+            c.save()
+            c.topics.set(topic_map[i])
+            c.save()
+
+        for i in range(0,5):
+            c = Competency.objects.get(pk=i+1)
+            t = Question.objects.get(pk=i+1).topics.all()
+            not_t = Topic.objects.exclude(id__in=t.values_list('id', flat=True))
+    
+            cu = Competency.objects.filter(user=u)
+
+            results = CompetencyService.get_user_competency_for_topics(u, t)
+
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].pk, i+1)

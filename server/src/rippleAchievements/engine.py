@@ -26,7 +26,10 @@ class AchievementEngine(object):
                     # update the object if key didn't change :
                     obj.name = cls.name
                     obj.description = cls.description
+                    obj.category = cls.category
                     obj.bonus = cls.bonus
+                    obj.condition = cls.condition
+                    obj.icon = cls.icon
                     obj.callback = construct_callback(cls)
                     obj.save()
                 for t in cls.tasks:

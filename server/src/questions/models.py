@@ -96,18 +96,15 @@ class QuestionScore(models.Model):
     question = models.ForeignKey(Question)
     user = models.ForeignKey(CourseUser)
 
-
 class Competency(models.Model):
     competency = models.FloatField()
     confidence = models.FloatField()
 
-
-class CompetencyMap(models.Model):
-    topic = models.ForeignKey(Topic)
-
+    topics = models.ManyToManyField(Topic)
     user = models.ForeignKey(CourseUser)
-    for_competency = models.ForeignKey(Competency)
 
+    def __str__(self):
+        return str(self.competency)+" "+str(self.confidence)+" "+str(self.topics)
 
 class QuestionImage(models.Model):
     image = models.ImageField(upload_to='question_photo')
