@@ -115,10 +115,10 @@ def rate_question(distractor_id, response, user):
 def calculate_question_score(attempts, is_correct):
 
     score_map = {
-        1: 1 if is_correct else -1,
-        2: 0.25 if is_correct else -1,
-        3: -0.25 if is_correct else -1,
-        4: -0.75 if is_correct else -1
+        1: 1 if is_correct else 0,
+        2: 0.75 if is_correct else 0,
+        3: 0.5 if is_correct else 0,
+        4: 0.25 if is_correct else 0
     }
     return score_map[min(4, attempts)]
 
@@ -199,12 +199,14 @@ def update_competency(user, question, response):
 
         weighted_features = [
             (difficulty/10, 0.3),
+            (previous_score, 0.3),
             (math.log(question_count), 0.1),
+            (math.log(total_incorrect), 0.3),
             (math.log(total_correct), 0.3),
-            (exp_moving_avg(0.33), 0.4),
-            (exp_moving_avg(0.1), 0.3),
-            (float(total_correct / question_count), 0.30),
-            (user_competency.competency, 0.50)
+            (exp_moving_avg(0.33), 0.35),
+            (exp_moving_avg(0.1), 0.25),
+            (float(total_correct / question_count), 0.25),
+            (user_competency.competency, 0.30)
         ]
 
         x , weight_vector = zip(*weighted_features)
@@ -216,15 +218,15 @@ def update_competency(user, question, response):
 
         # print(response.response.isCorrect)
         # print("SCORE: " + str(scores))
-        # print("TEST: " + str(test))
+        print("TEST: " + str(test))
 
         difference = abs(user_competency.competency - test)
         if response.response.isCorrect == False:
-            user_competency.competency -= difference
+            user_competency.competency = (user_competency.competency + (1 - test))/2
             if user_competency.competency < 0.1:
                 user_competency.competency = 0.1
         else:
-            user_competency.competency += difference
+            user_competency.competency = (user_competency.competency + test)/2
 
         user_competency.confidence += weight
         user_competency.save()
