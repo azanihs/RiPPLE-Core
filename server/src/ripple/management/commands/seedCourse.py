@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser
 
 from questions.services import QuestionService

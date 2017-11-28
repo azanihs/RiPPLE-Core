@@ -67,6 +67,7 @@
 .leftPanel {
     padding: 8px;
     border-right: 1px solid #ddd;
+    flex: 1;
 }
 
 
@@ -75,6 +76,7 @@
     padding: 8px;
     background-color: #fafafa;
     color: #999;
+    flex-grow: 0;
 }
 
 .rightPanel>div {
