@@ -2,10 +2,12 @@ from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser
+from recommendations.models import Day, Time, Availability
 
 from questions.services import QuestionService
 
 from random import randint, randrange, sample, choice
+from datetime import datetime
 from faker import Factory
 fake = Factory.create()
 
@@ -174,6 +176,18 @@ def newSource(urls, content, host):
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
 
+def make_days():
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    for x in days:
+        if len(Day.objects.filter(day=x)) == 0:
+            day = Day.objects.create(day=x)
+            day.save()
+
+def make_times(times):
+    for i in range(len(times) - 1):
+        if len(Time.objects.filter(start=times[i], end=times[i + 1])) == 0:
+            time_range = Time.objects.create(start=times[i], end=times[i + 1])
+            time_range.save()
 
 
 class Command(BaseCommand):
@@ -213,6 +227,16 @@ class Command(BaseCommand):
                 for i in range(0, 10):
                     make_question_responses(user, distractors)
 
+        def populate_availability(course_users, days, times):
+            for i in range(len(course_users)):
+                course_user = course_users[i]
+                for j in range(randint(3, 10)):
+                    random_day = Day.objects.get(pk=randint(1, len(days)))
+                    random_time = Time.objects.get(pk=randint(1, len(times)))
+                    # Add availability
+                    availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
+                    availability.save()
+
         courses = []
         for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
@@ -227,3 +251,15 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
+
+        print("Populating Availabilities")
+        make_days()
+
+        time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
+        time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
+        make_times(time_inputs)
+
+        course_users = CourseUser.objects.all()
+        days = Day.objects.all()
+        times = Time.objects.all()
+        populate_availability(course_users, days, times)
