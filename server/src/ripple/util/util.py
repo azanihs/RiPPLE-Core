@@ -49,6 +49,22 @@ def save_image(encoded_image, image_id):
         return None
     return data
 
+def save_image_course_seeder(encoded_image, image_id):
+    image_format, base64_payload = encoded_image.split(';base64,')
+    ext = image_format.split('/')[-1]
+    data = ContentFile(b64decode(base64_payload),
+                       name="u" + str(image_id) + "." + ext)
+    if imghdr.what(data) is not None:
+        print(imghdr.what(data))
+        data.name = "u"+str(image_id)+"."+imghdr.what(data)
+    else:
+        return None
+
+    # Validate image
+    #if imghdr.what(data) != ext:
+    #    return None
+    return data
+
 def merge_url_parts(parts, url=""):
     if len(parts) == 0:
         return url
