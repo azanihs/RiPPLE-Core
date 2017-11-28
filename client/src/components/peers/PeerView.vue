@@ -77,9 +77,13 @@ export default class PeerView extends Vue {
     updateUserAvailability(availability) {
         this.pUserAvailability = availability;
     };
-
-    updateAvailability(data) {
-        const courseDistribution = data[2];
+    updateDays(days) {
+        this.pDays = days;
+    };
+    updateTimes(times) {
+        this.pTimes = times;
+    };
+    updateAvailability(courseDistribution) {
         let maxAvailable = 0;
         let distribution = new Array(7);
         for (let i =0; i < distribution.length; i++) {
@@ -91,12 +95,9 @@ export default class PeerView extends Vue {
                 maxAvailable = entry.entries;
             }
         });
-
-        this.pDays = data[0];
-        this.pTimes = data[1];
         this.pCourseDistribution = distribution;
         this.pMaxAvailable = maxAvailable;
-    }
+    };
 
     @Lifecycle
     created() {
@@ -112,11 +113,15 @@ export default class PeerView extends Vue {
 
         Promise.all([
             AvailabilityService.getDays(),
-            AvailabilityService.getUTCTimeSlots(),
-            AvailabilityService.getCourseAvailability()
-        ]).then(data => {
-            this.updateAvailability(data);
+            AvailabilityService.getUTCTimeSlots()
+        ])
+        .then(data => {
+            this.updateDays(data[0]);
+            this.updateTimes(data[1]);
         });
+
+        Fetcher.get(AvailabilityService.getCourseAvailability)
+            .on(this.updateAvailability);
     }
 
     @Lifecycle
@@ -125,6 +130,8 @@ export default class PeerView extends Vue {
             .off(this.updateTopics);
         Fetcher.get(AvailabilityService.getUserAvailability)
             .off(this.updateUserAvailability);
+        Fetcher.get(AvailabilityService.getCourseAvailability)
+            .off(this.updateAvailability);
     }
 
     get topics() {
