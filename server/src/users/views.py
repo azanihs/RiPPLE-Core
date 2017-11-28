@@ -95,24 +95,5 @@ def get_all_user_achievements(request):
     data = []    
     for ach in achievements:
         data.append(engine.check_achievement(user=user, key=ach.key))
-    
-    #result = json.dumps(data)
-    print(data)
-    return JsonResponse(data, safe=False)
 
-def get_all_achievements(request):
-    user = logged_in_user(request)
-
-    achievements = Achievement.objects.all()
-
-    data = []
-    for ach in achievements:
-        data.append({"key": ach.key,
-            "name": ach.name,
-            "description": ach.description,
-            "category": ach.category,
-            "bonus": ach.bonus,
-            "condition": ach.condition,
-            "icon": ach.icon})
-    print(data)
     return JsonResponse(data, safe=False)
