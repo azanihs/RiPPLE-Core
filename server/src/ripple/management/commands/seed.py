@@ -132,9 +132,9 @@ class Command(BaseCommand):
             for course_user in course_users:
                 topics = Topic.objects.filter(course=course_user.course)
                 for topic in topics:
-                    role_id = randint(0, 2)
+                    role_id = randint(0, 1)
                     if role_id > 0:
-                        study_role = study_roles[role_id - 1]
+                        study_role = study_roles[1]
                         availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
 
                     role_id = randint(0, 1)

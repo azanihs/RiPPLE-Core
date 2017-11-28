@@ -13,7 +13,8 @@
                                        :recommendations="recommendations"
                                        :requests="requests"
                                        :studyRoles="studyRoles"
-                                       :topics="topics"></recommendation-search>
+                                       :topics="topics"
+                                       :userRoles="userRoles"></recommendation-search>
             </md-card>
         </md-layout>
     </md-layout>
@@ -31,6 +32,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
+import { StudyRole, Topic } from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
 import AvailabilityService from "../../services/AvailabilityService";
@@ -53,8 +55,8 @@ export default class PeerView extends Vue {
     pRecommendations = [];
     pCourseAvailability = [];
     pUserAvailability = [];
-    pStudyRoles = [];
-    pUserAvailableRoles = [];
+    pStudyRoles: StudyRole[] = [];
+    pUserAvailableRoles = new Map<string, Map<string, boolean>>();
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -75,7 +77,20 @@ export default class PeerView extends Vue {
         this.pStudyRoles = roles;
     }
     updateUserAvailableRoles(availableRoles) {
-        this.pUserAvailableRoles = availableRoles;
+        const userRoles = new Map<string, Map<string, boolean>>();
+        availableRoles.map(role => {
+            const topic: string = role.topic.name;
+            const studyRole: string = role.studyRole.role;
+            if (userRoles.has(topic)) {
+                const topicRoles = userRoles.get(topic);
+                topicRoles.set(studyRole, true);
+            } else {
+                const studyRoles = new Map<string, boolean>();
+                studyRoles.set(studyRole, true);
+                userRoles.set(topic, studyRoles);
+            }
+        });
+        this.pUserAvailableRoles = userRoles;
     }
 
     @Lifecycle
@@ -123,6 +138,10 @@ export default class PeerView extends Vue {
 
     get studyRoles() {
         return this.pStudyRoles;
+    }
+
+    get userRoles() {
+        return this.pUserAvailableRoles;
     }
 
     changeAvailability(day, time) {

@@ -24,6 +24,7 @@
                             class="centerAlign">
                             <md-checkbox class="centerCheckbox"
                                          :disabled="checkboxIsDisabled(role.description, topic)"
+                                         :value="checkbox(topic, role)"
                                          @change="checkboxChange"
                                          :id="`${role.id}_${topic.id}`"
                                          :name="`${role.id}_${topic.id}`"></md-checkbox>
@@ -151,6 +152,14 @@ export default class RecommendationSearch extends Vue {
         }
     });
 
+    @Prop
+    userRoles = p<Map<string, Map<string, boolean>>>({
+        type: Map,
+        default: () => {
+            return new Map<string, Map<string, boolean>>();
+        }
+    });
+
     competencies = new Map();
 
     updateCompetencies(newCompetencies) {
@@ -167,6 +176,19 @@ export default class RecommendationSearch extends Vue {
     created() {
         Fetcher.get(UserService.userCompetencies)
             .on(this.updateCompetencies);
+    }
+
+    checkbox(topic, studyRole) {
+        if (!this.userRoles.has(topic.name)) {
+            return false;
+        } else {
+            const topicRoles = this.userRoles.get(topic.name);
+            if (!topicRoles.has(studyRole.role)) {
+                return false;
+            } else {
+                return topicRoles.get(studyRole.role);
+            }
+        }
     }
 
     checkboxChange() {
