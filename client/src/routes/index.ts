@@ -55,11 +55,11 @@ const routes = [{
         component: NotificationsView
     }, {
         path: "/question/answer",
-        name: "questions",
+        name: "answer",
         component: QuestionBrowser
     }, {
         path: "/question/create",
-        name: "questions",
+        name: "create",
         component: AuthorView
     }, {
         path: "/view/friends",
