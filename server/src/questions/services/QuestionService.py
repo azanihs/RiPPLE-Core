@@ -4,7 +4,7 @@ from django.db.models import Count
 
 from ripple.util import util
 from users.models import CourseUser, Token
-from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore, ReportQuestion
 from questions.services import CompetencyService
 
 def leaderboard_sort(class_instance, user_column):
@@ -209,3 +209,24 @@ def update_competency(user, question, response):
         user_competency.save()
 
         update_question_score(user, question, question_score)
+
+def report_question(user, request):
+    request = request.get("questionReport", None)
+    reason = request.get("reason", None)
+    question = request.get("question", None)
+
+    if reason is None or question is None:
+        return {"error": "Please provide a reason and question ID"}
+
+    question = Question.objects.get(pk=question)
+
+    report = ReportQuestion(
+        question=question,
+        user=user,
+        reason=reason
+    )
+    report.save()
+    return {}
+
+
+

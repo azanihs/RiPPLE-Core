@@ -45,6 +45,11 @@ export interface Course {
     available: boolean
 };
 
+export interface ReportQuestion {
+    question: number,
+    reason: string
+};
+
 export interface User {
     id: number,
     name: string,
