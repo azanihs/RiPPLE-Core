@@ -2,13 +2,10 @@ import random
 
 from django.db.models import Count
 
-from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, QuestionScore
-from questions.models import CourseUser
-from questions.services import CompetencyService
-from users.models import Token
 from ripple.util import util
-
-
+from users.models import CourseUser, Token
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore
+from questions.services import CompetencyService
 
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
@@ -176,21 +173,24 @@ def update_question_score(user, question, new_score):
 
 def update_competency(user, question, response):
     """
-        Updates the users competency for all topic combinations in the given question
+        Updates the user's competency for all topic combinations in the given question
     """
     # Weigh each topic
-    weights = util.topic_weights(question.topics.all())
+    queryset_topics = question.topics.all()
+    weights = util.topic_weights(queryset_topics)
+
     for i in weights:
-        topics = i["topics"]
+        topics = queryset_topics.filter(id__in=[x.id for x in i["topics"]])
         weight = i["weight"]
 
         user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
         previous_score = 0
         attempt_count = 1
 
-        if user_competency is None:
+        if user_competency is None or len(user_competency) == 0:
             user_competency = CompetencyService.add_competency(50, 1, user, topics)
         else:
+            user_competency = user_competency[0]
             attempt_count = QuestionResponse.objects.filter(
                 user=user, response__in=Distractor.objects.filter(question=question)).count()
 
@@ -209,5 +209,3 @@ def update_competency(user, question, response):
         user_competency.save()
 
         update_question_score(user, question, question_score)
-
-    return user_competency

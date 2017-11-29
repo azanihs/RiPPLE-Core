@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency
 from users.models import Course, User, CourseUser
 from recommendations.models import Day, Time, Availability
 

@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from django.db import IntegrityError, transaction
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser
 
 from questions.services import QuestionService
@@ -43,12 +44,9 @@ def make_question_responses(user, distractors):
             user=user
         )
         response.save()
-        user_competency = QuestionService.update_competency(
+        QuestionService.update_competency(
             user, user_choice.question, response)
-        user_competency.competency = randrange(0, 100)
-        user_competency.confidence = randrange(0, 100)
 
-        user_competency.save()
         if chance(2):
             rating = QuestionRating(
                 quality=randrange(0, 10),
@@ -79,47 +77,59 @@ def parse_questions(file, course_users, all_topics, host):
     questions = data["questions"]
     counter = 0
     for q in questions:
-        counter = counter+1
-        print("Adding question: " + str(counter))
-        if q["explanation"]["content"] == None:
-                q["explanation"]["content"] = " "
-        question = Question(
-            content = q["question"]["content"],
-            explanation = q["explanation"]["content"],
-            difficulty = randrange(0, 5),
-            quality = randrange(0, 5),
-            difficultyCount = randrange(0, 100),
-            qualityCount = randrange(0, 100),
-            author = choice(course_users)
-        )
-        question.save()
-        decode_images(question.id, question, q["question"]["payloads"], "q", host)
-        decode_images(question.id, question, q["explanation"]["payloads"], "e", host)
+        try:
+            with transaction.atomic(): 
+                distractor_count = 0
+                counter = counter+1
+                print("Adding question: " + str(counter))
+                if q["explanation"]["content"] == None:
+                        q["explanation"]["content"] = " "
+                question = Question(
+                    content = q["question"]["content"],
+                    explanation = q["explanation"]["content"],
+                    difficulty = randrange(0, 5),
+                    quality = randrange(0, 5),
+                    difficultyCount = randrange(0, 100),
+                    qualityCount = randrange(0, 100),
+                    author = choice(course_users)
+                )
+                question.save()
+                d = decode_images(question.id, question, q["question"]["payloads"], "q", host)
+                if not d:
+                    raise IntegrityError("Invalid Question Image")
+                d = decode_images(question.id, question, q["explanation"]["payloads"], "e", host)
+                if not d:
+                    raise IntegrityError("Invalid Explanation Image")
 
-        q_topics = q["topics"]
-        for topic in q_topics:
-            idx = 0
-            while idx < len(all_topics):
-                if topic["name"] == all_topics[idx].name:
-                    break
-                idx+=1
-            question.topics.add(all_topics[idx])
-        question.save()
+                q_topics = q["topics"]
+                for topic in q_topics:
+                    idx = 0
+                    while idx < len(all_topics):
+                        if topic["name"] == all_topics[idx].name:
+                            break
+                        idx+=1
+                    question.topics.add(all_topics[idx])
+                question.save()
 
-        for i in ["A", "B", "C", "D"]:
-            response = q["responses"][i]
-            if response["content"] == None:
-                response["content"] = " "
-            distractor = Distractor(
-                content = response["content"],
-                response = i,
-                isCorrect = response["isCorrect"],
-                question = question
-            )
-            distractor.save()
-            decode_images(distractor.id, distractor, response["payloads"],"d", host)
-            distractors.append(distractor)
-
+                for i in ["A", "B", "C", "D"]:
+                    response = q["responses"][i]
+                    if response["content"] is None:
+                        response["content"] = " "
+                    distractor = Distractor(
+                        content = response["content"],
+                        response = i,
+                        isCorrect = response["isCorrect"],
+                        question = question
+                    )
+                    distractor.save()
+                    distractor_count+=1
+                    d = decode_images(distractor.id, distractor, response["payloads"],"d", host)
+                    if not d:
+                        raise IntegrityError("Invalid Distractor Image")
+                    distractors.append(distractor)
+        except Exception as e:
+            distractors=distractors[:len(distractors)-distractor_count]
+            print("Invalid question: " + str(counter))
 
     return distractors
 
@@ -135,15 +145,10 @@ def decode_images(image_id, obj, images, image_type, host):
     }
     ImageToSaveClass = database_image_types.get(image_type, None)
 
-    '''if image_type == "q" or image_type == "e":
-        reference = Question.objects.get(pk=image_id)
-    else:
-        reference = Distractor.objects.get(pk=image_id)'''
-
     for i, image in images.items():
-        contentfile_image = util.save_image(image, image_id)
+        contentfile_image = util.save_image_course_seeder(image, image_id)
         if contentfile_image is None:
-            urls.append(None)
+            return False
         # Question + Explanation in the same object
         if image_type == "q" or image_type == "e":
             new_image = ImageToSaveClass.objects.create(question=obj, image=contentfile_image)
@@ -168,7 +173,6 @@ def newSource(urls, content, host):
     for i in range(0, len(urls)):
         if urls[i] is None:
             continue
-        images[i]['src'] = "http://" + host + urls[i]
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
     immediate_children = soup.findChildren(recursive=False)
@@ -218,7 +222,7 @@ class Command(BaseCommand):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
-                 for user_id in range(15)]
+                 for user_id in range(50)]
 
         all_courses = [Course.objects.create(
             available=True,
@@ -227,3 +231,17 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
+
+    
+def save_image_course_seeder(encoded_image, image_id):
+    image_format, base64_payload = encoded_image.split(';base64,')
+    ext = image_format.split('/')[-1]
+    data = ContentFile(b64decode(base64_payload),
+                       name="")
+    if imghdr.what(data) is not None:
+        print(imghdr.what(data))
+        data.name = "u"+str(image_id)+"."+imghdr.what(data)
+    else:
+        return None
+
+    return data

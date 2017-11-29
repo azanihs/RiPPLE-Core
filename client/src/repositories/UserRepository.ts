@@ -1,5 +1,5 @@
 import {
-    CourseUser, User, Course, Badge, AcquiredBadge,
+    CourseUser, User, Course, Badge,
     Notification, Topic, PeerConnection, Edge, UserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
@@ -120,13 +120,11 @@ let _courseCode = "";
 
 export default class UserRepository {
     static getLoggedInUser(): Promise<CourseUser> {
-        return apiFetch(`/users/me/`)
-            .then(x => x.json());
+        return apiFetch<CourseUser>(`/users/me/`);
     }
 
     static getUserCourses(): Promise<Course[]> {
-        return apiFetch(`/users/courses/`)
-            .then(x => x.json());
+        return apiFetch<Course[]>(`/users/courses/`);
     }
 
     static getUserConnections(count: number): Promise<User[]> {
@@ -162,13 +160,11 @@ export default class UserRepository {
     }
 
     static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
-        return apiFetch(`/questions/leaderboard/${sortField}/${sortOrder}/`)
-            .then(x => x.json());
+        return apiFetch<UserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
     }
 
     static getCompareAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch(`/questions/competencies/aggregate/${compareTo}`)
-        .then(x => x.json())
+        return apiFetch<Edge[]>(`/questions/competencies/aggregate/${compareTo}`)
         .then(x => x.map(x => {
             const edge: Edge = {
                 source: TopicRepository.topicPointer(x[0]),
@@ -181,8 +177,7 @@ export default class UserRepository {
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
-        return apiFetch(`/questions/competencies/all/`)
-            .then(x => x.json())
+        return apiFetch<Edge[]>(`/questions/competencies/all/`)
             .then(x => x.map(x => {
                 const edge: Edge = {
                     source: TopicRepository.topicPointer(x[0]),
@@ -236,8 +231,7 @@ export default class UserRepository {
     }
 
     static authenticate(courseCode?: string): Promise<void> {
-        return apiFetch(`/users/login/${courseCode || " "}`)
-            .then(x => x.json())
+        return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
                 setToken(x.token);
                 UserRepository.setCurrentCourse(x.courseCode);
@@ -245,7 +239,7 @@ export default class UserRepository {
     }
 
     static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {
-        return apiFetch(`/users/courses/update/`, {
+        return apiFetch<CourseUser>(`/users/courses/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -255,12 +249,11 @@ export default class UserRepository {
                 course: course,
                 topics: topics
             })
-        })
-            .then(x => x.json());
+        });
     }
 
     static updateUserImage(newImage: string): Promise<User> {
-        return apiFetch(`/users/me/image/`, {
+        return apiFetch<User>(`/users/me/image/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -269,6 +262,6 @@ export default class UserRepository {
             body: JSON.stringify({
                 image: newImage
             })
-        }).then(x => x.json());
+        });
     }
 }

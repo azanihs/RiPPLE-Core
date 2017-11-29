@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 import random
 
-from questions.models import Distractor, QuestionResponse, QuestionScore, Competency
-from questions.services import QuestionService, SearchService
+from questions.models import Topic, Distractor, Question, QuestionResponse, QuestionScore, Competency
+from questions.services import CompetencyService, QuestionService, SearchService
 from users.models import CourseUser
 
 from .common import BootstrapTestCase
@@ -65,8 +65,7 @@ class QuestionTestCase(BootstrapTestCase):
         self.assertEqual(question_score.user_id, 1)
         self.assertEqual(question_score.question_id, question_number)
         self.assertEqual(question_score.score, -1)
-
-        self.assertEqual(Competency.objects.all().count(), topic_count)
+        #TODO: Ensure competency is updated
 
     def test_answering_question_correctly(self):
         """ New question with a correct answer """
@@ -173,9 +172,9 @@ class QuestionTestCase(BootstrapTestCase):
                 unique_topics.add(question_topic)
 
         self.assertEqual(QuestionResponse.objects.all().count(), number_of_questions)
-
         self.assertEqual(QuestionScore.objects.all().count(), number_of_questions)
-        self.assertEqual(Competency.objects.all().count(), len(unique_topics))
+        #TODO: Ensure competency is updated
+
 
     def test_answering_existing_question_many_users(self):
         """ Single question one topic answered by many users """
@@ -293,6 +292,47 @@ class QuestionTestCase(BootstrapTestCase):
 
         self.assertEqual(search_result.count(), 5)
 
-        for question in search_result:
-            self.assertEqual(question.author.course, responder_course)
-            self.assertEqual(question.topics.first().course, responder_course)
+    def test_answering_multiple_questions(self):
+        # New question with existing items with single topic
+        # New question with existing items with multiple topics
+        #TODO
+        pass
+
+    def test_competency_association(self):
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+
+        u = CourseUser.objects.all().first()
+
+        topic_map = [
+            Topic.objects.filter(id__in=[1]),
+            Topic.objects.filter(id__in=[1, 2]),
+            Topic.objects.filter(id__in=[2, 3, 4]),
+            Topic.objects.filter(id__in=[4]),
+            Topic.objects.filter(id__in=[2, 4])
+        ]
+        for i in range(0,5):
+            c = Competency(
+                competency=i,
+                confidence=i*10,
+                user=u
+            )
+            c.save()
+            c.topics.set(topic_map[i])
+            c.save()
+
+        for i in range(0,5):
+            c = Competency.objects.get(pk=i+1)
+            t = Question.objects.get(pk=i+1).topics.all()
+            not_t = Topic.objects.exclude(id__in=t.values_list('id', flat=True))
+
+            cu = Competency.objects.filter(user=u)
+
+            results = CompetencyService.get_user_competency_for_topics(u, t)
+
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].pk, i+1)

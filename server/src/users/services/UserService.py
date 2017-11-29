@@ -6,7 +6,7 @@ from django.conf import settings
 from datetime import datetime
 from ripple.util.util import save_image, mean
 
-from questions.models import Topic, Competency, CompetencyMap
+from questions.models import Topic, Competency
 from questions.services import CompetencyService
 from users.models import Course, CourseUser, User, Role, UserImage
 from users.services.TokenService import token_to_user_course
@@ -107,50 +107,26 @@ def update_course(course_user, new_data):
 
     return course_user.toJSON()
 
-
-def get_course_by_id(course_code):
-    try:
-        course = Course.objects.get(course_code=course_code)
-        return course.toJSON()
-    except Course.DoesNotExist:
-        return {
-            "error": "Course not available"
-        }
-def group_competencies(competencies):
-    def _group_competencies(carry, c):
-        if carry.get(c.topics, None) is None:
-            carry[c.topics] = []
-
-        carry[c.topics].append(c)
-        return carry
-
-    group = {}
-    for i in competencies:
-        group = _group_competencies(group, i)
-    return group
-
 def _process_competencies(competencies):
-
     edges = []
     threshold = settings.RUNTIME_CONFIGURATION["min_competency_threshold"]
-
-    for topic_group, competency_group in group_competencies(competencies).items():
-        competency = mean([x.competency for x in competency_group])
-        confidence = 0
-        if competency < threshold:
+    for comp in competencies:
+        if comp.confidence < threshold:
             continue
 
-        nodes = CompetencyMap.objects.filter(aggregate_id=topic_group)
+        # Only use two topics. 
+        nodes = comp.topics.all()
+        if not(len(nodes) > 0 and len(nodes) <= 2):
+            continue
+
         source = nodes.first()
         target = nodes.last()
-
         edges.append([
-            source.topic.toJSON(),
-            target.topic.toJSON(),
-            competency,
-            confidence
+            source.toJSON(),
+            target.toJSON(),
+            comp.competency,
+            comp.confidence
         ])
-
     return edges
 
 def user_competencies(user):

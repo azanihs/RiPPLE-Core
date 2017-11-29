@@ -1,4 +1,4 @@
-import { User, Badge, AcquiredBadge, Notification, Topic, Edge, Course } from "../interfaces/models";
+import { User, Badge, Notification, Topic, Edge, Course } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
