@@ -2,16 +2,13 @@ import random
 
 from django.db.models import Count
 
-<<<<<<< HEAD
 import math
 
 import numpy as np
-=======
 from ripple.util import util
 from users.models import CourseUser, Token
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore
 from questions.services import CompetencyService
->>>>>>> origin/master
 
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
@@ -182,7 +179,6 @@ def update_competency(user, question, response):
         Updates the user's competency for all topic combinations in the given question
     """
     # Weigh each topic
-<<<<<<< HEAD
     
     question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)
@@ -247,10 +243,8 @@ def update_competency(user, question, response):
     weights = util.topic_weights(question.topics.all())
 
 
-=======
     queryset_topics = question.topics.all()
     weights = util.topic_weights(queryset_topics)
->>>>>>> origin/master
 
     for i in weights:
         topics = queryset_topics.filter(id__in=[x.id for x in i["topics"]])
@@ -271,7 +265,6 @@ def update_competency(user, question, response):
                 # Has attempted question before
                 previous_score = QuestionScore.objects.get(
                     user=user, question=question).score
-<<<<<<< HEAD
         else:
             user_competency = Competency.objects.create(
                 competency=0.5, confidence=1)
@@ -284,11 +277,9 @@ def update_competency(user, question, response):
                 ).save()
 
         
-=======
 
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)
->>>>>>> origin/master
 
         # question_responses = QuestionResponse.objects.filter(user=user, response__in=Distractor.objects.filter(question__in = \
         #                 Question.objects.filter(topics__in = topics)))
@@ -297,7 +288,6 @@ def update_competency(user, question, response):
 
         
 
-<<<<<<< HEAD
 
 def exp_moving_avg(weight):
     ewma = 0.5
@@ -329,6 +319,4 @@ def exp_moving_avg(weight):
         # print(B)
         # print(sorted((A * np.exp(B * 0.90), 0.0, 1.0))[1])
         
-=======
         update_question_score(user, question, question_score)
->>>>>>> origin/master
