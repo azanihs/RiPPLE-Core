@@ -4,8 +4,11 @@
         <md-layout md-flex="100"
                    class="componentSeparator">
             <availability-selector @change="changeAvailability"
-                                   :course="course"
-                                   :user="user"></availability-selector>
+                                   :days="days"
+                                   :times="times"
+                                   :courseDistribution="course"
+                                   :userDistribution="user"
+                                   :maxAvailable="maxAvailable"></availability-selector>
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
@@ -31,6 +34,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
+import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
 import AvailabilityService from "../../services/AvailabilityService";
@@ -53,6 +57,10 @@ export default class PeerView extends Vue {
     pRecommendations = [];
     pCourseAvailability = [];
     pUserAvailability = [];
+    pDays: Day[] = [];
+    pTimes: Time[] = [];
+    pCourseDistribution: number[][] = [];
+    pMaxAvailable: number = 0;
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -69,6 +77,27 @@ export default class PeerView extends Vue {
     updateUserAvailability(availability) {
         this.pUserAvailability = availability;
     };
+    updateDays(days) {
+        this.pDays = days;
+    };
+    updateTimes(times) {
+        this.pTimes = times;
+    };
+    updateAvailability(courseDistribution) {
+        let maxAvailable = 0;
+        let distribution = new Array(7);
+        for (let i =0; i < distribution.length; i++) {
+            distribution[i] = new Array(24).fill(0);
+        }
+        courseDistribution.map(entry => {
+            distribution[entry.day - 1][entry.time - 1] = entry.entries;
+            if (entry.entries > maxAvailable) {
+                maxAvailable = entry.entries;
+            }
+        });
+        this.pCourseDistribution = distribution;
+        this.pMaxAvailable = maxAvailable;
+    };
 
     @Lifecycle
     created() {
@@ -78,16 +107,31 @@ export default class PeerView extends Vue {
             .then(this.updateConnections);
         UserService.getOutstandingRequests({ count: 3 })
             .then(this.updateRequests);
-        AvailabilityService.getCourseAvailability()
-            .then(this.updateCourseAvailability);
-        AvailabilityService.getUserAvailability()
-            .then(this.updateUserAvailability);
+
+        Fetcher.get(AvailabilityService.getUserAvailability)
+            .on(this.updateUserAvailability);
+
+        Promise.all([
+            AvailabilityService.getDays(),
+            AvailabilityService.getUTCTimeSlots()
+        ])
+        .then(data => {
+            this.updateDays(data[0]);
+            this.updateTimes(data[1]);
+        });
+
+        Fetcher.get(AvailabilityService.getCourseAvailability)
+            .on(this.updateAvailability);
     }
 
     @Lifecycle
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
+        Fetcher.get(AvailabilityService.getUserAvailability)
+            .off(this.updateUserAvailability);
+        Fetcher.get(AvailabilityService.getCourseAvailability)
+            .off(this.updateAvailability);
     }
 
     get topics() {
@@ -101,16 +145,40 @@ export default class PeerView extends Vue {
         return this.pRequests;
     }
 
+    get days() {
+        if (this.pDays.length > 0) {
+            const days = this.pDays.slice(0, 5);
+            return days;
+        } else {
+            return this.pDays;
+        }
+    }
+
+    get times() {
+        if (this.pTimes) {
+            const times = this.pTimes.slice(8, 21);
+            return times;
+        } else {
+            return this.pTimes;
+        }
+    }
+
     get course() {
-        return this.pCourseAvailability;
+        return this.pCourseDistribution;
     }
 
     get user() {
         return this.pUserAvailability;
     }
 
+    get maxAvailable() {
+        return this.pMaxAvailable;
+    }
+
     changeAvailability(day, time) {
-        AvailabilityService.updateUserAvailability(day, time);
+        AvailabilityService.updateUserAvailability(day, time)
+        .then(AvailabilityService.getCourseAvailability()
+            .then(this.updateCourseAvailability));
     }
 
     shuffleData() {

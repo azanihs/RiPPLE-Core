@@ -59,7 +59,7 @@ def make_question_responses(user, distractors):
         rating.save()
 
 def make_days():
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     for x in days:
         if len(Day.objects.filter(day=x)) == 0:
             day = Day.objects.create(day=x)
