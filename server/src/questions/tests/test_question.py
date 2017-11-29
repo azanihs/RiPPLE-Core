@@ -328,9 +328,6 @@ class QuestionTestCase(BootstrapTestCase):
         for i in range(0,5):
             c = Competency.objects.get(pk=i+1)
             t = Question.objects.get(pk=i+1).topics.all()
-            not_t = Topic.objects.exclude(id__in=t.values_list('id', flat=True))
-
-            cu = Competency.objects.filter(user=u)
 
             results = CompetencyService.get_user_competency_for_topics(u, t)
 
