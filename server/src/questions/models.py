@@ -104,7 +104,7 @@ class Competency(models.Model):
     user = models.ForeignKey(CourseUser)
 
     def __str__(self):
-        return str(self.competency)+" "+str(self.confidence)+" "+str(self.topics)
+        return str(self.competency)+" "+str(self.confidence)+" "+str(self.topics.all())
 
 class QuestionImage(models.Model):
     image = models.ImageField(upload_to='question_photo')
