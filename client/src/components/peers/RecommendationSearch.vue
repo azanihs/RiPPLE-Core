@@ -74,7 +74,8 @@
     }
 
     .connect-tabs .md-tab-header {
-        background-color: #256; 
+        
+        background-color: rgba(34,85,102, 0.7); 
         border-bottom: 6px solid #f2f2f2;  
     }
 
@@ -86,8 +87,12 @@
         font-weight: bold;
         font-family: Verdana,Arial,Helvetica,sans-serif;
     }
-    .connect-tabs .md-active span {
+    .connect-tabs .md-active span{
         color: #f2f2f2;   
+    }
+
+    .connect-tabs .md-active {
+        background-color: #256; 
     }
 
     .connect-tabs .md-tab-indicator{
