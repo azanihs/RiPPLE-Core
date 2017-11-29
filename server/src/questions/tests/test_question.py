@@ -70,7 +70,7 @@ class QuestionTestCase(TestCase):
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
         # print("FIRST TEST\n")
-        # for i in range(0, 0):
+        # for i in range(0, 20):
         #     QuestionService.respond_to_question(2, author)
         #     print(Competency.objects.all().first().confidence)
         #     print(Competency.objects.all().first().competency)
@@ -88,11 +88,11 @@ class QuestionTestCase(TestCase):
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
-        self._bootstrap_question_choices(correct_id=2)
+        self._bootstrap_question_choices(correct_id=6)
 
         print("SECOND TEST\n")
 
-        for i in range(0, 5):
+        for i in range(0, 20):
             QuestionService.respond_to_question(5, author)
             print(Competency.objects.all().first().competency)
       
