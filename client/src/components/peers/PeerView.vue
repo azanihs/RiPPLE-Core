@@ -177,8 +177,8 @@ export default class PeerView extends Vue {
 
     changeAvailability(day, time) {
         AvailabilityService.updateUserAvailability(day, time)
-        .then(AvailabilityService.getCourseAvailability()
-            .then(this.updateCourseAvailability));
+        .then(x => AvailabilityService.getCourseAvailability())
+        .then(this.updateCourseAvailability);
     }
 
     shuffleData() {
