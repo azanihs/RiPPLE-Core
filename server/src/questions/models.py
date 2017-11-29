@@ -119,3 +119,9 @@ class ExplanationImage(models.Model):
 class DistractorImage(models.Model):
     image = models.ImageField(upload_to='question_photo')
     distractor = models.ForeignKey(Distractor, on_delete=None)
+
+class ReportedQuestion(models.Model):
+    reason = models.CharField(max_length=256)
+    user = models.ForeignKey(CourseUser)
+    quesiton = models.ForeignKey(Question)
+    time = models.TimeField()
