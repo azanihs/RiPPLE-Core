@@ -12,11 +12,12 @@
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
-                <recommendation-search @change="shuffleData()"
-                                       :searchTypes="searchTypes"
+                <recommendation-search @change="changeRoles"
                                        :recommendations="recommendations"
                                        :requests="requests"
-                                       :topics="topics"></recommendation-search>
+                                       :studyRoles="studyRoles"
+                                       :topics="topics"
+                                       :userRoles="userRoles"></recommendation-search>
             </md-card>
         </md-layout>
     </md-layout>
@@ -34,7 +35,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
+import { Availability, CourseAvailability, Day, Time, StudyRole, Topic } from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
 import AvailabilityService from "../../services/AvailabilityService";
@@ -61,6 +62,8 @@ export default class PeerView extends Vue {
     pTimes: Time[] = [];
     pCourseDistribution: number[][] = [];
     pMaxAvailable: number = 0;
+    pStudyRoles: StudyRole[] = [];
+    pUserAvailableRoles = new Map<string, Map<string, boolean>>();
 
     updateTopics(newTopics) {
         this.pTopics = newTopics;
@@ -98,6 +101,25 @@ export default class PeerView extends Vue {
         this.pCourseDistribution = distribution;
         this.pMaxAvailable = maxAvailable;
     };
+    updateStudyRoles(roles) {
+        this.pStudyRoles = roles;
+    };
+    updateUserAvailableRoles(availableRoles) {
+        const userRoles = new Map<string, Map<string, boolean>>();
+        availableRoles.map(role => {
+            const topic: string = role.topic.name;
+            const studyRole: string = role.studyRole.role;
+            if (userRoles.has(topic)) {
+                const topicRoles = userRoles.get(topic);
+                topicRoles.set(studyRole, true);
+            } else {
+                const studyRoles = new Map<string, boolean>();
+                studyRoles.set(studyRole, true);
+                userRoles.set(topic, studyRoles);
+            }
+        });
+        this.pUserAvailableRoles = userRoles;
+    };
 
     @Lifecycle
     created() {
@@ -122,6 +144,12 @@ export default class PeerView extends Vue {
 
         Fetcher.get(AvailabilityService.getCourseAvailability)
             .on(this.updateAvailability);
+
+        AvailabilityService.getStudyRoles()
+            .then(this.updateStudyRoles);
+
+        Fetcher.get(AvailabilityService.getUserAvailableRoles)
+            .on(this.updateUserAvailableRoles);
     }
 
     @Lifecycle
@@ -132,6 +160,8 @@ export default class PeerView extends Vue {
             .off(this.updateUserAvailability);
         Fetcher.get(AvailabilityService.getCourseAvailability)
             .off(this.updateAvailability);
+        Fetcher.get(AvailabilityService.getUserAvailableRoles)
+            .off(this.updateUserAvailableRoles);
     }
 
     get topics() {
@@ -175,21 +205,22 @@ export default class PeerView extends Vue {
         return this.pMaxAvailable;
     }
 
+    get studyRoles() {
+        return this.pStudyRoles;
+    }
+
+    get userRoles() {
+        return this.pUserAvailableRoles;
+    }
+
     changeAvailability(day, time) {
         AvailabilityService.updateUserAvailability(day, time)
         .then(x => AvailabilityService.getCourseAvailability())
         .then(this.updateCourseAvailability);
     }
 
-    shuffleData() {
-        Promise.all([
-            UserService.getRecommendedConnections({ count: 3 }),
-            UserService.getOutstandingRequests({ count: 3 })
-        ])
-            .then(data => {
-                this.updateConnections(data[0]);
-                this.updateRequests(data[1]);
-            });
+    changeRoles(topic, studyRole) {
+        AvailabilityService.updateUserRoles(topic, studyRole);
     }
 }
 </script>

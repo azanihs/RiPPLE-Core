@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency
 from users.models import Course, User, CourseUser
-from recommendations.models import Day, Time, Availability
+from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 
 from questions.services import QuestionService
 
@@ -71,6 +71,15 @@ def make_times(times):
             time_range = Time.objects.create(start=times[i], end=times[i + 1])
             time_range.save()
 
+def make_study_roles():
+    study_roles = [
+    {"role": "mentor", "description": "Provide Mentorship"},
+    {"role": "mentee", "description": "Seek Mentorship"},
+    {"role": "partner", "description": "Find Study Partners"}]
+
+    for x in study_roles:
+        study_role = StudyRole.objects.create(role=x["role"], description=x["description"])
+        study_role.save()
 
 class Command(BaseCommand):
     args = ''
@@ -107,9 +116,23 @@ class Command(BaseCommand):
                     availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
                     availability.save()
 
+        def populate_available_roles(course_users, study_roles):
+            for course_user in course_users:
+                topics = Topic.objects.filter(course=course_user.course)
+                for topic in topics:
+                    role_id = randint(0, 1)
+                    if role_id > 0:
+                        study_role = study_roles[1]
+                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+
+                    role_id = randint(0, 1)
+                    if role_id:
+                        study_role = study_roles[2]
+                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+
         courses = [
-            # {"courseCode": "SCIE1000", "courseName": "Intro to science"},
-            # {"courseCode": "CSSE1001", "courseName": "Intro to data systems"},
+            #{"courseCode": "SCIE1000", "courseName": "Intro to science"},
+            {"courseCode": "CSSE1001", "courseName": "Intro to data systems"},
             {"courseCode": "INFS1200", "courseName": "Intro to software engineering"}
         ]
         unique_topics = ["Arrays", "Loops", "Recursion",
@@ -127,14 +150,17 @@ class Command(BaseCommand):
 
         print("Populating Availabilities")
 
-        """make_days()
+        make_days()
 
         time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
         time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
-
         make_times(time_inputs)
+
+        make_study_roles()
 
         course_users = CourseUser.objects.all()
         days = Day.objects.all()
         times = Time.objects.all()
-        populate_availability(course_users, days, times)"""
+        populate_availability(course_users, days, times)
+        study_roles = StudyRole.objects.all()
+        populate_available_roles(course_users, study_roles)
