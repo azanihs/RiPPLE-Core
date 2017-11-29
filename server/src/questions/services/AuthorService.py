@@ -1,12 +1,10 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from ripple.util import util
+from bs4 import BeautifulSoup
+
 from django.db import IntegrityError, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
-from django.conf import settings
-from ripple.util import util
-from bs4 import BeautifulSoup
-import base64
-import imghdr
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
 
 
 def add_question(question_request, host, user):

@@ -122,6 +122,10 @@ def aggregate(request, compare_type):
     aggregate_competencies = UserService.aggregate_competencies(logged_in_user, compare_type)
     return JsonResponse(aggregate_competencies, safe=False)
 
+def distribution(request, question_id):
+    question_distribution = QuestionService.question_response_distribution(question_id)
+    return JsonResponse(question_distribution)
+
 def leaderboard_default(request):
     return leaderboard(request, "reputation", "DESC")
 
