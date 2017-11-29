@@ -15,6 +15,25 @@ def leaderboard_sort(class_instance, user_column):
         user_column).annotate(total=Count(user_column))
     return [x for x in query]
 
+def question_response_distribution(question_id):
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        return {"error": "Question ID " + str(question_id) + " does not exist"}
+
+    question_distractors = Distractor.objects.filter(question=question)
+    question_responses = QuestionResponse.objects.filter(response__in=question_distractors)
+    total_responses = question_responses.count()
+    response_distribution = {}
+
+    for i in question_distractors:
+        distractor_response_count = question_responses.filter(response=i).count()
+        if total_responses is 0:
+            response_distribution[i.id] = 0
+        else:
+            response_distribution[i.id] = (distractor_response_count / total_responses) * 100
+
+    return response_distribution
 
 def get_course_leaders(course, sort_field, sort_order, limit=25):
     def lookup_total(fieldName, user_id, data):
