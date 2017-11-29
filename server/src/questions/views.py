@@ -5,6 +5,7 @@ from json import loads
 from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
+
 from ripple.util.util import is_number, merge_url_parts
 from users.services import UserService
 from questions.services import QuestionService, SearchService, AuthorService
@@ -50,7 +51,7 @@ def respond(request):
 
     if distractor_id is None:
         return JsonResponse({"error": "Missing integer distractorID in request"}, status=422)
-    if QuestionService.respond_to_question(distractor_id, UserService.logged_in_user(request)) is None:
+    if QuestionService.respond_to_question(distractor_id, UserService.logged_in_user(request)) is False:
         return JsonResponse({"error": "Invalid distractorID"}, status=422)
     else:
         return HttpResponse(status=204)
@@ -85,7 +86,7 @@ def rate(request):
         return JsonResponse({"error": "Missing integer distractorID in request"}, status=422)
 
     user_ratings = {"difficulty": difficulty, "quality": quality}
-    if QuestionService.rate_question(distractor_id, user_ratings, UserService.logged_in_user(request)) is None:
+    if QuestionService.rate_question(distractor_id, user_ratings, UserService.logged_in_user(request)) is False:
         return JsonResponse({"error": "Invalid distractorID"}, status=422)
     else:
         return HttpResponse(status=204)
@@ -116,6 +117,10 @@ def competencies(request):
     user_competencies = UserService.user_competencies(logged_in_user)
     return JsonResponse(user_competencies, safe=False)
 
+def aggregate(request, compare_type):
+    logged_in_user = UserService.logged_in_user(request)
+    aggregate_competencies = UserService.aggregate_competencies(logged_in_user, compare_type)
+    return JsonResponse(aggregate_competencies, safe=False)
 
 def leaderboard_default(request):
     return leaderboard(request, "reputation", "DESC")
@@ -132,13 +137,6 @@ def leaderboard(request, sort_field, sort_order):
     leaderboard_scores = QuestionService.get_course_leaders(
         logged_in_user.course, sort_field, sort_order, limit)
     return JsonResponse(leaderboard_scores, safe=False)
-
-
-def all(request):
-    logged_in_user = UserService.logged_in_user(request)
-    all_questions = [x.toJSON()
-                     for x in QuestionService.get_all_questions(logged_in_user.course)]
-    return JsonResponse(all_questions, safe=False)
 
 
 def topics(request):

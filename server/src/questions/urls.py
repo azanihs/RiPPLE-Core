@@ -5,7 +5,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^all/$', views.all, name='all'),
     url(r'^topics/$', views.topics, name='topics'),
 
     url(r'^respond/$', views.respond, name='respond'),
@@ -13,7 +12,10 @@ urlpatterns = [
 
     url(r'^id/(.*)/$', views.id),
     url(r'^page/(.*)/$', views.page),
+
     url(r'^competencies/all/$', views.competencies),
+    url(r'^competencies/aggregate/(.*)/$', views.aggregate),
+
     url(r'^add/$', views.add),
 
     url(r'^leaderboard/$', views.leaderboard_default),
