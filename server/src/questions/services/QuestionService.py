@@ -146,7 +146,71 @@ def update_competency(user, question, response):
         Updates the users competency for all topic combinations in the given question
     """
     # Weigh each topic
+    
+    question_score = calculate_question_score(
+            attempt_count, response.response.isCorrect)
+
+    total_correct = 1
+    total_incorrect = 1
+
+    q_first_clean = Question.objects.annotate(num_topics=Count('topics'))
+    q_second_clean = Question.objects.filter(topics__in=topics).annotate(num_topics=Count('topics'))
+    question_responses = QuestionResponse.objects.filter(user=user, response__in=Distractor.objects.filter(question__in = \
+                    q_second_clean.filter(num_topics=len(topics),id__in=q_first_clean.filter(num_topics=len(topics)).values('id'))))
+
+
+    if len(question_responses) > 0:
+
+            for response in question_responses:
+                if response.response.isCorrect:
+                    total_correct += 1
+                else:
+                    total_incorrect += 1
+
+            if response.response.isCorrect == False:
+                difficulty = 10 - response.response.question.difficulty
+            else:
+                difficulty = response.response.question.difficulty
+
+            print("WEIGHT:" + str(weight))
+            print(topics)
+
+            weighted_features = [
+                (difficulty/10, 0.25),
+                (previous_score, 0.3),
+                (math.log(user_competency.confidence), 0.25),
+                (math.log(total_incorrect), 0.35),
+                (math.log(total_correct), 0.35),
+                (exp_moving_avg(0.33), 0.35),
+                (exp_moving_avg(0.1), 0.25),
+                (float(total_correct / len(question_responses)), 0.30),
+                (user_competency.competency, 0.30)
+            ]
+
+            feature, weight_vector = zip(*weighted_features)
+
+            scores = np.dot(feature, weight_vector)
+
+            new_competency = 1 / (1 + math.exp(-scores))
+
+            if response.response.isCorrect == False:
+                user_competency.competency = (user_competency.competency + (1 - new_competency))/2
+                if user_competency.competency < 0.1:
+                    user_competency.competency = 0.1
+            else:
+                user_competency.competency = (user_competency.competency + new_competency)/2
+
+        user_competency.confidence += weight
+
+        user_competency.save()
+
+        update_question_score(user, question, question_score)
+    
+    
     weights = util.topic_weights(question.topics.all())
+
+
+
     for i in weights:
         topics = i["topics"]
         weight = i["weight"]
@@ -178,62 +242,14 @@ def update_competency(user, question, response):
                     for_competency=user_competency
                 ).save()
 
-        question_score = calculate_question_score(
-            attempt_count, response.response.isCorrect)
+        
 
-        total_correct = 1
-        total_incorrect = 1
+        # question_responses = QuestionResponse.objects.filter(user=user, response__in=Distractor.objects.filter(question__in = \
+        #                 Question.objects.filter(topics__in = topics)))
+        
+        print(question_responses)
 
-        # responses = QuestionResponse.objects.filter(user=user, response__in=Distractor.objects.filter(question__in= \
-        #     Questions.objects.annotate(num_topics=Count('topics')).filter(topic__in=topics).annotate(num_topics2=Count('topics')).filter(num_topics= \
-        #     len(topics)), num_topics2=len(topics))))
-
-        print(topics)
-        print(Question.objects.annotate(num_topics=Count('topics')).filter(topics__in=topics).annotate(num_topics2=Count('topics')).filter(num_topics=len(topics), num_topics2=len(topics))[0].topics.all())    
-        print(question.id)
-       
-        print()
-        question_count = 10
-        for response in QuestionResponse.objects.all():
-            if response.response.isCorrect:
-                total_correct += 1
-            else:
-                total_incorrect += 1
-
-        if response.response.isCorrect == False:
-            difficulty = 10 - response.response.question.difficulty
-        else:
-            difficulty = response.response.question.difficulty
-
-        weighted_features = [
-            (difficulty/10, 0.25),
-            (previous_score, 0.3),
-            (math.log(total_incorrect), 0.35),
-            (math.log(total_correct), 0.35),
-            (exp_moving_avg(0.33), 0.35),
-            (exp_moving_avg(0.1), 0.25),
-            (float(total_correct / question_count), 0.30),
-            (user_competency.competency, 0.30)
-        ]
-
-        feature, weight_vector = zip(*weighted_features)
-
-        scores = np.dot(feature, weight_vector)
-
-        new_competency = 1 / (1 + math.exp(-scores))
-
-        if response.response.isCorrect == False:
-            user_competency.competency = (user_competency.competency + (1 - new_competency))/2
-            if user_competency.competency < 0.1:
-                user_competency.competency = 0.1
-        else:
-            user_competency.competency = (user_competency.competency + new_competency)/2
-
-        user_competency.confidence += weight
-
-        user_competency.save()
-
-        update_question_score(user, question, question_score)
+        
 
 
 def exp_moving_avg(weight):
