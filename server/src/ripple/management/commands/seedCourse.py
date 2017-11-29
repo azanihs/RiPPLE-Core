@@ -44,12 +44,9 @@ def make_question_responses(user, distractors):
             user=user
         )
         response.save()
-        user_competency = QuestionService.update_competency(
+        QuestionService.update_competency(
             user, user_choice.question, response)
-        user_competency.competency = randrange(0, 100)
-        user_competency.confidence = randrange(0, 100)
 
-        user_competency.save()
         if chance(2):
             rating = QuestionRating(
                 quality=randrange(0, 10),
@@ -116,7 +113,7 @@ def parse_questions(file, course_users, all_topics, host):
 
                 for i in ["A", "B", "C", "D"]:
                     response = q["responses"][i]
-                    if response["content"] == None:
+                    if response["content"] is None:
                         response["content"] = " "
                     distractor = Distractor(
                         content = response["content"],
@@ -132,7 +129,7 @@ def parse_questions(file, course_users, all_topics, host):
                     distractors.append(distractor)
         except Exception as e:
             distractors=distractors[:len(distractors)-distractor_count]
-            print("Invalid question: " + counter)
+            print("Invalid question: " + str(counter))
 
     return distractors
 
@@ -147,11 +144,6 @@ def decode_images(image_id, obj, images, image_type, host):
         "e": ExplanationImage
     }
     ImageToSaveClass = database_image_types.get(image_type, None)
-
-    '''if image_type == "q" or image_type == "e":
-        reference = Question.objects.get(pk=image_id)
-    else:
-        reference = Distractor.objects.get(pk=image_id)'''
 
     for i, image in images.items():
         contentfile_image = util.save_image_course_seeder(image, image_id)
@@ -230,7 +222,7 @@ class Command(BaseCommand):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
-                 for user_id in range(15)]
+                 for user_id in range(50)]
 
         all_courses = [Course.objects.create(
             available=True,
@@ -239,3 +231,17 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
+
+    
+def save_image_course_seeder(encoded_image, image_id):
+    image_format, base64_payload = encoded_image.split(';base64,')
+    ext = image_format.split('/')[-1]
+    data = ContentFile(b64decode(base64_payload),
+                       name="")
+    if imghdr.what(data) is not None:
+        print(imghdr.what(data))
+        data.name = "u"+str(image_id)+"."+imghdr.what(data)
+    else:
+        return None
+
+    return data

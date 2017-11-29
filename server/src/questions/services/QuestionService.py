@@ -152,9 +152,8 @@ def update_competency(user, question, response):
 
     for i in weights:
         topics = queryset_topics.filter(id__in=[x.id for x in i["topics"]])
-        
         weight = i["weight"]
-
+        
         user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
         previous_score = 0
         attempt_count = 1
@@ -181,4 +180,3 @@ def update_competency(user, question, response):
         user_competency.save()
 
         update_question_score(user, question, question_score)
-        return user_competency
