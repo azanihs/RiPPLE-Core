@@ -31,7 +31,7 @@
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
                     </router-link>
-                    <div v-if="submenuIsVisible && link.text == 'Profile'">
+                    <div v-if="currentlyOpenMenu == link.href && link.submenu !== undefined">
                             <li v-for="submenuLink in link.submenu"
                                 :key="submenuLink.href">
                                 <router-link :to="submenuLink.href"
@@ -90,6 +90,11 @@
 .offset {
     height: 54px;
     min-width: 100%;
+}
+
+.submenu-active {
+    background-color: #1d323a;
+    color: #f2f2f2;
 }
 
 .sideNavContainer {
@@ -166,8 +171,8 @@ a.routerLink:hover {
     margin: 0px;
 }
 
-.router-link-exact-active.router-link-active,
-.router-link-exact-active.router-link-active:hover {
+.router-link-exact-active.router-link-active:not(.has-submenu),
+.router-link-exact-active.router-link-active:hover:not(.has-submenu){
     /* Sets the background colour of the currently selected item */
     background-color: #ffffff !important;
     color: #111 !important;
@@ -264,17 +269,20 @@ export default class Main extends Vue {
         };
 
         const baseLinks = [{
-            text: "Answer",
-            href: "/view/questions",
-            icon: "lightbulb_outline"
+            text: "Questions",
+            href: "/question/answer",
+            icon: "question_answer",
+            submenu: [{
+                text: "Answer",
+                href: "/question/answer"
+            }, {
+                text: "Create",
+                href: "/question/create"
+            }]
         }, {
             text: "Connect",
             href: "/view/peers",
             icon: "group"
-        }, {
-            text: "Author",
-            href: "/view/author",
-            icon: "attach_file"
         }];
 
         if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
@@ -359,15 +367,10 @@ export default class Main extends Vue {
             });
     }
 
-    submenuIsVisible = true;
+    currentlyOpenMenu = "/";
 
     toggleSubmenu(link) {
-        if (link.text == "Profile") {
-            this.submenuIsVisible = true;
-        } else {
-            this.submenuIsVisible = false;
-            this.activeSubmenu = false;
-        }
+        this.currentlyOpenMenu = link.href;
     }
 
     toggleSideNav(link) {
@@ -395,12 +398,11 @@ export default class Main extends Vue {
         this.activeSubmenu = true;
     }
 
-    submenuClassNames(link ) {
-        return {
-            "submenu-active": link.text=="Profile" && this.activeSubmenu
-        };
+    submenuClassNames(link) {
+        if (link.submenu !== undefined) {
+            return "has-submenu";
+        }
     }
-
 
 }
 </script>
