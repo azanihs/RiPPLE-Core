@@ -167,21 +167,17 @@ export default class UserRepository {
     }
 
     static getCompareAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch(`/questions/topics/`)
+        return apiFetch(`/questions/competencies/aggregate/${compareTo}`)
         .then(x => x.json())
-        .then((topics: Topic[]) => topics.reduce((carry: Edge[], topic) => {
-            topics.forEach(x => {
-                const edge: Edge = {
-                    source: TopicRepository.topicPointer(topic),
-                    target: TopicRepository.topicPointer(x),
-                    competency: Math.floor(Math.random() * 100),
-                    attempts: Math.floor(Math.random() * 100)
-                };
-                carry.push(edge);
-            });
-
-            return carry;
-        }, []));
+        .then(x => x.map(x => {
+            const edge: Edge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: x[2],
+                attempts: x[3]
+            };
+            return edge;
+        }));
     }
 
     static getUserCompetencies(): Promise<Edge[]> {

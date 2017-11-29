@@ -97,16 +97,20 @@ class QuestionScore(models.Model):
     user = models.ForeignKey(CourseUser)
 
 
+class CompetencyMap(models.Model):
+    topic = models.ForeignKey(Topic)
+    aggregate_id = models.IntegerField(null=True)
+
+
 class Competency(models.Model):
     competency = models.FloatField()
     confidence = models.FloatField()
 
-
-class CompetencyMap(models.Model):
-    topic = models.ForeignKey(Topic)
+    # Many to Many FK to CompetencyMap aggregate_id
+    topics = models.IntegerField()
 
     user = models.ForeignKey(CourseUser)
-    for_competency = models.ForeignKey(Competency)
+
 
 
 class QuestionImage(models.Model):
