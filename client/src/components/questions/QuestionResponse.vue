@@ -1,6 +1,6 @@
 <template>
     <md-layout md-flex="100">
-        <ul class="questionResponse">
+        <ul class="responsesContainer">
             <li v-for="(possibleAnswer, index) in question.distractors"
                 :key="index"
                 :class="getResponseStyles(possibleAnswer)">
@@ -21,7 +21,7 @@
                     :id="'' + possibleAnswer.id">
                         <span class="distractorIndex">{{distractorIndex(index)}}.</span>
                 </md-radio>
-                <div class="questionContent" v-html="possibleAnswer.content"></div>
+                <div class="questionContent" @click="questionResponse = index" v-html="possibleAnswer.content"></div>
                 <div class="distributionOverlay"
                     :style="answerOptionFill(possibleAnswer)"></div>
             </li>
@@ -69,7 +69,7 @@
     display: flex;
     margin-left: 0.5em;
 }
-.questionResponse {
+.responsesContainer {
     list-style: none;
     margin: 0px;
     padding: 0px;
@@ -78,7 +78,7 @@
     margin-top: 1em;
 }
 
-.questionResponse li {
+.responsesContainer li {
     list-style: none;
     cursor: pointer;
     position: relative;
@@ -167,10 +167,11 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Question } from "../../interfaces/models";
+import { Question, Distractor } from "../../interfaces/models";
 import Comment from "../util/Comment.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionService from "../../services/QuestionService";
+import Fetcher from "../../services/Fetcher";
 import * as d3 from "d3";
 
 @Component({
@@ -187,6 +188,24 @@ export default class QuestionResponse extends Vue {
     userAnswer: number = -1;
     hasGivenUp = false;
     disabledResponses = [];
+
+    pResponseDistribution: {[id: number]: number} = {};
+
+    updateResponseDistribution(newDistribution) {
+        this.pResponseDistribution = newDistribution;
+    }
+
+    @Lifecycle
+    created() {
+        QuestionService.distributionForQuestion(this.question)
+            .then(this.updateResponseDistribution);
+    }
+
+    @Watch("question")
+    questionChanged(oldQuestion, newQuestion) {
+        QuestionService.distributionForQuestion(this.question)
+            .then(this.updateResponseDistribution);
+    }
 
     feedbackEnter(el: HTMLElement, done) {
         el.style.height = "auto";
@@ -245,14 +264,15 @@ export default class QuestionResponse extends Vue {
             });
     }
 
-    answerOptionFill(response) {
+    answerOptionFill(response: Distractor) {
         if (this.userHasCorrectAnswer) {
             return {
-                width: (QuestionService.distributionForQuestion(this.question).get(response) * 100) + "%"
+                width: this.pResponseDistribution[response.id] + "%"
             };
         }
         return {};
     }
+
     distractorIndex(index: number) {
         return String.fromCharCode("A".charCodeAt(0) + index);
     }

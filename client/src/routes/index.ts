@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Main from "../main";
+import Main from "../Main.vue";
 
 import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
@@ -54,9 +54,13 @@ const routes = [{
         name: "notifications",
         component: NotificationsView
     }, {
-        path: "/view/questions",
-        name: "questions",
+        path: "/question/answer",
+        name: "answer",
         component: QuestionBrowser
+    }, {
+        path: "/question/create",
+        name: "create",
+        component: AuthorView
     }, {
         path: "/view/friends",
         name: "friends",

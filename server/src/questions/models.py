@@ -46,6 +46,7 @@ class Question(models.Model):
             "qualityCount": self.qualityCount,
             "topics": [x.toJSON() for x in self.topics.all()],
             "responses": [],
+            "responseCount": sum((x.questionresponse_set.count() for x in self.distractor_set.all())),
             "distractors": [x.toJSON() for x in self.distractor_set.all()]
         }
 
@@ -95,18 +96,15 @@ class QuestionScore(models.Model):
     question = models.ForeignKey(Question)
     user = models.ForeignKey(CourseUser)
 
-
 class Competency(models.Model):
     competency = models.FloatField()
     confidence = models.FloatField()
 
-
-class CompetencyMap(models.Model):
-    topic = models.ForeignKey(Topic)
-
+    topics = models.ManyToManyField(Topic)
     user = models.ForeignKey(CourseUser)
-    for_competency = models.ForeignKey(Competency)
 
+    def __str__(self):
+        return str(self.competency)+" "+str(self.confidence)+" "+str(self.topics.all())
 
 class QuestionImage(models.Model):
     image = models.ImageField(upload_to='question_photo')

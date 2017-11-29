@@ -36,7 +36,8 @@ class Availability(models.Model):
 
     def toJSON(self):
         return {
-            "course_user": self.course_user.toJSON(),
+            "id": self.id,
+            "courseUser": self.course_user.toJSON(),
             "day": self.day.toJSON(),
             "time": self.time.toJSON()
         }

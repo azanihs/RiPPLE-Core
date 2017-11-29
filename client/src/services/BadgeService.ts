@@ -2,62 +2,23 @@ import BadgeRepository from "../repositories/BadgeRepository";
 import { Badge } from "../interfaces/models";
 
 export default class BadgeService {
+
     static badgeToIcon(badge: Badge): string {
-        return [
-            "alarm",
-            "assessment",
-            "build",
-            "change_history",
-            "code",
-            "compare_arrows",
-            "delete",
-            "done",
-            "favorite",
-            "event",
-            "bug_report",
-            "find_replace",
-            "dns",
-            "explore",
-            "copyright",
-            "explore",
-            "gif",
-            "language",
-            "launch",
-            "lightbulb_outline",
-            "line_weight",
-            "hourglass_empty",
-            "home",
-            "play_for_work",
-            "polymer",
-            "lock_open",
-            "settings",
-            "translate",
-            "thumb_up",
-            "trending_up",
-            "toll"
-        ][badge.id] || "priority_high";
+        return badge.icon;
     }
 
-    static userHasBadge({ badgeId }: { badgeId: number }) {
-        return BadgeRepository.getAllUserBadges()
-            .then(badges => badges.find(userBadge => userBadge.badge.id === badgeId));
+    static getAllUserBadges() {
+        return BadgeRepository.getAllUserBadges();
     }
 
-    static getAllAvailableBadges() {
-        return BadgeRepository.getAllAvailableBadges();
+    static getBadgesByCategory(badges: Badge[], category: string) {
+        return badges.filter(x => x.category === category)
+                .sort((a, b) => b.progress - a.progress);
     }
 
-    static getBadgesByCategory({ category }: { category: string }) {
-        return BadgeRepository.getAllAvailableBadges()
-            .then(badges => badges.filter(x => x.category === category));
-    }
-
-
-    static getClosestUserBadges() {
-        return BadgeRepository.getAllUserBadges()
-            .then(badges => badges.filter(x => x.progress > 0 && x.progress < 100)
+    static getClosestUserBadges(badges: Badge[]) {
+        return badges.filter(x => x.progress < 100)
                 .sort((a, b) => (b.progress - a.progress))
-                .slice(0, 3)
-                .map(x => x.badge));
+                .slice(0, 3);
     }
 }

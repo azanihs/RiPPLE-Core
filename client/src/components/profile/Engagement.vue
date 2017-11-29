@@ -14,11 +14,6 @@
     </md-layout>
 </template>
 
-<style scoped>
-
-
-
-</style>
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";

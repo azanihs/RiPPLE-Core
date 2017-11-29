@@ -1,8 +1,13 @@
 *.pyc
+src/rippledb
 src/*.db
 src/*.db-journal
 src/media/
+htmlcov
+.coverage
 
 *.env
 .env*
 !.env.example
+
+rippledb
