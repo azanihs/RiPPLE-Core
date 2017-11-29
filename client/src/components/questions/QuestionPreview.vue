@@ -18,7 +18,7 @@
             <md-layout class="rightPanel">
                 <div>
                     <md-icon>reply</md-icon>
-                    <span>{{ data.responses.length }}</span>
+                    <span>{{ data.responseCount }}</span>
                     <md-tooltip md-direction="top">Question Responses</md-tooltip>
                 </div>
                 <div>
@@ -67,6 +67,7 @@
 .leftPanel {
     padding: 8px;
     border-right: 1px solid #ddd;
+    flex: 1;
 }
 
 
@@ -75,6 +76,7 @@
     padding: 8px;
     background-color: #fafafa;
     color: #999;
+    flex-grow: 0;
 }
 
 .rightPanel>div {

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from json import loads
+import json
 import base64
 import imghdr
 from django.http import JsonResponse
@@ -8,6 +9,9 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
+from users.models import User
+from rippleAchievements.models import Achievement
+from rippleAchievements.engine import engine
 from ripple.util import util
 
 def index(request):
@@ -19,7 +23,7 @@ def index(request):
 def me(request):
     token = request.META.get("HTTP_AUTHORIZATION", None)
     user_course = token_to_user_course(token)
-
+    
     return JsonResponse(user_course.toJSON())
 
 
@@ -51,7 +55,7 @@ def login(request, course_code):
 
     return JsonResponse(generate_token())
 
-def getUser(request, course_code=None):
+def get_user(request, course_code=None):
     if course_code != "":
         return JsonResponse(get_user(course_code))
 
@@ -82,3 +86,14 @@ def image_update(request):
     ])
 
     return JsonResponse(update_user_image(course_user.user, root_path, new_image))
+
+
+def get_all_user_achievements(request):
+    user = logged_in_user(request)
+
+    achievements = Achievement.objects.all()
+    data = []    
+    for ach in achievements:
+        data.append(engine.check_achievement(user=user, key=ach.key))
+
+    return JsonResponse(data, safe=False)

@@ -1,14 +1,9 @@
-
 import {
-    CourseUser, User, Course, Badge, AcquiredBadge,
+    CourseUser, User, Course, Badge,
     Notification, Topic, PeerConnection, Edge, UserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
-
-import faker from "faker";
-
-const f: any = faker;
 
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
@@ -16,37 +11,52 @@ const getCategory: any = i => ["connections", "engagement", "competencies"][i];
 const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recommendations", "Social Connections",
     "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"];
 
-const topics = Array.from({ length: 10 }, x => f.hacker.abbreviation()).filter((x, i, self) => self.indexOf(x) == i);
+const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures", "Variables"];
 
 type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
 
+const _n = i => Math.floor(Math.random() * i);
+
 const userTopicScores = {};
-const topicNodes = topics.map((x, id) => {
+const topicNodes = _topics.map((x, id) => {
     const topicNode = {
         id: id,
         name: x
     };
     // Ensure at least one self-loop per topic
-    userTopicScores[id] = [[topicNode, topicNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]];
+    userTopicScores[id] = [[topicNode, topicNode, _n(100), _n(100)]];
     return topicNode;
 });
 topicNodes.forEach(x => {
-    const randomNode = topicNodes[Math.floor(Math.random() * topicNodes.length)];
+    const randomNode = topicNodes[_n(topicNodes.length)];
     if (randomNode == x) {
         return;
     }
-    userTopicScores[x.id].push([x, randomNode, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+    userTopicScores[x.id].push([x, randomNode, _n(100), _n(100)]);
 });
 
+const _notificationMessages = [
+    "Upcoming meeting",
+    "New achievement unlocked!",
+    "New peer recommendation",
+    "Personal goal met",
+    "Personal goals slipping",
+    "User meeting requested",
+    "User meeting accepted",
+    "New achievements made available",
+    "Achievement lost"
+];
+
 const getRandomTopic = () => {
-    const i = f.random.number({ min: 0, max: 3 });
+    const i = _n(4);
     return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
 };
+
 const notificationCount = Math.random() < 0.5 ? 50 : 0;
 const notifications = Array.from({ length: notificationCount }).map(x => ({
     id: Math.random(),
     type: getRandomTopic() as NotificationType,
-    content: f.hacker.phrase(),
+    content: _notificationMessages[_n(_notificationMessages.length)],
     read: Math.random() < 0.5
 }));
 
@@ -59,16 +69,16 @@ const userEngagementScores = [];
 engagementNodes.forEach(engagementNode => {
     // Ensure at least one self-loop per topic
     userEngagementScores.push([engagementNode, engagementNode,
-        Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+        _n(100), _n(100)]);
 
-    const randomNode = engagementNodes[Math.floor(Math.random() * engagementNodes.length)];
+    const randomNode = engagementNodes[_n(engagementNodes.length)];
     if (randomNode == engagementNode) {
         return;
     }
 
     userEngagementScores.push([engagementNode, randomNode,
-        Math.floor(Math.random() * 100),
-        Math.floor(Math.random() * 100)]);
+        _n(100),
+        _n(100)]);
 });
 
 const makeUser = () => {
@@ -76,28 +86,27 @@ const makeUser = () => {
         return types[i] as "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner";
     };
 
-    const connections = new Array(f.random.number({ min: 2, max: 10 })).fill(0).map(x => {
+    const connections = new Array(2 + _n(8)).fill(0).map(x => {
         const connection: PeerConnection = {
             edgeStart: 0,
             edgeEnd: 0,
-
-            type: getType(f.random.number({ min: 0, max: 2 })),
-            topic: f.random.number({ min: 1, max: 6 }),
-            weight: f.random.number({ min: 0, max: 10 }),
+            type: getType(_n(2)),
+            topic: _topics[_n(6)],
+            weight: _n(10),
             date: new Date(),
             availableTime: new Date()
         };
         return connection;
     });
-    const proficienciesLength = f.random.number({ min: 1, max: 4 });
+    const proficienciesLength = 1 + _n(3);
     const proficiencies = Array.from({ length: proficienciesLength },
-        x => f.hacker.abbreviation()) as string[];
+        x => _topics[_n(_topics.length)]) as string[];
 
     const user: User = {
         id: IDCounter++,
-        name: f.name.findName(),
-        bio: f.hacker.phrase() + " " + f.hacker.phrase(),
-        image: f.image.avatar(),
+        name: "_",
+        bio: "_",
+        image: "//loremflickr.com/320/240/person",
 
         availableTime: new Date(),
         proficiencies: proficiencies,
@@ -105,18 +114,17 @@ const makeUser = () => {
     };
     return user;
 };
+
 const userConnections = makeUser().connections;
 let _courseCode = "";
 
 export default class UserRepository {
     static getLoggedInUser(): Promise<CourseUser> {
-        return apiFetch(`/users/me/`)
-            .then(x => x.json());
+        return apiFetch<CourseUser>(`/users/me/`);
     }
 
     static getUserCourses(): Promise<Course[]> {
-        return apiFetch(`/users/courses/`)
-            .then(x => x.json());
+        return apiFetch<Course[]>(`/users/courses/`);
     }
 
     static getUserConnections(count: number): Promise<User[]> {
@@ -152,31 +160,24 @@ export default class UserRepository {
     }
 
     static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
-        return apiFetch(`/questions/leaderboard/${sortField}/${sortOrder}/`)
-            .then(x => x.json());
+        return apiFetch<UserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
     }
 
     static getCompareAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch(`/questions/topics/`)
-        .then(x => x.json())
-        .then((topics: Topic[]) => topics.reduce((carry: Edge[], topic) => {
-            topics.forEach(x => {
-                const edge: Edge = {
-                    source: TopicRepository.topicPointer(topic),
-                    target: TopicRepository.topicPointer(x),
-                    competency: Math.floor(Math.random() * 100),
-                    attempts: Math.floor(Math.random() * 100)
-                };
-                carry.push(edge);
-            });
-
-            return carry;
-        }, []));
+        return apiFetch<Edge[]>(`/questions/competencies/aggregate/${compareTo}`)
+        .then(x => x.map(x => {
+            const edge: Edge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: x[2],
+                attempts: x[3]
+            };
+            return edge;
+        }));
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
-        return apiFetch(`/questions/competencies/all/`)
-            .then(x => x.json())
+        return apiFetch<Edge[]>(`/questions/competencies/all/`)
             .then(x => x.map(x => {
                 const edge: Edge = {
                     source: TopicRepository.topicPointer(x[0]),
@@ -204,10 +205,11 @@ export default class UserRepository {
         });
     }
 
-    static getMeetingHistory(): Promise<string[]> {
+    static getMeetingHistory(): Promise<{name: string, id: number }[]> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve(["Toowong", "UQ", "University Of Queensland", "Kenmore", "Indro"]);
+                resolve(["Toowong", "UQ", "University Of Queensland",
+                    "Kenmore", "Indro"].map((x, i) => ({ name: x, id: i })));
             }, Math.random() * 1000);
         });
     }
@@ -229,8 +231,7 @@ export default class UserRepository {
     }
 
     static authenticate(courseCode?: string): Promise<void> {
-        return apiFetch(`/users/login/${courseCode || " "}`)
-            .then(x => x.json())
+        return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
                 setToken(x.token);
                 UserRepository.setCurrentCourse(x.courseCode);
@@ -238,7 +239,7 @@ export default class UserRepository {
     }
 
     static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {
-        return apiFetch(`/users/courses/update/`, {
+        return apiFetch<CourseUser>(`/users/courses/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -248,12 +249,11 @@ export default class UserRepository {
                 course: course,
                 topics: topics
             })
-        })
-            .then(x => x.json());
+        });
     }
 
     static updateUserImage(newImage: string): Promise<User> {
-        return apiFetch(`/users/me/image/`, {
+        return apiFetch<User>(`/users/me/image/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -262,6 +262,6 @@ export default class UserRepository {
             body: JSON.stringify({
                 image: newImage
             })
-        }).then(x => x.json());
+        });
     }
 }
