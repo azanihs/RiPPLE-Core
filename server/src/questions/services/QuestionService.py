@@ -9,6 +9,8 @@ import random
 
 import math
 
+import numpy as np
+
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
         user_column).annotate(total=Count(user_column))
@@ -179,9 +181,6 @@ def update_competency(user, question, response):
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)
 
-        
-        #user_competency.competency = (
-        #user_competency.competency * user_competency.confidence - previous_score + question_score) / (user_competency.confidence + weight)
         total_correct = 1
         total_incorrect = 1
         
@@ -198,37 +197,29 @@ def update_competency(user, question, response):
             difficulty = response.response.question.difficulty
 
         weighted_features = [
-            (difficulty/10, 0.3),
+            (difficulty/10, 0.25),
             (previous_score, 0.3),
-            (math.log(question_count), 0.1),
-            (math.log(total_incorrect), 0.3),
-            (math.log(total_correct), 0.3),
+            (math.log(total_incorrect), 0.35),
+            (math.log(total_correct), 0.35),
             (exp_moving_avg(0.33), 0.35),
             (exp_moving_avg(0.1), 0.25),
-            (float(total_correct / question_count), 0.25),
+            (float(total_correct / question_count), 0.30),
             (user_competency.competency, 0.30)
         ]
 
-        x , weight_vector = zip(*weighted_features)
+        feature, weight_vector = zip(*weighted_features)
 
-        scores = sum([i*j for (i, j) in zip(x, weight_vector)])
-        
-        
-        test = 1 / (1 + math.exp(-scores))
+        scores = np.dot(feature, weight_vector)
 
-        # print(response.response.isCorrect)
-        # print("SCORE: " + str(scores))
-        print("TEST: " + str(test))
+        new_competency = 1 / (1 + math.exp(-scores))
 
-        difference = abs(user_competency.competency - test)
         if response.response.isCorrect == False:
-            user_competency.competency = (user_competency.competency + (1 - test))/2
+            user_competency.competency = (user_competency.competency + (1 - new_competency))/2
             if user_competency.competency < 0.1:
                 user_competency.competency = 0.1
         else:
-            user_competency.competency = (user_competency.competency + test)/2
+            user_competency.competency = (user_competency.competency + new_competency)/2
 
-        user_competency.confidence += weight
         user_competency.save()
 
         update_question_score(user, question, question_score)
@@ -243,3 +234,24 @@ def exp_moving_avg(weight):
         ewma = weight * correct + (1 - weight) * ewma
  
     return ewma
+
+"""Current implementation of the khan academy normalization equation """
+""" refer to http://david-hu.com/2011/11/02/how-khan-academy-is-using-machine-learning-to-assess-student-mastery.html? """
+# count = 10
+
+        # X = np.zeros(10)
+        # Y = np.zeros(10)
+
+        # for i in range(0,10):
+        #     QuestionService.respond_to_question(2, author)
+        #     X[i] = Competency.objects.all().first().competency
+        #     Y[i] = i+1
+        
+        # A, B = np.polyfit(X, np.log(Y),1)
+
+        # A /= (A * np.exp(B * 0.90))
+
+        # print(A)
+        # print(B)
+        # print(sorted((A * np.exp(B * 0.90), 0.0, 1.0))[1])
+        

@@ -8,7 +8,7 @@ from questions.models import Course, Topic, Question, Distractor, QuestionRespon
 from users.models import CourseUser, User
 from questions.services import QuestionService
 
-import numpy as np
+
 
 # Create your tests here.
 
@@ -72,13 +72,12 @@ class QuestionTestCase(TestCase):
         print("FIRST TEST\n")
 
 
-        # for i in range(0, 0):
-        #     QuestionService.respond_to_question(2, author)
-        #     #print(Competency.objects.all().first().confidence)
-        #     print(Competency.objects.all().first().competency)
-        #     QuestionService.respond_to_question(3, author)
-        #     print(Competency.objects.all().first().competency)
-        #     Competency.objects.all().first().save()
+        for i in range(0, 0):
+            QuestionService.respond_to_question(2, author)
+            #print(Competency.objects.all().first().confidence)
+            print(Competency.objects.all().first().competency)
+            QuestionService.respond_to_question(3, author)
+            print(Competency.objects.all().first().competency)
 
         for i in range(0, 20):
             QuestionService.respond_to_question(2, author)
@@ -95,29 +94,10 @@ class QuestionTestCase(TestCase):
 
         print("SECOND TEST\n")
 
-        for i in range(0, 20):
+        for i in range(0, 10):
             QuestionService.respond_to_question(3, author)
             print(Competency.objects.all().first().competency)
       
-
-
-        # count = 10
-
-        # X = np.zeros(10)
-        # Y = np.zeros(10)
-
-        # for i in range(0,10):
-        #     QuestionService.respond_to_question(2, author)
-        #     X[i] = Competency.objects.all().first().competency
-        #     Y[i] = i+1
-        
-        # A, B = np.polyfit(X, np.log(Y),1)
-
-        # A /= (A * np.exp(B * 0.90))
-
-        # print(A)
-        # print(B)
-        # print(sorted((A * np.exp(B * 0.90), 0.0, 1.0))[1])
 
     def test_answering_multiple_questions(self):
         # New question with existing items with single topic
