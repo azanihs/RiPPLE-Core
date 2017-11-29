@@ -49,6 +49,8 @@ def save_image(encoded_image, image_id):
         return None
     return data
 
+
+
 def merge_url_parts(parts, url=""):
     if len(parts) == 0:
         return url

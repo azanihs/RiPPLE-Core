@@ -13,8 +13,7 @@ export default class TopicRepository {
     }
 
     static getAllAvailableTopics(): Promise<Topic[]> {
-        return apiFetch(`/questions/topics/`)
-            .then(topics => topics.json())
+        return apiFetch<Topic[]>(`/questions/topics/`)
             .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
 }

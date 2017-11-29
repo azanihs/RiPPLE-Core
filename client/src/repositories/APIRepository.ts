@@ -1,4 +1,6 @@
 import "whatwg-fetch";
+import Fetcher from "../services/Fetcher";
+
 declare const process;
 declare let fetch;
 
@@ -33,15 +35,29 @@ export const blobFetch = (url: string, options?: Object) => {
         });
 };
 
-export const apiFetch = (url: string, opts?: Object) => {
+export const apiFetch = <T>(url: string, opts?: Object): Promise<T> => {
     const options = mergeAuthHeader(opts);
-
     return fetch(`${API}${url}`, options)
         .then(response => {
             if (!response.ok) {
                 throw response;
             }
-            return response;
+            if (response.status >= 200 && response.status < 300) {
+                if (response.status == 204) {
+                    return Promise.resolve({});
+                } else {
+                    return response.json() as Promise<T>;
+                }
+            }
+            // Fallthrough to error
+            Promise.resolve({});
+        })
+        .then(serverResponse => {
+            if (serverResponse.achievement) {
+                // Do global things
+                // Fetcher.forceUpdate(false);
+            }
+            return serverResponse;
         });
 };
 

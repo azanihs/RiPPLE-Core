@@ -90,16 +90,13 @@ export interface UserSummary {
 };
 
 export interface Badge {
-    id: number,
+    key: string,
     name: string,
+    description: string,
     category: "engagement" | "competencies" | "connections",
-    description: string
-};
-
-export interface AcquiredBadge {
-    id: number,
-    badge: Badge,
+    count: number,
     progress: number,
+    icon: string,
     dateAcquired: Date
 };
 
