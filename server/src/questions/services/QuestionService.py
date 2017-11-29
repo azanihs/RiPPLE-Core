@@ -183,8 +183,17 @@ def update_competency(user, question, response):
 
         total_correct = 1
         total_incorrect = 1
-        
-        question_count = QuestionResponse.objects.count()
+
+        # responses = QuestionResponse.objects.filter(user=user, response__in=Distractor.objects.filter(question__in= \
+        #     Questions.objects.annotate(num_topics=Count('topics')).filter(topic__in=topics).annotate(num_topics2=Count('topics')).filter(num_topics= \
+        #     len(topics)), num_topics2=len(topics))))
+
+        print(topics)
+        print(Question.objects.annotate(num_topics=Count('topics')).filter(topics__in=topics).annotate(num_topics2=Count('topics')).filter(num_topics=len(topics), num_topics2=len(topics))[0].topics.all())    
+        print(question.id)
+       
+        print()
+        question_count = 10
         for response in QuestionResponse.objects.all():
             if response.response.isCorrect:
                 total_correct += 1
@@ -220,10 +229,12 @@ def update_competency(user, question, response):
         else:
             user_competency.competency = (user_competency.competency + new_competency)/2
 
+        user_competency.confidence += weight
+
         user_competency.save()
 
         update_question_score(user, question, question_score)
-        return user_competency
+
 
 def exp_moving_avg(weight):
     ewma = 0.5
