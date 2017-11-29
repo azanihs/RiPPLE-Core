@@ -12,8 +12,7 @@ export default class AvailabilityRepository {
     }
 
     static getDays(): Promise<Day[]> {
-        return apiFetch("/recommendations/availability/days/")
-          .then(x => x.json());
+        return apiFetch<Day[]>("/recommendations/availability/days/");
     }
 
     static getUserAvailability(): Promise<Availability[]> {

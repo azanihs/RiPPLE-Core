@@ -94,4 +94,7 @@ export default class QuestionRepository {
         });
     }
 
+    static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
+        return apiFetch(`/questions/distribution/${question.id}/`);
+    }
 }

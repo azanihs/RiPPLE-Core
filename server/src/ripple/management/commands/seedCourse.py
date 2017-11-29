@@ -166,8 +166,6 @@ def decode_images(image_id, obj, images, image_type, host):
     obj.save()
     return True
 
-
-
 def newSource(urls, content, host):
     soup = BeautifulSoup(content, "html.parser")
 
