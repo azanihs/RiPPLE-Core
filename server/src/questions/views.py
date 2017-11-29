@@ -211,3 +211,13 @@ def page_response(data, page_index):
         "page": page_index,
         "totalItems": page_manager.count
     })
+
+def report(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    post_request = loads(request.body.decode("utf-8"))
+    user = UserService.logged_in_user(request)
+    return JsonResponse(report_question(user, post_request), safe=False)
