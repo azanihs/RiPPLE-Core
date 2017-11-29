@@ -182,3 +182,15 @@ export interface DayTime {
     day: number,
     time: number
 }
+
+export interface StudyRole {
+    id: number,
+    role: string,
+    description: string
+}
+
+export interface AvailableRole {
+    courseUser: CourseUser,
+    topic: Topic,
+    studyRole: StudyRole
+}

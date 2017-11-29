@@ -1,4 +1,4 @@
-import { Availability, CourseAvailability, Day, Time } from "../interfaces/models";
+import { Availability, CourseAvailability, Day, Time, StudyRole, AvailableRole } from "../interfaces/models";
 import { setToken, apiFetch } from "./APIRepository";
 
 export default class AvailabilityRepository {
@@ -19,7 +19,6 @@ export default class AvailabilityRepository {
         return apiFetch<Availability[]>("/recommendations/availability/");
     }
 
-
     static updateUserAvailability(day: number, time: number) {
         return apiFetch(`/recommendations/availability/update/`, {
             method: "POST",
@@ -30,6 +29,28 @@ export default class AvailabilityRepository {
             body: JSON.stringify({
                 day: day,
                 time: time
+            })
+        });
+    }
+
+    static getStudyRoles(): Promise<StudyRole[]> {
+        return apiFetch("/recommendations/roles/all");
+    }
+
+    static getUserAvailableRoles(): Promise<AvailableRole[]> {
+        return apiFetch("/recommendations/roles/");
+    }
+
+    static updateUserRoles(topic: number, studyRole: number) {
+        return apiFetch(`/recommendations/roles/update/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+                topic: topic,
+                studyRole: studyRole
             })
         });
     }

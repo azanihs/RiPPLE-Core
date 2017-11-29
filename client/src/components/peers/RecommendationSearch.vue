@@ -6,8 +6,8 @@
                 <thead>
                     <tr>
                         <th>Topics</th>
-                        <th v-for="sType in searchTypes"
-                            :key="sType">{{ sType }}
+                        <th v-for="role in studyRoles"
+                            :key="role.id">{{ role.description }}
                         </th>
                     </tr>
                 </thead>
@@ -19,14 +19,15 @@
                             <div class="cellOverlay"
                                  :style="getCellWeight(topic)"></div>
                         </td>
-                        <td v-for="sType in searchTypes"
-                            :key="sType"
+                        <td v-for="role in studyRoles"
+                            :key="role.id"
                             class="centerAlign">
                             <md-checkbox class="centerCheckbox"
-                                         :disabled="checkboxIsDisabled(sType, topic)"
-                                         @change="checkboxChange"
-                                         :id="`${sType}_${topic.id}`"
-                                         :name="`${sType}_${topic.id}`"></md-checkbox>
+                                         :disabled="checkboxIsDisabled(role.description, topic)"
+                                         :value="checkbox(topic, role)"
+                                         @change="checkboxChange(topic, role)"
+                                         :id="`${role.id}_${topic.id}`"
+                                         :name="`${role.id}_${topic.id}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
@@ -70,29 +71,29 @@
 <style>
 
     .connect-tabs .md-tabs-navigation-container {
-        background-color: #4d656d; 
+        background-color: #4d656d;
     }
 
     .connect-tabs .md-tab-header {
-        
-        background-color: rgba(34,85,102, 0.7); 
-        border-bottom: 6px solid #f2f2f2;  
+
+        background-color: rgba(34,85,102, 0.7);
+        border-bottom: 6px solid #f2f2f2;
     }
 
     .connect-tabs .md-tab-header:hover {
         background-color: rgba(34,85,102, 0.4);
     }
-    
+
     .connect-tabs span {
         font-weight: bold;
         font-family: Verdana,Arial,Helvetica,sans-serif;
     }
     .connect-tabs .md-active span{
-        color: #f2f2f2;   
+        color: #f2f2f2;
     }
 
     .connect-tabs .md-active {
-        background-color: #256; 
+        background-color: #256;
     }
 
     .connect-tabs .md-tab-indicator{
@@ -101,7 +102,7 @@
     }
 
 
-    
+
 </style>
 
 <style scoped>
@@ -149,7 +150,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic, UserSummary, Edge } from "../../interfaces/models";
+import { Topic, UserSummary, Edge, StudyRole } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -162,12 +163,6 @@ import RecommendationCard from "./RecommendationCard.vue";
     }
 })
 export default class RecommendationSearch extends Vue {
-    @Prop
-    searchTypes = p<string[]>({
-        required: true,
-        type: Array
-    });
-
     @Prop
     topics = p<Topic[]>({
         required: true,
@@ -184,6 +179,22 @@ export default class RecommendationSearch extends Vue {
     requests = p<UserSummary[]>({
         required: true,
         type: Array
+    });
+
+    @Prop
+    studyRoles = p<StudyRole[]>({
+        type: Array,
+        default: () => {
+            return [];
+        }
+    });
+
+    @Prop
+    userRoles = p<Map<string, Map<string, boolean>>>({
+        type: Map,
+        default: () => {
+            return new Map<string, Map<string, boolean>>();
+        }
     });
 
     competencies = new Map();
@@ -204,8 +215,21 @@ export default class RecommendationSearch extends Vue {
             .on(this.updateCompetencies);
     }
 
-    checkboxChange() {
-        this.$emit("change");
+    checkbox(topic, studyRole) {
+        if (!this.userRoles.has(topic.name)) {
+            return false;
+        } else {
+            const topicRoles = this.userRoles.get(topic.name);
+            if (!topicRoles.has(studyRole.role)) {
+                return false;
+            } else {
+                return topicRoles.get(studyRole.role);
+            }
+        }
+    }
+
+    checkboxChange(topic, studyRole) {
+        this.$emit("change", topic.id, studyRole.id);
     }
 
     checkboxIsDisabled(sType, topic) {
