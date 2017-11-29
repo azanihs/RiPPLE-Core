@@ -1,5 +1,5 @@
 import { apiFetch } from "./APIRepository";
-import { Question, Topic, QuestionUpload } from "../interfaces/models";
+import { Question, Topic, QuestionUpload, ReportQuestion } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
@@ -96,5 +96,18 @@ export default class QuestionRepository {
 
     static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
         return apiFetch(`/questions/distribution/${question.id}/`);
+    }
+
+    static uploadReport(questionReport: ReportQuestion) {
+        return apiFetch<Object>("/questions/report/", {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "Application/json"
+            }),
+            body: JSON.stringify({
+                questionReport
+            })
+        });
     }
 }

@@ -60,7 +60,8 @@
                 <md-icon>keyboard_return</md-icon>
                 <md-tooltip md-direction="left">Return</md-tooltip>
             </md-button>
-            <md-button class="md-fab md-primary md-mini md-clean">
+            <md-button class="md-fab md-primary md-mini md-clean" 
+                            @click="reportQuestion">
                 <md-icon>error_outline</md-icon>
                 <md-tooltip md-direction="left">Report Question</md-tooltip>
             </md-button>
@@ -213,6 +214,10 @@ export default class Question extends Vue {
 
     closeQuestion() {
         this.$emit("userAnswer");
+    }
+
+    reportQuestion() {
+        QuestionService.reportQuestion(this.question, "Test");
     }
 }
 </script>
