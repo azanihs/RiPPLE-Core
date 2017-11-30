@@ -99,7 +99,9 @@ def index(request):
         "id/:id": "Fetch question by ID",
         "search/sortField/:sortField/sortOrder/:sortOrder/filterField/:filterField/query/:query": "Run a server search",
         "page/:id": "Fetch question collection in chunks",
-        "competencies/all": "Fetch all competencies for the user"
+        "competencies/all": "Fetch all competencies for the user",
+        "add": "Add a question to the database",
+        "report": "Report a question",
     })
 
 
@@ -212,8 +214,7 @@ def page_response(data, page_index):
         "totalItems": page_manager.count
     })
 
-def report(request):
-    
+def report(request): 
     if request.method != 'POST':
         return JsonResponse({
             "error": "Must use POST to this endpoint"
@@ -222,3 +223,19 @@ def report(request):
     post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
     return JsonResponse(QuestionService.report_question(user, post_request))
+
+def getReports(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+    
+    post_request = loads(request.body.decode("utf-8"))
+    user = UserService.logged_in_user(request)
+    page=post_request.get("page", None)
+
+    search_result = QuestionService.get_reports(user)
+    if search_result["error"]:
+        return JsonResponse(search_result)
+    else:
+        return page_response(search_result, page)
