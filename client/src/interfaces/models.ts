@@ -50,6 +50,10 @@ export interface ReportQuestion {
     reason: string
 };
 
+export interface NetworkResponse {
+    error?: string
+}
+
 export interface User {
     id: number,
     name: string,
