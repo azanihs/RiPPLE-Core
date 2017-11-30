@@ -66,7 +66,7 @@ class AchievementChecker(object):
         if token is None or response.content is None or req is None:
             return response
         data = json.loads(response.content.decode('utf-8'))
-        data['achievement'] = None
+        data['achievement'] = []
         user = token_to_user_course(token) 
         
 
@@ -76,9 +76,11 @@ class AchievementChecker(object):
             for a in achievements:
                 result = engine.check_achievement(user=user, key=a.key)
                 if result["new"]:
-                    data["achievement"] = True
+                    data["achievement"].append(result)
                 #data['achievement'].append(engine.check_achievement(user=user, key=a.key))
 
+        if len(data["achievement"] == 0):
+            data["achievement"] = None
 
         response.content = json.dumps(data)
         return response
