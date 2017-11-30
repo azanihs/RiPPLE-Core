@@ -333,3 +333,31 @@ class QuestionTestCase(BootstrapTestCase):
 
             self.assertEqual(len(results), 1)
             self.assertEqual(results[0].pk, i+1)
+
+    def test_1(self):
+        author_course = self._bootstrap_courses(1)
+        author_user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=author_user, course=author_course)
+        self._bootstrap_topics(author_course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+
+
+        for i in range(0, 1):
+            print("TRUE")
+            QuestionService.respond_to_question(6, author)
+            print("First: " + str(Competency.objects.all()[0]))
+            print("SECOND: " + str(Competency.objects.all()[1]))
+            print("THIRD: " + str(Competency.objects.all()[2]))
+            
+            print("FALSE")
+            QuestionService.respond_to_question(7, author)
+            print("First: " + str(Competency.objects.all()[0]))
+            print("SECOND: " + str(Competency.objects.all()[1]))
+            print("THIRD: " + str(Competency.objects.all()[2]))
+            print("TRUE")
+            QuestionService.respond_to_question(6, author)
+            print("First: " + str(Competency.objects.all()[0]))
+            print("SECOND: " + str(Competency.objects.all()[1]))
+            print("THIRD: " + str(Competency.objects.all()[2]))
+            print("-------------")

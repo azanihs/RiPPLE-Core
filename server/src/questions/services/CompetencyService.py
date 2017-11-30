@@ -8,6 +8,7 @@ def get_user_competency_for_topics(user, topics):
     cu = Competency.objects.filter(user=user)
     return cu.filter(id__in=t_comp)
 
+
 def add_competency(competency, confidence, user, topics):
     c = Competency.objects.create(competency=competency, confidence=confidence, user=user)
     c.save()
