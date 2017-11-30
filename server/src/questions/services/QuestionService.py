@@ -228,5 +228,15 @@ def report_question(user, request):
     report.save()
     return {}
 
+def get_reports(user):
+    if not is_administrator(user):
+        return {"error": "User does not have administrative permission for current context"}
+    course = user.course
+    reportQuestions= ReportQuestion.objects \
+        .filter(author__in=CourseUser.objects.filter(course=course))
+    
+    return reportQuestions
+
+
 
 
