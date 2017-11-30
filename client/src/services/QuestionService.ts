@@ -33,7 +33,7 @@ export default class QuestionService {
         upload.question = question.id;
         upload.reason = reason;
 
-        QuestionRepository.uploadReport(upload);
+        return QuestionRepository.uploadReport(upload);
     }
 
 }

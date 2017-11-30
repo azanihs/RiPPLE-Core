@@ -1,5 +1,5 @@
 import { apiFetch } from "./APIRepository";
-import { Question, Topic, QuestionUpload, ReportQuestion } from "../interfaces/models";
+import { Question, Topic, QuestionUpload, ReportQuestion, NetworkResponse } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
@@ -99,7 +99,7 @@ export default class QuestionRepository {
     }
 
     static uploadReport(questionReport: ReportQuestion) {
-        return apiFetch<Object>("/questions/report/", {
+        return apiFetch<NetworkResponse>("/questions/report/", {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
