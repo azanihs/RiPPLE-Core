@@ -165,11 +165,12 @@ def search(request):
     filter_topics = post_request.get("filterTopics", None)
     query = post_request.get("query", None)
     sort_order = post_request.get("sortOrder", None)
-    page = post_request.get("page", None)
+    page_index = post_request.get("page", None)
+    page_size = post_request.get("pageSize", 25)
 
     if sort_field is None and filter_field is None and query is None:
         found_questions = QuestionService.all_questions()
-        return page_response(found_questions, page)
+        return page_response(found_questions, page_index, page_size)
 
     if sort_field is not None:
         search_query.add_sort(sort_field, sort_order)
@@ -185,18 +186,13 @@ def search(request):
 
     try:
         search_result = search_query.execute()
-        return page_response(search_result, page)
+        return page_response(search_result, page_index, page_size)
     except TypeError:
         all_questions = QuestionService.all_questions()
-        return page_response(all_questions, page)
+        return page_response(all_questions, page_index, page_size)
 
-
-def page(request, page):
-    return page_response(QuestionService.all_questions(), page)
-
-
-def page_response(data, page_index):
-    page_manager = Paginator(data, 25)
+def page_response(data, page_index, page_size=25):
+    page_manager = Paginator(data, page_size)
     try:
         page = page_manager.page(page_index)
     except PageNotAnInteger:

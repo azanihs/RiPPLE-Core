@@ -3,8 +3,9 @@ import { Question } from "../interfaces/models";
 
 export default class QuestionService {
     static search(searchQuery): Promise<{ questions: Question[], totalItems: number, page: number }> {
-        const { sortField, sortDesc, filterField, filterTopics, query, page } = searchQuery;
-        return QuestionRepository.search(sortField, sortDesc ? "DESC" : "ASC", filterField, filterTopics, query, page);
+        const { sortField, sortDesc, filterField, filterTopics, query, page, pageSize } = searchQuery;
+        return QuestionRepository.search(sortField, sortDesc ? "DESC" : "ASC",
+            filterField, filterTopics, query, page, pageSize);
     }
 
     static getRecommendedForUser({ count }: { count: number }): Promise<Question[]> {

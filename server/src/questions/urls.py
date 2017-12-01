@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^rate/$', views.rate, name='rate'),
 
     url(r'^id/(.*)/$', views.id),
-    url(r'^page/(.*)/$', views.page),
 
     url(r'^competencies/all/$', views.competencies),
     url(r'^competencies/aggregate/(.*)/$', views.aggregate),
