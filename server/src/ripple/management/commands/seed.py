@@ -10,7 +10,9 @@ class Command(BaseCommand):
         parser.add_argument("--host")
 
     def handle(self, *args, **options):
-        host = options.get("host", "//localhost:8000")
+        host = options.get("host", None)
+        if host is None:
+            host = "//localhost:8000"
 
         course_seeder = CourseSeedCommand(self)
         base_path = os.path.abspath("../../migration/JSONFiles/")
