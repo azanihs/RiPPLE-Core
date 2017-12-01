@@ -1,0 +1,14 @@
+[report]
+ignore_errors = True
+omit =
+    */migrations/*
+    */__init__.py
+    */tests/*
+    manage.py
+    */urls.py
+    */apps.py
+    */models.py
+    */tests.py
+    */admin.py
+    ripple/load_env.py
+    ripple/settings.py

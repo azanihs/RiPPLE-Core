@@ -1,12 +1,11 @@
-from ..models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, CompetencyMap, QuestionScore
-from users.models import Token
-from questions.models import CourseUser
-from django.core.exceptions import ObjectDoesNotExist
-from ripple.util import util
-
-from django.db.models import Count
 import random
 
+from django.db.models import Count
+
+from ripple.util import util
+from users.models import CourseUser, Token
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore
+from questions.services import CompetencyService
 
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
@@ -72,18 +71,14 @@ def get_course_leaders(course, sort_field, sort_order, limit=25):
     return leaderboard_users[0:limit]
 
 
-def all_questions():
-    return Question.objects.all()
-
-
 def get_course_topics(course):
     return Topic.objects.filter(course=course).distinct()
 
 
-def get_questions(id):
+def get_question(id):
     try:
         return Question.objects.get(pk=id)
-    except ObjectDoesNotExist:
+    except Question.DoesNotExist:
         return None
 
 
@@ -91,7 +86,10 @@ def respond_to_question(distractor_id, user):
     try:
         answered_option = Distractor.objects.get(pk=distractor_id)
     except Distractor.DoesNotExist:
-        return None
+        return False
+
+    if answered_option.question.author.course != user.course:
+        raise ValueError("Question course and user course do not match")
 
     response = QuestionResponse(
         user=user,
@@ -102,32 +100,48 @@ def respond_to_question(distractor_id, user):
     update_competency(user, answered_option.question, response)
     return True
 
+def update_running_mean(value, count, new_weight):
+    return (value * count + new_weight) / (count + 1)
 
-def rate_question(distractor_id, response, user):
-    difficulty = response.get("difficulty", None)
-    quality = response.get("quality", None)
+def update_mean(value, previous, count, new_weight):
+    return value + ((new_weight - previous) / count)
+
+def rate_question(distractor_id, user_ratings, user):
+    difficulty = user_ratings.get("difficulty", None)
+    quality = user_ratings.get("quality", None)
     try:
         answered_option = Distractor.objects.get(pk=distractor_id)
         found = QuestionRating.objects.filter(
             user_id=user.id, response_id=distractor_id
         ).first()
+        question = answered_option.question
 
         if found is None:
-            QuestionRating(
-                quality=quality,
-                difficulty=difficulty,
-                response=answered_option,
-                user=user
-            ).save()
-            return True
+            question_rating = QuestionRating(response=answered_option, user=user)
         else:
-            # Update existing response
-            found.quality = quality
-            found.difficulty = difficulty
-            found.save()
-            return True
-    except ObjectDoesNotExist:
-        return None
+            question_rating = found
+
+        if quality is not None:
+            if found is None or (found is not None and found.quality is None):
+                question.quality = update_running_mean(question.quality, question.qualityCount, quality)
+                question.qualityCount += 1
+            elif found is not None and found.quality is not None:
+                question.quality = update_mean(question.quality, found.quality, question.qualityCount, quality)
+            question_rating.quality = quality
+
+        if difficulty is not None:
+            if found is None or (found is not None and found.difficulty is None):
+                question.difficulty = update_running_mean(question.difficulty, question.difficultyCount, difficulty)
+                question.difficultyCount += 1
+            elif found is not None and found.difficulty is not None:
+                question.difficulty = update_mean(question.difficulty, found.difficulty, question.difficultyCount, difficulty)
+            question_rating.difficulty = difficulty
+
+        question_rating.save()
+        question.save()
+        return True
+    except Distractor.DoesNotExist:
+        return False
 
 
 def calculate_question_score(attempts, is_correct):
@@ -159,41 +173,31 @@ def update_question_score(user, question, new_score):
 
 def update_competency(user, question, response):
     """
-        Updates the users competency for all topic combinations in the given question
+        Updates the user's competency for all topic combinations in the given question
     """
     # Weigh each topic
-    weights = util.topic_weights(question.topics.all())
+    queryset_topics = question.topics.all()
+    weights = util.topic_weights(queryset_topics)
+
     for i in weights:
-        topics = i["topics"]
+        topics = queryset_topics.filter(id__in=[x.id for x in i["topics"]])
         weight = i["weight"]
 
-        mapped_competencies = CompetencyMap.objects.filter(
-            user=user, topic__in=topics)
-
+        user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
         previous_score = 0
         attempt_count = 1
-        if len(topics) == mapped_competencies.count():
+
+        if user_competency is None or len(user_competency) == 0:
+            user_competency = CompetencyService.add_competency(50, 1, user, topics)
+        else:
+            user_competency = user_competency[0]
             attempt_count = QuestionResponse.objects.filter(
                 user=user, response__in=Distractor.objects.filter(question=question)).count()
 
-            user_competency = Competency.objects.get(
-                pk=mapped_competencies.first().for_competency_id)
-
             if attempt_count > 1:
-                # Has not attempted question before
+                # Has attempted question before
                 previous_score = QuestionScore.objects.get(
                     user=user, question=question).score
-
-        else:
-            user_competency = Competency.objects.create(
-                competency=50, confidence=1)
-
-            for topic in topics:
-                CompetencyMap(
-                    user=user,
-                    topic=topic,
-                    for_competency=user_competency
-                ).save()
 
         question_score = calculate_question_score(
             attempt_count, response.response.isCorrect)
@@ -205,4 +209,3 @@ def update_competency(user, question, response):
         user_competency.save()
 
         update_question_score(user, question, question_score)
-        return user_competency

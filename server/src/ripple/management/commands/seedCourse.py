@@ -1,11 +1,17 @@
 from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap, QuestionImage, ExplanationImage, DistractorImage
+from django.db import IntegrityError, transaction
+from django.core.files.base import ContentFile
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser
+from recommendations.models import Day, Time, Availability
+from base64 import b64decode
+import imghdr
 
 from questions.services import QuestionService
 
 from random import randint, randrange, sample, choice
+from datetime import datetime
 from faker import Factory
 fake = Factory.create()
 
@@ -43,12 +49,9 @@ def make_question_responses(user, distractors):
             user=user
         )
         response.save()
-        user_competency = QuestionService.update_competency(
+        QuestionService.update_competency(
             user, user_choice.question, response)
-        user_competency.competency = randrange(0, 100)
-        user_competency.confidence = randrange(0, 100)
 
-        user_competency.save()
         if chance(2):
             rating = QuestionRating(
                 quality=randrange(0, 10),
@@ -65,9 +68,9 @@ def get_topics(file):
     return data["topics"]
 
 
-def parse_questions(file, course_users, all_topics):
+def parse_questions(file, course_users, all_topics, host):
     host = merge_url_parts([
-        _format("//" + "localhost:8000"),
+        _format(host),
         _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
@@ -79,47 +82,59 @@ def parse_questions(file, course_users, all_topics):
     questions = data["questions"]
     counter = 0
     for q in questions:
-        counter = counter+1
-        print("Adding question: " + str(counter))
-        if q["explanation"]["content"] == None:
-                q["explanation"]["content"] = " "
-        question = Question(
-            content = q["question"]["content"],
-            explanation = q["explanation"]["content"],
-            difficulty = randrange(0, 5),
-            quality = randrange(0, 5),
-            difficultyCount = randrange(0, 100),
-            qualityCount = randrange(0, 100),
-            author = choice(course_users)
-        )
-        question.save()
-        decode_images(question.id, question, q["question"]["payloads"], "q", host)
-        decode_images(question.id, question, q["explanation"]["payloads"], "e", host)
+        try:
+            with transaction.atomic():
+                distractor_count = 0
+                counter = counter+1
+                print("Adding question: " + str(counter))
+                if q["explanation"]["content"] == None:
+                        q["explanation"]["content"] = " "
+                question = Question(
+                    content = q["question"]["content"],
+                    explanation = q["explanation"]["content"],
+                    difficulty = randrange(0, 5),
+                    quality = randrange(0, 5),
+                    difficultyCount = randrange(0, 100),
+                    qualityCount = randrange(0, 100),
+                    author = choice(course_users)
+                )
+                question.save()
+                d = decode_images(question.id, question, q["question"]["payloads"], "q", host)
+                if not d:
+                    raise IntegrityError("Invalid Question Image")
+                d = decode_images(question.id, question, q["explanation"]["payloads"], "e", host)
+                if not d:
+                    raise IntegrityError("Invalid Explanation Image")
 
-        q_topics = q["topics"]
-        for topic in q_topics:
-            idx = 0
-            while idx < len(all_topics):
-                if topic["name"] == all_topics[idx].name:
-                    break
-                idx+=1
-            question.topics.add(all_topics[idx])
-        question.save()
+                q_topics = q["topics"]
+                for topic in q_topics:
+                    idx = 0
+                    while idx < len(all_topics):
+                        if topic["name"] == all_topics[idx].name:
+                            break
+                        idx+=1
+                    question.topics.add(all_topics[idx])
+                question.save()
 
-        for i in ["A", "B", "C", "D"]:
-            response = q["responses"][i]
-            if response["content"] == None:
-                response["content"] = " "
-            distractor = Distractor(
-                content = response["content"],
-                response = i,
-                isCorrect = response["isCorrect"],
-                question = question
-            )
-            distractor.save()
-            decode_images(distractor.id, distractor, response["payloads"],"d", host)
-            distractors.append(distractor)
-
+                for i in ["A", "B", "C", "D"]:
+                    response = q["responses"][i]
+                    if response["content"] is None:
+                        response["content"] = " "
+                    distractor = Distractor(
+                        content = response["content"],
+                        response = i,
+                        isCorrect = response["isCorrect"],
+                        question = question
+                    )
+                    distractor.save()
+                    distractor_count+=1
+                    d = decode_images(distractor.id, distractor, response["payloads"],"d", host)
+                    if not d:
+                        raise IntegrityError("Invalid Distractor Image")
+                    distractors.append(distractor)
+        except IntegrityError as e:
+            distractors=distractors[:len(distractors)-distractor_count]
+            print("Invalid question: " + str(counter))
 
     return distractors
 
@@ -135,15 +150,10 @@ def decode_images(image_id, obj, images, image_type, host):
     }
     ImageToSaveClass = database_image_types.get(image_type, None)
 
-    '''if image_type == "q" or image_type == "e":
-        reference = Question.objects.get(pk=image_id)
-    else:
-        reference = Distractor.objects.get(pk=image_id)'''
-
     for i, image in images.items():
-        contentfile_image = util.save_image(image, image_id)
+        contentfile_image = save_image_course_seeder(image, image_id)
         if contentfile_image is None:
-            urls.append(None)
+            return False
         # Question + Explanation in the same object
         if image_type == "q" or image_type == "e":
             new_image = ImageToSaveClass.objects.create(question=obj, image=contentfile_image)
@@ -159,8 +169,6 @@ def decode_images(image_id, obj, images, image_type, host):
     obj.save()
     return True
 
-
-
 def newSource(urls, content, host):
     soup = BeautifulSoup(content, "html.parser")
 
@@ -168,12 +176,23 @@ def newSource(urls, content, host):
     for i in range(0, len(urls)):
         if urls[i] is None:
             continue
-        images[i]['src'] = "http://" + host + urls[i]
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
 
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
 
+def make_days():
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    for x in days:
+        if len(Day.objects.filter(day=x)) == 0:
+            day = Day.objects.create(day=x)
+            day.save()
+
+def make_times(times):
+    for i in range(len(times) - 1):
+        if len(Time.objects.filter(start=times[i], end=times[i + 1])) == 0:
+            time_range = Time.objects.create(start=times[i], end=times[i + 1])
+            time_range.save()
 
 
 class Command(BaseCommand):
@@ -184,6 +203,7 @@ class Command(BaseCommand):
         parser.add_argument("--name", nargs="+")
         parser.add_argument("--course", nargs="+")
         parser.add_argument("--file", nargs="+")
+        parser.add_argument("--host")
 
     def handle(self, *args, **options):
         if(len(options["name"])!=len(options["course"]) or len(options["name"])!=len(options["file"])):
@@ -192,6 +212,7 @@ class Command(BaseCommand):
         course_names = options["name"]
         course_codes = options["course"]
         course_files = options["file"]
+        host = options["host"]
 
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
@@ -204,19 +225,29 @@ class Command(BaseCommand):
                         CourseUser.objects.create(user=user, course=course))
 
             print("\t-Making Questions")
-            distractors = parse_questions(file, course_users, all_topics)
+            distractors = parse_questions(file, course_users, all_topics, host)
 
             print("\t-Answering and Rating Questions")
             for user in course_users:
                 for i in range(0, 10):
                     make_question_responses(user, distractors)
 
+        def populate_availability(course_users, days, times):
+            for i in range(len(course_users)):
+                course_user = course_users[i]
+                for j in range(randint(3, 10)):
+                    random_day = Day.objects.get(pk=randint(1, len(days)))
+                    random_time = Time.objects.get(pk=randint(1, len(times)))
+                    # Add availability
+                    availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
+                    availability.save()
+
         courses = []
         for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
-                 for user_id in range(15)]
+                 for user_id in range(50)]
 
         all_courses = [Course.objects.create(
             available=True,
@@ -225,3 +256,27 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
+        print("Populating Availabilities")
+        make_days()
+
+        time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
+        time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
+        make_times(time_inputs)
+
+        course_users = CourseUser.objects.all()
+        days = Day.objects.all()
+        times = Time.objects.all()
+        populate_availability(course_users, days, times)
+
+
+def save_image_course_seeder(encoded_image, image_id):
+    image_format, base64_payload = encoded_image.split(';base64,')
+    ext = image_format.split('/')[-1]
+    data = ContentFile(b64decode(base64_payload),
+                       name="")
+    if imghdr.what(data) is not None:
+        data.name = "u"+str(image_id)+"."+imghdr.what(data)
+    else:
+        return None
+
+    return data

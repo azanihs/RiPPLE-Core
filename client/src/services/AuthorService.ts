@@ -116,7 +116,7 @@ export default class AuthorService {
                 validateFunction: this.domIsNotEmpty,
                 args: question.responses.D
             },
-            "You must select which question is correct": {
+            "You must select which response is correct": {
                 validateFunction: x => question.correctIndex !== "",
                 args: ""
             },

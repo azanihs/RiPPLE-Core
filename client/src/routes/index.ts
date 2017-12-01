@@ -54,9 +54,13 @@ const routes = [{
         name: "notifications",
         component: NotificationsView
     }, {
-        path: "/view/questions",
-        name: "questions",
+        path: "/question/answer",
+        name: "answer",
         component: QuestionBrowser
+    }, {
+        path: "/question/create",
+        name: "create",
+        component: AuthorView
     }, {
         path: "/view/friends",
         name: "friends",

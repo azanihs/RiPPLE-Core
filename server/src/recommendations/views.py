@@ -20,6 +20,10 @@ def course_availability(request):
     # Get the count of each user in the course
     return JsonResponse(counts, safe=False)
 
+def days(request):
+    days = [x.toJSON() for x in AvailabilityService.get_days()]
+    return JsonResponse(days, safe=False)
+
 def update(request):
     # HTTP.POST is required for this.
     if request.method != "POST":
@@ -32,11 +36,11 @@ def update(request):
     post_request = loads(request.body.decode("utf-8"))
     day = post_request.get("day", None)
     time = post_request.get("time", None)
-
-    if AvailabilityService.update_availability(logged_in_user, day, time) is None:
+    updated_availability = AvailabilityService.update_availability(logged_in_user, day, time)
+    if updated_availability is None:
         return JsonResponse({"error": "Invalid day/time/availability combination"}, status=422)
     else:
-        return HttpResponse(status=204)
+        return JsonResponse(updated_availability.toJSON())
 
 def utc_times(request):
     times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]

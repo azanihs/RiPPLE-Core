@@ -3,7 +3,7 @@
         <md-card>
                 <h3>{{topic}} Badges</h3>
                 <md-layout v-for="badge in availableBadges"
-                        :key="badge.id"
+                        :key="badge.key"
                         md-flex="33"
                         class="badgeGutter"
                         md-gutter>
@@ -51,25 +51,27 @@ import Fetcher from "../../services/Fetcher";
 export default class CollectedBadges extends PropUpdate {
     @Prop topic = p(String);
 
-    availableBadges = [];
+    pAvailableBadges = [];
     fetcherInstance = undefined;
 
     updateAvailableBadges(newBadges) {
-        this.availableBadges = newBadges;
+        this.pAvailableBadges = newBadges;
     };
 
     @Lifecycle
     created() {
-        if (this.topic == "all") {
-            this.fetcherInstance = Fetcher.get(BadgeService.getAllAvailableBadges);
-        } else if (this.topic == "closest") {
-            this.fetcherInstance = Fetcher.get(BadgeService.getClosestUserBadges);
-        } else {
-            this.fetcherInstance = Fetcher.get(BadgeService.getBadgesByCategory, { category: this.topic });
-        }
+        Fetcher.get(BadgeService.getAllUserBadges)
+            .on(this.updateAvailableBadges);
+    }
 
-        this.fetcherInstance.on(this.updateAvailableBadges);
-        this.fetcherInstance.run();
+    get availableBadges() {
+        if (this.topic == "closest") {
+            return BadgeService.getClosestUserBadges(this.pAvailableBadges);
+        } else if (this.topic == "all") {
+            return this.pAvailableBadges;
+        } else {
+            return BadgeService.getBadgesByCategory(this.pAvailableBadges, this.topic);
+        }
     }
 
     @Lifecycle

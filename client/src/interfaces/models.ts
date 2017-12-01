@@ -90,16 +90,13 @@ export interface UserSummary {
 };
 
 export interface Badge {
-    id: number,
+    key: string,
     name: string,
+    description: string,
     category: "engagement" | "competencies" | "connections",
-    description: string
-};
-
-export interface AcquiredBadge {
-    id: number,
-    badge: Badge,
+    count: number,
     progress: number,
+    icon: string,
     dateAcquired: Date
 };
 
@@ -169,13 +166,19 @@ export interface Time {
 
 export interface Availability {
     id: number,
+    courseUser: CourseUser,
     day: Day,
     time: Time
 }
 
 export interface CourseAvailability {
     courseUser: CourseUser,
-    day: Day,
-    time: Time,
+    day: number,
+    time: number,
     entries: number
+}
+
+export interface DayTime {
+    day: number,
+    time: number
 }
