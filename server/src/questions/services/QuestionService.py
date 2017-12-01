@@ -269,11 +269,12 @@ def get_competency_score(question, response):
     # How does alternating questions work
     # Questions of varying difficutly
     ### 
+    print(difficulty)
     weighted_features = [
-        (difficulty/10, 0.3),
-        (correct, 0.2),
-        (exp_moving_avg(0.33, question_responses), 0.2),
-        (exp_moving_avg(0.1, question_responses), 0.10)
+        (difficulty/10, 0.30),
+        (correct, 0.10),
+        (exp_moving_avg(0.33, question_responses), 0.15),
+        (exp_moving_avg(0.1, question_responses), 0.05)
     ]
 
     feature, weight_vector = zip(*weighted_features)
