@@ -13,6 +13,10 @@ from users.services.TokenService import token_to_user_course
 from ripple.util import util
 
 def update_user_image(user, server_root, new_image):
+    if new_image is None:
+        return {
+            "error": "No image provided"
+        }
     saved_image = save_image(new_image, str(user.id))
     if saved_image is None:
         return {
