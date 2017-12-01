@@ -205,7 +205,6 @@ def update_competency(user, question, response):
     calculate_children_competency(user, queryset_topics, score)
     
         
-
 def calculate_children_competency(user, queryset_topics, score):
     """ Updates children competencies"""
     # Weigh each topic
@@ -236,12 +235,12 @@ def get_competency_score(question, response):
     q_first_clean = Question.objects.annotate(num_topics=Count('topics'))
     q_second_clean = Question.objects.filter(topics__in=topics).annotate(num_topics=Count('topics'))
     question_scores = QuestionScore.objects.filter(user=user, question__in = \
-            q_second_clean.filter(num_topics=len(topics),id__in=q_first_clean.filter(num_topics=len(topics)).values('id')))
+            q_second_clean.filter(num_topics=len(topics),id__in=q_first_clean.filter(num_topics=len(topics)).values('id'))).order_by("-id")[:20]
     if (len(question_scores) > 0):
         past_average = 0
         for score in question_scores:
             past_average += score.score
-        past_average = past_average/len(question_scores)
+        past_average = past_average/len(question_scores)    
     else:
         past_average = 1 
 
@@ -250,9 +249,8 @@ def get_competency_score(question, response):
     if response.response.isCorrect:
         difficulty = question.difficulty
     else:
-        difficulty = 10 - question.difficulty
+        difficulty = (10 - question.difficulty)/2+5
 
-    print(difficulty)
     ### Array for dot product. Goal is to have 
     ### abs(dotProd) between 0.25 and 0.5 in 
     ### most situations
@@ -265,16 +263,10 @@ def get_competency_score(question, response):
     # Questions of varying difficutly
     ### 
     weighted_features = [
-        (difficulty/10, 0.30),
-<<<<<<< HEAD
-        (past_average, 0.10),
-        (exp_moving_avg(0.33, question_scores), 0.15),
-        (exp_moving_avg(0.1, question_scores), 0.05)
-=======
-        (correct, 0.10),
-        (exp_moving_avg(0.33, question_responses), 0.20),
-        (exp_moving_avg(0.1, question_responses), 0.15)
->>>>>>> 3b7409804272818e57d138a15f8de54c088e7e92
+        (difficulty/10, 0.2),
+        (past_average, 0.1),
+        (exp_moving_avg(0.9, question_scores), 0.3),
+        #(exp_moving_avg(5, question_scores), 0.15)
     ]
 
     feature, weight_vector = zip(*weighted_features)
@@ -286,29 +278,24 @@ def get_competency_score(question, response):
     else:
         return -new_scores
 
-<<<<<<< HEAD
 def competency_to_score(competency):
     return math.log(competency/(1-competency))
 
 #Inverse of competency_to_score
 def score_to_competency(score):
-    return 1 / (1 + math.exp(-score)
+    return 1 / (1 + math.exp(-score))
 
 
-def exp_moving_avg(weight, question_scores):
-    ewma = 0.5
+def exp_moving_avg(decay_factor, question_scores):
+    res = 0
+    counter = 0
+    divisor = 0.3 *math.exp(3.64 * decay_factor)
+    decay_factor = math.log(decay_factor)
     for score in question_scores:
-        ewma = weight * score.score + (1 - weight) * ewma
- 
-=======
-def exp_moving_avg(weight, questions):
-    ewma = 0.3
-    for response in questions:
-        correct = 0
-        if response.response.isCorrect:
-            correct += 1
-        ewma = weight * correct + (1 - weight) * ewma
->>>>>>> 3b7409804272818e57d138a15f8de54c088e7e92
-    return ewma
+        res += score.score*math.exp(decay_factor * counter)
+        counter += 1
+        #ewma = weight * score.score + (1 - weight) * ewma
+    #print("RES: " + str(res/10))
+    return res/divisor
 
         
