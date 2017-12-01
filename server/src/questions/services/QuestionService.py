@@ -257,7 +257,7 @@ def get_competency_score(question, response):
     else:
         difficulty = 10 - question.difficulty
 
-
+    print(difficulty)
     ### Array for dot product. Goal is to have 
     ### abs(dotProd) between 0.25 and 0.5 in 
     ### most situations
@@ -269,12 +269,11 @@ def get_competency_score(question, response):
     # How does alternating questions work
     # Questions of varying difficutly
     ### 
-    print(difficulty)
     weighted_features = [
         (difficulty/10, 0.30),
         (correct, 0.10),
-        (exp_moving_avg(0.33, question_responses), 0.15),
-        (exp_moving_avg(0.1, question_responses), 0.05)
+        (exp_moving_avg(0.33, question_responses), 0.20),
+        (exp_moving_avg(0.1, question_responses), 0.15)
     ]
 
     feature, weight_vector = zip(*weighted_features)
@@ -288,13 +287,12 @@ def get_competency_score(question, response):
   
 
 def exp_moving_avg(weight, questions):
-    ewma = 0.5
+    ewma = 0.3
     for response in questions:
         correct = 0
         if response.response.isCorrect:
             correct += 1
         ewma = weight * correct + (1 - weight) * ewma
- 
     return ewma
 
         
