@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     "ripple.apps.RippleConfig",
 
-    "ripplelti.apps.RippleltiConfig",
+    "lti.apps.LTIConfig",
     "users.apps.UsersConfig",
     "questions.apps.QuestionsConfig",
     "recommendations.apps.RecommendationsConfig",
