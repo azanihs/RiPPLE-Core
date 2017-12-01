@@ -1,22 +1,24 @@
-import { Availability, CourseAvailability, Time } from "../interfaces/models";
+import { Availability, CourseAvailability, Day, Time } from "../interfaces/models";
 import { setToken, apiFetch } from "./APIRepository";
 
 export default class AvailabilityRepository {
 
     static getUTCTimeSlots(): Promise<Time[]> {
-        return apiFetch("/recommendations/availability/times")
-            .then(x => x.json());
+        return apiFetch<Time[]>("/recommendations/availability/times/");
     }
 
     static getCourseAvailability(): Promise<CourseAvailability[]> {
-        return apiFetch("/recommendations/availability/all")
-          .then(x => x.json());
+        return apiFetch<CourseAvailability[]>("/recommendations/availability/all/");
+    }
+
+    static getDays(): Promise<Day[]> {
+        return apiFetch<Day[]>("/recommendations/availability/days/");
     }
 
     static getUserAvailability(): Promise<Availability[]> {
-        return apiFetch("/recommendations/availability/")
-          .then(x => x.json());
+        return apiFetch<Availability[]>("/recommendations/availability/");
     }
+
 
     static updateUserAvailability(day: number, time: number) {
         return apiFetch(`/recommendations/availability/update/`, {
@@ -29,9 +31,6 @@ export default class AvailabilityRepository {
                 day: day,
                 time: time
             })
-        })
-            .then(x => {
-                return x.json();
-            });
+        });
     }
 }

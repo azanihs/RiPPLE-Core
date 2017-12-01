@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rippleAchievements'
 ]
 
 MIDDLEWARE = [
@@ -70,7 +71,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'users.middleware.TokenValidator'
+    'users.middleware.TokenValidator',
+    'users.middleware.AchievementChecker'
 ]
 ROOT_URLCONF = 'ripple.urls'
 
@@ -167,6 +169,15 @@ STATICFILES_DIRS = [
     MEDIA_ROOT
 ]
 
+
+#==============================================================================
+# Achievements conf
+#==============================================================================
+ACHIEVEMENT_CLASSES = ['users.achievements.userAchievements']
+
+
+
+
 RUNTIME_CONFIGURATION = {
-    "min_competency_threshold": 5
+    "min_competency_threshold": -1
 }

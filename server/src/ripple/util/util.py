@@ -7,6 +7,9 @@ try:
 except ImportError:
     from urllib.parse import urljoin
 
+def mean(collection):
+    return sum((float(x) for x in collection)) / float(len(collection))
+
 def is_number(test_str):
     try:
         val = int(test_str)
@@ -45,6 +48,8 @@ def save_image(encoded_image, image_id):
     if imghdr.what(data) != ext:
         return None
     return data
+
+
 
 def merge_url_parts(parts, url=""):
     if len(parts) == 0:

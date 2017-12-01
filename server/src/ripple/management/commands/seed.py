@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, CompetencyMap
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency
 from users.models import Course, User, CourseUser
 from recommendations.models import Day, Time, Availability
 
@@ -49,28 +49,17 @@ def make_questions(course_users, all_topics):
 def make_question_responses(user, distractors):
     if chance(2):
         user_choice = choice(distractors)
-        response = QuestionResponse(
+        QuestionService.respond_to_question(user_choice.id, user)
+        rating = QuestionRating(
+            quality=randrange(0, 10),
+            difficulty=randrange(0, 10),
             response=user_choice,
             user=user
         )
-        response.save()
-        user_competency = QuestionService.update_competency(
-            user, user_choice.question, response)
-        user_competency.competency = randrange(0, 100)
-        user_competency.confidence = randrange(0, 100)
-
-        user_competency.save()
-        if chance(2):
-            rating = QuestionRating(
-                quality=randrange(0, 10),
-                difficulty=randrange(0, 10),
-                response=user_choice,
-                user=user
-            )
-            rating.save()
+        rating.save()
 
 def make_days():
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     for x in days:
         if len(Day.objects.filter(day=x)) == 0:
             day = Day.objects.create(day=x)
@@ -119,8 +108,8 @@ class Command(BaseCommand):
                     availability.save()
 
         courses = [
-            {"courseCode": "SCIE1000", "courseName": "Intro to science"},
-            {"courseCode": "CSSE1001", "courseName": "Intro to data systems"},
+            # {"courseCode": "SCIE1000", "courseName": "Intro to science"},
+            # {"courseCode": "CSSE1001", "courseName": "Intro to data systems"},
             {"courseCode": "INFS1200", "courseName": "Intro to software engineering"}
         ]
         unique_topics = ["Arrays", "Loops", "Recursion",
@@ -138,7 +127,7 @@ class Command(BaseCommand):
 
         print("Populating Availabilities")
 
-        make_days()
+        """make_days()
 
         time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
         time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
@@ -148,4 +137,4 @@ class Command(BaseCommand):
         course_users = CourseUser.objects.all()
         days = Day.objects.all()
         times = Time.objects.all()
-        populate_availability(course_users, days, times)
+        populate_availability(course_users, days, times)"""
