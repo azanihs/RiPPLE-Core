@@ -23,6 +23,6 @@ urlpatterns = [
     url(r'^users/', include("users.urls")),
     url(r'^questions/', include("questions.urls")),
     url(r'^recommendations/', include("recommendations.urls")),
-    url(r'^lti/', include("ripplelti.urls")),
+    url(r'^lti/', include("lti.urls")),
 
 ]

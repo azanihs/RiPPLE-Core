@@ -1,6 +1,6 @@
 import rfc3987
 from celtic_lib import get_lti_validator, LTIValidatorException
-from ripplelti.models import LTIConfiguration, RequestHistory
+from lti.models import LTIConfiguration, RequestHistory
 from django.conf import settings
 
 from .endpoint import SignatureEndpoint
