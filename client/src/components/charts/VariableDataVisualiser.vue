@@ -52,7 +52,7 @@
                                     </md-option>
                                 </md-select>
                             </md-input-container>
-                            <h4>Topics to Visulise</h4>
+                            <h4>Topics to Visualise</h4>
                             <topic-chip v-for="category in dataCategories"
                                 :key="category.id"
                                 :disabled="isDisabled(category)"

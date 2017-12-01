@@ -44,7 +44,8 @@ export default class QuestionRepository {
         filterField: string | undefined,
         filterTopics: string[] | undefined,
         query: string | undefined,
-        page: string | undefined) {
+        page: string | undefined,
+        pageSize: string | undefined) {
         return apiFetch<SearchResult>(`/questions/search/`, {
             method: "POST",
             headers: new Headers({
@@ -57,7 +58,8 @@ export default class QuestionRepository {
                 filterField,
                 filterTopics,
                 query,
-                page
+                page,
+                pageSize
             })
         })
             .then(searchResult => ({
