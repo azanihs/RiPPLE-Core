@@ -221,9 +221,9 @@ def calculate_children_competency(user, queryset_topics, score):
         else:
             user_competency = user_competency[0]
 
-        old_score = math.log(user_competency.competency/(1-user_competency.competency))
+        old_score = competency_to_score(user_competency.competency)
         new_score = old_score + (score*weight)      
-        new_competency =  1 / (1 + math.exp(-new_score))
+        new_competency =  score_to_competency(new_score)
         user_competency.competency = new_competency
         user_competency.confidence += weight
         user_competency.save()
@@ -233,22 +233,17 @@ def get_competency_score(question, response):
     """ Calculates the competency for the exact topics"""
     topics = question.topics.all()
     user = response.user
-    #### Update to get question scores, not responses.
     q_first_clean = Question.objects.annotate(num_topics=Count('topics'))
     q_second_clean = Question.objects.filter(topics__in=topics).annotate(num_topics=Count('topics'))
-    question_responses = QuestionResponse.objects.filter(user=user, response__in=Distractor.objects.filter(question__in = \
-            q_second_clean.filter(num_topics=len(topics),id__in=q_first_clean.filter(num_topics=len(topics)).values('id'))))
-    
-    ### This will be averaging question scores
-    if (len(question_responses) > 0):
-        correct = 0
-        for resp in question_responses: 
-            if resp.response.isCorrect:
-                correct += 1
-        correct = correct/len(question_responses)
+    question_scores = QuestionScore.objects.filter(user=user, question__in = \
+            q_second_clean.filter(num_topics=len(topics),id__in=q_first_clean.filter(num_topics=len(topics)).values('id')))
+    if (len(question_scores) > 0):
+        past_average = 0
+        for score in question_scores:
+            past_average += score.score
+        past_average = past_average/len(question_scores)
     else:
-        correct = 0.5
-    #############################################
+        past_average = 1 
 
     ### Easy question = less score
     ### Hard question = more score
@@ -269,12 +264,11 @@ def get_competency_score(question, response):
     # How does alternating questions work
     # Questions of varying difficutly
     ### 
-    print(difficulty)
     weighted_features = [
         (difficulty/10, 0.30),
-        (correct, 0.10),
-        (exp_moving_avg(0.33, question_responses), 0.15),
-        (exp_moving_avg(0.1, question_responses), 0.05)
+        (past_average, 0.10),
+        (exp_moving_avg(0.33, question_scores), 0.15),
+        (exp_moving_avg(0.1, question_scores), 0.05)
     ]
 
     feature, weight_vector = zip(*weighted_features)
@@ -285,15 +279,19 @@ def get_competency_score(question, response):
         return new_scores
     else:
         return -new_scores
-  
 
-def exp_moving_avg(weight, questions):
+def competency_to_score(competency):
+    return math.log(competency/(1-competency))
+
+#Inverse of competency_to_score
+def score_to_competency(score):
+    return 1 / (1 + math.exp(-score)
+
+
+def exp_moving_avg(weight, question_scores):
     ewma = 0.5
-    for response in questions:
-        correct = 0
-        if response.response.isCorrect:
-            correct += 1
-        ewma = weight * correct + (1 - weight) * ewma
+    for score in question_scores:
+        ewma = weight * score.score + (1 - weight) * ewma
  
     return ewma
 
