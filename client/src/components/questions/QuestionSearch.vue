@@ -4,7 +4,15 @@
         <md-layout v-for="field in searchableFields"
                    :key="field.displayName"
                    class="searchItem">
-            <md-input-container v-if="field.type == 'select'">
+            <md-input-container v-if="field.type == 'multiselect'">
+                <label :for="field.name">{{field.name}}</label>
+                <md-select :name="field.name" multiple v-model="search[field.id]">
+                    <md-option v-for="option in field.options"
+                        :key="option.value"
+                        :value="option.value">{{ option.name }} </md-option>
+                </md-select>
+            </md-input-container>
+            <md-input-container v-else-if="field.type == 'select'">
                 <label :for="field.name">{{field.name}}</label>
                 <md-select :name="field.name"
                            :id="field.name"
@@ -84,9 +92,11 @@ input {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Question } from "../../interfaces/models";
+import { Topic, Question } from "../../interfaces/models";
 
 import QuestionService from "../../services/QuestionService";
+import TopicService from "../../services/TopicService";
+import Fetcher from "../../services/Fetcher";
 
 
 @Component()
@@ -101,16 +111,29 @@ export default class QuestionSearch extends Vue {
     page = p<number>({
         default: 1
     });
-
     @Prop
-    filterOut = p<string[]>({
-        default: []
+    pageSize = p<number>({
+        default: 25
     });
+
+    pTopics: Topic[] = [];
+
+    updateCourseTopics(newTopics: Topic[]) {
+        this.pTopics = newTopics;
+        if (this.search.filterTopics.length == 0) {
+            this.search.filterTopics = newTopics.map(x => x.id);
+        }
+    }
+
+    get topics() {
+        return this.pTopics;
+    }
 
     get searchableFields() {
         return [{
             name: "Sort By",
             id: "sortField",
+            type: "select",
             sort: true,
             options: [{
                 name: "",
@@ -133,11 +156,19 @@ export default class QuestionSearch extends Vue {
             }, {
                 name: "Personalised Rating",
                 value: "personalisation"
-            }],
-            type: "select"
+            }]
         }, {
-            name: "Filter",
+            name: "Show With Topic",
+            id: "filterTopics",
+            type: "multiselect",
+            options: this.topics.map(topic => ({
+                name: topic.name,
+                value: topic.id
+            }))
+        }, {
+            name: "Filter Questions",
             id: "filterField",
+            type: "select",
             options: [{
                 name: "All Questions",
                 value: ""
@@ -150,8 +181,7 @@ export default class QuestionSearch extends Vue {
             }, {
                 name: "Incorrectly Answered",
                 value: "wrong"
-            }],
-            type: "select"
+            }]
         }, {
             name: "Search",
             id: "query",
@@ -164,12 +194,21 @@ export default class QuestionSearch extends Vue {
         sortDesc: false,
         filterField: "All Questions",
         query: "",
-        page: 0
+        page: 0,
+        filterTopics: []
     }
 
     @Lifecycle
     created() {
         this.applyFilters();
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .on(this.updateCourseTopics);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(TopicService.getAllAvailableTopics)
+            .off(this.updateCourseTopics);
     }
 
     sort() {
@@ -177,7 +216,7 @@ export default class QuestionSearch extends Vue {
     }
 
     applyFilters() {
-        const search = Object.assign({}, this.search, { page: this.page, filterTopics: this.filterOut });
+        const search = Object.assign({}, this.search, { page: this.page, pageSize: this.pageSize });
         QuestionService.search(search)
             .then(searchResult => {
                 this.timeoutId = undefined;
@@ -195,9 +234,8 @@ export default class QuestionSearch extends Vue {
     pageChanged(newVal, oldVal) {
         this.startSearch();
     }
-
-    @Watch("filterOut")
-    topicsChanged(newVal, oldVal) {
+    @Watch("pageSize")
+    pageSizeChanged(newVal, oldVal) {
         this.startSearch();
     }
 
