@@ -164,8 +164,28 @@ class CompetencyTestCase(BootstrapTestCase):
             self.assertLess(responder_old_competency, responder_new_competency)
             self.assertGreater(author_new_competency, responder_new_competency)
   
+    def test_exponential_moving_average_function(self):
+        author_course = self._bootstrap_courses(1)
+        author_user = self._bootstrap_user(1)
+        responder_user = self._bootstrap_user(2)
+        responder = CourseUser.objects.create(user = responder_user, course=author_course)
+        author = CourseUser.objects.create(user=author_user, course=author_course)
+        self._bootstrap_topics(author_course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
 
-    def astest_1(self):
+        for i in range(0,10):
+            QuestionService.respond_to_question(2, author)
+            QuestionService.respond_to_question(3, responder)
+        for i in range(0,10):
+            QuestionService.respond_to_question(3, author)
+            QuestionService.respond_to_question(2, responder)
+
+        author_competency = Competency.objects.get(user = author).competency
+        responder_competency = Competency.objects.get(user = responder).competency
+        self.assertLess(author_competency, responder_competency)
+
+    def test_1(self):
         author_course = self._bootstrap_courses(1)
         author_user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=author_user, course=author_course)
@@ -173,14 +193,13 @@ class CompetencyTestCase(BootstrapTestCase):
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
 
-        for i in Question.objects.all():
-            i.difficulty = 10
-            print(i.difficulty)
-            i.save()
+        question = Question.objects.all()[1]
+        question.difficulty = 0
+        question.save()
 
         for i in range(0, 20):
             print("TRUE " + str(i))
-            QuestionService.respond_to_question(6, author)
+            QuestionService.respond_to_question(7, author)
             print("First: " + str(Competency.objects.all()[0]))
             print("SECOND: " + str(Competency.objects.all()[1]))
             print("THIRD: " + str(Competency.objects.all()[2]))
