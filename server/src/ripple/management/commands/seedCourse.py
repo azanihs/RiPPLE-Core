@@ -1,9 +1,12 @@
 from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
+from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser
 from recommendations.models import Day, Time, Availability
+from base64 import b64decode
+import imghdr
 
 from questions.services import QuestionService
 
@@ -129,7 +132,7 @@ def parse_questions(file, course_users, all_topics, host):
                     if not d:
                         raise IntegrityError("Invalid Distractor Image")
                     distractors.append(distractor)
-        except Exception as e:
+        except IntegrityError as e:
             distractors=distractors[:len(distractors)-distractor_count]
             print("Invalid question: " + str(counter))
 
@@ -148,7 +151,7 @@ def decode_images(image_id, obj, images, image_type, host):
     ImageToSaveClass = database_image_types.get(image_type, None)
 
     for i, image in images.items():
-        contentfile_image = util.save_image_course_seeder(image, image_id)
+        contentfile_image = save_image_course_seeder(image, image_id)
         if contentfile_image is None:
             return False
         # Question + Explanation in the same object
@@ -253,7 +256,7 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
-                    print("Populating Availabilities")
+        print("Populating Availabilities")
         make_days()
 
         time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
@@ -272,7 +275,6 @@ def save_image_course_seeder(encoded_image, image_id):
     data = ContentFile(b64decode(base64_payload),
                        name="")
     if imghdr.what(data) is not None:
-        print(imghdr.what(data))
         data.name = "u"+str(image_id)+"."+imghdr.what(data)
     else:
         return None
