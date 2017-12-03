@@ -243,9 +243,9 @@ def get_competency_score(question, response):
         past_average = past_average/len(question_scores)    
     else:
         past_average = 1 
-
-    ### Easy question = less score
-    ### Hard question = more score
+    ### When getting question wrong
+    ### Easy question = less score - less weight going down
+    ### Hard question = more score - more weight going down
     if response.response.isCorrect:
         difficulty = question.difficulty
     else:
@@ -254,19 +254,10 @@ def get_competency_score(question, response):
     ### Array for dot product. Goal is to have 
     ### abs(dotProd) between 0.25 and 0.5 in 
     ### most situations
-
-    ### Important tests: 
-    # How many correct to high
-    # How many incorrect to low
-    # How many to recover from low to high, and reverse 
-    # How does alternating questions work
-    # Questions of varying difficutly
-    ### 
     weighted_features = [
         (difficulty/10, 0.2),
         (past_average, 0.1),
-        (exp_moving_avg(0.9, question_scores), 0.3),
-        #(exp_moving_avg(5, question_scores), 0.15)
+        (exp_moving_avg(0.9, question_scores), 0.3)
     ]
 
     feature, weight_vector = zip(*weighted_features)
@@ -294,8 +285,6 @@ def exp_moving_avg(decay_factor, question_scores):
     for score in question_scores:
         res += score.score*math.exp(decay_factor * counter)
         counter += 1
-        #ewma = weight * score.score + (1 - weight) * ewma
-    #print("RES: " + str(res/10))
     return res/divisor
 
         
