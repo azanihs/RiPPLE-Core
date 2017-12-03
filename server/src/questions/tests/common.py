@@ -41,7 +41,6 @@ class BootstrapTestCase(TestCase):
             )
             q.save()
             q.topics.set(topic_map[i])
-            print(topic_map[i])
 
     def _bootstrap_questions_same_topics(self, author, topics, num_questions):
         for i in range(num_questions):
