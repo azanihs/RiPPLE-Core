@@ -19,7 +19,7 @@ if [ $# -eq 0 ]
         pip install -r requirements.txt
         cd $DEPLOY_PATH
         python manage.py migrate
-        python manage.py seed
+        python manage.py seed --host $SERVER_HOST
         chown -R $APP_OWNER .
         service $SERVICE_NAME start
 fi

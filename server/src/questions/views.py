@@ -98,6 +98,7 @@ def rate(request):
 
 def index(request):
     return JsonResponse({
+<<<<<<< HEAD
         "data": {
             "all": "Returns all Questions",
             "topics": "Returns all Question Topics",
@@ -106,6 +107,16 @@ def index(request):
             "page/:id": "Fetch question collection in chunks",
             "competencies/all": "Fetch all competencies for the user"
         }
+=======
+        "all": "Returns all Questions",
+        "topics": "Returns all Question Topics",
+        "id/:id": "Fetch question by ID",
+        "search/sortField/:sortField/sortOrder/:sortOrder/filterField/:filterField/query/:query": "Run a server search",
+        "page/:id": "Fetch question collection in chunks",
+        "competencies/all": "Fetch all competencies for the user",
+        "add": "Add a question to the database",
+        "report": "Report a question",
+>>>>>>> origin/master
     })
 
 
@@ -171,11 +182,12 @@ def search(request):
     filter_topics = post_request.get("filterTopics", None)
     query = post_request.get("query", None)
     sort_order = post_request.get("sortOrder", None)
-    page = post_request.get("page", None)
+    page_index = post_request.get("page", None)
+    page_size = post_request.get("pageSize", 25)
 
     if sort_field is None and filter_field is None and query is None:
         found_questions = QuestionService.all_questions()
-        return page_response(found_questions, page)
+        return page_response(found_questions, page_index, page_size)
 
     if sort_field is not None:
         search_query.add_sort(sort_field, sort_order)
@@ -191,18 +203,13 @@ def search(request):
 
     try:
         search_result = search_query.execute()
-        return page_response(search_result, page)
+        return page_response(search_result, page_index, page_size)
     except TypeError:
         all_questions = QuestionService.all_questions()
-        return page_response(all_questions, page)
+        return page_response(all_questions, page_index, page_size)
 
-
-def page(request, page):
-    return page_response(QuestionService.all_questions(), page)
-
-
-def page_response(data, page_index):
-    page_manager = Paginator(data, 25)
+def page_response(data, page_index, page_size=25):
+    page_manager = Paginator(data, page_size)
     try:
         page = page_manager.page(page_index)
     except PageNotAnInteger:
@@ -219,3 +226,29 @@ def page_response(data, page_index):
             "totalItems": page_manager.count
         }
     })
+
+def report(request): 
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+    
+    post_request = loads(request.body.decode("utf-8"))
+    user = UserService.logged_in_user(request)
+    return JsonResponse(QuestionService.report_question(user, post_request))
+
+def getReports(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+    
+    post_request = loads(request.body.decode("utf-8"))
+    user = UserService.logged_in_user(request)
+    page=post_request.get("page", None)
+
+    search_result = QuestionService.get_reports(user)
+    if search_result["error"]:
+        return JsonResponse(search_result)
+    else:
+        return page_response(search_result, page)
