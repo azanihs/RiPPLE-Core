@@ -53,7 +53,6 @@ class NotificationMiddleware(object):
             i.save()
 
         response.content = json.dumps(data)
-        print(response.content)
         return response
 
 class AchievementChecker(object):
