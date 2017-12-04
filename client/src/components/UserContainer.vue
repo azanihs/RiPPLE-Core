@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { User, Course } from "../interfaces/models";
+import { CourseUser, User, Course } from "../interfaces/models";
 
 import UserService from "../services/UserService";
 import ImageService from "../services/ImageService";
@@ -136,8 +136,11 @@ export default class UserContainer extends Vue {
                     }))
                     .then((user: User) => {
                         this.$emit("changeUser", user);
+                        UserService.getLoggedInUser()
+                            .then((cu: CourseUser) => {
+                                this.$emit("changeUser", cu.user);
+                            });
                         this.showMessage("Profile image changed");
-                        Fetcher.forceUpdate();
                         document.body.removeChild(input);
                     })
                     .catch(err => {

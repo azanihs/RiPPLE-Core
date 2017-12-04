@@ -1,5 +1,5 @@
 import { apiFetch } from "./APIRepository";
-import { Question, Topic, QuestionUpload } from "../interfaces/models";
+import { Question, Topic, QuestionUpload, ReportQuestion, NetworkResponse } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
@@ -44,7 +44,8 @@ export default class QuestionRepository {
         filterField: string | undefined,
         filterTopics: string[] | undefined,
         query: string | undefined,
-        page: string | undefined) {
+        page: string | undefined,
+        pageSize: string | undefined) {
         return apiFetch<SearchResult>(`/questions/search/`, {
             method: "POST",
             headers: new Headers({
@@ -57,7 +58,8 @@ export default class QuestionRepository {
                 filterField,
                 filterTopics,
                 query,
-                page
+                page,
+                pageSize
             })
         })
             .then(searchResult => ({
@@ -96,5 +98,18 @@ export default class QuestionRepository {
 
     static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
         return apiFetch(`/questions/distribution/${question.id}/`);
+    }
+
+    static uploadReport(questionReport: ReportQuestion) {
+        return apiFetch<NetworkResponse>("/questions/report/", {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "Application/json"
+            }),
+            body: JSON.stringify({
+                questionReport
+            })
+        });
     }
 }

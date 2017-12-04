@@ -16,7 +16,8 @@ export default class TinyMCE extends Vue {
         default: () => {}
     });
     @Prop content = p<string | undefined>({
-        required: false
+        required: false,
+        default: ""
     });
     @Prop value = p<string | undefined>({
         required: false
