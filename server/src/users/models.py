@@ -70,3 +70,20 @@ class Token(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     user = models.ForeignKey(CourseUser)
+
+
+class Notification(models.Model):
+    name = models.CharField(max_length=64)
+    description = models.CharField(max_length=128)
+    created = models.DateTimeField(auto_now_add=True)
+    sent = models.BooleanField(default=False)
+    icon = models.CharField(default="Bronze", max_length=30)
+
+    user = models.ForeignKey(CourseUser)
+
+    def toJSON(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "icon": self.icon
+        }
