@@ -7,7 +7,7 @@ import math
 import numpy as np
 from ripple.util import util
 from users.models import CourseUser, Token
-from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore, ReportQuestion
 from questions.services import CompetencyService
 
 def leaderboard_sort(class_instance, user_column):
@@ -148,6 +148,10 @@ def rate_question(distractor_id, user_ratings, user):
 
 
 def calculate_question_score(user, question, response):
+    """ 
+        calculates the questions score and updates the cached question  score. Also increments the answer count for the questions core
+        Creates a QuestionScore if none exists
+    """
     try:
         question_score = QuestionScore.objects.get(
             user=user, question=question)
@@ -173,24 +177,6 @@ def calculate_question_score(user, question, response):
     question_score.score = score_map[min(4,question_score.number_answers+1)]
     question_score.number_answers = 0
     question_score.save()
-
-def update_question_score(user, question, new_score):
-    """
-        Helper method to update the cached QuestionScore for a users question to new_score. Also increments the answer count for the question score
-        Creates a QuestionScore is none exists
-    """
-    try:
-        cached_question_score = QuestionScore.objects.get(
-            user=user, question=question)
-        cached_question_score.score = new_score
-        if new_score > 0:
-            cached_question_score.number_answers = 0
-        else:
-            cached_question_score.number_answers += 1      
-        cached_question_score.save()
-    except QuestionScore.DoesNotExist:
-        QuestionScore(user=user, question=question, number_answers=1,
-                      score=new_score).save()
 
 
 def update_competency(user, question, response):
@@ -288,3 +274,34 @@ def exp_moving_avg(decay_factor, question_scores):
     return res/divisor
 
         
+
+def report_question(user, request):
+    request = request.get("questionReport", None)
+    reason = request.get("reason", None)
+    question = request.get("question", None)
+
+    if reason is None or question is None:
+        return {"error": "Please provide a reason and question ID"}
+
+    question = Question.objects.get(pk=question)
+
+    report = ReportQuestion(
+        question=question,
+        user=user,
+        reason=reason
+    )
+    report.save()
+    return {}
+
+def get_reports(user):
+    if not is_administrator(user):
+        return {"error": "User does not have administrative permission for current context"}
+    course = user.course
+    reportQuestions= ReportQuestion.objects \
+        .filter(author__in=CourseUser.objects.filter(course=course))
+    
+    return reportQuestions
+
+
+
+

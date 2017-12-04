@@ -6,6 +6,8 @@ src/media/
 htmlcov
 .coverage
 
+.env*
+!.env.example
 *.env
 .env*
 !.env.example
