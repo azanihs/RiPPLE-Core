@@ -4,7 +4,8 @@
                    md-hide-small
                    md-hide-medium
                    class="questionNavigation">
-            <action-buttons @back="closeQuestion()"></action-buttons>
+            <action-buttons @back="closeQuestion()" 
+                    @report="openDialog()"></action-buttons>
         </md-layout>
         <md-layout md-flex="100">
             <md-layout md-flex="100"
