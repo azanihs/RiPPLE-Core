@@ -211,3 +211,15 @@ export interface IServerResponse<T> {
     notifications: Notification[]
     data: T
 }
+
+export interface StudyRole {
+    id: number,
+    role: string,
+    description: string
+}
+
+export interface AvailableRole {
+    courseUser: CourseUser,
+    topic: Topic,
+    studyRole: StudyRole
+}
