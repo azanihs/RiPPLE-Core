@@ -13,10 +13,6 @@
                 {{enrolledCourse.courseCode}}
             </option>
         </select>
-          <md-snackbar md-position="bottom center" ref="snackbar" :md-duration="6000">
-                <span>{{errorMessage}}</span>
-                <md-button class="md-primary" @click="$refs.snackbar.close()">Close</md-button>
-        </md-snackbar>
     </div>
 </template>
 
@@ -69,7 +65,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { CourseUser, User, Course } from "../interfaces/models";
-
+import { addEventsToQueue } from "../util";
 import UserService from "../services/UserService";
 import ImageService from "../services/ImageService";
 
@@ -86,7 +82,6 @@ export default class UserContainer extends Vue {
 
     pCourse: Course | undefined = undefined;
     pCourses: Course[] = [];
-    errorMessage: string = "";
 
     set currentCourse(newCourse: Course | undefined) {
         this.pCourse = newCourse;
@@ -140,7 +135,7 @@ export default class UserContainer extends Vue {
                             .then((cu: CourseUser) => {
                                 this.$emit("changeUser", cu.user);
                             });
-                        this.showMessage("Profile image changed");
+                        this.showMessage("Profile image changed", "done");
                         document.body.removeChild(input);
                     })
                     .catch(err => {
@@ -162,9 +157,13 @@ export default class UserContainer extends Vue {
         }));
     }
 
-    showMessage(message: string) {
-        this.errorMessage = message;
-        (this.$refs["snackbar"] as any).open();
+    showMessage(message: string, icon: string = "error") {
+        addEventsToQueue([{
+            id: -2,
+            name: "Image Upload",
+            description: message,
+            icon: icon
+        }]);
     }
 
     @Lifecycle

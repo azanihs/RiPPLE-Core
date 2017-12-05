@@ -98,13 +98,6 @@
                     :md-progress="uploadProgress"></md-spinner>
             </div>
         </md-layout>
-        <md-snackbar md-position="bottom center"
-            ref="snackbar"
-            md-duration="4000">
-            <span>{{networkMessage}}</span>
-            <md-button class="md-accent"
-                @click="$refs.snackbar.close()">Close</md-button>
-        </md-snackbar>
     </md-layout>
 </template>
 
@@ -152,6 +145,7 @@ h3 {
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 import { Question as QuestionModel, Topic, QuestionBuilder } from "../../interfaces/models";
+import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
 import ImageService from "../../services/ImageService";
@@ -299,8 +293,12 @@ export default class AuthorView extends Vue {
         const error = AuthorService.validateQuestions(this.question);
 
         if (error !== "") {
-            this.networkMessage = error;
-            (this.$refs.snackbar as any).open();
+            addEventsToQueue([{
+                id: -1,
+                name: "Invalid Question",
+                description: error,
+                icon: "error"
+            }]);
         } else {
             this.disabled = true;
             AuthorService.prepareUpload(this.question)
