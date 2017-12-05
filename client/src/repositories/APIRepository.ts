@@ -1,4 +1,6 @@
 import "whatwg-fetch";
+import { IServerResponse } from "../interfaces/models";
+import { addEventsToQueue } from "../util";
 
 let token: undefined | string = undefined;
 
@@ -48,13 +50,25 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             }
             if (response.status >= 200 && response.status < 300) {
                 if (response.status == 204) {
-                    return Promise.resolve({}) as Promise<T>;
+                    return Promise.resolve({}) as Promise<IServerResponse<T>>;
                 } else {
-                    return response.json() as Promise<T>;
+                    return response.json() as Promise<IServerResponse<T>>;
                 }
             }
             // Fallthrough to error
-            return Promise.resolve({}) as Promise<T>;
+            return Promise.resolve({}) as Promise<IServerResponse<T>>;
+        })
+        .then(x => {
+            if (x.notifications) {
+                addEventsToQueue(x.notifications);
+            }
+
+            if (x.error) {
+                // TODO: Handle global things
+                return Promise.resolve({}) as Promise<T>;
+            } else {
+                return Promise.resolve(x.data);
+            }
         });
 };
 

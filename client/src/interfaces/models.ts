@@ -212,3 +212,9 @@ export interface ILink {
         href: string
     }[]
 };
+
+export interface IServerResponse<T> {
+    error: string,
+    notifications: Notification[]
+    data: T
+}
