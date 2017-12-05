@@ -19,7 +19,11 @@
             :class="pageSize"
             md-hide-xsmall
             md-hide-small>
-                <user-container :user="user" :course="course" @changeUser="updateUser" @changeCourse="updateCourse"></user-container>
+                <user-container
+                    :user="user"
+                    :course="course"
+                    @changeUser="updateUser"
+                    @changeCourse="updateCourse"></user-container>
             <ul>
                 <li v-for="link in links"
                     :key="link.href">
