@@ -98,16 +98,6 @@ def rate(request):
 
 def index(request):
     return JsonResponse({
-<<<<<<< HEAD
-        "data": {
-            "all": "Returns all Questions",
-            "topics": "Returns all Question Topics",
-            "id/:id": "Fetch question by ID",
-            "search/sortField/:sortField/sortOrder/:sortOrder/filterField/:filterField/query/:query": "Run a server search",
-            "page/:id": "Fetch question collection in chunks",
-            "competencies/all": "Fetch all competencies for the user"
-        }
-=======
         "all": "Returns all Questions",
         "topics": "Returns all Question Topics",
         "id/:id": "Fetch question by ID",
@@ -116,7 +106,6 @@ def index(request):
         "competencies/all": "Fetch all competencies for the user",
         "add": "Add a question to the database",
         "report": "Report a question",
->>>>>>> origin/master
     })
 
 
