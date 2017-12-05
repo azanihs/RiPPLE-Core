@@ -37,11 +37,7 @@ def add(request):
     if response['state'] == "Error":
         return JsonResponse({"error": response['error']}, status=422)
     else:
-        return JsonResponse({
-            "data": {
-                "question": response['question']
-            }
-        })
+        return JsonResponse({"question": response['question']}, status=200)
 
 
 def respond(request):
@@ -103,9 +99,13 @@ def index(request):
         "id/:id": "Fetch question by ID",
         "search/sortField/:sortField/sortOrder/:sortOrder/filterField/:filterField/query/:query": "Run a server search",
         "page/:id": "Fetch question collection in chunks",
+<<<<<<< HEAD
         "competencies/all": "Fetch all competencies for the user",
         "add": "Add a question to the database",
         "report": "Report a question",
+=======
+        "competencies/all": "Fetch all competencies for the user"
+>>>>>>> parent of 69f7033... Add data tag to all server responses
     })
 
 
@@ -115,22 +115,22 @@ def id(request, id):
     if question is None:
         return JsonResponse({}, status=404)
 
-    return JsonResponse({"data": question.toJSON()})
+    return JsonResponse(question.toJSON())
 
 
 def competencies(request):
     logged_in_user = UserService.logged_in_user(request)
     user_competencies = UserService.user_competencies(logged_in_user)
-    return JsonResponse({"data": user_competencies})
+    return JsonResponse(user_competencies, safe=False)
 
 def aggregate(request, compare_type):
     logged_in_user = UserService.logged_in_user(request)
     aggregate_competencies = UserService.aggregate_competencies(logged_in_user, compare_type)
-    return JsonResponse({"data": aggregate_competencies})
+    return JsonResponse(aggregate_competencies, safe=False)
 
 def distribution(request, question_id):
     question_distribution = QuestionService.question_response_distribution(question_id)
-    return JsonResponse({"data": question_distribution})
+    return JsonResponse(question_distribution)
 
 def leaderboard_default(request):
     return leaderboard(request, "reputation", "DESC")
@@ -146,7 +146,7 @@ def leaderboard(request, sort_field, sort_order):
 
     leaderboard_scores = QuestionService.get_course_leaders(
         logged_in_user.course, sort_field, sort_order, limit)
-    return JsonResponse({"data": leaderboard_scores})
+    return JsonResponse(leaderboard_scores, safe=False)
 
 
 def topics(request):
@@ -154,7 +154,7 @@ def topics(request):
     course_topics = QuestionService.get_course_topics(logged_in_user.course)
     unique_topics = [x.toJSON() for x in course_topics]
 
-    return JsonResponse({"data": unique_topics})
+    return JsonResponse(unique_topics, safe=False)
 
 
 def search(request):
@@ -209,11 +209,9 @@ def page_response(data, page_index, page_size=25):
         page = page_manager.page(page_index)
 
     return JsonResponse({
-        "data": {
-            "items": [x.toJSON() for x in page.object_list],
-            "page": page_index,
-            "totalItems": page_manager.count
-        }
+        "items": [x.toJSON() for x in page.object_list],
+        "page": page_index,
+        "totalItems": page_manager.count
     })
 
 def report(request): 
