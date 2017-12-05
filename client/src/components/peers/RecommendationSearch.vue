@@ -6,8 +6,8 @@
                 <thead>
                     <tr>
                         <th>Topics</th>
-                        <th v-for="sType in searchTypes"
-                            :key="sType">{{ sType }}
+                        <th v-for="role in studyRoles"
+                            :key="role.id">{{ role.description }}
                         </th>
                     </tr>
                 </thead>
@@ -19,14 +19,15 @@
                             <div class="cellOverlay"
                                  :style="getCellWeight(topic)"></div>
                         </td>
-                        <td v-for="sType in searchTypes"
-                            :key="sType"
+                        <td v-for="role in studyRoles"
+                            :key="role.id"
                             class="centerAlign">
                             <md-checkbox class="centerCheckbox"
-                                         :disabled="checkboxIsDisabled(sType, topic)"
-                                         @change="checkboxChange"
-                                         :id="`${sType}_${topic.id}`"
-                                         :name="`${sType}_${topic.id}`"></md-checkbox>
+                                         :disabled="checkboxIsDisabled(role.description, topic)"
+                                         :value="checkbox(topic, role)"
+                                         @change="checkboxChange(topic, role)"
+                                         :id="`${role.id}_${topic.id}`"
+                                         :name="`${role.id}_${topic.id}`"></md-checkbox>
                         </td>
                     </tr>
                 </tbody>
@@ -149,7 +150,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic, UserSummary, Edge, CompareSet } from "../../interfaces/models";
+import { Topic, UserSummary, Edge, StudyRole, CompareSet } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -162,12 +163,6 @@ import RecommendationCard from "./RecommendationCard.vue";
     }
 })
 export default class RecommendationSearch extends Vue {
-    @Prop
-    searchTypes = p<string[]>({
-        required: true,
-        type: Array
-    });
-
     @Prop
     topics = p<Topic[]>({
         required: true,
@@ -186,6 +181,22 @@ export default class RecommendationSearch extends Vue {
         type: Array
     });
 
+    @Prop
+    studyRoles = p<StudyRole[]>({
+        type: Array,
+        default: () => {
+            return [];
+        }
+    });
+
+    @Prop
+    userRoles = p<Map<string, Map<string, boolean>>>({
+        type: Map,
+        default: () => {
+            return new Map<string, Map<string, boolean>>();
+        }
+    });
+
     competencies = new Map();
 
     updateCompetencies(newCompetencies: CompareSet) {
@@ -200,12 +211,24 @@ export default class RecommendationSearch extends Vue {
 
     @Lifecycle
     created() {
-        Fetcher.get(UserService.userCompetencies, { count: 10 })
+        Fetcher.get(UserService.userCompetencies)
             .on(this.updateCompetencies);
     }
 
-    checkboxChange() {
-        this.$emit("change");
+    checkbox(topic: Topic, studyRole: StudyRole): boolean {
+        if (!this.userRoles.has(topic.name)) {
+            return false;
+        } else {
+            const topicRoles = this.userRoles.get(topic.name);
+            if (topicRoles !== undefined) {
+                return topicRoles.get(studyRole.role) || false;
+            }
+            return false;
+        }
+    }
+
+    checkboxChange(topic: Topic, studyRole: StudyRole) {
+        this.$emit("change", topic.id, studyRole.id);
     }
 
     checkboxIsDisabled(sType: string, topic: Topic) {
