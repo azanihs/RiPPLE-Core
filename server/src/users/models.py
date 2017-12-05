@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import pytz as timezone
+from datetime import datetime
 from django.db import models
 
+_epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 class Course(models.Model):
     course_code = models.CharField(max_length=30)
@@ -20,8 +22,8 @@ class Course(models.Model):
             "courseCode": self.course_code,
             "courseName": self.course_name,
             "available": self.available,
-            "start": self.start.replace(tzinfo=timezone.utc).timestamp() if self.start else None,
-            "end": self.end.replace(tzinfo=timezone.utc).timestamp() if self.end else None
+            "start": (self.start.replace(tzinfo=timezone.utc) - _epoch).total_seconds() if self.start else None,
+            "end": (self.end.replace(tzinfo=timezone.utc) - _epoch).total_seconds() if self.end else None
         }
 
 

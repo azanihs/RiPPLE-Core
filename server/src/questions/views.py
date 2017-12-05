@@ -99,13 +99,9 @@ def index(request):
         "id/:id": "Fetch question by ID",
         "search/sortField/:sortField/sortOrder/:sortOrder/filterField/:filterField/query/:query": "Run a server search",
         "page/:id": "Fetch question collection in chunks",
-<<<<<<< HEAD
         "competencies/all": "Fetch all competencies for the user",
         "add": "Add a question to the database",
         "report": "Report a question",
-=======
-        "competencies/all": "Fetch all competencies for the user"
->>>>>>> parent of 69f7033... Add data tag to all server responses
     })
 
 

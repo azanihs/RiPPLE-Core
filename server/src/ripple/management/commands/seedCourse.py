@@ -117,6 +117,10 @@ def parse_questions(file, course_users, all_topics, host):
                     question.topics.add(all_topics[idx])
                 question.save()
 
+                _response_set = ["A", "B", "C", "D"]
+                if True not in q["responses"[i].get("isCorrect", False) for i in _response_set]:
+                    raise IntegrityError("Question: " + str(counter) + " has no solution")
+
                 for i in ["A", "B", "C", "D"]:
                     response = q["responses"][i]
                     if response["content"] is None:
