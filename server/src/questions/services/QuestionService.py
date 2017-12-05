@@ -2,6 +2,9 @@ import random
 
 from django.db.models import Count
 
+import math
+
+import numpy as np
 from ripple.util import util
 from users.models import CourseUser, Token
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore, ReportQuestion
@@ -144,71 +147,133 @@ def rate_question(distractor_id, user_ratings, user):
         return False
 
 
-def calculate_question_score(attempts, is_correct):
-
-    score_map = {
-        1: 1 if is_correct else -1,
-        2: 0.25 if is_correct else -1,
-        3: -0.25 if is_correct else -1,
-        4: -0.75 if is_correct else -1
-    }
-    return score_map[min(4, attempts)]
-
-
-def update_question_score(user, question, new_score):
-    """
-        Helper method to update the cached QuestionScore for a users question to new_score. Also increments the answer count for the question score
-        Creates a QuestionScore is none exists
+def calculate_question_score(user, question, response):
+    """ 
+        calculates the questions score and updates the cached question  score. Also increments the answer count for the questions core
+        Creates a QuestionScore if none exists
     """
     try:
-        cached_question_score = QuestionScore.objects.get(
+        question_score = QuestionScore.objects.get(
             user=user, question=question)
-        cached_question_score.score = new_score
-        cached_question_score.number_answers += 1
-        cached_question_score.save()
     except QuestionScore.DoesNotExist:
-        QuestionScore(user=user, question=question, number_answers=1,
-                      score=new_score).save()
+        question_score = QuestionScore(user=user, question=question, 
+                number_answers=0, score=0)
+        question_score.save()
+
+    is_correct = response.response.isCorrect
+    if not is_correct:
+        question_score.number_answers += 1
+        question_score.score = 0
+        question_score.save()
+        return
+
+    score_map = {
+        1: 1 if is_correct else 0,
+        2: 0.75 if is_correct else 0,
+        3: 0.5 if is_correct else 0,
+        4: 0.25 if is_correct else 0
+    }
+
+    question_score.score = score_map[min(4,question_score.number_answers+1)]
+    question_score.number_answers = 0
+    question_score.save()
 
 
 def update_competency(user, question, response):
     """
         Updates the user's competency for all topic combinations in the given question
     """
-    # Weigh each topic
-    queryset_topics = question.topics.all()
-    weights = util.topic_weights(queryset_topics)
+    calculate_question_score(user, question, response)
 
+    queryset_topics = question.topics.all()
+
+    score = get_competency_score(question, response)
+    calculate_children_competency(user, queryset_topics, score)
+    
+        
+def calculate_children_competency(user, queryset_topics, score):
+    """ Updates children competencies"""
+    # Weigh each topic
+    weights = util.topic_weights(queryset_topics)
     for i in weights:
         topics = queryset_topics.filter(id__in=[x.id for x in i["topics"]])
         weight = i["weight"]
 
         user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
-        previous_score = 0
-        attempt_count = 1
 
         if user_competency is None or len(user_competency) == 0:
-            user_competency = CompetencyService.add_competency(50, 1, user, topics)
+            user_competency = CompetencyService.add_competency(0.5, 0, user, topics)
         else:
             user_competency = user_competency[0]
-            attempt_count = QuestionResponse.objects.filter(
-                user=user, response__in=Distractor.objects.filter(question=question)).count()
 
-            if attempt_count > 1:
-                # Has attempted question before
-                previous_score = QuestionScore.objects.get(
-                    user=user, question=question).score
-
-        question_score = calculate_question_score(
-            attempt_count, response.response.isCorrect)
-
-        user_competency.competency = (
-            user_competency.competency * user_competency.confidence - previous_score + question_score) / (user_competency.confidence + weight)
-
+        old_score = competency_to_score(user_competency.competency)
+        new_score = old_score + (score*weight)      
+        new_competency =  score_to_competency(new_score)
+        user_competency.competency = new_competency
         user_competency.confidence += weight
         user_competency.save()
 
-        update_question_score(user, question, question_score)
+
+def get_competency_score(question, response):
+    """ Calculates the competency for the exact topics"""
+    topics = question.topics.all()
+    user = response.user
+    q_first_clean = Question.objects.annotate(num_topics=Count('topics'))
+    q_second_clean = Question.objects.filter(topics__in=topics).annotate(num_topics=Count('topics'))
+    question_scores = QuestionScore.objects.filter(user=user, question__in = \
+            q_second_clean.filter(num_topics=len(topics),id__in=q_first_clean.filter(num_topics=len(topics)).values('id'))).order_by("-id")[:20]
+    if (len(question_scores) > 0):
+        past_average = 0
+        for score in question_scores:
+            past_average += score.score
+        past_average = past_average/len(question_scores)    
+    else:
+        past_average = 1 
+    ### When getting question wrong
+    ### Easy question = less score - less weight going down
+    ### Hard question = more score - more weight going down
+    if response.response.isCorrect:
+        difficulty = question.difficulty
+    else:
+        difficulty = (10 - question.difficulty)/2+5
+
+    ### Array for dot product. Goal is to have 
+    ### abs(dotProd) between 0.25 and 0.5 in 
+    ### most situations
+    weighted_features = [
+        (difficulty/10, 0.2),
+        (past_average, 0.1),
+        (exp_moving_avg(0.9, question_scores), 0.3)
+    ]
+
+    feature, weight_vector = zip(*weighted_features)
+    new_scores = np.dot(feature, weight_vector)
+
+    ### Add score if correct, subtract if incorrect
+    if response.response.isCorrect:
+        return new_scores
+    else:
+        return -new_scores
+
+def competency_to_score(competency):
+    return math.log(competency/(1-competency))
+
+#Inverse of competency_to_score
+def score_to_competency(score):
+    return 1 / (1 + math.exp(-score))
+
+
+def exp_moving_avg(decay_factor, question_scores):
+    res = 0
+    counter = 0
+    divisor = 0.3 *math.exp(3.64 * decay_factor)
+    decay_factor = math.log(decay_factor)
+    for score in question_scores:
+        res += score.score*math.exp(decay_factor * counter)
+        counter += 1
+    return res/divisor
+
+        
 
 def report_question(user, request):
     request = request.get("questionReport", None)
