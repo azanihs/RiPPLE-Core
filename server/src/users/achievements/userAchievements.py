@@ -71,7 +71,7 @@ class AbstractAchievementClass(ABC):
 
     def toJSON(self):
         return {"key": self.key, "name": self.name, "key": self.key, "description": self.description, 
-            "category": self.category, "icon":self.icon, "bonus": self.bonus}
+            "category": self.category, "condition": self.condition, "icon":self.icon, "bonus": self.bonus}
 
     def get_result(self, count, progress):
         json = self.toJSON()
@@ -91,7 +91,7 @@ class BeginnerAuthorAchievement(AbstractAchievementClass):
 
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class IntermediateAuthorAchievement(AbstractAchievementClass):
@@ -106,7 +106,7 @@ class IntermediateAuthorAchievement(AbstractAchievementClass):
 
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class AdvancedAuthorAchievement(AbstractAchievementClass):
@@ -121,7 +121,7 @@ class AdvancedAuthorAchievement(AbstractAchievementClass):
 
     def evaluate(self, user, *args, **kwargs):
         count = Question.objects.filter(author=user).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class BeginnerResponseAchievement(AbstractAchievementClass):
@@ -135,9 +135,9 @@ class BeginnerResponseAchievement(AbstractAchievementClass):
     tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
-        responses = QuestionResponse.objects.filter(user=user).only('id').all()
+        responses = QuestionResponse.objects.filter(user=user).values('response').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class IntermediateResponseAchievement(AbstractAchievementClass):
@@ -151,9 +151,9 @@ class IntermediateResponseAchievement(AbstractAchievementClass):
     tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
-        responses = QuestionResponse.objects.filter(user=user).only('id').all()
+        responses = QuestionResponse.objects.filter(user=user).values('response').all()
         count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class AdvancedResponseAchievement(AbstractAchievementClass):
@@ -167,9 +167,9 @@ class AdvancedResponseAchievement(AbstractAchievementClass):
     tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
-        responses = QuestionResponse.objects.filter(user=user).only('id').all()
-        count = Distractor.objects.filter(id__in=responses, isCorrect=True  ).count()
-        progress = min(100, count/self.condition*100)
+        responses = QuestionResponse.objects.filter(user=user).values('response').all()
+        count = Distractor.objects.filter(id__in=responses, isCorrect=True).count()
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class BeginnerCompetencyAchievement(AbstractAchievementClass):
@@ -184,7 +184,7 @@ class BeginnerCompetencyAchievement(AbstractAchievementClass):
 
     def evaluate(self, user, *args, **kwargs):
         count = Competency.objects.filter(user=user, competency__gte=50).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class IntermediateCompetencyAchievement(AbstractAchievementClass):
@@ -199,7 +199,7 @@ class IntermediateCompetencyAchievement(AbstractAchievementClass):
 
     def evaluate(self, user, *args, **kwargs):
         count = Competency.objects.filter(user=user, competency__gte=50).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class AdvancedCompetencyAchievement(AbstractAchievementClass):
@@ -214,7 +214,7 @@ class AdvancedCompetencyAchievement(AbstractAchievementClass):
 
     def evaluate(self, user, *args, **kwargs):
         count = Competency.objects.filter(user=user, competency__gte=50).count()
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 
@@ -231,7 +231,7 @@ class BeginnerConnectionAchievement(AbstractAchievementClass):
     def evaluate(self, user, *args, **kwargs):
         ### Faked method
         count = user.pk/2
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class IntermediateConnectionAchievement(AbstractAchievementClass):
@@ -247,7 +247,7 @@ class IntermediateConnectionAchievement(AbstractAchievementClass):
     def evaluate(self, user, *args, **kwargs):
         ### Faked method
         count = user.pk/2
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
 class AdvancedConnectionAchievement(AbstractAchievementClass):
@@ -263,5 +263,5 @@ class AdvancedConnectionAchievement(AbstractAchievementClass):
     def evaluate(self, user, *args, **kwargs):
         ### Faked method
         count = user.pk/2
-        progress = min(100, count/self.condition*100)
+        progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)

@@ -96,8 +96,8 @@ def respond_to_question(distractor_id, user):
         response=answered_option
     )
     response.save()
-
-    update_competency(user, answered_option.question, response)
+    if answered_option.isCorrect:
+        update_competency(user, answered_option.question, response)
     return True
 
 def update_running_mean(value, count, new_weight):
@@ -229,7 +229,7 @@ def report_question(user, request):
     return {}
 
 def get_reports(user):
-    if not is_administrator(user):
+    if not util.is_administrator(user):
         return {"error": "User does not have administrative permission for current context"}
     course = user.course
     reportQuestions= ReportQuestion.objects \

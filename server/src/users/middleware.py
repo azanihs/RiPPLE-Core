@@ -53,7 +53,6 @@ class NotificationMiddleware(object):
             i.save()
 
         response.content = json.dumps(data)
-        print(response.content)
         return response
 
 class AchievementChecker(object):
@@ -95,10 +94,9 @@ class AchievementChecker(object):
 
         for t in tasks:    
             achievements = t.achievements.all() 
-            #data['achievement'] = []
             for a in achievements:
                 result = engine.check_achievement(user=user, key=a.key)
-                if result["new"]:
+                if result["new"]:   
                     n = Notification (
                         name=result["name"] + " Earned",
                         description=result["description"],
@@ -106,15 +104,5 @@ class AchievementChecker(object):
                         user=user
                     )
                     n.save()
-
-
-                    #data["achievement"].append(result)
-                #data['achievement'].append(engine.check_achievement(user=user, key=a.key))
-
-        #if len(data["achievement"] == 0):
-        #    data["achievement"] = None
-
-        #response.content = json.dumps(data)
     
         return response
-

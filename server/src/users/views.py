@@ -100,7 +100,16 @@ def get_all_user_achievements(request):
     achievements = Achievement.objects.all()
     data = []    
     for ach in achievements:
-        data.append(engine.check_achievement(user=user, key=ach.key))
+        result = engine.check_achievement(user=user, key=ach.key)
+        data.append(result)
+        if result["new"]:
+            n = Notification (
+                name=result["name"] + " Earned",
+                description=result["description"],
+                icon=result["icon"],
+                user=user
+            )
+            n.save()
 
     return JsonResponse({"data": data})
 

@@ -22,13 +22,13 @@ def check_achievement_plain(sender, user, key, *args, **kwargs):
     obj = Achievement.objects.get(key=key)
     result = evaluate_achievement_callback(user, obj, *args, **kwargs)
     result["new"] = False
-    if result["progress"] == 1:
+    if result["progress"] == 100:
         (user_ach, created) = UserAchievement.objects.get_or_create(achievement=obj, user=user)
         if created:
             print("Achievement %s unlocked for user %s " % (obj, user))
             logger.info("Achievement %s unlocked for user %s " % (obj, user))
-            achievement_unlocked.send(sender=sender, user=user, achievement=obj, *args, **kwargs)
             result["new"] = True
+            achievement_unlocked.send(sender=sender, user=user, achievement=obj, *args, **kwargs)            
     return result
 
 
