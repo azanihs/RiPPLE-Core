@@ -54,7 +54,7 @@ def update_course(course_user, new_data):
     if course_user.course.course_code != course_code:
         return {"error": "Course not found"}
 
-    if "Instructor" not in (x.role for x in course_user.roles.all()):
+    if not util.is_administrator(course_user):
         return {"error": "User does not have administrative permission for current context"}
 
     start = course_information.get("start", None)
