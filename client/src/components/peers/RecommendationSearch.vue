@@ -215,7 +215,7 @@ export default class RecommendationSearch extends Vue {
             .on(this.updateCompetencies);
     }
 
-    checkbox(topic, studyRole) {
+    checkbox(topic: Topic, studyRole: StudyRole): boolean {
         if (!this.userRoles.has(topic.name)) {
             return false;
         } else {
