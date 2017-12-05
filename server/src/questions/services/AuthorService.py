@@ -37,14 +37,12 @@ def add_question(question_request, host, user):
             # Question Images
             images = question.get("payloads", None)
             if images:
-                if not decodeImages(str(questionObj.id), questionObj, images, "q", host):
-                    raise IntegrityError("Invalid Question Image")
+                decodeImages(str(questionObj.id), questionObj, images, "q", host)
 
             # Explanation Images
             images = explanation.get("payloads", None)
             if images:
-                if not decodeImages(str(questionObj.id), questionObj, images, "e", host):
-                    raise IntegrityError("Invalid Explanation Image")
+                decodeImages(str(questionObj.id), questionObj, images, "e", host)
 
             # Topics
             topicList = []
@@ -69,8 +67,7 @@ def add_question(question_request, host, user):
                 # Distractor Images
                 images = responses[i].get("payloads", None)
                 if images:
-                    if not decodeImages(str(distractor.id), distractor, images, "d", host):
-                        raise IntegrityError("Invalid Distractor Image")
+                    decodeImages(str(distractor.id), distractor, images, "d", host)
     except IntegrityError as e:
         return {"state": "Error", "error": str(e)}
     except Exception as e:
@@ -119,7 +116,6 @@ def newSource(urls, content, host):
             continue
         images[i]['src'] = "//" + host + urls[i]
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
-
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
 

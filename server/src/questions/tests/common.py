@@ -18,13 +18,13 @@ class BootstrapTestCase(TestCase):
     def _bootstrap_question_request(self):
         topic = Topic.objects.all().first()
         new_question = {
-            "question": { "content" : "q1"},
-            "explanation": {"content" : "e1"},
+            "question": { "content" : "q1", "payloads": None},
+            "explanation": {"content" : "e1", "payloads": None},
             "responses" :  {
-                "A": {"content": "qr2", "isCorrect": "True"},
-                "B": {"content": "qr3", "isCorrect": "False"},
-                "C": {"content": "qr4", "isCorrect": "False"},
-                "D": {"content": "qr5", "isCorrect": "False"},
+                "A": {"content": "qr2", "payloads": None, "isCorrect": "True"},
+                "B": {"content": "qr3", "payloads": None, "isCorrect": "False"},
+                "C": {"content": "qr4", "payloads": None, "isCorrect": "False"},
+                "D": {"content": "qr5", "payloads": None, "isCorrect": "False"},
             },
             "topics": [{"id": topic.id, "name": topic.name
             }]
