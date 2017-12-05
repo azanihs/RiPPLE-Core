@@ -171,7 +171,7 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
 import ActionButtons from "../util/ActionButtons.vue";
@@ -179,7 +179,6 @@ import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
-import QuestionService from "../../services/QuestionService";
 
 @Component({
     components: {

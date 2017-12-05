@@ -61,12 +61,13 @@ import { Vue, Component, Prop, p } from "av-ts";
 
 @Component()
 export default class TopicChip extends Vue {
-    @Prop linkTo = p({
-        type: String
+    @Prop linkTo = p<string>({
+        required: false,
+        default: ""
     });
 
-    @Prop disabled = p({
-        type: Boolean,
+    @Prop disabled = p<boolean>({
+        required: false,
         default: false
     });
 

@@ -30,9 +30,16 @@
 </style>
 
 <script lang="ts">
-import ChartJS from "chart.js";
 import Graph from "./Graph.vue";
-import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
+import { Vue, Component, Prop, p } from "av-ts";
+import { Topic } from "../../interfaces/models";
+import { ISimulationNode, ISimulationEdge } from "../../interfaces/chart";
+
+interface IGraphRepresentation {
+    node: d3.Selection<HTMLElement, ISimulationNode, Element, null>,
+    link: d3.Selection<HTMLElement, ISimulationEdge, Element, null>,
+    label: d3.Selection<HTMLElement, ISimulationNode, Element, null>
+}
 
 @Component({
     components: {
@@ -40,13 +47,15 @@ import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
     }
 })
 export default class GraphComparator extends Vue {
-    @Prop
-    data;
+    @Prop data = p<any>({
+        required: true
+    });
 
-    @Prop
-    nodes;
+    @Prop nodes = p<Topic[]>({
+        required: true
+    });
 
-    chartQueue = [];
+    chartQueue: IGraphRepresentation[] = [];
 
     get graphNodes() {
         return this.nodes;
@@ -56,13 +65,13 @@ export default class GraphComparator extends Vue {
         this.chartQueue = [];
     }
 
-    updateGraphQueue(graph) {
+    updateGraphQueue(graph: IGraphRepresentation) {
         this.chartQueue.push(graph);
     }
 
     updateNodes() {
         this.chartQueue.forEach(x => {
-            x.node
+            x.node // d3 selection
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
 
@@ -74,16 +83,16 @@ export default class GraphComparator extends Vue {
 
             x.label
                 .attr("dx", d => d.x)
-                .attr("dy", d => d.y + 4);
+                .attr("dy", d => d.y);
         });
     }
 
-    rescale(oldDimensions, newDimensions) {
+    rescale(oldDimensions: ClientRect, newDimensions: ClientRect) {
         // Normalise data into new range
-        const newX = nodeX => {
+        const newX = (nodeX: number) => {
             return (nodeX / oldDimensions.width) * newDimensions.width;
         };
-        const newY = nodeY => {
+        const newY = (nodeY: number) => {
             return (nodeY / oldDimensions.height) * newDimensions.height;
         };
         this.chartQueue[0].node
@@ -99,7 +108,7 @@ export default class GraphComparator extends Vue {
         this.updateNodes();
     }
 
-    ticked(graphWidth, graphHeight, radius) {
+    ticked(graphWidth: number, graphHeight: number, radius: number) {
         if (this.chartQueue.length != this.data.datasets.length) {
             return setTimeout(() => {
                 this.ticked(graphWidth, graphHeight, radius);
@@ -108,9 +117,11 @@ export default class GraphComparator extends Vue {
         this.chartQueue[0].node
             .attr("cx", d => {
                 d.x = Math.max(radius, Math.min(graphWidth - radius, d.x));
+                return null;
             })
             .attr("cy", d => {
                 d.y = Math.max(radius, Math.min(graphHeight - radius, d.y));
+                return null;
             });
         this.updateNodes();
     }

@@ -87,21 +87,25 @@ p + p {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Notification, NotificationType } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
-@Component()
+type NotificationTypeMap = {
+    [K in NotificationType]: string;
+};
+
+@Component
 export default class Notifications extends Vue {
     @Prop
-    showCount = p({
-        type: Number,
+    showCount = p<number>({
         default: 10
-    }) as number;
+    });
 
-    pNotifications = [];
-    updateNotifications(newNotifications) {
+    pNotifications: Notification[] = [];
+    updateNotifications(newNotifications: Notification[]) {
         this.pNotifications = newNotifications.slice(0, this.showCount);
     };
 
@@ -135,13 +139,15 @@ export default class Notifications extends Vue {
         return this.pNotifications;
     }
 
-    iconFromType(notification) {
-        return ({
+    iconFromType(notificationType: NotificationType) {
+        const _icons: NotificationTypeMap = {
             "Incoming Connection": "supervisor_account",
             "Achievement": "bar_chart",
             "Personal Goal": "trending_up",
             "Upcoming Meeting": "hourglass_full"
-        })[notification];
+        };
+
+        return _icons[notificationType];
     }
 }
 </script>

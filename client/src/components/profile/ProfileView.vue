@@ -120,13 +120,18 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
+import { User, Topic } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
-import TopicService from "../../services/TopicService";
 
 import CollectedBadges from "../util/CollectedBadges.vue";
 import Notifications from "../util/Notifications.vue";
+
+interface IEngagementSummary {
+    node: Topic,
+    score: number
+};
 
 @Component({
     components: {
@@ -136,14 +141,14 @@ import Notifications from "../util/Notifications.vue";
 })
 export default class DefaultView extends Vue {
 
-    pUser = undefined;
-    pEngagementSummary = [];
+    pUser: User | undefined = undefined;
+    pEngagementSummary: IEngagementSummary[] = [];
 
-    updateEngagementSummary(newSummary) {
+    updateEngagementSummary(newSummary: IEngagementSummary[]) {
         this.pEngagementSummary = newSummary;
     };
 
-    updateUser(user) {
+    updateUser(user: User) {
         this.pUser = user;
     };
 

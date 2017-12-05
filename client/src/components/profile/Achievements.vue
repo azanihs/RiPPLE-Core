@@ -23,11 +23,8 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component } from "av-ts";
 
-import Fetcher from "../../services/Fetcher";
-import UserService from "../../services/UserService";
-import TopicService from "../../services/TopicService";
 import CollectedBadges from "../util/CollectedBadges.vue";
 import OverviewDescription from "../util/OverviewDescription.vue";
 
@@ -38,6 +35,6 @@ import OverviewDescription from "../util/OverviewDescription.vue";
     }
 })
 export default class AchievementView extends Vue {
-    
+
 }
 </script>

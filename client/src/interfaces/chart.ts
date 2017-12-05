@@ -1,3 +1,5 @@
+import { Topic, Edge } from "./models";
+
 import * as d3 from "d3";
 
 export interface Line {
@@ -63,3 +65,14 @@ export interface DataContainer {
     [key: string]: null | any
 };
 
+export interface ISimulationNode extends d3.SimulationNodeDatum, Topic {
+    x: number,
+    y: number,
+    cx: number,
+    cy: number
+};
+
+export interface ISimulationEdge extends Edge {
+    source: ISimulationNode
+    target: ISimulationNode
+};

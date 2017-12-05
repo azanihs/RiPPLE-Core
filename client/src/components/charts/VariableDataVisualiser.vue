@@ -146,7 +146,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Topic } from "../../interfaces/models";
+import { Topic, Edge } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
@@ -165,9 +165,9 @@ interface IChartType {
 })
 export default class VariableDataVisualiser extends Vue {
     @Prop
-    dataCategories = p({ // Topics...
+    dataCategories = p<Topic[]>({
         required: true
-    }) as Topic[];
+    });
 
     // Subscribable function to provide access to dataset for chartType
     @Prop
@@ -191,10 +191,9 @@ export default class VariableDataVisualiser extends Vue {
     });
 
     @Prop
-    chartType = p({
-        type: String,
+    chartType = p<string>({
         default: "bar"
-    }) as string;
+    });
 
     pDataGeneratorFunction: Function | undefined = undefined;
     pChartData: any = {
@@ -202,9 +201,9 @@ export default class VariableDataVisualiser extends Vue {
         options: undefined
     };
 
-    hiddenData = {};
+    hiddenData: {[topicId: number]: boolean} = {};
     pChartType: string = "";
-    pExcludeTopics = [];
+    pExcludeTopics: number[] = [];
 
     pCompareAgainst: string = "peers";
 
@@ -214,7 +213,7 @@ export default class VariableDataVisualiser extends Vue {
 
     set chart(newVal: string) {
         Fetcher.get(this.pDataGeneratorFunction as any,
-            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
+            { compareTo: this.compare, exclude: this.pExcludeTopics })
             .off(this.updateChartData);
 
         this.pChartType = newVal;
@@ -223,7 +222,7 @@ export default class VariableDataVisualiser extends Vue {
 
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
         Fetcher.get(this.pDataGeneratorFunction as any,
-            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
+            { compareTo: this.compare, exclude: this.pExcludeTopics })
             .on(this.updateChartData);
     }
 
@@ -236,32 +235,36 @@ export default class VariableDataVisualiser extends Vue {
         this.chart = this.chart;
     }
 
-    toggleVisible(dataItem) {
+    toggleVisible(dataItem: Topic) {
         if (this.hiddenData[dataItem.id]) {
-            this.$set(this.hiddenData, dataItem.id, false);
+            // this.hiddenData[dataItem.id] = false;
+            this.$set(this.hiddenData as any, dataItem.id, false);
         } else {
-            this.$set(this.hiddenData, dataItem.id, true);
+            // this.hiddenData[dataItem.id] = true;
+            this.$set(this.hiddenData as any, dataItem.id, true);
         }
-        const topicsToShow = this.dataCategories.filter(x => !this.isDisabled(x));
 
+        const topicsToShow = this.dataCategories.filter(x => !this.isDisabled(x));
         this.chart = this.chart;
         this.$emit("changeTopics", topicsToShow);
     }
 
     updateChart() {
-        const dim = this.$el.querySelector(".visualisationMenu").getBoundingClientRect();
-        this.$el.querySelector(".chartContainer")["style"].height = dim.height + "px";
+        const dim = this.$el.querySelector(".visualisationMenu")!.getBoundingClientRect();
+        const chartContainer = this.$el.querySelector(".chartContainer")! as HTMLDivElement;
+        chartContainer.style.height = dim.height + "px";
     }
 
-    calculateChartValues(newData) {
+    calculateChartValues(newData: { topics: Topic[], ownScores: Edge[], compareAgainst: Edge[] }) {
         const { topics, ownScores, compareAgainst } = newData;
 
-        let compareResults = compareAgainst.map(x => x);
-        let ownResults = ownScores.map(x => x);
-        let dataTopics = topics;
+        let compareResults: any[];
+        let ownResults: any[];
+        let dataTopics: any[];
+
         if (this.chart != "topicDependency") {
             // Get all self loops from edge list, and use that competency.
-            const findOrEmpty = x => search => {
+            const findOrEmpty = (x: Topic) => (search: Edge[]) => {
                 return search.find(s => s.source === x && s.target === x) || {
                     target: x,
                     source: x,
@@ -269,9 +272,13 @@ export default class VariableDataVisualiser extends Vue {
                     attempts: 0
                 };
             };
-            compareResults = topics.map(topic => findOrEmpty(topic)(compareAgainst)).map(x => x.competency);
-            ownResults = topics.map(topic => findOrEmpty(topic)(ownScores)).map(x => x.competency);
-            dataTopics = topics.map(x => x.name);
+            compareResults = newData.topics.map(topic => findOrEmpty(topic)(compareAgainst)).map(x => x.competency);
+            ownResults = newData.topics.map(topic => findOrEmpty(topic)(ownScores)).map(x => x.competency);
+            dataTopics = newData.topics.map(x => x.name);
+        } else {
+            compareResults = compareAgainst.map(x => x);
+            ownResults = ownScores.map(x => x);
+            dataTopics = topics;
         }
 
         const ownData = {
@@ -312,12 +319,12 @@ export default class VariableDataVisualiser extends Vue {
         this.pChartData = chartData;
     }
 
-    updateChartData(newChartData) {
+    updateChartData(newChartData: { topics: Topic[], ownScores: Edge[], compareAgainst: Edge[] }) {
         this.calculateChartValues(newChartData);
     }
 
     @Watch("dataCategories")
-    changedDataCategories() {
+    changedDataCategories(_oldTopics: Topic[], _newTopics: Topic[]) {
         this.$emit("changeTopics", this.dataCategories);
     }
 
@@ -349,7 +356,7 @@ export default class VariableDataVisualiser extends Vue {
             .off(this.updateChartData);
     }
 
-    getColour(c) {
+    getColour(c: number) {
         if (c < 50) {
             return "rgba(255, 99, 132, ";
         } else if (c >= 50 && c <= 75) {
@@ -359,7 +366,7 @@ export default class VariableDataVisualiser extends Vue {
         }
     };
 
-    isDisabled(dataItem) {
+    isDisabled(dataItem: Topic) {
         return !!this.hiddenData[dataItem.id];
     }
 

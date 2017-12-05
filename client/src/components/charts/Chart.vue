@@ -96,53 +96,49 @@ import { Vue, Component, Prop, Watch, Lifecycle, p } from "av-ts";
         GraphComparator
     }
 })
-export default class Chart extends Vue {
-    @Prop type = p({
-        type: String,
+export default class ChartWrapper extends Vue {
+    @Prop type = p<string>({
         required: true
     });
-    @Prop data = p({
-        type: Object,
-        required: true,
+
+    @Prop data = p<Chart.ChartData>({
+        required: true
+    });
+
+    @Prop options = p<Chart.ChartOptions>({
         default: () => {
             return {};
         }
     });
 
-    @Prop options = p({
-        type: Object,
-        default: () => {
-            return {};
-        }
-    });
-
-    chart: ChartJS = null;
+    chart: Chart | null = null;
 
     mountChart() {
         if (this.type == "topicDependency") {
             this.chart = {
                 destroy: () => { },
                 update: () => { }
-            };
+            } as Chart;
         } else {
-            const chartOptions = Object.assign({
+            const chartOptions: Chart.ChartOptions = Object.assign({
                 maintainAspectRatio: false,
                 responsive: true
             }, this.options);
+
             if (this.type === "bar") {
-                if (chartOptions["legend"] === undefined) {
-                    chartOptions["legend"] = {};
+                if (chartOptions.legend === undefined) {
+                    chartOptions.legend = {};
                 }
-                chartOptions["legend"].display = false;
+                chartOptions.legend.display = false;
             } else if (this.type == "radar") {
-                chartOptions["scale"] = {
+                chartOptions.scales = {
                     ticks: {
                         display: false
                     }
                 };
             }
-
-            this.chart = new ChartJS(this.$el.querySelector("canvas").getContext("2d"), {
+            const canvas = this.$el.querySelector("canvas")!;
+            this.chart = new ChartJS(canvas.getContext("2d")!, {
                 type: this.type,
                 data: this.data,
                 options: chartOptions
@@ -154,12 +150,12 @@ export default class Chart extends Vue {
     @Lifecycle
     mounted() {
         this.mountChart();
-        window.dispatchEvent(new Event("resize"));
     }
 
     resetChart() {
+        window.dispatchEvent(new Event("resize"));
         this.$nextTick(() => {
-            this.chart.destroy();
+            this.chart!.destroy();
             this.mountChart();
         });
     }
@@ -167,14 +163,14 @@ export default class Chart extends Vue {
     @Lifecycle
     beforeUpdate() {
         if (this.type == "topicDependency") {
-            this.chart.destroy();
+            this.chart!.destroy();
         }
     }
 
     @Watch("type")
-    handleTypeChange() {
+    handleTypeChange(_oldType: string, _newType: string) {
         if (this.type == "topicDependency") {
-            this.chart.destroy();
+            this.chart!.destroy();
             this.$nextTick(() => {
                 this.mountChart();
             });
@@ -184,13 +180,13 @@ export default class Chart extends Vue {
     }
 
     @Watch("options")
-    handleOptionsChange() {
+    handleOptionsChange(_oldOptions: Chart.ChartOptions, _newOptions: Chart.ChartOptions) {
         this.resetChart();
     }
 
     @Watch("data")
-    handleDataChange() {
-        this.chart.update();
+    handleDataChange(_oldData: Chart.ChartData, _newData: Chart.ChartData) {
+        this.chart!.update();
     }
 }
 </script>

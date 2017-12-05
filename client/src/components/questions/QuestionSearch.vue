@@ -92,17 +92,26 @@ input {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Topic, Question } from "../../interfaces/models";
+import { Topic } from "../../interfaces/models";
 
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
 import Fetcher from "../../services/Fetcher";
 
 
+interface ISearch {
+    sortField: string,
+    sortDesc: boolean,
+    filterField: string,
+    query: string,
+    page: number,
+    filterTopics: number[]
+};
+
 @Component()
 export default class QuestionSearch extends Vue {
 
-    timeoutId = undefined;
+    timeoutId: number | undefined = undefined;
     searchInFlight = false;
 
     nextSearchRequest: Function| undefined = undefined;
@@ -189,7 +198,7 @@ export default class QuestionSearch extends Vue {
         }];
     }
 
-    search = {
+    search: ISearch = {
         sortField: "",
         sortDesc: false,
         filterField: "All Questions",
@@ -231,25 +240,26 @@ export default class QuestionSearch extends Vue {
     }
 
     @Watch("page")
-    pageChanged(newVal, oldVal) {
+    pageChanged(_newVal: number, _oldVal: number) {
         this.startSearch();
     }
+
     @Watch("pageSize")
-    pageSizeChanged(newVal, oldVal) {
+    pageSizeChanged(_newVal: number, _oldVal: number) {
         this.startSearch();
     }
 
     @Watch("search", { deep: true })
-    searchWatch() {
+    searchWatch(_oldValue: ISearch, _newValue: ISearch) {
         this.startSearch();
     }
 
     startSearch() {
         if (this.timeoutId === undefined) {
-            this.timeoutId = setTimeout((() => this.applyFilters()), 10);
+            this.timeoutId = window.setTimeout((() => this.applyFilters()), 10);
         } else {
             this.nextSearchRequest = () => {
-                this.timeoutId = setTimeout((() => this.applyFilters()), 10);
+                this.timeoutId = window.setTimeout((() => this.applyFilters()), 10);
             };
         }
     }

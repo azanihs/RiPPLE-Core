@@ -84,11 +84,11 @@ export default class UserContainer extends Vue {
         required: false
     });
 
-    pCourse: Course = undefined;
+    pCourse: Course | undefined = undefined;
     pCourses: Course[] = [];
     errorMessage: string = "";
 
-    set currentCourse(newCourse: Course) {
+    set currentCourse(newCourse: Course | undefined) {
         this.pCourse = newCourse;
         this.$emit("changeCourse", newCourse);
     }
@@ -123,8 +123,8 @@ export default class UserContainer extends Vue {
     }
 
     handleImageChange(input: HTMLInputElement) {
-        return (e: MouseEvent) => {
-            const newImages = (e.target as HTMLInputElement).files;
+        return (e: Event) => {
+            const newImages = (e.target as HTMLInputElement).files || [];
             if (newImages.length == 0) {
                 // Snackbar err
                 document.body.removeChild(input);
@@ -154,7 +154,7 @@ export default class UserContainer extends Vue {
     openImagePicker() {
         const input = document.createElement("input");
         input.type = "file";
-        input.addEventListener("change", this.handleImageChange(input));
+        input.addEventListener("change", (e: Event) => this.handleImageChange(input)(e));
 
         document.body.appendChild(input);
         input.dispatchEvent(new MouseEvent("click", {
