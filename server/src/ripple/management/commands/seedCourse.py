@@ -7,6 +7,7 @@ from users.models import Course, User, CourseUser
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
+import sys
 
 from questions.services import QuestionService
 
@@ -86,9 +87,9 @@ def parse_questions(file, course_users, all_topics, host):
             with transaction.atomic():
                 distractor_count = 0
                 counter = counter+1
-                print("Adding question: " + str(counter))
-                if q["explanation"]["content"] == None:
+                if q["explanation"]["content"] is None:
                         q["explanation"]["content"] = " "
+
                 question = Question(
                     content = q["question"]["content"],
                     explanation = q["explanation"]["content"],
@@ -217,7 +218,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if(len(options["name"])!=len(options["course"]) or len(options["name"])!=len(options["file"])):
             print("Please ensure you have a course code, name and file for each course")
-            return
+            sys.exit(1)
+
         course_names = options["name"]
         course_codes = options["course"]
         course_files = options["file"]
