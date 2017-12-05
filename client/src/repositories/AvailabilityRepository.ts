@@ -19,8 +19,8 @@ export default class AvailabilityRepository {
         return apiFetch<Availability[]>("/recommendations/availability/");
     }
 
-    static updateUserAvailability(day: number, time: number) {
-        return apiFetch(`/recommendations/availability/update/`, {
+    static updateUserAvailability(day: number, time: number): Promise<Availability> {
+        return apiFetch<Availability>(`/recommendations/availability/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -34,15 +34,15 @@ export default class AvailabilityRepository {
     }
 
     static getStudyRoles(): Promise<StudyRole[]> {
-        return apiFetch("/recommendations/roles/all");
+        return apiFetch<StudyRole[]>("/recommendations/roles/all");
     }
 
     static getUserAvailableRoles(): Promise<AvailableRole[]> {
-        return apiFetch("/recommendations/roles/");
+        return apiFetch<AvailableRole[]>("/recommendations/roles/");
     }
 
-    static updateUserRoles(topic: number, studyRole: number) {
-        return apiFetch(`/recommendations/roles/update/`, {
+    static updateUserRoles(topic: number, studyRole: number): Promise<AvailableRole> {
+        return apiFetch<AvailableRole>(`/recommendations/roles/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
