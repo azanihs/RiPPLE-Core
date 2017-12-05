@@ -1,5 +1,5 @@
 import { apiFetch } from "./APIRepository";
-import { Question, QuestionUpload, Distractor } from "../interfaces/models";
+import { Question, QuestionUpload, Distractor, NetworkResponse, ReportQuestion } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
@@ -7,8 +7,7 @@ type SearchResult = { items: Question[], searchResult: any, totalItems: number, 
 function toQuestion(x: Question): Question {
     let solution: undefined | Distractor = x.distractors.find(d => d.isCorrect === true);
     if (solution === undefined) {
-        // throw new Error(`Question id: ${x.id} does not have a solution`);
-        solution = x.distractors[0];
+        throw new Error(`Question id: ${x.id} does not have a solution`);
     }
 
     const question: Question = {
@@ -70,7 +69,7 @@ export default class QuestionRepository {
     }
 
     static submitResponse(distractorID: number) {
-        return apiFetch<Object>(`/questions/respond/`, {
+        return apiFetch<{}>(`/questions/respond/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -83,7 +82,7 @@ export default class QuestionRepository {
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
-        return apiFetch<Object>(`/questions/rate/`, {
+        return apiFetch<{}>(`/questions/rate/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -98,5 +97,18 @@ export default class QuestionRepository {
 
     static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
         return apiFetch(`/questions/distribution/${question.id}/`);
+    }
+
+    static uploadReport(questionReport: ReportQuestion) {
+        return apiFetch<NetworkResponse>("/questions/report/", {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "Application/json"
+            }),
+            body: JSON.stringify({
+                questionReport
+            })
+        });
     }
 }

@@ -53,7 +53,11 @@ def add_question(question_request, host, user):
             questionObj.topics = topicList
 
             # Distractors
-            for i in ["A", "B", "C", "D"]:
+            _response_choices = ["A", "B", "C", "D"]
+            if True not in [responses[i].get("isCorrect", False) for i in _response_choices]:
+                raise IntegrityError("No correct answer for question")
+
+            for i in _response_choices:
                 distractor = Distractor(
                     content=responses[i].get("content", None),
                     isCorrect=responses[i].get("isCorrect", None),

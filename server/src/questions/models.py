@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from django.db import models
 from users.models import Course, CourseUser
+from datetime import datetime
 
 
 class Topic(models.Model):
@@ -119,3 +120,10 @@ class ExplanationImage(models.Model):
 class DistractorImage(models.Model):
     image = models.ImageField(upload_to='question_photo')
     distractor = models.ForeignKey(Distractor, on_delete=None)
+
+class ReportQuestion(models.Model):
+    reason = models.TextField(max_length=256)
+    time = models.DateTimeField(auto_now=True)
+
+    question = models.ForeignKey(Question)
+    user = models.ForeignKey(CourseUser)

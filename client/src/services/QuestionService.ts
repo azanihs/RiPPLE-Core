@@ -1,5 +1,5 @@
 import QuestionRepository from "../repositories/QuestionRepository";
-import { Question } from "../interfaces/models";
+import { Question, ReportQuestion } from "../interfaces/models";
 
 interface ISearchQuery {
     sortField?: string,
@@ -29,6 +29,14 @@ export default class QuestionService {
     static submitRating({ responseId, rateType, rateValue }:
         { responseId: number, rateType: string, rateValue: number }) {
         return QuestionRepository.submitRating(responseId, rateType, rateValue);
+    }
+
+    static reportQuestion(question: Question, reason: string) {
+        const upload: ReportQuestion = {
+            question: question.id,
+            reason: reason
+        };
+        return QuestionRepository.uploadReport(upload);
     }
 
 }
