@@ -406,21 +406,6 @@ class UserTestCase(BootstrapTestCase):
 
         UserService.update_user_roles(cu, "role2")
         self.assertTrue("role2" in cu.roles.all().values_list("role", flat=True))
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 from unittest.mock import MagicMock
 class RequestMock:
