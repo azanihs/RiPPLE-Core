@@ -58,7 +58,7 @@ def respond(request):
     if QuestionService.respond_to_question(distractor_id, UserService.logged_in_user(request)) is False:
         return JsonResponse({"error": "Invalid distractorID"}, status=422)
     else:
-        return JsonResponse({}, status=200)
+        return JsonResponse({})
 
 
 def rate(request):
@@ -216,12 +216,12 @@ def page_response(data, page_index, page_size=25):
         }
     })
 
-def report(request): 
+def report(request):
     if request.method != 'POST':
         return JsonResponse({
             "error": "Must use POST to this endpoint"
         }, status=405)
-    
+
     post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
     return JsonResponse(QuestionService.report_question(user, post_request))
@@ -231,7 +231,7 @@ def getReports(request):
         return JsonResponse({
             "error": "Must use POST to this endpoint"
         }, status=405)
-    
+
     post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
     page=post_request.get("page", None)

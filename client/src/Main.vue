@@ -53,6 +53,7 @@
             :class="pageSize">
             <router-view></router-view>
         </md-layout>
+        <global-notification></global-notification>
     </md-layout>
 </template>
 
@@ -200,9 +201,11 @@ import UserService from "./services/UserService";
 import Fetcher from "./services/Fetcher";
 
 import UserContainer from "./components/UserContainer.vue";
+import GlobalNotification from "./GlobalNotification.vue";
 
 @Component({
     components: {
+        GlobalNotification,
         UserContainer
     }
 })

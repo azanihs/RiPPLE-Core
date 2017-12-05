@@ -85,6 +85,7 @@ class Notification(models.Model):
 
     def toJSON(self):
         return {
+            "id": self.id,
             "name": self.name,
             "description": self.description,
             "icon": self.icon

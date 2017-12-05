@@ -12,9 +12,15 @@ const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recom
 
 const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures", "Variables"];
 
-type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
-
 const _n = (i: number) => Math.floor(Math.random() * i);
+
+const _icons = [
+    "error",
+    "supervisor_account",
+    "bar_chart",
+    "trending_up",
+    "hourglass_full"
+];
 
 const _notificationMessages = [
     "Upcoming meeting",
@@ -34,11 +40,11 @@ const getRandomTopic = () => {
 };
 
 const notificationCount = Math.random() < 0.5 ? 50 : 0;
-const notifications = Array.from({ length: notificationCount }).map(_ => ({
-    id: Math.random(),
-    type: getRandomTopic() as NotificationType,
-    content: _notificationMessages[_n(_notificationMessages.length)],
-    read: Math.random() < 0.5
+const notifications = Array.from({ length: notificationCount }).map((_, i: number) => ({
+    id: i,
+    name: getRandomTopic(),
+    description: _notificationMessages[_n(_notificationMessages.length)],
+    icon: _icons[_n(4)]
 }));
 
 const engagementNodes: Topic[] = engagementTypes.map((x, i) => ({
