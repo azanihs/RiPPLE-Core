@@ -49,9 +49,15 @@ def save_image(encoded_image, image_id):
         return None
     return data
 
-
-
 def merge_url_parts(parts, url=""):
     if len(parts) == 0:
         return url
     return merge_url_parts(parts, urljoin(url, parts.pop(0)))
+
+
+
+def is_administrator(course_user):
+    if "Instructor" in (x.role for x in course_user.roles.all()):
+        return True
+    else:
+        return False
