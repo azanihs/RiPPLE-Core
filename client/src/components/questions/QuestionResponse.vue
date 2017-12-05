@@ -168,6 +168,7 @@ h2 {
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Question, Distractor } from "../../interfaces/models";
+import { addEventsToQueue } from "../../util";
 import Comment from "../util/Comment.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionService from "../../services/QuestionService";
@@ -309,9 +310,16 @@ export default class QuestionResponse extends Vue {
                 responseId: this.question.distractors[this.userAnswer].id,
                 rateType: rateType,
                 rateValue: rateValue
+            })
+            .then(() => {
+                addEventsToQueue([{
+                    id: -3,
+                    name: "Question Rated",
+                    description: "Successfully rated question " + rateType,
+                    icon: "done"
+                }]);
             });
         };
     }
-
 }
 </script>

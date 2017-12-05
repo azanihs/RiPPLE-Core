@@ -160,8 +160,8 @@ export default class UserRepository {
             const edge: Edge = {
                 source: TopicRepository.topicPointer(x[0]),
                 target: TopicRepository.topicPointer(x[1]),
-                competency: Math.round(x[2]),
-                attempts: Math.round(x[3])
+                competency: Math.round(x[2] * 100),
+                attempts: Math.round(x[3] * 100)
             };
             return edge;
         }));
@@ -173,8 +173,8 @@ export default class UserRepository {
                 const edge: Edge = {
                     source: TopicRepository.topicPointer(x[0]),
                     target: TopicRepository.topicPointer(x[1]),
-                    competency: Math.round(x[2]),
-                    attempts: Math.round(x[3])
+                    competency: Math.round(x[2] * 100),
+                    attempts: Math.round(x[3] * 100)
                 };
                 return edge;
             }));
