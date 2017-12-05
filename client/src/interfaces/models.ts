@@ -113,18 +113,11 @@ export interface Badge {
     dateAcquired: Date
 };
 
-export type NotificationType =
-    "Incoming Connection" |
-    "Achievement" |
-    "Personal Goal" |
-    "Upcoming Meeting";
-
-
 export interface Notification {
     id: number,
-    type: NotificationType,
-    content: string,
-    read: boolean
+    name: string,
+    description: string,
+    icon: string
 };
 
 export interface Edge {

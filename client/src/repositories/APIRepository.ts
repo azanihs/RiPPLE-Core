@@ -59,12 +59,18 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             return Promise.resolve({}) as Promise<IServerResponse<T>>;
         })
         .then(x => {
-            if (x.notifications) {
+            if (x.notifications && x.notifications.length > 0) {
                 addEventsToQueue(x.notifications);
             }
 
             if (x.error) {
                 // TODO: Handle global things
+                addEventsToQueue([{
+                    id: performance.now(),
+                    icon: "error",
+                    name: `Server Error`,
+                    description: `${x.error}`
+                }]);
                 return Promise.resolve({}) as Promise<T>;
             } else {
                 return Promise.resolve(x.data);

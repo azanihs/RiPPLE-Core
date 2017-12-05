@@ -7,11 +7,11 @@
                      class="card"
                      :class="{disabled: notification.read}">
                 <div class="leftPanel">
-                    <md-icon>{{iconFromType(notification.type)}}</md-icon>
+                    <md-icon>{{notification.icon}}</md-icon>
                 </div>
                 <div class="rightPanel">
-                    <h3>{{notification.type}}</h3>
-                    <p>{{notification.content}}</p>
+                    <h3>{{notification.name}}</h3>
+                    <p>{{notification.description}}</p>
                     <span class="date">{{ notificationDate }}</span>
                 </div>
             </md-card>
@@ -88,14 +88,10 @@ p + p {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { Notification, NotificationType } from "../../interfaces/models";
+import { Notification } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
-
-type NotificationTypeMap = {
-    [K in NotificationType]: string;
-};
 
 @Component
 export default class Notifications extends Vue {
@@ -137,17 +133,6 @@ export default class Notifications extends Vue {
 
     get notifications() {
         return this.pNotifications;
-    }
-
-    iconFromType(notificationType: NotificationType) {
-        const _icons: NotificationTypeMap = {
-            "Incoming Connection": "supervisor_account",
-            "Achievement": "bar_chart",
-            "Personal Goal": "trending_up",
-            "Upcoming Meeting": "hourglass_full"
-        };
-
-        return _icons[notificationType];
     }
 }
 </script>

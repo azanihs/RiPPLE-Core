@@ -1,3 +1,4 @@
+import Vue from "vue";
 import { ILink, Notification } from "./interfaces/models";
 
 // From https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/901144#901144
@@ -67,9 +68,16 @@ export function getLinks(): ILink[] {
     return [adminLink, profileLink, questionLink, connectLink, leaderLink];
 }
 
-const _queue: Notification[] = [];
+const _bus = new Vue();
+
+export const NEW_QUEUE_ITEM = "NEW_QUEUE_ITEM";
+
 export function addEventsToQueue(items: Notification[]) {
     items.forEach(x => {
-        _queue.push(x);
+        _bus.$emit(NEW_QUEUE_ITEM, x);
     });
+}
+
+export function getBus() {
+    return _bus;
 }
