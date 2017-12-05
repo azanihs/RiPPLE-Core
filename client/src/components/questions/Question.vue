@@ -60,11 +60,51 @@
                 <md-icon>keyboard_return</md-icon>
                 <md-tooltip md-direction="left">Return</md-tooltip>
             </md-button>
-            <md-button class="md-fab md-primary md-mini md-clean">
+            <md-button class="md-fab md-primary md-mini md-clean"
+                            @click="openDialog">
                 <md-icon>error_outline</md-icon>
                 <md-tooltip md-direction="left">Report Question</md-tooltip>
             </md-button>
         </md-speed-dial>
+        <md-dialog ref="report_question_modal"
+            :md-click-outside-to-close="true"
+            :md-esc-to-close="true">
+            <md-dialog-title>Report Question</md-dialog-title>
+            <md-dialog-content>
+                <form>
+                    <label>Report question for:</label><br>
+                    <topic-chip class="topicChip" v-for="reason in reasonList"
+                        :key="reason"
+                        :disabled="!reasonIsUsed(reason)"
+                        @click.native="toggleReason(reason)">
+                        {{reason}}
+                    </topic-chip>
+                    <md-input-container>
+                        <label>Add an explanation:</label>
+                        <md-textarea v-model="reason"></md-textarea>
+                    </md-input-container>
+                    <div class="right">
+                        <md-button class="md-fab md-primary md-mini md-clean"
+                                @click="closeDialog()">
+                            <md-icon>clear</md-icon>
+                            <md-tooltip md-direction="top">Cancel</md-tooltip>
+                        </md-button>
+                        <md-button class="md-fab md-primary md-mini md-clean"
+                                @click="reportQuestion()">
+                            <md-icon>done</md-icon>
+                            <md-tooltip md-direction="top">Report Question</md-tooltip>
+                        </md-button>
+                    </div>
+                </form>
+            </md-dialog-content>
+        </md-dialog>
+        <md-snackbar md-position="bottom center"
+            ref="snackbar"
+            md-duration="4000">
+            <span>{{networkMessage}}</span>
+            <md-button class="md-accent"
+                @click="$refs.snackbar.close()">Close</md-button>
+        </md-snackbar>
     </md-layout>
 </template>
 
@@ -168,24 +208,38 @@ h2 {
 .bottomSpace {
     margin-bottom: 4em;
 }
+
+.topicChip {
+    margin-top:0.5em;
+}
+
+.right {
+    text-align:right;
+}
 </style>
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
-import ActionButtons from "../util/ActionButtons.vue";
+import QuestionService from "../../services/QuestionService";
 
+import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
+
+import TopicChip from "../util/TopicChip.vue";
+
+const _MODAL_NAME = "report_question_modal";
 
 @Component({
     components: {
         ActionButtons,
         QuestionRater,
         QuestionResponse,
-        QuestionDetails
+        QuestionDetails,
+        TopicChip
     }
 })
 export default class Question extends Vue {
@@ -196,6 +250,11 @@ export default class Question extends Vue {
     @Prop showSpeedDial = p<boolean>({
         default: true
     });
+
+    reason = "";
+    reasonList = ["Inappropriate Content", "Incorrect Answer", "Incorrect Tags"];
+    reasonsUsed: string[] = []
+    networkMessage = "";
 
     userIsFinishedWithQuestion: boolean = false;
 
@@ -212,6 +271,47 @@ export default class Question extends Vue {
 
     closeQuestion() {
         this.$emit("userAnswer");
+    }
+
+    reportQuestion() {
+        this.reasonsUsed.push(this.reason);
+        QuestionService.reportQuestion(this.question, this.reasonsUsed.toString())
+            .then(x => {
+                if (x.error !== undefined) {
+                    this.networkMessage = "Error Submitting Report.";
+                    (this.$refs.snackbar as any).open();
+                }
+                this.networkMessage = "Question Reported.";
+                (this.$refs.snackbar as any).open();
+                this.closeDialog();
+            })
+            .catch(err => {
+                this.networkMessage = err;
+            });
+    }
+
+    openDialog() {
+        const modal = this.$refs[_MODAL_NAME] as any;
+        if (modal) {
+            requestAnimationFrame(() => modal.open());
+        }
+    }
+
+    closeDialog() {
+        (this.$refs[_MODAL_NAME] as any).close();
+    }
+
+    toggleReason(reasonToToggle: string) {
+        const reasonIndex = this.reasonsUsed.indexOf(reasonToToggle);
+        if (reasonIndex == -1) {
+            this.reasonsUsed.push(reasonToToggle);
+        } else {
+            this.reasonsUsed.splice(reasonIndex, 1);
+        }
+    }
+
+    reasonIsUsed(reason: string) {
+        return this.reasonsUsed.indexOf(reason) >= 0;
     }
 }
 </script>
