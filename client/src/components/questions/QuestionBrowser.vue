@@ -7,31 +7,31 @@
                 class="viewContainer">
                 <md-layout md-flex="100"
                     class="questionContainer">
-                    <question @userAnswer="setUserIsFinished"
-                        @newQuestion="selectRandom"
-                        class="question"
-                        :question="selectedQuestion"></question>
+                    <question class="question"
+                        :question="selectedQuestion"
+                        @userAnswer="setUserIsFinished"
+                        @newQuestion="selectRandom"></question>
                 </md-layout>
             </md-layout>
         </transition>
-        <div :class="{hidden: selectedQuestion}"
+        <div :class="{ hidden: selectedQuestion }"
             key="2"
             md-gutter="8"
             class="viewContainer">
             <md-layout class="headingContainer"
                 md-flex="100">
                 <variable-data-visualiser class="overview"
-                    @changeTopics="filterQuestionTopic"
                     :dataCategories="topics"
                     :compareList="generateCompetencies">
                 </variable-data-visualiser>
                 <question-search :page="page"
-                    :filterOut="topicsToFilter"
+                    :pageSize="pageSize"
                     @searched="changeDisplay">
                     <div class="md-table-card">
                         <md-table-pagination class="paginationControls"
                             :md-total="totalQuestions"
-                            :md-size="25"
+                            md-label="Questions per page"
+                            :md-size="pageSize"
                             :md-page="page"
                             @pagination="nextPage">
                         </md-table-pagination>
@@ -163,6 +163,7 @@ export default class QuestionBrowser extends Vue {
     pTopics = [];
     pData = {};
     pPage = 1;
+    pPageSize = 25;
     pQuestionCount = 0;
 
     searchedQuestions: QuestionModel[] = [];
@@ -244,10 +245,6 @@ export default class QuestionBrowser extends Vue {
         this.topicsToUse = topicsToUse;
     }
 
-    get topicsToFilter() {
-        return this.topics.filter(x => this.topicsToUse.indexOf(x) != -1).map(x => x.id);
-    }
-
     generateCompetencies() {
         return UserService.userCompetencies;
     }
@@ -256,12 +253,17 @@ export default class QuestionBrowser extends Vue {
         return this.pPage;
     }
 
+    get pageSize() {
+        return this.pPageSize;
+    }
+
     get totalQuestions() {
         return this.pQuestionCount;
     }
 
     nextPage(pagination: { size: number, page: number }) {
         this.pPage = pagination.page;
+        this.pPageSize = pagination.size;
     }
 
 }
