@@ -98,7 +98,7 @@ class CompetencyTestCase(BootstrapTestCase):
         for i in range(1, 20):
             offset = 4 * i
             first_old_competency = Competency.objects.all()[0].competency
-            
+
             second_old_competency = Competency.objects.all()[1].competency
             third_old_competency = Competency.objects.all()[2].competency
             QuestionService.respond_to_question(3 + offset, author)
@@ -110,7 +110,7 @@ class CompetencyTestCase(BootstrapTestCase):
             self.assertTrue(third_old_competency >= third_new_competency)
 
         self.assertEqual(QuestionResponse.objects.count(), 20)
-        
+
         num_topics = combinations(QuestionScore.objects.all().first().question.topics.all())
         self.assertEqual(Competency.objects.count(), len(num_topics))
 
@@ -147,7 +147,7 @@ class CompetencyTestCase(BootstrapTestCase):
             self.assertTrue(third_new_competency >= Competency.objects.all()[2].competency)
 
         self.assertEqual(QuestionResponse.objects.count(), 19)
-        
+
         num_topics = combinations(QuestionScore.objects.all().first().question.topics.all())
         self.assertEqual(Competency.objects.count(), len(num_topics))
 
@@ -161,7 +161,7 @@ class CompetencyTestCase(BootstrapTestCase):
         self._bootstrap_topics(author_course)
         topic_selected = Topic.objects.all().filter(id__in=[1])
         self._bootstrap_questions_same_topics(author, topic_selected, 20)
-        
+
         for question in Question.objects.all():
             question.difficulty = 10
             question.save()
@@ -173,7 +173,7 @@ class CompetencyTestCase(BootstrapTestCase):
         starting_point = 20 * 4
 
         QuestionService.respond_to_question(2, author)
-        QuestionService.respond_to_question(2 + starting_point, responder)        
+        QuestionService.respond_to_question(2 + starting_point, responder)
 
         for i in range(1, 20):
             offset = 4 * i
@@ -189,7 +189,7 @@ class CompetencyTestCase(BootstrapTestCase):
             self.assertTrue(author_old_competency <= author_new_competency)
             self.assertTrue(responder_old_competency <= responder_new_competency)
             self.assertTrue(author_new_competency >= responder_new_competency)
-  
+
     def test_decay_function(self):
         """ Test decay function influences question competency over time """
         author_course = self._bootstrap_courses(1)
@@ -221,31 +221,3 @@ class CompetencyTestCase(BootstrapTestCase):
         self.assertEqual(QuestionResponse.objects.count(), 40)
         self.assertEqual(QuestionScore.objects.count(), 40)
         self.assertTrue(author_competency <= responder_competency)
-
-    """Used for testing weights in competency equation, delete stop to test"""
-    def stop_test_1(self):
-        author_course = self._bootstrap_courses(1)
-        author_user = self._bootstrap_user(1)
-        author = CourseUser.objects.create(user=author_user, course=author_course)
-        self._bootstrap_topics(author_course)
-        topic_selected = Topic.objects.all().filter(id__in=[1, 2])
-        self._bootstrap_questions_same_topics(author, topic_selected, 20)
-        self._bootstrap_question_choices(correct_id=2)
-
-        QuestionService.respond_to_question(2, author)
-
-        for i in range(1, 10):
-            offset = 4 * i
-            QuestionService.respond_to_question(2 + offset, author)
-            print("First: " + str(Competency.objects.all()[0].competency))
-            print("Second: " + str(Competency.objects.all()[1].competency))
-            print("third: " + str(Competency.objects.all()[2].competency))
-        print("______________")
-        for i in range(10, 20):
-            offset = 4 * i
-            QuestionService.respond_to_question(3 + offset, author)
-            print("First: " + str(Competency.objects.all()[0].competency))
-            print("Second: " + str(Competency.objects.all()[1].competency))
-            print("third: " + str(Competency.objects.all()[2].competency))
-        
-        print(QuestionResponse.objects.count())

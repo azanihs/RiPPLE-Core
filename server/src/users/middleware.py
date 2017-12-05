@@ -41,24 +41,26 @@ class NotificationMiddleware(object):
 
         if token is None:
             return response
+        try:
+            user = token_to_user_course(token)
+            data = json.loads(response.content.decode('utf-8'))
+            notifications = Notification.objects.filter(user=user, sent=False)
 
-        user = token_to_user_course(token)
-        data = json.loads(response.content.decode('utf-8'))
-        notifications = Notification.objects.filter(user=user, sent=False)
-        
-        data["notifications"] = []
-        for i in notifications:
-            data["notifications"].append(i.toJSON())
-            i.sent = True
-            i.save()
+            data["notifications"] = []
+            for i in notifications:
+                data["notifications"].append(i.toJSON())
+                i.sent = True
+                i.save()
 
-        response.content = json.dumps(data)
+            response.content = json.dumps(data)
+        except json.JSONDecodeError:
+            pass
         return response
 
 class AchievementChecker(object):
     def __init__(self, get_response):
         self.get_response = get_response
-        self.views = View.objects.all()   
+        self.views = View.objects.all()
 
     def __call__(self, request):
         ###################
@@ -75,13 +77,13 @@ class AchievementChecker(object):
         for v in self.views:
             if pre(v.url):
                 req = v.view
-                
-        if req is not None:     
+
+        if req is not None:
             req = View.objects.get(view=req)
             tasks = Task.objects.filter(views = req)
 
         response=self.get_response(request)
-        
+
         ####################
         # On server response
         ####################
@@ -89,14 +91,14 @@ class AchievementChecker(object):
             return response
         #data = json.loads(response.content.decode('utf-8'))
         #data['achievement'] = []
-        user = token_to_user_course(token) 
-        
+        user = token_to_user_course(token)
 
-        for t in tasks:    
-            achievements = t.achievements.all() 
+
+        for t in tasks:
+            achievements = t.achievements.all()
             for a in achievements:
                 result = engine.check_achievement(user=user, key=a.key)
-                if result["new"]:   
+                if result["new"]:
                     n = Notification (
                         name=result["name"] + " Earned",
                         description=result["description"],
@@ -104,5 +106,5 @@ class AchievementChecker(object):
                         user=user
                     )
                     n.save()
-    
+
         return response
