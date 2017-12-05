@@ -144,10 +144,8 @@ export default class PeerView extends Vue {
 
         Fetcher.get(AvailabilityService.getCourseAvailability)
             .on(this.updateAvailability);
-
-        AvailabilityService.getStudyRoles()
-            .then(this.updateStudyRoles);
-
+        Fetcher.get(AvailabilityService.getStudyRoles)
+            .on(this.updateStudyRoles);
         Fetcher.get(AvailabilityService.getUserAvailableRoles)
             .on(this.updateUserAvailableRoles);
     }
@@ -160,6 +158,8 @@ export default class PeerView extends Vue {
             .off(this.updateUserAvailability);
         Fetcher.get(AvailabilityService.getCourseAvailability)
             .off(this.updateAvailability);
+        Fetcher.get(AvailabilityService.getStudyRoles)
+            .off(this.updateStudyRoles);
         Fetcher.get(AvailabilityService.getUserAvailableRoles)
             .off(this.updateUserAvailableRoles);
     }
