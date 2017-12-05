@@ -42,6 +42,20 @@ class BootstrapTestCase(TestCase):
             q.save()
             q.topics.set(topic_map[i])
 
+    def _bootstrap_questions_same_topics(self, author, topics, num_questions):
+        for i in range(num_questions):
+            q = Question(
+                author=author,
+                content="",
+                explanation="",
+                difficulty=0,
+                quality=0,
+                difficultyCount=0,
+                qualityCount=0
+            )
+            q.save()
+            q.topics.set(topics)
+
     def _bootstrap_question_choices(self, correct_id):
         #correct_id will specify the question correctly out of the distractors. Ex. 2 == option b is correct for all questions
         question_count = Question.objects.all().count()

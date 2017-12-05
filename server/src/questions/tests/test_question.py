@@ -32,15 +32,15 @@ class QuestionTestCase(BootstrapTestCase):
 
         self.assertEqual(question_score.user_id, 1)
         self.assertEqual(question_score.question_id, 1)
-        self.assertEqual(question_score.score, -1)
+        self.assertEqual(question_score.score, 0)
 
         self.assertEqual(Competency.objects.all().count(), 1)
 
     def test_answering_new_question_multiple_topics(self):
         """ New question with multiple topics """
         question_number = 3
-        # The plus two selects option b by default
-        distractor_id = ((question_number - 1) * 4) + 2
+        ### distractor 10 chooses option b in the third question as each question has 4 distractors
+        distractor_id = 10
 
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
@@ -64,8 +64,7 @@ class QuestionTestCase(BootstrapTestCase):
 
         self.assertEqual(question_score.user_id, 1)
         self.assertEqual(question_score.question_id, question_number)
-        self.assertEqual(question_score.score, -1)
-        #TODO: Ensure competency is updated
+        self.assertEqual(question_score.score, 0)
 
     def test_answering_question_correctly(self):
         """ New question with a correct answer """
@@ -101,7 +100,7 @@ class QuestionTestCase(BootstrapTestCase):
         QuestionService.respond_to_question(distractor_id, author)
         question_score = QuestionScore.objects.all().first()
 
-        self.assertEqual(question_score.score, -1)
+        self.assertEqual(question_score.score, 0)
 
     def test_answering_multiple_existing_questions(self):
         """ Single user answers multiple questions created by other authors """
@@ -166,7 +165,7 @@ class QuestionTestCase(BootstrapTestCase):
             if question_number == correct_id:
                 self.assertEqual(question_score.score, 1)
             else:
-                self.assertEqual(question_score.score, -1)
+                self.assertEqual(question_score.score, 0)
 
             for question_topic in Distractor.objects.get(id=distractor_id).question.topics.all():
                 unique_topics.add(question_topic)
@@ -209,10 +208,11 @@ class QuestionTestCase(BootstrapTestCase):
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
-        self._bootstrap_question_choices(correct_id=3)
+        self._bootstrap_question_choices(correct_id=4)
         responder_user = self._bootstrap_user(2)
         responder = CourseUser.objects.create(user=responder_user, course=course)
 
+        ###answers all questions incorrectly so it has 3 responses before it gets it correctly
         responses_count = 3
         for i in range(0, responses_count):
             QuestionService.respond_to_question(i + 1, responder)
