@@ -1,8 +1,9 @@
 <template>
     <div class="snackWrapper" :class="snackbarClass">
         <div class="snackbar">
-            <span>{{ networkMessage }}</span>
-            <md-button @click="closeSnackbar" class="md-accent">Close</md-button>
+            <md-icon class="icon">{{ notification.icon }}</md-icon>
+            <span> {{ notification.description }} </span>
+            <md-button @click="closeSnackbar" class="button">Close</md-button>
         </div>
     </div>
 </template>
@@ -35,10 +36,17 @@
     }
 
     span {
-        margin: 6px 0px 6px 24px;
+        margin: 6px 0px 6px 6px;
         flex-grow: 0;
         text-overflow: ellipsis;
         overflow: hidden;
+    }
+    .icon {
+        margin: 6px 0px 6px 24px;
+    }
+
+    .button {
+        color: #f2f2f2;
     }
 
     .snackWrapper.closed {
@@ -55,10 +63,14 @@
     @Component
     export default class GlobalNotification extends Vue {
         pEventQueue: Notification[] = [];
-        networkMessage: string | undefined = undefined;
+        pNotification: Notification | undefined = undefined;
         snackbarCloseTimeout: number | undefined = undefined;
 
         snackbarIsClosed = true;
+
+        get notification() {
+            return this.pNotification || {};
+        }
 
         get snackbarClass() {
             return {
@@ -100,7 +112,7 @@
         cycleQueue() {
             if (this.pEventQueue.length > 0) {
                 const notification = this.pEventQueue[0];
-                this.networkMessage = notification.description;
+                this.pNotification = notification;
                 this.showSnackbar();
             } else {
                 this.snackbarIsClosed = true;

@@ -7,7 +7,7 @@
                 @input="rateAction"
                 :disabled="disabled"
                 :icon="icon"
-                :defaultIndex="defaultValue"></rating>
+                :defaultIndex="0"></rating>
     </div>
 </template>
 
