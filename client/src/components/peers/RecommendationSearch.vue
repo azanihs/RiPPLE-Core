@@ -70,29 +70,29 @@
 <style>
 
     .connect-tabs .md-tabs-navigation-container {
-        background-color: #4d656d; 
+        background-color: #4d656d;
     }
 
     .connect-tabs .md-tab-header {
-        
-        background-color: rgba(34,85,102, 0.7); 
-        border-bottom: 6px solid #f2f2f2;  
+
+        background-color: rgba(34,85,102, 0.7);
+        border-bottom: 6px solid #f2f2f2;
     }
 
     .connect-tabs .md-tab-header:hover {
         background-color: rgba(34,85,102, 0.4);
     }
-    
+
     .connect-tabs span {
         font-weight: bold;
         font-family: Verdana,Arial,Helvetica,sans-serif;
     }
     .connect-tabs .md-active span{
-        color: #f2f2f2;   
+        color: #f2f2f2;
     }
 
     .connect-tabs .md-active {
-        background-color: #256; 
+        background-color: #256;
     }
 
     .connect-tabs .md-tab-indicator{
@@ -101,7 +101,7 @@
     }
 
 
-    
+
 </style>
 
 <style scoped>
@@ -149,7 +149,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic, UserSummary, Edge } from "../../interfaces/models";
+import { Topic, UserSummary, Edge, CompareSet } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -188,7 +188,7 @@ export default class RecommendationSearch extends Vue {
 
     competencies = new Map();
 
-    updateCompetencies(newCompetencies) {
+    updateCompetencies(newCompetencies: CompareSet) {
         this.competencies = newCompetencies.ownScores
             .reduce((carry: Map<Topic, number>, x: Edge) => {
                 if (carry.get(x.source) === undefined) {
@@ -200,7 +200,7 @@ export default class RecommendationSearch extends Vue {
 
     @Lifecycle
     created() {
-        Fetcher.get(UserService.userCompetencies)
+        Fetcher.get(UserService.userCompetencies, { count: 10 })
             .on(this.updateCompetencies);
     }
 
@@ -208,7 +208,7 @@ export default class RecommendationSearch extends Vue {
         this.$emit("change");
     }
 
-    checkboxIsDisabled(sType, topic) {
+    checkboxIsDisabled(sType: string, topic: Topic) {
         if (sType == "Provide Mentorship") {
             const weight = this.competencies.get(topic);
             return weight === undefined || weight <= 85;
@@ -217,7 +217,7 @@ export default class RecommendationSearch extends Vue {
         return false;
     }
 
-    getColour(c) {
+    getColour(c: number) {
         if (c < 50) {
             return "rgba(255, 99, 132, ";
         } else if (c >= 50 && c < 85) {
@@ -227,7 +227,7 @@ export default class RecommendationSearch extends Vue {
         }
     };
 
-    getCellWeight(topic) {
+    getCellWeight(topic: Topic) {
         const weight = this.competencies.get(topic);
         return {
             background: `${this.getColour(weight)}${0.4})`,

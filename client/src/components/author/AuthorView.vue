@@ -151,7 +151,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Question as QuestionModel, Topic, QuestionUpload, QuestionBuilder } from "../../interfaces/models";
+import { Question as QuestionModel, Topic, QuestionBuilder } from "../../interfaces/models";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
 import ImageService from "../../services/ImageService";
@@ -161,9 +161,6 @@ import tinyMCEPlugins from "./plugins";
 import TinyMCE from "../util/TinyMCE.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Question from "../questions/Question.vue";
-
-// Global tinymce instance
-declare const tinymce;
 
 @Component({
     components: {
@@ -214,8 +211,8 @@ export default class AuthorView extends Vue {
 
     set disabled(shouldHide: boolean) {
         this.pDisabled = shouldHide;
-        const changeEditor = mode => {
-            tinymce.get().forEach(editor => {
+        const changeEditor = (mode: any) => {
+            tinymce.get().forEach((editor: any) => {
                 editor.setMode(mode);
             });
         };
@@ -240,25 +237,26 @@ export default class AuthorView extends Vue {
         this.pTopics = newTopics;
     }
 
-    handleFileClick(resolve, currentFieldValue, fieldMeta) {
+    handleFileClick(resolve: any, _currentFieldValue: any, fieldMeta: any) {
         if (fieldMeta.filetype != "image") {
             return;
         }
 
-        const input = document.createElement("input");
+        const input = document.createElement("input")!;
         input.type = "file";
 
         input.addEventListener("change", () => {
-            if (input.files.length != 1) {
+            const inputFiles = input.files!;
+            if (inputFiles.length != 1) {
                 return;
             }
-            const file = input.files[0];
+            const file = inputFiles[0];
             ImageService.fileToBase64EncodeString(file)
                 .then(x => {
                     // * tinyMCE will encode the uploaded image with an window.createObjectURL until it loses focus.
                     // ** It will use the base64 encoding when focus is lost.
                     // * When upload time happens, just pull all img srcs from the DOM object, and if they are not a base64 then encode the object to be so
-                    resolve(x["base64"], x["_meta"]);
+                    resolve(x.base64, x._meta);
                 })
                 .catch(err => {
                     console.warn(err);
@@ -291,14 +289,6 @@ export default class AuthorView extends Vue {
             file_picker_callback: this.handleFileClick,
             file_picker_types: "image"
         };
-    }
-
-    updateUploadProgress(newProgress) {
-        this.uploadProgress = newProgress;
-
-        if (this.uploadProgress >= 100) {
-            this.disabled = false;
-        }
     }
 
     navigateToAnswer() {

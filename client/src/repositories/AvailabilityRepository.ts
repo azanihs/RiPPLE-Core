@@ -1,5 +1,5 @@
 import { Availability, CourseAvailability, Day, Time } from "../interfaces/models";
-import { setToken, apiFetch } from "./APIRepository";
+import { apiFetch } from "./APIRepository";
 
 export default class AvailabilityRepository {
 
@@ -21,7 +21,7 @@ export default class AvailabilityRepository {
 
 
     static updateUserAvailability(day: number, time: number) {
-        return apiFetch(`/recommendations/availability/update/`, {
+        return apiFetch<Availability>(`/recommendations/availability/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",

@@ -33,6 +33,7 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
+import { User } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -40,8 +41,8 @@ import Fetcher from "../../services/Fetcher";
 @Component()
 export default class ConnectionOverview extends Vue {
 
-    pPeers = [];
-    updatePeers(newPeers) {
+    pPeers: User[] = [];
+    updatePeers(newPeers: User[]) {
         this.pPeers = newPeers;
     };
 

@@ -2,6 +2,11 @@ export interface Topic {
     id: number,
     name: string
 };
+export interface CompareSet {
+    topics: Topic[], // Node List
+    ownScores: Edge[], // Edge list of self
+    compareAgainst: Edge[] // Edge list of other
+};
 
 export interface Question {
     id: number,
@@ -14,8 +19,7 @@ export interface Question {
     explanation: string
     solution: Distractor,
     distractors: Distractor[],
-    responseCount: number,
-    responses: QuestionResponse[]
+    responseCount: number
 };
 export interface Distractor {
     id: number,
@@ -40,9 +44,9 @@ export interface Node {
 export interface Course {
     courseCode: string,
     courseName: string,
-    start: number,
-    end: number,
-    available: boolean
+    start?: number,
+    end?: number,
+    available?: boolean
 };
 
 export interface User {
@@ -100,9 +104,16 @@ export interface Badge {
     dateAcquired: Date
 };
 
+export type NotificationType =
+    "Incoming Connection" |
+    "Achievement" |
+    "Personal Goal" |
+    "Upcoming Meeting";
+
+
 export interface Notification {
     id: number,
-    type: "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting",
+    type: NotificationType,
     content: string,
     read: boolean
 };
@@ -136,15 +147,15 @@ export interface AuthorResponse {
 };
 
 export interface QuestionUpload {
-    question: AuthorResponse,
-    explanation: AuthorResponse,
+    question?: AuthorResponse,
+    explanation?: AuthorResponse,
     responses: {
-        A: AuthorResponse,
-        B: AuthorResponse,
-        C: AuthorResponse,
-        D: AuthorResponse
+        A?: AuthorResponse,
+        B?: AuthorResponse,
+        C?: AuthorResponse,
+        D?: AuthorResponse
     },
-    topics: Topic[]
+    topics?: Topic[]
 };
 
 export interface Day {
@@ -155,12 +166,12 @@ export interface Day {
 export interface Time {
     id: number,
     start: {
-      time: string,
-      hour: number
+        time: string,
+        hour: number
     },
     end: {
-      time: string,
-      hour: number
+        time: string,
+        hour: number
     }
 }
 
@@ -176,9 +187,19 @@ export interface CourseAvailability {
     day: number,
     time: number,
     entries: number
-}
+};
 
 export interface DayTime {
     day: number,
     time: number
-}
+};
+
+export interface ILink {
+    text: string,
+    href: string
+    icon: string
+    submenu?: {
+        text: string,
+        href: string
+    }[]
+};

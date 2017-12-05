@@ -1,4 +1,3 @@
-import { Availability, Day, Time } from "../interfaces/models";
 import AvailabilityRepository from "../repositories/AvailabilityRepository";
 
 export default class AvailabilityService {

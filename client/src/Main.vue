@@ -191,7 +191,8 @@ label {
 </style>
 <script lang="ts">
 import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
-import { User, Course, CourseUser } from "./interfaces/models";
+import { ILink, User, Course, CourseUser } from "./interfaces/models";
+import { getLinks } from "./util";
 
 // Special case where main.vue needs to refresh application
 import UserRepository from "./repositories/UserRepository";
@@ -211,14 +212,19 @@ export default class Main extends Vue {
     });
 
     courseRoles: string[] = [];
-    pUser: User = undefined;
-    pCourse: Course = undefined;
+    pUser: User | undefined = undefined;
+    pCourse: Course| undefined = undefined;
+
+    menuIcon = "menu";
+    mobileMode = false;
+    pageTitle = "";
+    activeSubmenu = false;
 
     get user() {
         return this.pUser;
     }
 
-    updateUser(newUser: User) {
+    updateUser(newUser: User | undefined) {
         this.pUser = newUser;
     }
 
@@ -231,72 +237,17 @@ export default class Main extends Vue {
         }
     };
 
-    menuIcon = "menu";
-    mobileMode = false;
-    pageTitle = "";
-    activeSubmenu = false;
-
     get links() {
-        const profileLink = {
-            text: "Profile",
-            href: "/",
-            icon: "widgets",
-            submenu: [{
-                text: "Overview",
-                href: "/"
-            }, {
-                text: "Engagement",
-                href: "/profile/engagement"
-            }, {
-                text: "Competencies",
-                href: "/profile/competencies"
-            }, {
-                text: "Connections",
-                href: "/profile/connections"
-            }, {
-                text: "Achievements",
-                href: "/profile/achievements"
-            }, {
-                text: "Notifications",
-                href: "/profile/notifications"
-            }]
-        };
-        const adminLink = {
-            text: "Admin",
-            href: "/admin",
-            icon: "widgets"
-        };
-        const leaderLink = {
-            text: "Leaders",
-            href: "/view/leaderboard",
-            icon: "assignment"
-        };
-
-        const baseLinks = [{
-            text: "Questions",
-            href: "/question/answer",
-            icon: "question_answer",
-            submenu: [{
-                text: "Answer",
-                href: "/question/answer"
-            }, {
-                text: "Create",
-                href: "/question/create"
-            }]
-        }, {
-            text: "Connect",
-            href: "/view/peers",
-            icon: "group"
-        }];
-
+        const links = getLinks();
         if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
-            baseLinks.unshift(adminLink);
+            const profileLinkIndex = links.findIndex(x => x.href == "/");
+            links.splice(profileLinkIndex, 1);
             this.$router.push("admin");
         } else {
-            baseLinks.unshift(profileLink);
-            baseLinks.push(leaderLink);
+            const adminLinkIndex = links.findIndex(x => x.href == "/admin");
+            links.splice(adminLinkIndex, 1);
         }
-        return baseLinks;
+        return links;
     }
 
     get pageSize() {
@@ -356,7 +307,7 @@ export default class Main extends Vue {
     }
 
     updateCourse(newCourse: Course) {
-        let oldCourseCode = undefined;
+        let oldCourseCode: string | undefined = undefined;
         if (this.pCourse && this.pCourse.courseCode) {
             oldCourseCode = this.pCourse.courseCode;
         }
@@ -365,7 +316,7 @@ export default class Main extends Vue {
 
         this.pCourse = newCourse;
         UserRepository.authenticate(newCourse.courseCode)
-            .then(newToken => {
+            .then(_ => {
                 const preserveCache = !(oldCourseCode == newCourse.courseCode);
                 Fetcher.forceUpdate(preserveCache);
             });
@@ -373,11 +324,11 @@ export default class Main extends Vue {
 
     currentlyOpenMenu = "/";
 
-    toggleSubmenu(link) {
+    toggleSubmenu(link: ILink) {
         this.currentlyOpenMenu = link.href;
     }
 
-    toggleSideNav(link) {
+    toggleSideNav(link: ILink) {
         this.toggleSubmenu(link);
         if (this.mobileMode) {
             this.updatePageName();
@@ -402,7 +353,7 @@ export default class Main extends Vue {
         this.activeSubmenu = true;
     }
 
-    submenuClassNames(link) {
+    submenuClassNames(link: ILink) {
         if (link.submenu !== undefined) {
             return "has-submenu";
         }

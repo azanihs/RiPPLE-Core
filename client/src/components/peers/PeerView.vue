@@ -33,8 +33,8 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
+import { Vue, Component, Lifecycle } from "av-ts";
+import { Topic, User, Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
 import AvailabilityService from "../../services/AvailabilityService";
@@ -52,38 +52,42 @@ import RecommendationSearch from "./RecommendationSearch.vue";
 export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
-    pTopics = [];
-    pRequests = [];
-    pRecommendations = [];
-    pCourseAvailability = [];
-    pUserAvailability = [];
+    pRequests: User[] = [];
+    pRecommendations: User[] = [];
+
+    pTopics: Topic[] = [];
+    pCourseAvailability: CourseAvailability[] = [];
+    pUserAvailability: Availability[] = [];
+
     pDays: Day[] = [];
     pTimes: Time[] = [];
+
     pCourseDistribution: number[][] = [];
     pMaxAvailable: number = 0;
 
-    updateTopics(newTopics) {
+    updateTopics(newTopics: Topic[]) {
         this.pTopics = newTopics;
     };
-    updateConnections(newConnections) {
+    updateConnections(newConnections: User[]) {
         this.pRecommendations = newConnections;
     };
-    updateRequests(newRequests) {
+    updateRequests(newRequests: User[]) {
         this.pRequests = newRequests;
     };
-    updateCourseAvailability(availability) {
+    updateCourseAvailability(availability: CourseAvailability[]) {
         this.pCourseAvailability = availability;
     };
-    updateUserAvailability(availability) {
+    updateUserAvailability(availability: Availability[]) {
         this.pUserAvailability = availability;
     };
-    updateDays(days) {
+    updateDays(days: Day[]) {
         this.pDays = days;
     };
-    updateTimes(times) {
+    updateTimes(times: Time[]) {
         this.pTimes = times;
     };
-    updateAvailability(courseDistribution) {
+
+    updateAvailability(courseDistribution: CourseAvailability[]) {
         let maxAvailable = 0;
         let distribution = new Array(7);
         for (let i =0; i < distribution.length; i++) {
@@ -175,9 +179,9 @@ export default class PeerView extends Vue {
         return this.pMaxAvailable;
     }
 
-    changeAvailability(day, time) {
+    changeAvailability(day: number, time: number) {
         AvailabilityService.updateUserAvailability(day, time)
-        .then(x => AvailabilityService.getCourseAvailability())
+        .then(_ => AvailabilityService.getCourseAvailability())
         .then(this.updateCourseAvailability);
     }
 

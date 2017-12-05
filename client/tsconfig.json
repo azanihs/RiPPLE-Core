@@ -1,19 +1,24 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "allowSyntheticDefaultImports": true,
         "lib": [
             "es5",
             "dom",
             "es2015"
         ],
+        "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "sourceMap": true,
         "module": "es2015",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "strict": true,
+        "noImplicitAny": true,
+        "allowUnreachableCode": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
     },
     "include": [
-        "./src/vue-shims.d.ts", // Makes *.vue files work with TS imports
+        "./src/typings/**/*.d.ts",
         "./src/main.ts",
         "./src/**/*.vue"
     ]

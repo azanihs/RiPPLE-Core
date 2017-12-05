@@ -9,11 +9,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component } from "av-ts";
 
-import Fetcher from "../../services/Fetcher";
-import UserService from "../../services/UserService";
-import TopicService from "../../services/TopicService";
 import OverviewDescription from "../util/OverviewDescription.vue";
 import Notifications from "../util/Notifications.vue";
 
@@ -24,6 +21,6 @@ import Notifications from "../util/Notifications.vue";
     }
 })
 export default class NotificationsView extends Vue {
-    
+
 }
 </script>

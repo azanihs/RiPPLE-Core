@@ -13,8 +13,8 @@ svg {}
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import UserService from "../../services/UserService";
-
+import { Edge, Topic } from "../../interfaces/models";
+import { ISimulationNode, ISimulationEdge } from "../../interfaces/chart";
 import * as d3 from "d3";
 
 @Component()
@@ -30,29 +30,30 @@ export default class Graph extends Vue {
 
     width = 0;
     height = 0;
-    @Prop edges = p({
-        type: Array,
+    @Prop edges = p<Edge[]>({
         required: true
     });
 
-    @Prop nodes = p({
-        type: Array,
+    @Prop nodes = p<Topic[]>({
         required: true
     });
-    @Prop
-    shouldTick: boolean;
 
-    simulation = null;
+    @Prop shouldTick: boolean = p<boolean>({
+        required: false,
+        default: true
+    });
+
+    simulation: d3.Simulation<ISimulationNode, ISimulationEdge> | undefined = undefined;
 
     render() {
         const edges = this.edges.slice();
-        const nodes = this.nodes.slice();
+        const nodes = this.nodes.slice() as ISimulationNode[];
 
         const selfLoops = edges.filter(x => x.source == x.target);
 
         const minRange = 2;
         const maxRange = 10;
-        const normalise = (min, max, v) => {
+        const normalise = (min: number, max: number, v: number) => {
             return (maxRange - minRange) * ((v - min) / (max - min)) + minRange;
         };
 
@@ -62,7 +63,7 @@ export default class Graph extends Vue {
         const lineColour = d3.interpolate("pink", "#256");
         const maxColour = Math.max(...edges.map(x => x.competency));
         const minColour = Math.min(...edges.map(x => x.competency));
-        const getStrokeColour = d => lineColour((d.competency - maxColour) / (minColour - maxColour));
+        const getStrokeColour = (d: Edge) => lineColour((d.competency - maxColour) / (minColour - maxColour));
 
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
         svg.html(null);
@@ -77,12 +78,12 @@ export default class Graph extends Vue {
 
         const forceLink = d3.forceLink(edges);
 
-        this.simulation = d3.forceSimulation(nodes)
+        this.simulation = d3.forceSimulation<ISimulationNode, ISimulationEdge>(nodes)
             .alpha(3)
             .force("collision", d3.forceCollide(3 * nodeRadius))
             .force("link", forceLink.distance(3 * nodeRadius))
             .force("body", d3.forceManyBody().distanceMin(nodeRadius))
-            .force("center", d3.forceCenter(this.graphWidth / 2, this.graphHeight / 2)) as any;
+            .force("center", d3.forceCenter(this.graphWidth / 2, this.graphHeight / 2));
 
         const link = container.append("g")
             .attr("class", "links")
@@ -119,11 +120,12 @@ export default class Graph extends Vue {
             .attr("class", "labels")
             .selectAll("text")
             .data(nodes)
-            .enter().append("text")
-            .attr("dx", d => d.cx)
-            .attr("dy", d => d.cy)
-            .attr("text-anchor", "middle")
-            .text(d => d.id);
+            .enter()
+                .append("text")
+                .attr("dx", d => d.cx)
+                .attr("dy", d => d.cy)
+                .attr("text-anchor", "middle")
+                .text(d => d.id);
 
         this.$emit("graphElements", {
             node: node,
@@ -148,12 +150,12 @@ export default class Graph extends Vue {
     }
 
     @Watch("edges")
-    edgeChange() {
+    edgeChange(_oldEdges: Edge[], _newEdges: Edge[]) {
         this.render();
     }
 
     @Watch("nodes")
-    nodeChange() {
+    nodeChange(_oldNodes: Topic[], _newNodes: Topic[]) {
         this.render();
     }
 
@@ -191,7 +193,7 @@ export default class Graph extends Vue {
         }
     }
 
-    ticked(radius) {
+    ticked(radius: number) {
         return () => {
             this.willAnimateNextChange = false;
             this.$emit("tick", this.graphWidth, this.graphHeight, radius);
@@ -199,6 +201,10 @@ export default class Graph extends Vue {
     }
 
     computeStaticLayout() {
+        if (this.simulation === undefined) {
+            return;
+        }
+
         this.simulation.stop();
         this.simulation.on("tick", null);
 

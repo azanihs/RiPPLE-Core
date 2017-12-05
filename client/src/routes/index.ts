@@ -24,7 +24,7 @@ Vue.use(VueRouter);
 const routes = [{
     path: "/",
     component: Main,
-    props: x => ({
+    props: (x: any) => ({
         path: x.name,
         token: x.query.token,
         initCourseCode: x.query.course_code
