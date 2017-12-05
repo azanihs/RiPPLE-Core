@@ -52,15 +52,18 @@ def add_question(question_request, host, user):
                 topicList.append(i.get("id", None))
             questionObj.topics = topicList
 
+            _response_set = ["A", "B", "C", "D"]
+            if True not in [responses[i].get("isCorrect", False) for i in _response_set]:
+                raise IntegrityError("Question has no solution")
+            
             # Distractors
-            for i in ["A", "B", "C", "D"]:
+            for i in _response_set:
                 distractor = Distractor(
                     content=responses[i].get("content", None),
                     isCorrect=responses[i].get("isCorrect", None),
                     response=i,
                     question=questionObj
                 )
-
                 if verifyContent(distractor.content):
                     distractor.save()
                 else:
@@ -71,6 +74,7 @@ def add_question(question_request, host, user):
                 if images:
                     if not decodeImages(str(distractor.id), distractor, images, "d", host):
                         raise IntegrityError("Invalid Distractor Image")
+            
     except IntegrityError as e:
         return {"state": "Error", "error": str(e)}
     except Exception as e:

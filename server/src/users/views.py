@@ -95,21 +95,4 @@ def get_all_user_achievements(request):
     data = []    
     for ach in achievements:
         data.append(engine.check_achievement(user=user, key=ach.key))
-
-<<<<<<< HEAD
-    return JsonResponse({"data": data})
-
-def get_all_notifications(request):
-    user = logged_in_user(request)
-
-    notifications = Notification.objects.filter(user=user)
-    data = []
-
-    for n in notifications:
-        n.sent = True
-        data.append(n.toJSON())
-    
-    return JsonResponse({"data":data})
-=======
     return JsonResponse(data, safe=False)
->>>>>>> parent of 69f7033... Add data tag to all server responses

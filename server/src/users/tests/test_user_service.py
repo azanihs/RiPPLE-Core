@@ -10,7 +10,7 @@ from questions.models import Topic, Course
 from django.core.files import File as f
 from django.test import Client
 from django.utils import timezone
-import datetime
+from datetime import datetime
 import urllib
 import json
 

@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 import math
-from django.utils import timezone
-import datetime
+import pytz as timezone
+from datetime import datetime
 from django.test import TestCase
 from questions.models import Topic, Question, Distractor, Competency
 from users.models import User, Role, Course, CourseUser
@@ -13,8 +13,8 @@ class BootstrapTestCase(TestCase):
     def _bootstrap_courses(self, id):
         return Course.objects.create(course_code="test_course_" + str(id), 
             course_name="course_name_" + str(id),
-            start=timezone.now() - datetime.timedelta(days=5),
-            end=timezone.now(),
+            start=datetime.fromtimestamp(int(100), timezone.utc),
+            end=datetime.fromtimestamp(int(100), timezone.utc),
             available=True)
 
     def _bootstrap_user(self):
