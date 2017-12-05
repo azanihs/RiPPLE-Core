@@ -16,9 +16,7 @@ from ripple.util import util
 
 def index(request):
     return JsonResponse({
-        "data": {
-            "login": "Returns a token to authenticate against the server"
-        }
+        "login": "Returns a token to authenticate against the server"
     })
 
 
@@ -26,12 +24,12 @@ def me(request):
     token = request.META.get("HTTP_AUTHORIZATION", None)
     user_course = token_to_user_course(token)
     
-    return JsonResponse({"data": user_course.toJSON()})
+    return JsonResponse(user_course.toJSON())
 
 
 def courses(request):
     user = logged_in_user(request)
-    return JsonResponse({"data": user_courses(user)})
+    return JsonResponse(user_courses(user), safe=False)
 
 
 def update(request):
@@ -42,7 +40,7 @@ def update(request):
 
     post_request = loads(request.body.decode("utf-8"))
     user = logged_in_user(request)
-    return JsonResponse({"data": update_course(user, post_request)})
+    return JsonResponse(update_course(user, post_request), safe=False)
 
 
 def login(request, course_code):
@@ -50,18 +48,16 @@ def login(request, course_code):
     if token != "" and token is not None:
         if not token_valid(token):
             return JsonResponse({
-                "data": {
-                    "token": token
-                }
+                "token": token
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_code=course_code)})
+        return JsonResponse(generate_token(user=user_course.user, course_code=course_code), safe=False)
 
-    return JsonResponse({"data": generate_token()})
+    return JsonResponse(generate_token())
 
 def get_user(request, course_code=None):
     if course_code != "":
-        return JsonResponse({"data": get_user(course_code)})
+        return JsonResponse(get_user(course_code))
 
     return JsonResponse({"error": "Course not provided"})
 
@@ -89,9 +85,7 @@ def image_update(request):
         _format("static")
     ])
 
-    return JsonResponse({
-        "data":update_user_image(course_user.user, root_path, new_image)
-    })
+    return JsonResponse(update_user_image(course_user.user, root_path, new_image))
 
 
 def get_all_user_achievements(request):
@@ -102,6 +96,7 @@ def get_all_user_achievements(request):
     for ach in achievements:
         data.append(engine.check_achievement(user=user, key=ach.key))
 
+<<<<<<< HEAD
     return JsonResponse({"data": data})
 
 def get_all_notifications(request):
@@ -115,3 +110,6 @@ def get_all_notifications(request):
         data.append(n.toJSON())
     
     return JsonResponse({"data":data})
+=======
+    return JsonResponse(data, safe=False)
+>>>>>>> parent of 69f7033... Add data tag to all server responses
