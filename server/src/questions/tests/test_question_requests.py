@@ -5,7 +5,7 @@ from questions.models import Question, QuestionImage, ExplanationImage, Distract
 from questions.services import AuthorService
 from users.models import CourseUser
 from django.db import IntegrityError
-from unittest.mock import MagicMock, Mock, patch
+from mock import MagicMock, Mock, patch
 from ripple.util import util
 
 from .common import BootstrapTestCase
