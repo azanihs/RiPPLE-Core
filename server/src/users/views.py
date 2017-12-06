@@ -7,7 +7,7 @@ import imghdr
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
-from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image, user_engagement, aggregate_engagement
+from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image, user_engagement, get_all_engagements
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
@@ -127,10 +127,15 @@ def get_all_notifications(request):
 
 def engagement(request):
     user = logged_in_user(request)
+    engagement_list = get_all_engagements(user)
+    return JsonResponse({"data": engagement_list})
+
+def engagement_all(request):
+    user = logged_in_user(request)
     engagement = user_engagement(user)
     return JsonResponse({"data": engagement})
 
 def engagement_aggregate(request, compare_type):
     user = logged_in_user(request)
-    engagement = aggregate_engagement(compare_type)
+    engagement = user_engagement(user, compare_type)
     return JsonResponse({"data": engagement})

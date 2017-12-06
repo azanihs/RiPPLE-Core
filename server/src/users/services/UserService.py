@@ -4,12 +4,13 @@ import pytz as timezone
 
 from django.conf import settings
 from django.db.models import Count
+from django.apps import apps
 from datetime import datetime
 from ripple.util.util import save_image, mean
 
 from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating
 from questions.services import CompetencyService
-from users.models import Course, CourseUser, User, Role, UserImage
+from users.models import Course, CourseUser, User, Role, UserImage, Engagement
 from rippleAchievements.models import UserAchievement
 from users.services.TokenService import token_to_user_course
 from ripple.util import util
@@ -159,7 +160,7 @@ def user_competencies(user):
 def aggregate_competencies(user, compare_type):
     if user is None or compare_type is None:
         return []
-    if compare_type == "peer":
+    if compare_type == "peers":
         competencies = Competency.objects.filter(user__in=CourseUser.objects.filter(course=user.course))
     else:
         # TODO: handle other compare_types
@@ -214,169 +215,51 @@ def update_user_roles(course_user, role):
     if saved_role not in course_user.roles.all():
         course_user.roles.add(saved_role)
 
-def user_engagement(user):
+def get_all_engagements(user):
+    course = user.course
+    engagements = Engagement.objects.filter(course=course)
+    engagements = [x.toJSON() for x in engagements]
+    for e in engagements:
+        e["id"] = -e["id"]
+    return engagements
+
+def user_engagement(user, user_type=None):
     edges = []
+    engagements = Engagement.objects.filter(course=user.course)
 
-    #Questions Answered
-    edges.append([
-        {"id":-1, "name":"Questions Answered"},
-        {"id":-1, "name":"Questions Answered"},
-        get_questions_answered(user),
-        0
-    ])
+    #Compare against self
+    if not user_type:
+        user_type=user
 
-    #Questions Authored
-    edges.append([
-        {"id":-2, "name":"Questions Authored"},
-        {"id":-2, "name":"Questions Authored"},
-        get_questions_authored(user),
-        0
-    ])
-
-    #Questions Rated
-    edges.append([
-        {"id":-3, "name":"Questions Rated"},
-        {"id":-3, "name":"Questions Rated"},
-        get_questions_rated(user),
-        0
-    ])
-
-    #Questions Rated
-    edges.append([
-        {"id":-4, "name":"Questions Authored"},
-        {"id":-4, "name":"Questions Authored"},
-        get_competent_topics(user),
-        0
-    ])
-
-    #Achievements Earned
-    edges.append([
-        {"id":-5, "name":"Achievements Earned"},
-        {"id":-5, "name":"Achievements Earned"},
-        get_achievements_earned(user),
-        0
-    ])
-    print(edges)
+    for e in engagements:
+        item = apps.get_model(e.app, e.item)
+        filter_name = e.filter_name
+        filter_cond = e.filter_cond
+        if filter_cond:
+            filter_cond = eval(filter_cond)
+        key_user = e.key_user
+        edges.append([
+            e.toJSON(),
+            e.toJSON(),
+            get_engagement_result(user_type, item, filter_name, filter_cond, key_user),
+            0
+        ])
     return edges
 
-def aggregate_engagement(compare_type):
-    edges = []
-
-    #Questions Answered
-    edges.append([
-        {"id":-1, "name":"Questions Answered"},
-        {"id":-1, "name":"Questions Answered"},
-        get_questions_answered(compare_type),
-        0
-    ])
-
-    #Questions Authored
-    edges.append([
-        {"id":-2, "name":"Questions Authored"},
-        {"id":-2, "name":"Questions Authored"},
-        get_questions_authored(compare_type),
-        0
-    ])
-
-    #Questions Rated
-    edges.append([
-        {"id":-3, "name":"Questions Rated"},
-        {"id":-3, "name":"Questions Rated"},
-        get_questions_rated(compare_type),
-        0
-    ])
-
-    #Questions Rated
-    edges.append([
-        {"id":-4, "name":"Questions Authored"},
-        {"id":-4, "name":"Questions Authored"},
-        get_competent_topics(compare_type),
-        0
-    ])
-
-    #Achievements Earned
-    edges.append([
-        {"id":-5, "name":"Achievements Earned"},
-        {"id":-5, "name":"Achievements Earned"},
-        get_achievements_earned(compare_type),
-        0
-    ])
-    print(edges)
-    return edges
-
-def get_questions_answered(user):
-    correct = QuestionResponse.objects.filter(response_id__in=Distractor.objects.filter(isCorrect=True))
-    max_num = correct.values("user_id").annotate(num_answers=Count("user_id"))\
-            .values("num_answers").order_by("-num_answers")
+def get_engagement_result(user, item, filter_name, filter_cond, key_user):
+    if filter_name:
+        correct = item.objects.filter(**{filter_name:filter_cond})
+    else:
+        correct = item.objects.all()
+    max_num = correct.values(key_user).annotate(num_results=Count(key_user))\
+            .values("num_results").order_by("-num_results")
     if not max_num:
         return 0
-    max_num = max_num[0]["num_answers"]
-    if user == "peer":
-        num_users = correct.values("user_id").distinct().count()
+    max_num = max_num[0]["num_results"]
+    if user == "peers":
+        num_users = correct.values(key_user).distinct().count()
         avg_correct = correct.count()/num_users
         return avg_correct/max_num
     else:
-        user_correct = correct.filter(user_id=user).count()
+        user_correct = correct.filter(**{key_user:user}).count()
         return user_correct/max_num
-
-def get_questions_authored(user):
-    questions = Question.objects.all()
-    max_num = questions.values("author_id").annotate(num_questions=Count("author_id"))\
-            .values("num_questions").order_by("-num_questions")
-    if not max_num:
-        return 0
-    max_num = max_num[0]["num_questions"]
-    if user == "peer":
-        num_users = questions.values("author_id").distinct().count()
-        avg_correct = questions.count()/num_users
-        return avg_correct/max_num
-    else:
-        user_correct = questions.filter(author_id=user).count()
-        return user_correct/max_num
-
-def get_questions_rated(user):
-    question_ratings = QuestionRating.objects.all()
-    max_num = question_ratings.values("user_id").annotate(num_questions=Count("user_id"))\
-            .values("num_questions").order_by("-num_questions")
-    if not max_num:
-        return 0
-    max_num = max_num[0]["num_questions"]
-    if user == "peer":
-        num_users = question_ratings.values("user_id").distinct().count()
-        avg_correct = question_ratings.count()/num_users
-        return avg_correct/max_num
-    else:
-        user_correct = question_ratings.filter(user_id=user).count()
-        return user_correct/max_num
-        
-def get_competent_topics(user):
-    competencies = Competency.objects.annotate(t_count=Count('topics'))\
-            .filter(t_count=1, competency__gte=competency_threshold)
-    max_num = competencies.values("user_id").annotate(num_competencies=Count("user_id"))\
-            .values("num_competencies").order_by("-num_competencies")
-    if not max_num:
-        return 0
-    max_num = max_num[0]["num_competencies"]
-    if user == "peer":
-        num_users = competencies.values("user_id").distinct().count()
-        avg_correct = competencies.count()/num_users
-        return avg_correct/max_num
-    else:
-        user_correct = competencies.filter(user_id=user).count()
-        return user_correct/max_num
-
-def get_achievements_earned(user):
-    achievements = UserAchievement.objects.all()
-    max_num = achievements.values("user").annotate(num_achievements=Count("user"))\
-            .values("num_achievements").order_by("-num_achievements")
-    if not max_num:
-        return 0
-    max_num = max_num[0]["num_achievements"]
-    if user == "peer":
-        num_users = achievements.values("user").distinct().count()
-        avg_correct = achievements.count()/num_users
-        return avg_correct/max_num
-    else:
-        user_correct = achievements.filter(user=user).count()
-        return user_correct/max_num
-        

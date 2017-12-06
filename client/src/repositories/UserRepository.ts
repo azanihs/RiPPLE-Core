@@ -7,8 +7,6 @@ import { setToken, apiFetch } from "./APIRepository";
 
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
-const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recommendations", "Social Connections",
-    "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"];
 
 const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures", "Variables"];
 
@@ -47,33 +45,12 @@ const notifications = Array.from({ length: notificationCount }).map((_, i: numbe
     icon: _icons[_n(4)]
 }));
 
-const engagementNodes: Topic[] = engagementTypes.map((x, i) => ({
-    id: 1000 + i,
-    name: x
-}));
-
 type ServerEdge = {
     0: Topic,
     1: Topic,
     2: number,
     3: number
 };
-
-const userEngagementScores: ServerEdge[] = [];
-engagementNodes.forEach(engagementNode => {
-    // Ensure at least one self-loop per topic
-    userEngagementScores.push([engagementNode, engagementNode,
-        _n(100), _n(100)]);
-
-    const randomNode = engagementNodes[_n(engagementNodes.length)];
-    if (randomNode == engagementNode) {
-        return;
-    }
-
-    userEngagementScores.push([engagementNode, randomNode,
-        _n(100),
-        _n(100)]);
-});
 
 const makeUser = () => {
     const getType = (i: number) => {
@@ -143,11 +120,8 @@ export default class UserRepository {
     }
 
     static getAllAvailableEngagementTypes(): Promise<Topic[]> {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(engagementNodes);
-            }, Math.random() * 1000);
-        });
+        return apiFetch<Topic[]>(`/users/engagement/`)
+        .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
 
     static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
@@ -181,19 +155,29 @@ export default class UserRepository {
     }
 
     static getUserEngagement(): Promise<Edge[]> {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(userEngagementScores.map(x => {
-                    const edge: Edge = {
-                        source: x[0] as Topic,
-                        target: x[1] as Topic,
-                        competency: Math.round(x[2]),
-                        attempts: Math.round(x[3])
-                    };
-                    return edge;
-                }));
-            }, Math.random() * 1000);
-        });
+        return apiFetch<ServerEdge[]>(`/users/engagement/all/`)
+        .then(x => x.map(x => {
+            const edge: Edge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: Math.round(x[2]*100),
+                attempts: Math.round(x[3]*100)
+            };
+            return edge;
+        }));
+    }
+
+    static getEngagementAgainst(compareTo: string): Promise<Edge[]> {
+        return apiFetch<ServerEdge[]>(`/users/engagement/aggregate/${compareTo}/`)
+        .then(x => x.map(x => {
+            const edge: Edge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: Math.round(x[2] * 100),
+                attempts: Math.round(x[3] * 100)
+            };
+            return edge;
+        }));
     }
 
     static getMeetingHistory(): Promise<{name: string, id: number }[]> {

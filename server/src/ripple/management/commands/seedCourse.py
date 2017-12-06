@@ -3,7 +3,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
-from users.models import Course, User, CourseUser
+from users.models import Course, User, CourseUser, Engagement
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
@@ -232,6 +232,22 @@ class Command(BaseCommand):
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
                 name=x, course=course) for x in topics]
+
+            print("\t-Adding Engagements")
+            engagements = ["Questions Answered", "Questions Authored", "Questions Rated",
+                    "Competent Topics", "Achievements Earned"]
+            e_apps = ["questions", "questions", "questions", "questions", "rippleAchievements"]
+            e_items = ["QuestionResponse", "Question", "QuestionRating", "Competency", 
+                    "UserAchievement"]
+            e_filter_name = ["response_id__in", "", "", "", ""]
+            e_filter_cond = ["Distractor.objects.filter(isCorrect=True)", "", "", "", ""]
+            e_key_user = ["user_id", "author_id", "user_id", "user_id", "user"]
+            for i in range(len(engagements)):
+                e = Engagement(name=engagements[i], course=course, app=e_apps[i], 
+                        item=e_items[i], filter_name=e_filter_name[i], 
+                        filter_cond=e_filter_cond[i], key_user=e_key_user[i])
+                e.save()
+
             print("\t-Enrolling Users")
             course_users = []
             for user in users:
@@ -285,7 +301,8 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
-        print("Populating Availabilities")
+
+        '''print("Populating Availabilities")
         print("\t-Making Days")
         make_days()
 
@@ -304,7 +321,7 @@ class Command(BaseCommand):
         populate_availability(course_users, days, times)
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
-        populate_available_roles(course_users, study_roles)
+        populate_available_roles(course_users, study_roles)'''
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')
