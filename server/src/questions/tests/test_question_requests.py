@@ -47,6 +47,20 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertEqual(response["state"], "Error")
         self.assertEqual(response["error"], "Missing response " + distractor)
 
+    def test_no_true_answer(self):
+        """Check that an Integrity Error is raised when none of the distractors have a true response"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        question = self._bootstrap_question_request()
+        #Make all answers false
+        for i in question["responses"]:
+            question["responses"][i]["isCorrect"] = False
+        response = AuthorService.add_question(question, "/", author)
+        self.assertEqual(response["state"], "Error")
+        self.assertEqual(response["error"], "No correct answer for question")
+
 
     def test_check_for_script_tags(self):
         """Tests that questions added do not have script tags in any of their text areas"""

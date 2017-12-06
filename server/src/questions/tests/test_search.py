@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import random
 
-from questions.models import Topic, Question, QuestionResponse, QuestionScore
+from questions.models import Topic, Question, QuestionResponse, QuestionScore, Distractor
 from questions.services import SearchService, QuestionService
 from users.models import CourseUser
 from datetime import datetime
@@ -192,6 +192,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             q.save()
         
         test_search = SearchService.SearchService(course)
+        #The sorting order does not matter as anything that is not DESC will be considered ascending
         test_search.add_sort("difficultyCount", "ASC")
         sorted_questions = test_search.execute()
         #make sure next question has higher difficulty
@@ -228,6 +229,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             q.save()
         
         test_search = SearchService.SearchService(course)
+        #The sorting order does not matter as anything that is not DESC will be considered ascending
         test_search.add_sort("qualityCount", "ASC")
         sorted_questions = test_search.execute()
         #make sure next question has higher quality
@@ -269,8 +271,78 @@ class SearchServiceTestCase(BootstrapTestCase):
             q.save()
         
         test_search = SearchService.SearchService(course)
+        #The sorting order does not matter as anything that is not DESC will be considered ascending
         test_search.add_sort("created_time", "ASC")
         sorted_questions = test_search.execute()
         #make sure next question has higher created_time
         for i in range(0,sorted_questions.count() - 1):
             self.assertTrue(sorted_questions[i].created_time < sorted_questions[i + 1].created_time)
+
+    
+    def test_sorting_responses_descending(self):
+        """Check that the questions get sorted by their number of responses in descending order """
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        responder_user = self._bootstrap_user(2)
+        first_responder = CourseUser.objects.create(user=responder_user, course=course)
+        another_responder_user = self._bootstrap_user(3)
+        second_responder = CourseUser.objects.create(user=another_responder_user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+        
+        #Last question is responded 3 times, started from the back to ensure descending sorting happens
+        QuestionService.respond_to_question(17, author)
+        QuestionService.respond_to_question(18, first_responder)
+        QuestionService.respond_to_question(19, second_responder)
+        #Second last question is responded two times
+        QuestionService.respond_to_question(14, author)
+        QuestionService.respond_to_question(15, first_responder)
+        #Third last question is responded once
+        QuestionService.respond_to_question(9, author)
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("responses", "DESC")
+        sorted_questions = test_search.execute()
+        for i in range(0, sorted_questions.count() - 1):
+            responses = QuestionResponse.objects.filter(response__in = Distractor.objects.filter(
+                question = Question.objects.get(id = sorted_questions[i].id)))
+            next_responses = QuestionResponse.objects.filter(response__in = Distractor.objects.filter(
+                question = Question.objects.get(id = sorted_questions[i + 1].id)))
+            self.assertTrue(responses.count() >= next_responses.count())
+
+
+    def test_sorting_responses_ascending(self):
+        """Check that the questions get sorted by their number of responses in ascending order """
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        responder_user = self._bootstrap_user(2)
+        first_responder = CourseUser.objects.create(user=responder_user, course=course)
+        another_responder_user = self._bootstrap_user(3)
+        second_responder = CourseUser.objects.create(user=another_responder_user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+        self._bootstrap_question_choices(correct_id=2)
+        
+        #First question is responded 3 times, started from the back to ensure descending sorting happens
+        QuestionService.respond_to_question(1, author)
+        QuestionService.respond_to_question(2, first_responder)
+        QuestionService.respond_to_question(3, second_responder)
+        #Second question is responded two times
+        QuestionService.respond_to_question(5, author)
+        QuestionService.respond_to_question(6, first_responder)
+        #Third question is responded once
+        QuestionService.respond_to_question(9, author)
+        
+        test_search = SearchService.SearchService(course)
+        #The sorting order does not matter as anything that is not DESC will be considered ascending
+        test_search.add_sort("responses", "ASC")
+        sorted_questions = test_search.execute()
+        for i in range(0, sorted_questions.count() - 1):
+            responses = QuestionResponse.objects.filter(response__in = Distractor.objects.filter(
+                question = Question.objects.get(id = sorted_questions[i].id)))
+            next_responses = QuestionResponse.objects.filter(response__in = Distractor.objects.filter(
+                question = Question.objects.get(id = sorted_questions[i + 1].id)))
+            self.assertTrue(responses.count() <= next_responses.count())
