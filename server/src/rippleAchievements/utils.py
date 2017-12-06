@@ -25,10 +25,9 @@ def check_achievement_plain(sender, user, key, *args, **kwargs):
     if result["progress"] == 100:
         (user_ach, created) = UserAchievement.objects.get_or_create(achievement=obj, user=user)
         if created:
-            print("Achievement %s unlocked for user %s " % (obj, user))
             logger.info("Achievement %s unlocked for user %s " % (obj, user))
             result["new"] = True
-            achievement_unlocked.send(sender=sender, user=user, achievement=obj, *args, **kwargs)            
+            achievement_unlocked.send(sender=sender, user=user, achievement=obj, *args, **kwargs)
     return result
 
 
@@ -50,5 +49,5 @@ def construct_callback(obj):
 def get_callback_object(ref):
     module = ".".join(ref.split(".")[:-1])
     class_name = ref.split(".")[-1]
-    m = importlib.import_module(module)    
+    m = importlib.import_module(module)
     return eval('m.%s' % class_name)

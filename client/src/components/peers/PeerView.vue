@@ -105,6 +105,7 @@ export default class PeerView extends Vue {
         this.pCourseDistribution = distribution;
         this.pMaxAvailable = maxAvailable;
     };
+
     updateStudyRoles(roles: StudyRole[]) {
         this.pStudyRoles = roles;
     };

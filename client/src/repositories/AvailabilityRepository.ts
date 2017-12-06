@@ -34,7 +34,7 @@ export default class AvailabilityRepository {
     }
 
     static getStudyRoles(): Promise<StudyRole[]> {
-        return apiFetch<StudyRole[]>("/recommendations/roles/all");
+        return apiFetch<StudyRole[]>("/recommendations/roles/all/");
     }
 
     static getUserAvailableRoles(): Promise<AvailableRole[]> {
@@ -54,5 +54,4 @@ export default class AvailabilityRepository {
             })
         });
     }
-
 }

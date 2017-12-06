@@ -37,3 +37,28 @@ def get_study_roles():
 
 def get_user_available_roles(course_user):
     return AvailableRole.objects.filter(course_user=course_user)
+
+def update_role(course_user, topic_id, study_role_id):
+    # Check if availaibility exists
+    try:
+        available_role = AvailableRole.objects.get(course_user=course_user, topic=topic_id, study_role=study_role_id)
+        exists = True
+    except ObjectDoesNotExist:
+        exists = False
+
+    if exists:
+        available_role.delete()
+        return available_role
+
+    else:
+        try:
+            topic = Topic.objects.get(pk=topic_id)
+        except ObjectDoesNotExist:
+            return None
+        try:
+            study_role = StudyRole.objects.get(pk=study_role_id)
+        except ObjectDoesNotExist:
+            return None
+        available_role = AvailableRole(course_user=course_user, topic=topic, study_role=study_role)
+        available_role.save()
+        return available_role
