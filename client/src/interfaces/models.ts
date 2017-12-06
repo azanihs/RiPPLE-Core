@@ -223,3 +223,15 @@ export interface AvailableRole {
     topic: Topic,
     studyRole: StudyRole
 }
+
+export interface StudyRole {
+    id: number,
+    role: string,
+    description: string
+}
+
+export interface AvailableRole {
+    courseUser: CourseUser,
+    topic: Topic,
+    studyRole: StudyRole
+}

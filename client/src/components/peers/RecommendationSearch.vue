@@ -151,7 +151,6 @@
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
 import { Topic, UserSummary, Edge, StudyRole, CompareSet } from "../../interfaces/models";
-
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
