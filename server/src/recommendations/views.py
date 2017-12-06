@@ -24,7 +24,7 @@ def days(request):
     days = [x.toJSON() for x in AvailabilityService.get_days()]
     return JsonResponse({"data": days }, safe=False)
 
-def update(request):
+def update_availability(request):
     # HTTP.POST is required for this.
     if request.method != "POST":
         return JsonResponse({
@@ -43,14 +43,34 @@ def update(request):
         return JsonResponse({"data": updated_availability.toJSON()})
 
 def utc_times(request):
-    times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]
-    return JsonResponse({"data": times})
+    times = [x.toJSON() for x in AvailabilityService.get_utc_times()]
+    return JsonResponse({"data": times}, safe=False)
 
 def study_roles(request):
     roles = [x.toJSON() for x in AvailabilityService.get_study_roles()]
-    return JsonResponse({"data": roles})
+    return JsonResponse(roles, safe=False)
 
 def user_roles(request):
     logged_in_user = UserService.logged_in_user(request)
     available_roles = [x.toJSON() for x in AvailabilityService.get_user_available_roles(logged_in_user)]
-    return JsonResponse({"data": available_roles }, safe=False)
+    return JsonResponse({"data": available_roles}, safe=False)
+
+def update_role(request):
+    # HTTP.POST is required for this.
+    if request.method != "POST":
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    logged_in_user = UserService.logged_in_user(request)
+
+    post_request = loads(request.body.decode("utf-8"))
+    topic = post_request.get("topic", None)
+    study_role = post_request.get("studyRole", None)
+
+    updated_role = AvailabilityService.update_role(logged_in_user, topic, study_role)
+
+    if updated_role is None:
+        return JsonResponse({"error": "Invalid topic/studyRole/availableRole combination"}, status=422)
+    else:
+        return JsonResponse(updated_role.toJSON())
