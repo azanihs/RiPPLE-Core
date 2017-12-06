@@ -54,9 +54,7 @@ export default class UserService {
     }
 
     static getEngagementScores({ compareTo, exclude }: { compareTo: string, exclude?: undefined | number[] }) {
-        compareTo;
-
-        return Promise.all([UserRepository.getUserEngagement(), UserRepository.getUserEngagement()])
+        return Promise.all([UserRepository.getUserEngagement(), UserRepository.getEngagementAgainst(compareTo)])
             .then(data => UserService.generateGraph(data[0], data[1], exclude || []));
     }
 
