@@ -107,7 +107,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop } from "av-ts";
+import { Vue, Component, Prop } from "av-ts";
 import { Question } from "../../interfaces/models";
 
 import QuestionDetails from "./QuestionDetails.vue";

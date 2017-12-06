@@ -1,4 +1,3 @@
-import { Availability, Day, Time } from "../interfaces/models";
 import AvailabilityRepository from "../repositories/AvailabilityRepository";
 
 export default class AvailabilityService {
@@ -21,5 +20,17 @@ export default class AvailabilityService {
 
     static getUTCTimeSlots() {
         return AvailabilityRepository.getUTCTimeSlots();
+    }
+
+    static getStudyRoles() {
+        return AvailabilityRepository.getStudyRoles();
+    }
+
+    static getUserAvailableRoles() {
+        return AvailabilityRepository.getUserAvailableRoles();
+    }
+
+    static updateUserRoles(topic: number, studyRole: number) {
+        return AvailabilityRepository.updateUserRoles(topic, studyRole);
     }
 }

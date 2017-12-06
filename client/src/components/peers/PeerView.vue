@@ -12,11 +12,12 @@
         </md-layout>
         <md-layout md-flex="100">
             <md-card>
-                <recommendation-search @change="shuffleData()"
-                                       :searchTypes="searchTypes"
+                <recommendation-search @change="changeRoles"
                                        :recommendations="recommendations"
                                        :requests="requests"
-                                       :topics="topics"></recommendation-search>
+                                       :studyRoles="studyRoles"
+                                       :topics="topics"
+                                       :userRoles="userRoles"></recommendation-search>
             </md-card>
         </md-layout>
     </md-layout>
@@ -33,8 +34,10 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import { Availability, CourseAvailability, Day, Time } from "../../interfaces/models";
+import { Vue, Component, Lifecycle } from "av-ts";
+import {
+    AvailableRole, Availability, CourseAvailability, Day, Time, StudyRole, Topic, User
+} from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
 import AvailabilityService from "../../services/AvailabilityService";
@@ -52,44 +55,48 @@ import RecommendationSearch from "./RecommendationSearch.vue";
 export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
-    pTopics = [];
-    pRequests = [];
-    pRecommendations = [];
-    pCourseAvailability = [];
-    pUserAvailability = [];
+    pTopics: Topic[] = [];
+    pRequests: User[] = [];
+    pRecommendations: User[] = [];
+    pCourseAvailability: CourseAvailability[] = [];
+    pUserAvailability: Availability[] = [];
     pDays: Day[] = [];
     pTimes: Time[] = [];
     pCourseDistribution: number[][] = [];
     pMaxAvailable: number = 0;
+    pStudyRoles: StudyRole[] = [];
+    pUserAvailableRoles = new Map<string, Map<string, boolean>>();
 
-    updateTopics(newTopics) {
+    updateTopics(newTopics: Topic[]) {
         this.pTopics = newTopics;
     };
-    updateConnections(newConnections) {
+    updateConnections(newConnections: User[]) {
         this.pRecommendations = newConnections;
     };
-    updateRequests(newRequests) {
+    updateRequests(newRequests: User[]) {
         this.pRequests = newRequests;
     };
-    updateCourseAvailability(availability) {
+    updateCourseAvailability(availability: CourseAvailability[]) {
         this.pCourseAvailability = availability;
     };
-    updateUserAvailability(availability) {
+    updateUserAvailability(availability: Availability[]) {
         this.pUserAvailability = availability;
     };
-    updateDays(days) {
+    updateDays(days: Day[]) {
         this.pDays = days;
     };
-    updateTimes(times) {
+    updateTimes(times: Time[]) {
         this.pTimes = times;
     };
-    updateAvailability(courseDistribution) {
+
+    updateAvailability(courseDistribution: CourseAvailability[]) {
         let maxAvailable = 0;
         let distribution = new Array(7);
-        for (let i =0; i < distribution.length; i++) {
+        for (let i = 0; i < distribution.length; i++) {
             distribution[i] = new Array(24).fill(0);
         }
-        courseDistribution.map(entry => {
+
+        courseDistribution.forEach(entry => {
             distribution[entry.day - 1][entry.time - 1] = entry.entries;
             if (entry.entries > maxAvailable) {
                 maxAvailable = entry.entries;
@@ -97,6 +104,26 @@ export default class PeerView extends Vue {
         });
         this.pCourseDistribution = distribution;
         this.pMaxAvailable = maxAvailable;
+    };
+    updateStudyRoles(roles: StudyRole[]) {
+        this.pStudyRoles = roles;
+    };
+
+    updateUserAvailableRoles(availableRoles: AvailableRole[]) {
+        const userRoles = new Map<string, Map<string, boolean>>();
+        availableRoles.map(role => {
+            const topic: string = role.topic.name;
+            const studyRole: string = role.studyRole.role;
+            if (userRoles.has(topic)) {
+                const topicRoles = userRoles.get(topic)!;
+                topicRoles.set(studyRole, true);
+            } else {
+                const studyRoles = new Map<string, boolean>();
+                studyRoles.set(studyRole, true);
+                userRoles.set(topic, studyRoles);
+            }
+        });
+        this.pUserAvailableRoles = userRoles;
     };
 
     @Lifecycle
@@ -122,6 +149,10 @@ export default class PeerView extends Vue {
 
         Fetcher.get(AvailabilityService.getCourseAvailability)
             .on(this.updateAvailability);
+        Fetcher.get(AvailabilityService.getStudyRoles)
+            .on(this.updateStudyRoles);
+        Fetcher.get(AvailabilityService.getUserAvailableRoles)
+            .on(this.updateUserAvailableRoles);
     }
 
     @Lifecycle
@@ -132,6 +163,10 @@ export default class PeerView extends Vue {
             .off(this.updateUserAvailability);
         Fetcher.get(AvailabilityService.getCourseAvailability)
             .off(this.updateAvailability);
+        Fetcher.get(AvailabilityService.getStudyRoles)
+            .off(this.updateStudyRoles);
+        Fetcher.get(AvailabilityService.getUserAvailableRoles)
+            .off(this.updateUserAvailableRoles);
     }
 
     get topics() {
@@ -175,21 +210,22 @@ export default class PeerView extends Vue {
         return this.pMaxAvailable;
     }
 
-    changeAvailability(day, time) {
-        AvailabilityService.updateUserAvailability(day, time)
-        .then(x => AvailabilityService.getCourseAvailability())
-        .then(this.updateCourseAvailability);
+    get studyRoles() {
+        return this.pStudyRoles;
     }
 
-    shuffleData() {
-        Promise.all([
-            UserService.getRecommendedConnections({ count: 3 }),
-            UserService.getOutstandingRequests({ count: 3 })
-        ])
-            .then(data => {
-                this.updateConnections(data[0]);
-                this.updateRequests(data[1]);
-            });
+    get userRoles() {
+        return this.pUserAvailableRoles;
+    }
+
+    changeAvailability(day: number, time: number) {
+        AvailabilityService.updateUserAvailability(day, time)
+            .then(_ => AvailabilityService.getCourseAvailability())
+            .then(x => this.updateCourseAvailability(x));
+    }
+
+    changeRoles(topic: number, studyRole: number) {
+        AvailabilityService.updateUserRoles(topic, studyRole);
     }
 }
 </script>

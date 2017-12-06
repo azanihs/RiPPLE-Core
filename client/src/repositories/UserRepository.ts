@@ -1,5 +1,5 @@
 import {
-    CourseUser, User, Course, Badge,
+    CourseUser, User, Course,
     Notification, Topic, PeerConnection, Edge, UserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
@@ -7,33 +7,20 @@ import { setToken, apiFetch } from "./APIRepository";
 
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
-const getCategory: any = i => ["connections", "engagement", "competencies"][i];
 const engagementTypes = ["Competencies", "Goal Progress", "Achievements", "Recommendations", "Social Connections",
     "Study Partners", "Peers Mentored", "Questions Rated", "Questions Asked", "Questions Answered", "Questions Viewed"];
 
 const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures", "Variables"];
 
-type NotificationType = "Incoming Connection" | "Achievement" | "Personal Goal" | "Upcoming Meeting";
+const _n = (i: number) => Math.floor(Math.random() * i);
 
-const _n = i => Math.floor(Math.random() * i);
-
-const userTopicScores = {};
-const topicNodes = _topics.map((x, id) => {
-    const topicNode = {
-        id: id,
-        name: x
-    };
-    // Ensure at least one self-loop per topic
-    userTopicScores[id] = [[topicNode, topicNode, _n(100), _n(100)]];
-    return topicNode;
-});
-topicNodes.forEach(x => {
-    const randomNode = topicNodes[_n(topicNodes.length)];
-    if (randomNode == x) {
-        return;
-    }
-    userTopicScores[x.id].push([x, randomNode, _n(100), _n(100)]);
-});
+const _icons = [
+    "error",
+    "supervisor_account",
+    "bar_chart",
+    "trending_up",
+    "hourglass_full"
+];
 
 const _notificationMessages = [
     "Upcoming meeting",
@@ -53,19 +40,26 @@ const getRandomTopic = () => {
 };
 
 const notificationCount = Math.random() < 0.5 ? 50 : 0;
-const notifications = Array.from({ length: notificationCount }).map(x => ({
-    id: Math.random(),
-    type: getRandomTopic() as NotificationType,
-    content: _notificationMessages[_n(_notificationMessages.length)],
-    read: Math.random() < 0.5
+const notifications = Array.from({ length: notificationCount }).map((_, i: number) => ({
+    id: i,
+    name: getRandomTopic(),
+    description: _notificationMessages[_n(_notificationMessages.length)],
+    icon: _icons[_n(4)]
 }));
 
-const engagementNodes = engagementTypes.map(x => ({
-    id: x,
+const engagementNodes: Topic[] = engagementTypes.map((x, i) => ({
+    id: 1000 + i,
     name: x
 }));
 
-const userEngagementScores = [];
+type ServerEdge = {
+    0: Topic,
+    1: Topic,
+    2: number,
+    3: number
+};
+
+const userEngagementScores: ServerEdge[] = [];
 engagementNodes.forEach(engagementNode => {
     // Ensure at least one self-loop per topic
     userEngagementScores.push([engagementNode, engagementNode,
@@ -82,11 +76,11 @@ engagementNodes.forEach(engagementNode => {
 });
 
 const makeUser = () => {
-    const getType = i => {
+    const getType = (i: number) => {
         return types[i] as "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner";
     };
 
-    const connections = new Array(2 + _n(8)).fill(0).map(x => {
+    const connections = new Array(2 + _n(8)).fill(0).map(_ => {
         const connection: PeerConnection = {
             edgeStart: 0,
             edgeEnd: 0,
@@ -100,7 +94,7 @@ const makeUser = () => {
     });
     const proficienciesLength = 1 + _n(3);
     const proficiencies = Array.from({ length: proficienciesLength },
-        x => _topics[_n(_topics.length)]) as string[];
+        _ => _topics[_n(_topics.length)]) as string[];
 
     const user: User = {
         id: IDCounter++,
@@ -115,9 +109,6 @@ const makeUser = () => {
     return user;
 };
 
-const userConnections = makeUser().connections;
-let _courseCode = "";
-
 export default class UserRepository {
     static getLoggedInUser(): Promise<CourseUser> {
         return apiFetch<CourseUser>(`/users/me/`);
@@ -128,7 +119,7 @@ export default class UserRepository {
     }
 
     static getUserConnections(count: number): Promise<User[]> {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(Array.from({ length: count }, makeUser));
             }, Math.random() * 1000);
@@ -136,7 +127,7 @@ export default class UserRepository {
     }
 
     static getUserNotifications(): Promise<Notification[]> {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(notifications);
             }, Math.random() * 1000);
@@ -144,15 +135,15 @@ export default class UserRepository {
     }
 
     static getAllAvailableCategories(): Promise<string[]> {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(types.slice());
             }, Math.random() * 1000);
         });
     }
 
-    static getAllAvailableEngagementTypes(): Promise<{ id: string, name: string }[]> {
-        return new Promise((resolve, reject) => {
+    static getAllAvailableEngagementTypes(): Promise<Topic[]> {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(engagementNodes);
             }, Math.random() * 1000);
@@ -164,40 +155,40 @@ export default class UserRepository {
     }
 
     static getCompareAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch<Edge[]>(`/questions/competencies/aggregate/${compareTo}`)
+        return apiFetch<ServerEdge[]>(`/questions/competencies/aggregate/${compareTo}/`)
         .then(x => x.map(x => {
             const edge: Edge = {
                 source: TopicRepository.topicPointer(x[0]),
                 target: TopicRepository.topicPointer(x[1]),
-                competency: x[2],
-                attempts: x[3]
+                competency: Math.round(x[2] * 100),
+                attempts: Math.round(x[3] * 100)
             };
             return edge;
         }));
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
-        return apiFetch<Edge[]>(`/questions/competencies/all/`)
+        return apiFetch<ServerEdge[]>(`/questions/competencies/all/`)
             .then(x => x.map(x => {
                 const edge: Edge = {
                     source: TopicRepository.topicPointer(x[0]),
                     target: TopicRepository.topicPointer(x[1]),
-                    competency: x[2],
-                    attempts: x[3]
+                    competency: Math.round(x[2] * 100),
+                    attempts: Math.round(x[3] * 100)
                 };
                 return edge;
             }));
     }
 
     static getUserEngagement(): Promise<Edge[]> {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(userEngagementScores.map(x => {
                     const edge: Edge = {
                         source: x[0] as Topic,
                         target: x[1] as Topic,
-                        competency: x[2],
-                        attempts: x[3]
+                        competency: Math.round(x[2]),
+                        attempts: Math.round(x[3])
                     };
                     return edge;
                 }));
@@ -206,7 +197,7 @@ export default class UserRepository {
     }
 
     static getMeetingHistory(): Promise<{name: string, id: number }[]> {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(["Toowong", "UQ", "University Of Queensland",
                     "Kenmore", "Indro"].map((x, i) => ({ name: x, id: i })));
@@ -215,15 +206,11 @@ export default class UserRepository {
     }
 
     static getCurrentCourse(courseCode: string) {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 resolve(courseCode);
             }, Math.random() * 1000);
         });
-    }
-
-    static setCurrentCourse(courseCode: string) {
-        _courseCode = courseCode;
     }
 
     static setCurrentToken(token: string) {
@@ -234,7 +221,6 @@ export default class UserRepository {
         return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
                 setToken(x.token);
-                UserRepository.setCurrentCourse(x.courseCode);
             });
     }
 

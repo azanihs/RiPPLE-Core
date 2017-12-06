@@ -74,7 +74,6 @@ import { Vue, Component, Lifecycle } from "av-ts";
 import { UserSummary } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
-import Fetcher from "../../services/Fetcher";
 
 @Component()
 export default class LeaderBoard extends Vue {
@@ -85,7 +84,7 @@ export default class LeaderBoard extends Vue {
     sortType: string = "reputation";
     reverse: boolean = false;
 
-    pUsers = [];
+    pUsers: UserSummary[] = [];
     updateUsers(newUsers: UserSummary[]) {
         this.pUsers = newUsers;
         this.$emit("userData", newUsers);
@@ -99,15 +98,16 @@ export default class LeaderBoard extends Vue {
         }).then(this.updateUsers);
     }
 
-    updateShowItems(a) {
-        this.itemsPerPage = a.size;
-        this.pageIndex = a.page;
+    updateShowItems(pageIndo: { size: number, page: number}) {
+        this.itemsPerPage = pageIndo.size;
+        this.pageIndex = pageIndo.page;
     }
 
-    sort(item) {
+    sort(item: { name: string, type: "DESC" | "ASC" }) {
+        const sortOrder = item.type.toUpperCase() as "DESC" | "ASC";
         UserService.getMostReputableUsers({
             sortField: item.name,
-            sortOrder: item.type.toUpperCase()
+            sortOrder: sortOrder
         }).then(this.updateUsers);
     }
 

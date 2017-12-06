@@ -17,10 +17,10 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
+import { Topic } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
-import TopicService from "../../services/TopicService";
 
 import CollectedBadges from "../util/CollectedBadges.vue";
 import OverviewDescription from "../util/OverviewDescription.vue";
@@ -34,10 +34,10 @@ import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
     }
 })
 export default class EngagementView extends Vue {
-    
-    pEngagementItems = [];
 
-    updateEngagementItems(newEngagementItems) {
+    pEngagementItems: Topic[] = [];
+
+    updateEngagementItems(newEngagementItems: Topic[]) {
         this.pEngagementItems = newEngagementItems;
     };
 
@@ -57,7 +57,7 @@ export default class EngagementView extends Vue {
         return this.pEngagementItems;
     }
 
-    generateEngagement(itemsToInclude) {
+    generateEngagement(_: any) {
         return UserService.getEngagementScores;
     }
 }

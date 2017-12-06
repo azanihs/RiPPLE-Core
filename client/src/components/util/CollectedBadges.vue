@@ -35,26 +35,26 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
+import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
 import { Badge } from "../../interfaces/models";
-import PropUpdate from "../mixins/PropUpdate";
+
 import UserBadge from "../util/UserBadge.vue";
 import BadgeService from "../../services/BadgeService";
 import Fetcher from "../../services/Fetcher";
-
 
 @Component({
     components: {
         "user-badge": UserBadge
     }
 })
-export default class CollectedBadges extends PropUpdate {
-    @Prop topic = p(String);
+export default class CollectedBadges extends Vue {
+    @Prop topic = p<string>({
+        required: true
+    });
 
-    pAvailableBadges = [];
-    fetcherInstance = undefined;
+    pAvailableBadges: Badge[] = [];
 
-    updateAvailableBadges(newBadges) {
+    updateAvailableBadges(newBadges: Badge[]) {
         this.pAvailableBadges = newBadges;
     };
 
@@ -62,6 +62,12 @@ export default class CollectedBadges extends PropUpdate {
     created() {
         Fetcher.get(BadgeService.getAllUserBadges)
             .on(this.updateAvailableBadges);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(BadgeService.getAllUserBadges)
+            .off(this.updateAvailableBadges);
     }
 
     get availableBadges() {
@@ -73,13 +79,5 @@ export default class CollectedBadges extends PropUpdate {
             return BadgeService.getBadgesByCategory(this.pAvailableBadges, this.topic);
         }
     }
-
-    @Lifecycle
-    destroyed() {
-        if (this.fetcherInstance !== undefined) {
-            this.fetcherInstance.off(this.updateAvailableBadges);
-        }
-    }
-
 }
 </script>

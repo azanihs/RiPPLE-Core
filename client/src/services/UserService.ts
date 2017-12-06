@@ -1,4 +1,4 @@
-import { User, Badge, Notification, Topic, Edge, Course } from "../interfaces/models";
+import { Topic, Edge, Course, CompareSet } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
@@ -17,7 +17,7 @@ function addTopicsToEdgeList(topics: Topic[], edges: Edge[]) {
 }
 
 export default class UserService {
-    static generateGraph(sourceData: Edge[], otherData: Edge[], exclude: number[]) {
+    static generateGraph(sourceData: Edge[], otherData: Edge[], exclude: number[]): CompareSet {
         const ownScores = sourceData;
         const userGoals = otherData;
         const topics = ownScores
@@ -38,8 +38,8 @@ export default class UserService {
         };
     }
 
-    static userCompetencies({ compareTo, excludeTopicIds }: { compareTo: string, excludeTopicIds?: number[] }) {
-        const excludeTopics = excludeTopicIds || [];
+    static userCompetencies({ compareTo, exclude }: { compareTo: string, exclude?: undefined | number[] }) {
+        const excludeTopics = exclude || [];
         return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getCompareAgainst(compareTo)])
             .then(data => UserService.generateGraph(data[0], data[1], excludeTopics))
             .then(graph => TopicRepository.getAllAvailableTopics()
@@ -53,7 +53,9 @@ export default class UserService {
                 }));
     }
 
-    static getEngagementScores({ compareTo, exclude }: { compareTo: string, exclude: number[] }) {
+    static getEngagementScores({ compareTo, exclude }: { compareTo: string, exclude?: undefined | number[] }) {
+        compareTo;
+
         return Promise.all([UserRepository.getUserEngagement(), UserRepository.getUserEngagement()])
             .then(data => UserService.generateGraph(data[0], data[1], exclude || []));
     }

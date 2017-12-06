@@ -6,8 +6,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
-import TopicService from "../services/TopicService";
+import { Vue, Component } from "av-ts";
 
 @Component()
 export default class WIP extends Vue {

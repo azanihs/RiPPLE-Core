@@ -15,6 +15,8 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 
+import { Topic } from "../../interfaces/models";
+
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
@@ -31,10 +33,10 @@ import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
     }
 })
 export default class CompetenciesView extends Vue {
-    
-    pTopics = [];
 
-    updateTopics(topics) {
+    pTopics: Topic[] = [];
+
+    updateTopics(topics: Topic[]) {
         this.pTopics = topics;
     };
 
@@ -54,7 +56,7 @@ export default class CompetenciesView extends Vue {
         return this.pTopics;
     }
 
-    generateCompetencies(itemsToInclude) {
+    generateCompetencies() {
         return UserService.userCompetencies;
     }
 }

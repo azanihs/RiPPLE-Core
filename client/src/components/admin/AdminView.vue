@@ -2,13 +2,13 @@
     <md-layout md-flex="100">
         <md-layout md-flex="100">
             <md-card>
-                <h2>Administration Page for: {{courseCode}}</h2>
+                <h2>Administration Page for: {{ pCourseCode }}</h2>
                 <md-input-container>
-                    <label>Teaching Start: {{this.teachingStart}}</label>
+                    <label>Teaching Start: {{ this.teachingStart }}</label>
                     <date-picker v-model="teachingStart"></date-picker>
                 </md-input-container>
                 <md-input-container>
-                    <label>Teaching End: {{this.teachingEnd}}</label>
+                    <label>Teaching End: {{ this.teachingEnd }}</label>
                     <date-picker v-model="teachingEnd"></date-picker>
                 </md-input-container>
                 <md-chips v-model="editableTopics"
@@ -95,6 +95,11 @@ import TopicChip from "../util/TopicChip.vue";
 
 const _MODAL_NAME = "course_create_modal";
 
+interface ConstructTopic {
+    id?: number,
+    name: string;
+};
+
 @Component({
     components: {
         DatePicker,
@@ -103,14 +108,14 @@ const _MODAL_NAME = "course_create_modal";
     }
 })
 export default class AdminView extends Vue {
-    pTopics = [];
-    courseCode = "";
+    pTopics: Topic[] = [];
+    pCourseCode = "";
 
     teachingStart: string | undefined = undefined;
     teachingEnd: string | undefined = undefined;
 
-    pUser: User = undefined;
-    pCourse: Course = undefined;
+    pUser: User | undefined = undefined;
+    pCourse: Course| undefined = undefined;
     pCsvString: string = "";
     networkError: string = "";
 
@@ -122,7 +127,7 @@ export default class AdminView extends Vue {
         this.pUser = courseUser.user;
         this.pCourse = courseUser.course;
 
-        this.courseCode = this.pCourse.courseCode;
+        this.pCourseCode = this.pCourse.courseCode;
 
         if (this.pCourse.available === false) {
             this.openDialog();
@@ -149,7 +154,7 @@ export default class AdminView extends Vue {
     }
 
     set editableTopics(newTopics: (Topic | string)[]) {
-        const normalisedTopics: Topic[] = newTopics.map(x => {
+        const normalisedTopics: ConstructTopic[] = newTopics.map(x => {
             if (typeof x === "string") {
                 return {
                     id: undefined,
@@ -159,9 +164,9 @@ export default class AdminView extends Vue {
             return x;
         });
 
-        this.pTopics = normalisedTopics.reduce((carry: Topic[], topic: Topic) => {
+        this.pTopics = normalisedTopics.reduce((carry: Topic[], topic: ConstructTopic) => {
             if (carry.find(x => topic.name.toLowerCase() === x.name.toLowerCase()) === undefined) {
-                carry.push(topic);
+                carry.push(topic as Topic);
             }
             return carry;
         }, []);
@@ -223,9 +228,13 @@ export default class AdminView extends Vue {
     }
 
     saveCourseInformation() {
+        if (this.pCourse == undefined) {
+            return;
+        }
+
         UserService.updateCourse({
             course: {
-                courseCode: this.courseCode,
+                courseCode: this.pCourseCode,
                 courseName: this.pCourse.courseName,
                 start: this.localToUTC(this.teachingStart),
                 end: this.localToUTC(this.teachingEnd),
@@ -246,23 +255,29 @@ export default class AdminView extends Vue {
     };
 
     generateCSVString(userData: UserSummary[]) {
-        this.pCsvString = Papa.unparse(userData, {
+        if (userData.length == 0) {
+            return;
+        }
+
+        const unparseData = {
+            fields: Object.keys(userData[0]),
+            data: userData
+        };
+        this.pCsvString = Papa.unparse(unparseData, {
             quotes: true,
-            quoteChar: `"`,
             delimiter: ",",
-            header: true,
             newline: "\r\n"
         });
     }
 
-    downloadCSVString(e: MouseEvent) {
+    downloadCSVString(_e: MouseEvent) {
         // Encode the CSV string as a URI
         const uri = encodeURI("data:text/csv;charset=utf-8," + this.pCsvString);
         // Create a mock anchor element and point it at the CSV URI
         const _a = document.createElement("a");
         _a.target = "_blank";
         _a.href = uri;
-        _a.download = this.pCourse.courseCode + "_ripple_export_" + Date.now() + ".csv";
+        _a.download = this.pCourseCode + "_ripple_export_" + Date.now() + ".csv";
         _a.style.opacity = "0";
 
         // Add the anchor tag to the DOM and programmically click it

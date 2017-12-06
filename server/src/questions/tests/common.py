@@ -15,6 +15,22 @@ class BootstrapTestCase(TestCase):
         return [Topic.objects.create(name=x, course=course)
          for x in ["t1", "t2", "t3", "t4", "t5", "t6"]]
 
+    def _bootstrap_question_request(self):
+        topic = Topic.objects.all().first()
+        new_question = {
+            "question": { "content" : "q1", "payloads": None},
+            "explanation": {"content" : "e1", "payloads": None},
+            "responses" :  {
+                "A": {"content": "qr2", "payloads": None, "isCorrect": True},
+                "B": {"content": "qr3", "payloads": None, "isCorrect": False},
+                "C": {"content": "qr4", "payloads": None, "isCorrect": False},
+                "D": {"content": "qr5", "payloads": None, "isCorrect": False},
+            },
+            "topics": [{"id": topic.id, "name": topic.name
+            }]
+        }
+        return new_question
+
     def _bootstrap_questions(self, author, offset=0):
         # Allow offseting question/topic relations by a constant amount
         topic_map = [
@@ -41,6 +57,20 @@ class BootstrapTestCase(TestCase):
             )
             q.save()
             q.topics.set(topic_map[i])
+
+    def _bootstrap_questions_same_topics(self, author, topics, num_questions):
+        for i in range(num_questions):
+            q = Question(
+                author=author,
+                content="",
+                explanation="",
+                difficulty=0,
+                quality=0,
+                difficultyCount=0,
+                qualityCount=0
+            )
+            q.save()
+            q.topics.set(topics)
 
     def _bootstrap_question_choices(self, correct_id):
         #correct_id will specify the question correctly out of the distractors. Ex. 2 == option b is correct for all questions

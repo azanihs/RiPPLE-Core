@@ -49,21 +49,23 @@ import { Vue, Component, Prop, Lifecycle, p } from "av-ts";
 @Component()
 export default class Rating extends Vue {
     // Max number of starts
-    @Prop max;
-    @Prop disabled = p({
-        type: Boolean,
+    @Prop max = p<number>({
+        required: true
+    });
+
+    @Prop disabled = p<boolean>({
+        required: false,
         default: false
     });
 
-    @Prop icon = p({
-        type: String,
+    @Prop icon = p<string>({
         default: "star"
-    }) as string;
+    });
 
-    @Prop defaultIndex = p({
-        type: Number,
+    @Prop defaultIndex = p<number>({
+        required: false,
         default: -1
-    }) as number;
+    });
 
     // Current start selection
     selectedIndex = -1;
@@ -75,34 +77,40 @@ export default class Rating extends Vue {
         this.previewIndex = this.defaultIndex;
     }
 
-
     changeRating(e: MouseEvent) {
-        if (this.disabled) return;
+        if (this.disabled) {
+            return;
+        }
 
         // Check if the user clicked on child. If so, select the parent button
         let target = e.target as HTMLElement;
         if (target.tagName == "I") {
-            target = target.parentElement;
+            target = target.parentElement!;
         }
+
         const icons = this.$refs["icons"] as Array<Vue>;
         this.selectedIndex = icons.findIndex((x: Vue) => x.$el == target);
         this.$emit("input", this.selectedIndex);
     }
 
     previewRating(e: MouseEvent) {
-        if (this.disabled) return;
+        if (this.disabled) {
+            return;
+        }
 
         // Check if the user clicked on child. If so, select the parent button
         let target = e.target as HTMLElement;
         if (target.tagName == "I") {
-            target = target.parentElement;
+            target = target.parentElement!;
         }
         const icons = this.$refs["icons"] as Array<Vue>;
         this.previewIndex = icons.findIndex((x: Vue) => x.$el == target);
     }
 
-    mouseOut(e: MouseEvent) {
-        if (this.disabled) return;
+    mouseOut(_e: MouseEvent) {
+        if (this.disabled) {
+            return;
+        }
 
         this.previewIndex = this.selectedIndex;
     }

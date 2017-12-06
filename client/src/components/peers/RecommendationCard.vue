@@ -82,6 +82,11 @@ import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
 
+interface IMeetingHistory {
+    name: string,
+    id: number
+};
+
 @Component({
     components: {
         TopicChip
@@ -92,8 +97,8 @@ export default class RecommendationCard extends Vue {
         required: true
     });
 
-    pMeetingHistory = [];
-    updateMeetingHistory(newHistory) {
+    pMeetingHistory: IMeetingHistory[] = [];
+    updateMeetingHistory(newHistory: IMeetingHistory[]) {
         this.pMeetingHistory = newHistory;
     }
 
@@ -105,7 +110,7 @@ export default class RecommendationCard extends Vue {
             .on(this.updateMeetingHistory);
     }
 
-    findItem(toSearch: {name: string, id: number}[], query: string) {
+    findItem(toSearch: IMeetingHistory[], query: string) {
         return toSearch.filter(x => x.name.toLowerCase().indexOf(query.toLowerCase()) >= 0);
     }
 

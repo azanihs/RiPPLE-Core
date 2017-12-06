@@ -13,6 +13,10 @@ from users.services.TokenService import token_to_user_course
 from ripple.util import util
 
 def update_user_image(user, server_root, new_image):
+    if new_image is None:
+        return {
+            "error": "No image provided"
+        }
     saved_image = save_image(new_image, str(user.id))
     if saved_image is None:
         return {
@@ -30,7 +34,9 @@ def update_user_image(user, server_root, new_image):
 
 
 def logged_in_user(request):
-    token = request.META.get("HTTP_AUTHORIZATION")
+    if request is None or not request:
+        return {"error": "Request must be provided"}
+    token = request.META.get("HTTP_AUTHORIZATION", None)
     if token is not None:
         return token_to_user_course(token)
 
@@ -38,14 +44,23 @@ def logged_in_user(request):
 
 
 def user_courses(course_user):
+    if course_user is None or not course_user:
+        return {"error": "CourseUser must be provided"}
     return [x.course.toJSON() for x in CourseUser.objects.filter(user=course_user.user)]
 
 
 def update_course(course_user, new_data):
+    if course_user is None or new_data is None \
+            or not course_user or not new_data:
+        return {"error": "Course user and update data must be provided"}
     course_information = new_data.get("course", {})
     topics = new_data.get("topics", None)
     if not topics:
         return {"error": "Course must have topics"}
+    for t in topics:
+        if not t.get("name", None):
+            return {"error": 
+                "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
     course_code = course_information.get("courseCode", None)
     if course_code is None:
@@ -62,18 +77,16 @@ def update_course(course_user, new_data):
     available = course_information.get("available", None)
 
     course = course_user.course
-    if available is not None:
-        course.available = available
     if start is not None:
         if str(start).isdigit():
             course.start = datetime.fromtimestamp(int(start), timezone.utc)
         else:
-            return {"error": "Given start timestamp is not valid: " + start}
+            return {"error": "Given start timestamp is not valid: " + str(start)}
     if end is not None:
         if str(end).isdigit():
             course.end = datetime.fromtimestamp(int(end), timezone.utc)
         else:
-            return {"error": "Given end timestamp is not valid: " + end}
+            return {"error": "Given end timestamp is not valid: " + str(end)}
 
     course.save()
     original_topics = course.topic_set.all()
@@ -86,6 +99,8 @@ def update_course(course_user, new_data):
             new_topics.append(Topic.objects.create(
                 name=topic_name, course=course))
         elif topic_id is not None:
+            if not str(topic_id).isdigit():
+                return {"error": "Invalid Topic ID"}
             try:
                 existing_topic = Topic.objects.get(pk=topic_id)
                 existing_topic.name = topic_name
@@ -108,6 +123,8 @@ def update_course(course_user, new_data):
     return course_user.toJSON()
 
 def _process_competencies(competencies):
+    if competencies is None:
+        return []
     edges = []
     threshold = settings.RUNTIME_CONFIGURATION["min_competency_threshold"]
     for comp in competencies:
@@ -130,9 +147,14 @@ def _process_competencies(competencies):
     return edges
 
 def user_competencies(user):
-    return _process_competencies(Competency.objects.filter(user=user))
+    try:
+        return _process_competencies(Competency.objects.filter(user=user))
+    except TypeError:
+        return[] 
 
 def aggregate_competencies(user, compare_type):
+    if user is None or compare_type is None:
+        return []
     if compare_type == "peer":
         competencies = Competency.objects.filter(user__in=CourseUser.objects.filter(course=user.course))
     else:
@@ -142,6 +164,9 @@ def aggregate_competencies(user, compare_type):
     return _process_competencies(competencies)
 
 def insert_course_if_not_exists(course):
+    if course is None or course.get("course_name", None) is None \
+            or course.get("course_code", None) is None:
+        return {"error": "Invalid Course Provided"}
     try:
         return Course.objects.get(course_code=course.get("course_code"))
     except Course.DoesNotExist:
@@ -149,13 +174,22 @@ def insert_course_if_not_exists(course):
 
 
 def insert_user_if_not_exists(user):
+    if user is None or user.get("user_id", None) is None:
+        return {"error": "Invalid User Provided"}
     try:
         return User.objects.get(user_id=user.get("user_id"))
     except User.DoesNotExist:
+        if user.get("first_name", None) is None or user.get("last_name", None) is None \
+                or user.get("image", None) is None:
+            return {"error": "Invalid User Provided"}
         return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image="")
 
 
 def insert_course_user_if_not_exists(course, user):
+    if course is None or not isinstance(course, Course):
+        return {"error": "Invalid Course Provided"}
+    if user is None or not isinstance(user, User):
+        return {"error": "Invalid User Provided"}
     try:
         return CourseUser.objects.get(course=course, user=user)
     except CourseUser.DoesNotExist:
@@ -163,6 +197,10 @@ def insert_course_user_if_not_exists(course, user):
 
 
 def update_user_roles(course_user, role):
+    if course_user is None or not isinstance(course_user, CourseUser):
+        return {"error": "Invalid CourseUser Provided"}
+    if role is None:
+        return {"error": "Invalid Role Provided"}
     # Insert role if not exists
     try:
         saved_role = Role.objects.get(role=role)
