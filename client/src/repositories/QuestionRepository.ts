@@ -1,20 +1,24 @@
 import { apiFetch } from "./APIRepository";
-import { Question, Topic, QuestionUpload, ReportQuestion, NetworkResponse } from "../interfaces/models";
+import { Question, QuestionUpload, Distractor, NetworkResponse, ReportQuestion } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
 
 function toQuestion(x: Question): Question {
+    let solution: undefined | Distractor = x.distractors.find(d => d.isCorrect === true);
+    if (solution === undefined) {
+        throw new Error(`Question id: ${x.id} does not have a solution`);
+    }
+
     const question: Question = {
         id: x.id,
-        difficulty: x.difficulty,
-        quality: x.quality,
-        solution: x.distractors.find(d => d.isCorrect === true),
-        distractors: x.distractors,
+        difficulty: Math.round(x.difficulty),
+        quality: Math.round(x.quality),
         topics: x.topics.map(t => TopicRepository.topicPointer(t)),
         content: x.content,
         explanation: x.explanation,
-        responses: x.responses,
+        solution: solution,
+        distractors: x.distractors,
         responseCount: x.responseCount
     };
     return question;
@@ -22,7 +26,7 @@ function toQuestion(x: Question): Question {
 
 export default class QuestionRepository {
     static uploadQuestion(question: QuestionUpload): Promise<Question> {
-        return apiFetch<Question>(`/questions/add/`, {
+        return apiFetch<{question: Question}>(`/questions/add/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -30,22 +34,17 @@ export default class QuestionRepository {
             }),
             body: JSON.stringify(question)
         })
-            .then(x => x["question"])
+            .then(x => x.question)
             .then(response => toQuestion(response));
-    }
-
-    static getMany(count: number): Promise<Question[]> {
-        return apiFetch<Question[]>(`/questions/all/`)
-            .then(questions => questions.map(x => toQuestion(x)));
     }
 
     static search(sortField: string | undefined,
         sortOrder: string | undefined,
         filterField: string | undefined,
-        filterTopics: string[] | undefined,
+        filterTopics: number[] | undefined,
         query: string | undefined,
-        page: string | undefined,
-        pageSize: string | undefined) {
+        page: number | undefined,
+        pageSize: number | undefined) {
         return apiFetch<SearchResult>(`/questions/search/`, {
             method: "POST",
             headers: new Headers({
@@ -70,7 +69,7 @@ export default class QuestionRepository {
     }
 
     static submitResponse(distractorID: number) {
-        return apiFetch<Object>(`/questions/respond/`, {
+        return apiFetch<{}>(`/questions/respond/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -83,7 +82,7 @@ export default class QuestionRepository {
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
-        return apiFetch<Object>(`/questions/rate/`, {
+        return apiFetch<{}>(`/questions/rate/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",

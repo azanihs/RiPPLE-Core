@@ -4,7 +4,8 @@
                    md-hide-small
                    md-hide-medium
                    class="questionNavigation">
-            <action-buttons @back="closeQuestion()"></action-buttons>
+            <action-buttons @back="closeQuestion()" 
+                    @report="openDialog()"></action-buttons>
         </md-layout>
         <md-layout md-flex="100">
             <md-layout md-flex="100"
@@ -60,7 +61,7 @@
                 <md-icon>keyboard_return</md-icon>
                 <md-tooltip md-direction="left">Return</md-tooltip>
             </md-button>
-            <md-button class="md-fab md-primary md-mini md-clean" 
+            <md-button class="md-fab md-primary md-mini md-clean"
                             @click="openDialog">
                 <md-icon>error_outline</md-icon>
                 <md-tooltip md-direction="left">Report Question</md-tooltip>
@@ -84,12 +85,12 @@
                         <md-textarea v-model="reason"></md-textarea>
                     </md-input-container>
                     <div class="right">
-                        <md-button class="md-fab md-primary md-mini md-clean" 
+                        <md-button class="md-fab md-primary md-mini md-clean"
                                 @click="closeDialog()">
                             <md-icon>clear</md-icon>
                             <md-tooltip md-direction="top">Cancel</md-tooltip>
                         </md-button>
-                        <md-button class="md-fab md-primary md-mini md-clean" 
+                        <md-button class="md-fab md-primary md-mini md-clean"
                                 @click="reportQuestion()">
                             <md-icon>done</md-icon>
                             <md-tooltip md-direction="top">Report Question</md-tooltip>
@@ -219,15 +220,15 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
-import ActionButtons from "../util/ActionButtons.vue";
+import QuestionService from "../../services/QuestionService";
 
+import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
-import QuestionService from "../../services/QuestionService";
 
 import TopicChip from "../util/TopicChip.vue";
 

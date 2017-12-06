@@ -22,10 +22,6 @@ a.topicChipLink:hover {
     text-decoration: none;
 }
 
-a.topicChipLink:hover .topicChip {
-    background-color: #333;
-}
-
 .md-chip.topicChip {
     background-color: #fff;
 
@@ -50,10 +46,6 @@ a.topicChipLink:hover .topicChip {
     color: #333;
 }
 
-.disabled.md-chip.topicChip:hover {
-    background-color: #256;
-    color: #f2f2f2;
-}
 </style>
 
 <script lang="ts">
@@ -61,12 +53,13 @@ import { Vue, Component, Prop, p } from "av-ts";
 
 @Component()
 export default class TopicChip extends Vue {
-    @Prop linkTo = p({
-        type: String
+    @Prop linkTo = p<string>({
+        required: false,
+        default: ""
     });
 
-    @Prop disabled = p({
-        type: Boolean,
+    @Prop disabled = p<boolean>({
+        required: false,
         default: false
     });
 

@@ -1,7 +1,7 @@
 import Vue from "vue";
 type PrimitiveMap = { [key: string]: number | string | boolean | number[] };
 type FetcherIdentifer = string;
-type FetcherFunctions<T> = (params?: PrimitiveMap) => Promise<T>;
+type FetcherFunctions<T> = (params: any) => Promise<T>;
 
 let subscriptionCount = 0;
 
@@ -26,7 +26,7 @@ export default class Fetcher<T extends any> {
             cache.clear();
         }
         // Cause a refresh of all async data by firing all functions on event bus
-        Fetcher.functionParamMap.forEach((value, key) => {
+        Fetcher.functionParamMap.forEach((value, _key) => {
             value.run();
         });
     }
@@ -38,20 +38,23 @@ export default class Fetcher<T extends any> {
         return Fetcher.functionIdentifiers.get(subscription);
     }
 
-    static serialize(fn: Function, params: PrimitiveMap): FetcherIdentifer {
+    static serialize(fn: Function, params: PrimitiveMap = {}): FetcherIdentifer {
         const functionIdentifier = Fetcher.subscriptionLookup(fn);
         const orderedParams = Object.keys(params).sort().map(x => [x, params[x]]);
         return `${functionIdentifier}_${JSON.stringify(orderedParams)}`;
     }
 
-    static get<T extends any>(fn: FetcherFunctions<T>, params: PrimitiveMap = {}, policy?: number) {
+    static get<T>(fn: FetcherFunctions<T>, params: PrimitiveMap = {}) {
         const serialisedIdentifier = Fetcher.serialize(fn, params);
         if (Fetcher.functionParamMap.get(serialisedIdentifier) === undefined) {
             const fetcherInstance = new Fetcher(serialisedIdentifier, fn, params);
             Fetcher.functionParamMap.set(serialisedIdentifier, fetcherInstance);
         }
-
-        return Fetcher.functionParamMap.get(serialisedIdentifier);
+        const found = Fetcher.functionParamMap.get(serialisedIdentifier);
+        if (found === undefined) {
+            throw new TypeError(`Could not find: ${serialisedIdentifier}`);
+        }
+        return found;
     }
 
     private constructor(identifier: FetcherIdentifer, fn: FetcherFunctions<T>, params: PrimitiveMap) {
@@ -76,7 +79,7 @@ export default class Fetcher<T extends any> {
         };
         cache.set(this.identifier, cacheResult);
         this.fn(this.params)
-            .then(x => {
+            .then((x: any) => {
                 cacheResult.value = x;
                 Fetcher.sharedBus.$emit(this.identifier, x);
             });

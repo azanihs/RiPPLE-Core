@@ -11,18 +11,18 @@ from recommendations.services import AvailabilityService
 def user_availability(request):
     logged_in_user = UserService.logged_in_user(request)
     availability = [x.toJSON() for x in AvailabilityService.get_user_availability(logged_in_user)]
-    return JsonResponse(availability, safe=False)
+    return JsonResponse({"data": availability})
 
 def course_availability(request):
     course = UserService.logged_in_user(request).course
     counts = AvailabilityService.get_course_availability(course)
 
     # Get the count of each user in the course
-    return JsonResponse(counts, safe=False)
+    return JsonResponse({"data": counts})
 
 def days(request):
     days = [x.toJSON() for x in AvailabilityService.get_days()]
-    return JsonResponse(days, safe=False)
+    return JsonResponse({"data": days }, safe=False)
 
 def update(request):
     # HTTP.POST is required for this.
@@ -40,8 +40,17 @@ def update(request):
     if updated_availability is None:
         return JsonResponse({"error": "Invalid day/time/availability combination"}, status=422)
     else:
-        return JsonResponse(updated_availability.toJSON())
+        return JsonResponse({"data": updated_availability.toJSON()})
 
 def utc_times(request):
     times = [x.toJSON() for x in  AvailabilityService.get_utc_times()]
-    return JsonResponse(times, safe=False)
+    return JsonResponse({"data": times})
+
+def study_roles(request):
+    roles = [x.toJSON() for x in AvailabilityService.get_study_roles()]
+    return JsonResponse({"data": roles})
+
+def user_roles(request):
+    logged_in_user = UserService.logged_in_user(request)
+    available_roles = [x.toJSON() for x in AvailabilityService.get_user_available_roles(logged_in_user)]
+    return JsonResponse({"data": available_roles }, safe=False)

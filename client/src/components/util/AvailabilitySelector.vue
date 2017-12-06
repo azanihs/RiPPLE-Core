@@ -76,10 +76,8 @@ h2 {}
 </style>
 
 <script lang="ts">
-import { Vue, Component, Watch, Lifecycle, Prop, p } from "av-ts";
-import { Availability, CourseAvailability, Day, DayTime, Time } from "../../interfaces/models";
-import Fetcher from "../../services/Fetcher";
-import AvailabilityService from "../../services/AvailabilityService";
+import { Vue, Component, Prop, p } from "av-ts";
+import { Availability, Day, DayTime, Time } from "../../interfaces/models";
 
 @Component()
 export default class AvailabilitySelector extends Vue {
@@ -122,7 +120,7 @@ export default class AvailabilitySelector extends Vue {
         this.pShowAvailability = newVal;
     }
 
-    checkbox(localDay, localTime) {
+    checkbox(localDay: number, localTime: number) {
         const { day, time } = this.localToUTC(localDay, localTime);
         for (let i = 0; i < this.userDistribution.length; i++) {
             const entry = this.userDistribution[i];
@@ -147,7 +145,7 @@ export default class AvailabilitySelector extends Vue {
         return `${time - 12}pm`;
     }
 
-    checkboxChange(localDay, localTime) {
+    checkboxChange(localDay: number, localTime: number) {
         const { day, time } = this.localToUTC(localDay, localTime);
         this.$emit("change", day, time);
     }
@@ -160,7 +158,7 @@ export default class AvailabilitySelector extends Vue {
         throw new Error("deleteRow not implemented");
     }
 
-    getCellShade(localDay, localTime) {
+    getCellShade(localDay: number, localTime: number) {
         if (this.showAvailability) {
             let weight = 0;
             if (this.maxAvailable > 0) {
@@ -176,8 +174,10 @@ export default class AvailabilitySelector extends Vue {
         }
     }
 
-    convertDay(day?:number): number {
-        if (day === undefined || this.days.length == 0) return undefined;
+    convertDay(day?: number): number {
+        if (day === undefined || this.days.length == 0) {
+            throw new Error("Missing day");
+        }
         if (day < 1) {
             return day + 7;
         } else if (day > 7) {
@@ -188,7 +188,10 @@ export default class AvailabilitySelector extends Vue {
     }
 
     convertTime(time?: number): number {
-        if (time === undefined) return undefined;
+        if (time === undefined) {
+            throw new Error("Missing day time");
+        }
+
         if (time < 1) {
             return time + 24;
         } else if (time > 24) {
@@ -199,7 +202,9 @@ export default class AvailabilitySelector extends Vue {
     }
 
     localToUTC(localDay?: number, localTime?: number): DayTime {
-        if (localDay === undefined || localTime === undefined) return undefined;
+        if (localDay === undefined || localTime === undefined) {
+            throw new Error("Missing localday or localtime");
+        }
 
         const offset = new Date().getTimezoneOffset() / 60;
         let time = localTime + offset;
@@ -210,10 +215,11 @@ export default class AvailabilitySelector extends Vue {
             day++;
         }
 
-        return {
+        const dayTime: DayTime = {
             day: this.convertDay(day),
             time: this.convertTime(time)
         };
+        return dayTime;
     }
 }
 </script>

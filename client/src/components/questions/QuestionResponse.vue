@@ -168,10 +168,10 @@ h2 {
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Question, Distractor } from "../../interfaces/models";
+import { addEventsToQueue } from "../../util";
 import Comment from "../util/Comment.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionService from "../../services/QuestionService";
-import Fetcher from "../../services/Fetcher";
 import * as d3 from "d3";
 
 @Component({
@@ -187,11 +187,11 @@ export default class QuestionResponse extends Vue {
 
     userAnswer: number = -1;
     hasGivenUp = false;
-    disabledResponses = [];
+    disabledResponses: Distractor[] = [];
 
     pResponseDistribution: {[id: number]: number} = {};
 
-    updateResponseDistribution(newDistribution) {
+    updateResponseDistribution(newDistribution: {[responseId: number]: number}) {
         this.pResponseDistribution = newDistribution;
     }
 
@@ -202,12 +202,12 @@ export default class QuestionResponse extends Vue {
     }
 
     @Watch("question")
-    questionChanged(oldQuestion, newQuestion) {
+    questionChanged(_oldQuestion: Question, _newQuestion: Question) {
         QuestionService.distributionForQuestion(this.question)
             .then(this.updateResponseDistribution);
     }
 
-    feedbackEnter(el: HTMLElement, done) {
+    feedbackEnter(el: HTMLElement, done: Function) {
         el.style.height = "auto";
         const actualHeight = el.clientHeight;
         el.style.height = "0px";
@@ -228,7 +228,7 @@ export default class QuestionResponse extends Vue {
             });
     }
 
-    feedbackLeave(el: HTMLElement, done) {
+    feedbackLeave(el: HTMLElement, done: Function) {
         d3.select(el)
             .transition()
             .style("height", "0px")
@@ -239,7 +239,7 @@ export default class QuestionResponse extends Vue {
             });
     }
 
-    getResponseStyles(answer) {
+    getResponseStyles(answer: Distractor) {
         const answerIcon = this.optionIcon(answer);
         return {
             answered: this.disabledResponses.find(x => x == answer) || this.userHasCorrectAnswer,
@@ -259,7 +259,7 @@ export default class QuestionResponse extends Vue {
         this.userAnswer = newValue;
 
         QuestionService.submitResponse({ responseId: distractor.id })
-            .then(x => {
+            .then(() => {
                 this.$emit("userAnswer", this.userHasCorrectAnswer);
             });
     }
@@ -277,7 +277,7 @@ export default class QuestionResponse extends Vue {
         return String.fromCharCode("A".charCodeAt(0) + index);
     }
 
-    optionIcon(solution) {
+    optionIcon(solution: Distractor) {
         return this.question.solution == solution ? "done" : "clear";
     }
 
@@ -305,14 +305,21 @@ export default class QuestionResponse extends Vue {
     }
 
     rate(rateType: string) {
-        return rateValue => {
+        return (rateValue: number) => {
             QuestionService.submitRating({
                 responseId: this.question.distractors[this.userAnswer].id,
                 rateType: rateType,
                 rateValue: rateValue
+            })
+            .then(() => {
+                addEventsToQueue([{
+                    id: -3,
+                    name: "Question Rated",
+                    description: "Successfully rated question " + rateType,
+                    icon: "done"
+                }]);
             });
         };
     }
-
 }
 </script>

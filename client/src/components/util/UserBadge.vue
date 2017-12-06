@@ -87,15 +87,13 @@
 </style>
 
 <script lang="ts">
-import { Vue, Prop, Lifecycle, Mixin, Watch, Component, p } from "av-ts";
-import PropUpdate from "../mixins/PropUpdate";
+import { Vue, Prop, Component, p } from "av-ts";
 
 import { Badge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
-import Fetcher from "../../services/Fetcher";
 
 @Component()
-export default class Badges extends PropUpdate {
+export default class Badges extends Vue {
     @Prop badge = p<Badge>({
         required: true
     });

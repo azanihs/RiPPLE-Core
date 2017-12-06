@@ -45,11 +45,10 @@ INSTALLED_APPS = [
     'corsheaders',
     "ripple.apps.RippleConfig",
 
-    "ripplelti.apps.RippleltiConfig",
+    "lti.apps.LTIConfig",
     "users.apps.UsersConfig",
     "questions.apps.QuestionsConfig",
     "recommendations.apps.RecommendationsConfig",
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -72,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'users.middleware.TokenValidator',
+    'users.middleware.NotificationMiddleware',
     'users.middleware.AchievementChecker'
 ]
 ROOT_URLCONF = 'ripple.urls'

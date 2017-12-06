@@ -7,11 +7,11 @@
                      class="card"
                      :class="{disabled: notification.read}">
                 <div class="leftPanel">
-                    <md-icon>{{iconFromType(notification.type)}}</md-icon>
+                    <md-icon>{{notification.icon}}</md-icon>
                 </div>
                 <div class="rightPanel">
-                    <h3>{{notification.type}}</h3>
-                    <p>{{notification.content}}</p>
+                    <h3>{{notification.name}}</h3>
+                    <p>{{notification.description}}</p>
                     <span class="date">{{ notificationDate }}</span>
                 </div>
             </md-card>
@@ -87,21 +87,21 @@ p + p {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Notification } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
-@Component()
+@Component
 export default class Notifications extends Vue {
     @Prop
-    showCount = p({
-        type: Number,
+    showCount = p<number>({
         default: 10
-    }) as number;
+    });
 
-    pNotifications = [];
-    updateNotifications(newNotifications) {
+    pNotifications: Notification[] = [];
+    updateNotifications(newNotifications: Notification[]) {
         this.pNotifications = newNotifications.slice(0, this.showCount);
     };
 
@@ -133,15 +133,6 @@ export default class Notifications extends Vue {
 
     get notifications() {
         return this.pNotifications;
-    }
-
-    iconFromType(notification) {
-        return ({
-            "Incoming Connection": "supervisor_account",
-            "Achievement": "bar_chart",
-            "Personal Goal": "trending_up",
-            "Upcoming Meeting": "hourglass_full"
-        })[notification];
     }
 }
 </script>

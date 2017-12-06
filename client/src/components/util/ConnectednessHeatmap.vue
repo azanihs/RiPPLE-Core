@@ -82,24 +82,30 @@ td:hover {
 <script lang="ts">
 import { Vue, Prop, p, Lifecycle, Component, Watch } from "av-ts";
 
-import { Topic } from "../../interfaces/models";
+import { Topic, User } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
+
+interface IRenderWeight {
+    [mentorType: string]: {
+        [topicId: string]: number
+    }
+}
 
 @Component()
 export default class ConnectednessHeatmap extends Vue {
     @Prop topics = p<Topic[]>({
         required: true
     });
-    @Prop categories = p<any>({
+    @Prop categories = p<string[]>({
         required: true
     });
 
-    renderWeights = {};
-    pConnections = [];
+    renderWeights: IRenderWeight = {};
+    pConnections: User[] = [];
 
-    updateConnections(newConnections) {
+    updateConnections(newConnections: User[]) {
         this.pConnections = newConnections;
     }
 
@@ -107,9 +113,9 @@ export default class ConnectednessHeatmap extends Vue {
         return this.pConnections;
     };
 
-    renderColor(category, topic) {
-        const max = this.connections.reduce((max, x) => max > x.weight ? max : x.weight, 0);
-        const weight = (this.renderWeights[category] && this.renderWeights[category][topic]) || 0;
+    renderColor(category: string, topicId: number) {
+        const max = 1;
+        const weight = (this.renderWeights[category] && this.renderWeights[category][topicId]) || 0;
         return {
             background: `rgba(34, 85, 102, ${weight / max})`
         };
@@ -117,34 +123,30 @@ export default class ConnectednessHeatmap extends Vue {
 
     updatedCategories() {
         this.categories.forEach(category => {
-            this.renderWeights[category] = this.connections
-                .filter(x => x.type == category)
-                .reduce((categoryWeight, connection) => {
-                    if (categoryWeight[connection.topic] === undefined) {
-                        categoryWeight[connection.topic] = connection.weight;
-                    } else {
-                        categoryWeight[connection.topic] += connection.weight;
-                    }
-                    return categoryWeight;
-                }, {});
+            this.topics.forEach(topic => {
+                if (this.renderWeights[category] === undefined) {
+                    this.renderWeights[category] = {};
+                }
+                this.renderWeights[category][topic.id] = Math.random();
+            });
         });
     }
 
     @Watch("categories")
-    changeCategories() {
+    changeCategories(_oldValue: string[], _newValue: string[]) {
         this.updatedCategories();
     }
 
     @Lifecycle
     created() {
-        Fetcher.get(UserService.getUserPeers)
+        Fetcher.get(UserService.getUserPeers, { count: 10 })
             .on(this.updateConnections);
         this.updatedCategories();
     }
 
     @Lifecycle
     destroyed() {
-        Fetcher.get(UserService.getUserPeers)
+        Fetcher.get(UserService.getUserPeers, { count: 10 })
             .off(this.updateConnections);
     }
 }

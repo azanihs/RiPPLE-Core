@@ -2,7 +2,7 @@ import "whatwg-fetch";
 import { Topic } from "../interfaces/models";
 import { apiFetch } from "./APIRepository";
 
-const topics = {};
+const topics: {[id: number]: Topic} = {};
 export default class TopicRepository {
 
     static topicPointer(topic: Topic) {

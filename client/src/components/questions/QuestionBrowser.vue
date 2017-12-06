@@ -135,10 +135,9 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch } from "av-ts";
-import { Question as QuestionModel, Topic as TopicModel } from "../../interfaces/models";
+import { Question as IQuestion, Topic as ITopic } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
-import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
 import Fetcher from "../../services/Fetcher";
 
@@ -160,42 +159,33 @@ import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 })
 export default class QuestionBrowser extends Vue {
 
-    pTopics = [];
-    pData = {};
+    pTopics: ITopic[] = [];
+
     pPage = 1;
     pPageSize = 25;
     pQuestionCount = 0;
 
-    searchedQuestions: QuestionModel[] = [];
+    searchedQuestions: IQuestion[] = [];
 
-    topicsToUse: TopicModel[] = [];
+    topicsToUse: ITopic[] = [];
 
-    selectedQuestion: QuestionModel = null;
+    selectedQuestion: undefined | IQuestion = undefined;
     userIsFinished: boolean = false;
 
-    updateTopics(topics) {
+    updateTopics(topics: ITopic[]) {
         this.pTopics = topics;
-    };
-    updateCompetencies(competency) {
-        this.pData = competency;
     };
 
     @Lifecycle
     created() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateTopics);
-
-        Fetcher.get(UserService.userCompetencies, {})
-            .on(this.updateCompetencies);
     }
 
     @Lifecycle
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
-
-        Fetcher.get(UserService.userCompetencies)
-            .off(this.updateCompetencies);
     }
 
     get topics() {
@@ -208,8 +198,8 @@ export default class QuestionBrowser extends Vue {
 
 
     @Watch("selectedQuestion")
-    questionChanged() {
-        if (this.selectedQuestion != null) {
+    questionChanged(_oldVal: IQuestion | undefined, _newVal: IQuestion | undefined) {
+        if (this.selectedQuestion !== undefined) {
             window.scrollTo(0, 0);
         }
     }
@@ -217,31 +207,31 @@ export default class QuestionBrowser extends Vue {
     setUserIsFinished(newVal: boolean) {
         // Request new data
         this.userIsFinished = newVal;
-        this.selectedQuestion = null;
+        this.selectedQuestion = undefined;
     }
 
-    changeDisplay(searchedQuestions) {
+    changeDisplay(searchedQuestions: { questions: IQuestion[], page: number, totalItems: number }) {
         this.pPage = searchedQuestions.page;
         this.searchedQuestions = searchedQuestions.questions;
         this.pQuestionCount = searchedQuestions.totalItems;
     }
 
     selectRandom() {
-        this.selectedQuestion = null;
+        this.selectedQuestion = undefined;
         Vue.nextTick(() => {
             this.selectedQuestion = this.showQuestions[Math.floor(Math.random() * this.showQuestions.length)];
         });
     }
 
-    openQuestionPreview(question) {
+    openQuestionPreview(question: IQuestion) {
         if (this.selectedQuestion == question) {
-            this.selectedQuestion = null;
+            this.selectedQuestion = undefined;
         } else {
             this.selectedQuestion = question;
         }
     }
 
-    filterQuestionTopic(topicsToUse) {
+    filterQuestionTopic(topicsToUse: ITopic[]) {
         this.topicsToUse = topicsToUse;
     }
 

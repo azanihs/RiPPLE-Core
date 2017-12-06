@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.conf import settings
 
-from ripplelti.services.LTIService import validate_lti_request, request_to_course, request_to_user, create_course_user
+from lti.services.LTIService import validate_lti_request, request_to_course, request_to_user, create_course_user
 from users.services.TokenService import generate_token
 
 
