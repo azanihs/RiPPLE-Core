@@ -12,6 +12,7 @@ from .common import BootstrapTestCase
 
 class QuestionRequestTest(BootstrapTestCase):
     def test_add_question(self):
+        """Tests addittion of a new simple question without images"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -24,6 +25,7 @@ class QuestionRequestTest(BootstrapTestCase):
 
 
     def test_none_field(self):
+        """Tests an invalid question added that contains none fields in its attributes, including none fields in responses"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -47,6 +49,7 @@ class QuestionRequestTest(BootstrapTestCase):
 
 
     def test_check_for_script_tags(self):
+        """Tests that questions added do not have script tags in any of their text areas"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -72,6 +75,7 @@ class QuestionRequestTest(BootstrapTestCase):
      
  
     def test_question_with_valid_image(self):
+        """Checks that a question can be added that contains an image"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -104,6 +108,7 @@ class QuestionRequestTest(BootstrapTestCase):
 
 
     def test_question_with_invalid_image(self):
+        """Checks that a question addition fails when image is none type"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -119,6 +124,7 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertEqual(response["error"], "Image is not of valid type")
 
     def test_new_source(self):
+        """Tests that the new source function creates a new path with the past path pieces"""
         urls = ["test"]
         content = "<img src='test'>"
         host="/here/asfd/"
@@ -130,6 +136,7 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertTrue(urls[0] in result and host in result)
 
     def test_empty_content(self):
+        """Check that a question addition fails when content on an attribute is empty"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -144,6 +151,7 @@ class QuestionRequestTest(BootstrapTestCase):
 
     @patch("questions.services.AuthorService.decodeImages")
     def test_general_exception_raised(self, mock_class):
+        """Tests that addition function behaves accordingly on a different exception that an IntegrityError"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
