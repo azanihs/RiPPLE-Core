@@ -111,4 +111,12 @@ export default class QuestionRepository {
             })
         });
     }
+
+    static getQuestionById(questionId: number) {
+        return apiFetch<Question>(`/questions/id/${questionId}/`)
+            .then(toQuestion);
+    }
+    static getRandomCourseQuestion() {
+        return apiFetch<number>(`/questions/random/`);
+    }
 }

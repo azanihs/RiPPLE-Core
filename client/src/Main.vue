@@ -51,7 +51,7 @@
         </md-layout>
         <md-layout class="pageContent"
             :class="pageSize">
-            <router-view></router-view>
+            <router-view :key="$route.fullPath" ></router-view>
         </md-layout>
         <global-notification></global-notification>
     </md-layout>
