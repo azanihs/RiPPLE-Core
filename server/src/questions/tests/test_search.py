@@ -243,7 +243,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
 
-        #Test descending order 
+        #Test descending order, creates date object and changes by day 
         day_index = 1
         time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
         for q in Question.objects.all():
