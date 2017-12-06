@@ -65,7 +65,7 @@ export default class Fetcher<T extends any> {
 
     run() {
         const hasRequestedBefore = cache.get(this.identifier);
-        if (hasRequestedBefore !== undefined && (hasRequestedBefore.timestamp + 100000) > Date.now()) {
+        if (hasRequestedBefore !== undefined && (hasRequestedBefore.timestamp + 10000) > Date.now()) {
             if (hasRequestedBefore.value !== undefined) {
                 Fetcher.sharedBus.$emit(this.identifier, hasRequestedBefore.value);
                 return;

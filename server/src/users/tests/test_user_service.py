@@ -29,7 +29,7 @@ def mock_request_factory(request_dict):
     mocked_request = RequestMock(request_dict)
     return mocked_request
 
-class UserTestCase(BootstrapTestCase):   
+class UserTestCase(BootstrapTestCase):
     def test_update_user_image(self):
         user = self._bootstrap_user()
         host = "//localhost:8000"
@@ -56,19 +56,19 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(res, {"name":user.first_name + " " + user.last_name,
                 "image": user.image
             })
-        
-        image = UserImage.objects.filter(user=user)[0].image 
+
+        image = UserImage.objects.filter(user=user)[0].image
         encode = str(b"data:image/jpeg;base64,"+base64.b64encode(image.read()))
         self.assertEqual(good_encode, encode)
 
-    
+
     def test_logged_in_user(self):
         user = self._bootstrap_course_user()
-        
+
         # Request not none
         self.assertEqual(UserService.logged_in_user(None),
             {"error": "Request must be provided"})
-        
+
         #Request not empty
         self.assertEqual(UserService.logged_in_user({}),
             {"error": "Request must be provided"})
@@ -106,14 +106,14 @@ class UserTestCase(BootstrapTestCase):
                 UserService.user_courses(None))
 
 
-        # Valid        
+        # Valid
         for c_u in course_users:
             u_id = c_u.user.id-1
             u_c = UserService.user_courses(c_u)
             c_list = [x.toJSON() for x in course_map[u_id]]
 
             self.assertEqual(u_c, c_list)
-           
+
 
 
     def test_update_course(self):
@@ -131,20 +131,20 @@ class UserTestCase(BootstrapTestCase):
 
         # New_Data invalid attributes
         # no topics
-        self.assertEqual(UserService.update_course(course_user, {"test":"att"}), 
+        self.assertEqual(UserService.update_course(course_user, {"test":"att"}),
                 {"error": "Course must have topics"})
 
         # Invalid topics
-        self.assertEqual(UserService.update_course(course_user, 
+        self.assertEqual(UserService.update_course(course_user,
                     {"topics": [{"invalid": "topic"}]}),
                 {"error": "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"})
 
 
         topics = self._bootstrap_topics(course)
         topics = [t.toJSON() for t in topics]
-        
+
         # No course Code
-        self.assertEqual(UserService.update_course(course_user, 
+        self.assertEqual(UserService.update_course(course_user,
                     {"topics": topics}),
                 {"error": "Missing course code"})
 
@@ -163,7 +163,7 @@ class UserTestCase(BootstrapTestCase):
                         "courseCode": "test_course_1"
                     }}),
                 {"error": "User does not have administrative permission for current context"})
-        
+
         role = Role(role="Student")
         role.save()
         role = [role]
@@ -211,8 +211,8 @@ class UserTestCase(BootstrapTestCase):
                         "end": 100
                     }}),
                 {"error": "Invalid Topic ID"})
-    
-        
+
+
         #VALID TESTS
         self.assertEqual(UserService.update_course(course_user, {
                     "topics": [{"name": "topicA"}],
@@ -241,7 +241,7 @@ class UserTestCase(BootstrapTestCase):
                     "topics": [
                         {"id": 8, "name": "topicA"},
                         {"name": "newTopic"},
-                        {"id": 100, "name": "idNotExist"}    
+                        {"id": 100, "name": "idNotExist"}
                     ],
                     "course": {
                         "courseCode": "test_course_1",
@@ -297,7 +297,7 @@ class UserTestCase(BootstrapTestCase):
         course = self._bootstrap_courses(1)
         course_user = self._user_in_course(user, course)
         topics = self._bootstrap_topics(course)
-        
+
 
         self.assertEqual([], UserService.user_competencies(None))
 
@@ -344,7 +344,7 @@ class UserTestCase(BootstrapTestCase):
 
         c = Course(course_code="test2", course_name="test2")
         c.save()
-        
+
         self.assertEqual(UserService.insert_course_if_not_exists(
                 {"course_code": "test2", "course_name": "test2"}
         ), c)
@@ -364,7 +364,7 @@ class UserTestCase(BootstrapTestCase):
         u = User(user_id="test2", first_name="first_name", last_name="last_name",
                 image="")
         u.save()
-        
+
         self.assertEqual(UserService.insert_user_if_not_exists(
                 {"user_id": "test2", "first_name":"first_name", "last_name":"last_name",
                 "image": ""}
@@ -388,16 +388,16 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(UserService.insert_course_user_if_not_exists(course, {}),
                 {"error": "Invalid User Provided"})
 
-        self.assertEqual(UserService.insert_course_user_if_not_exists(course, user), 
+        self.assertEqual(UserService.insert_course_user_if_not_exists(course, user),
                 CourseUser.objects.filter(course=course, user=user)[0])
-        
+
         cu = CourseUser(course=course2, user=user)
         cu.save()
 
         self.assertEqual(UserService.insert_course_user_if_not_exists(
             course2, user), cu)
 
-    
+
     def test_update_user_roles(self):
         user = self._bootstrap_user()
         course = self._bootstrap_courses(1)
@@ -419,4 +419,3 @@ class UserTestCase(BootstrapTestCase):
 
         UserService.update_user_roles(cu, "role2")
         self.assertTrue("role2" in cu.roles.all().values_list("role", flat=True))
-

@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser
-from recommendations.models import Day, Time, Availability
+from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
 import sys
@@ -199,6 +199,15 @@ def make_times(times):
             time_range = Time.objects.create(start=times[i], end=times[i + 1])
             time_range.save()
 
+def make_study_roles():
+    study_roles = [
+    {"role": "mentor", "description": "Provide Mentorship"},
+    {"role": "mentee", "description": "Seek Mentorship"},
+    {"role": "partner", "description": "Find Study Partners"}]
+
+    for x in study_roles:
+        study_role = StudyRole.objects.create(role=x["role"], description=x["description"])
+        study_role.save()
 
 class Command(BaseCommand):
     args = ''
@@ -248,6 +257,20 @@ class Command(BaseCommand):
                     availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
                     availability.save()
 
+        def populate_available_roles(course_users, study_roles):
+            for course_user in course_users:
+                topics = Topic.objects.filter(course=course_user.course)
+                for topic in topics:
+                    role_id = randint(0, 1)
+                    if role_id > 0:
+                        study_role = study_roles[1]
+                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+
+                    role_id = randint(0, 1)
+                    if role_id:
+                        study_role = study_roles[2]
+                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+
         courses = []
         for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
@@ -263,17 +286,25 @@ class Command(BaseCommand):
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
         print("Populating Availabilities")
+        print("\t-Making Days")
         make_days()
 
+        print("\t-Making Times")
         time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
         time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
         make_times(time_inputs)
 
+        print("\t-Making Study Roles")
+        make_study_roles()
+
         course_users = CourseUser.objects.all()
         days = Day.objects.all()
         times = Time.objects.all()
+        print("\t-Populating Availabilities")
         populate_availability(course_users, days, times)
-
+        study_roles = StudyRole.objects.all()
+        print("\t-Populating Study Roles")
+        populate_available_roles(course_users, study_roles)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')
