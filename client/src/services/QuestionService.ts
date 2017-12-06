@@ -31,12 +31,20 @@ export default class QuestionService {
         return QuestionRepository.submitRating(responseId, rateType, rateValue);
     }
 
-    static reportQuestion(question: Question, reason: string) {
+    static reportQuestion(questionId: number, reason: string) {
         const upload: ReportQuestion = {
-            question: question.id,
+            question: questionId,
             reason: reason
         };
         return QuestionRepository.uploadReport(upload);
+    }
+
+    static getQuestionById(questionId: number) {
+        return QuestionRepository.getQuestionById(questionId);
+    }
+
+    static getRandomCourseQuestion() {
+        return QuestionRepository.getRandomCourseQuestion();
     }
 
 }

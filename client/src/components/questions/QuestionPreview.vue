@@ -9,8 +9,8 @@
                 </div>
                 <div class="bottomPanel">
                     <topic-chip v-for="topic in data.topics"
-                                :key="topic.id"
-                                linkTo="/view/questions">
+                                :disabled="true"
+                                :key="topic.id">
                         {{topic.name}}
                     </topic-chip>
                 </div>

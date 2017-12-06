@@ -109,11 +109,20 @@ def index(request):
     })
 
 
+def random_question_id(request):
+    logged_in_user = UserService.logged_in_user(request)
+    question = QuestionService.get_random_question(logged_in_user)
+    if question is None:
+        return JsonResponse({"error": "User does not belong to course"}, status=403)
+
+    return JsonResponse({"data": question.id})
+
 def id(request, id):
-    question = QuestionService.get_questions(id)
+    logged_in_user = UserService.logged_in_user(request)
+    question = QuestionService.get_question_by_id(logged_in_user, id)
 
     if question is None:
-        return JsonResponse({}, status=404)
+        return JsonResponse({"error": "User does not belong to course"}, status=403)
 
     return JsonResponse({"data": question.toJSON()})
 
