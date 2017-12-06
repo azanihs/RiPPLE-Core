@@ -100,8 +100,7 @@ def respond_to_question(distractor_id, user):
     )
     response.save()
     calculate_question_score(user, answered_option.question, response)
-    if answered_option.isCorrect:
-        update_competency(user, answered_option.question, response)
+    update_competency(user, answered_option.question, response)
     return True
 
 def update_running_mean(value, count, new_weight):
@@ -201,7 +200,7 @@ def calculate_children_competency(user, queryset_topics, score):
         user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
 
         if user_competency is None or len(user_competency) == 0:
-            user_competency = CompetencyService.add_competency(0.5, 0, user, topics)
+            user_competency = CompetencyService.add_competency(0.1, 0, user, topics)
         else:
             user_competency = user_competency[0]
 
