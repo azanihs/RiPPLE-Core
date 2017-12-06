@@ -19,7 +19,9 @@ class QuestionTestCase(BootstrapTestCase):
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
 
+        # Answer question incorrectly
         QuestionService.respond_to_question(1, author)
+
 
         self.assertEqual(QuestionResponse.objects.all().count(), 1)
         user_response = QuestionResponse.objects.first()
@@ -27,14 +29,9 @@ class QuestionTestCase(BootstrapTestCase):
         self.assertEqual(user_response.user_id, 1)
         self.assertEqual(user_response.response_id, 1)
 
-        self.assertEqual(QuestionScore.objects.all().count(), 1)
-        question_score = QuestionScore.objects.all().first()
-
-        self.assertEqual(question_score.user_id, 1)
-        self.assertEqual(question_score.question_id, 1)
-        self.assertEqual(question_score.score, 0)
-
-        self.assertEqual(Competency.objects.all().count(), 1)
+        # QuestionScore does not get saved when answered wrong
+        self.assertEqual(QuestionScore.objects.all().count(), 0)
+        self.assertEqual(Competency.objects.all().count(), 0)
 
     def test_answering_new_question_multiple_topics(self):
         """ New question with multiple topics """
@@ -59,12 +56,9 @@ class QuestionTestCase(BootstrapTestCase):
         self.assertEqual(user_response.user_id, 1)
         self.assertEqual(user_response.response_id, distractor_id)
 
-        self.assertEqual(QuestionScore.objects.all().count(), 1)
-        question_score = QuestionScore.objects.all().first()
-
-        self.assertEqual(question_score.user_id, 1)
-        self.assertEqual(question_score.question_id, question_number)
-        self.assertEqual(question_score.score, 0)
+        # QuestionScore does not get saved when answered wrong
+        self.assertEqual(QuestionScore.objects.all().count(), 0)
+        self.assertEqual(QuestionScore.objects.all().count(), 0)
 
     def test_answering_question_correctly(self):
         """ New question with a correct answer """
@@ -99,8 +93,9 @@ class QuestionTestCase(BootstrapTestCase):
 
         QuestionService.respond_to_question(distractor_id, author)
         question_score = QuestionScore.objects.all().first()
+        # QuestionScore does not get saved when answered wrong
+        self.assertIsNone(question_score)
 
-        self.assertEqual(question_score.score, 0)
 
     def test_answering_multiple_existing_questions(self):
         """ Single user answers multiple questions created by other authors """
@@ -148,9 +143,12 @@ class QuestionTestCase(BootstrapTestCase):
 
         #Range from 1 as both questions and distractors are id starting at 1
         for question_number in range(1, number_of_questions + 1):
-            #picks different distractor for each question based on the question id. Ex Q1 == A
-            distractor_id = ((question_number -1) * 4 + question_number)
-
+            #picks different distractor for each question based on the question id. Ex Q1 == A, Q2 == B
+            distractor_id = {
+                1: 1,
+                2: 7,
+                3: 10
+            }.get(question_number)
             QuestionService.respond_to_question(distractor_id, author)
             distractor_object = Distractor.objects.get(pk=distractor_id)
 
@@ -158,21 +156,23 @@ class QuestionTestCase(BootstrapTestCase):
             self.assertEqual(user_response.user_id, 1)
             self.assertEqual(user_response.response_id, distractor_id)
 
-            question_score = QuestionScore.objects.get(pk=distractor_object.question.id)
+            # Incorrect QuestionScore is not stored until the answer is right
+            if question_number in [1, 2]:
+                self.assertEqual(QuestionScore.objects.all().count(), 0)
+                continue
+
+            question_score = QuestionScore.objects.get(question=distractor_object.question.id)
             self.assertEqual(question_score.user_id, 1)
             self.assertEqual(question_score.question_id, question_number)
 
-            if question_number == correct_id:
-                self.assertEqual(question_score.score, 1)
-            else:
-                self.assertEqual(question_score.score, 0)
+            self.assertEqual(question_score.score, 1)
 
             for question_topic in Distractor.objects.get(id=distractor_id).question.topics.all():
                 unique_topics.add(question_topic)
 
         self.assertEqual(QuestionResponse.objects.all().count(), number_of_questions)
-        self.assertEqual(QuestionScore.objects.all().count(), number_of_questions)
-        #TODO: Ensure competency is updated
+        # Only one question score per correct answer
+        self.assertEqual(QuestionScore.objects.all().count(), 1)
 
 
     def test_answering_existing_question_many_users(self):
@@ -188,14 +188,16 @@ class QuestionTestCase(BootstrapTestCase):
             user = self._bootstrap_user(i+1)
             responder = CourseUser.objects.create(user=user, course=course)
             QuestionService.respond_to_question(i, responder)
+
         self.assertEqual(QuestionResponse.objects.all().count(), number_of_responders)
-        self.assertEqual(QuestionScore.objects.all().count(), number_of_responders)
+
         response_index = 2
         for user_response in QuestionResponse.objects.all():
             self.assertEqual(user_response.user.user_id, response_index)
             self.assertEqual(user_response.response_id, response_index - 1)
             response_index += 1
-        score_index = 2
+
+        score_index = 3
         for question_score in QuestionScore.objects.all():
             self.assertEqual(question_score.user_id, score_index)
             self.assertEqual(question_score.question_id, 1)
@@ -213,11 +215,12 @@ class QuestionTestCase(BootstrapTestCase):
         responder = CourseUser.objects.create(user=responder_user, course=course)
 
         ###answers all questions incorrectly so it has 3 responses before it gets it correctly
-        responses_count = 3
+        responses_count = 4
         for i in range(0, responses_count):
             QuestionService.respond_to_question(i + 1, responder)
 
         self.assertEqual(QuestionResponse.objects.all().count(), responses_count)
+        # QuestionScore does not get saved when answered wrong
         self.assertEqual(QuestionScore.objects.all().count(), 1)
 
         response_index = 1
@@ -225,11 +228,6 @@ class QuestionTestCase(BootstrapTestCase):
             self.assertEqual(user_response.user_id, 2)
             self.assertEqual(user_response.response_id, response_index)
             response_index+=1
-
-        question_score = QuestionScore.objects.all().first()
-        self.assertEqual(question_score.user_id, 2)
-        self.assertEqual(question_score.question_id, 1)
-        self.assertEqual(question_score.number_answers, responses_count)
 
     def test_answering_question_different_course(self):
         """ User answers question from course they do not belong to """

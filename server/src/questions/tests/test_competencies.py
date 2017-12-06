@@ -35,7 +35,7 @@ class CompetencyTestCase(BootstrapTestCase):
 
 
     def test_answer_many_incorrect_questions_single_topic(self):
-        """ checks that answering many incorrect questions brings competency downwards """
+        """ checks that answering a question incorrectly does not store competency """
         author_course = self._bootstrap_courses(1)
         author_user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=author_user, course=author_course)
@@ -44,15 +44,21 @@ class CompetencyTestCase(BootstrapTestCase):
         self._bootstrap_questions_same_topics(author, topic_selected, 20)
         self._bootstrap_question_choices(correct_id=2)
 
+        # Answer question incorrectly
         QuestionService.respond_to_question(3, author)
         for i in range(1, 20):
             offset = 4 * i
-            old_competency = Competency.objects.all().first().competency
+            old_competency = Competency.objects.all().first()
+            # We do not calculate a competency for the user until they get it right
+            self.assertIsNone(old_competency)
+            # Answer another question incorrectly
             QuestionService.respond_to_question(3 + offset, author)
-            new_competency = Competency.objects.all().first().competency
-            self.assertTrue(old_competency >= new_competency)
+            new_competency = Competency.objects.all().first()
+            self.assertIsNone(new_competency)
+
         self.assertEqual(QuestionResponse.objects.count(), 20)
-        self.assertEqual(Competency.objects.count(), 1)
+        # User never got the question correct; so there should be no stored competencies
+        self.assertEqual(Competency.objects.count(), 0)
 
     def test_answer_many_correct_questions_many_topics(self):
         """ check that answering many correct questions affects competency children """
@@ -84,36 +90,6 @@ class CompetencyTestCase(BootstrapTestCase):
         num_topics = combinations(QuestionScore.objects.all().first().question.topics.all())
         self.assertEqual(Competency.objects.count(), len(num_topics))
 
-    def test_answer_many_incorrect_questions_many_topics(self):
-        """ check that answering many incorrect questions affects competency children"""
-        author_course = self._bootstrap_courses(1)
-        author_user = self._bootstrap_user(1)
-        author = CourseUser.objects.create(user=author_user, course=author_course)
-        self._bootstrap_topics(author_course)
-        topic_selected = Topic.objects.all().filter(id__in=[1, 2])
-        self._bootstrap_questions_same_topics(author, topic_selected, 20)
-        self._bootstrap_question_choices(correct_id=2)
-
-        QuestionService.respond_to_question(3, author)
-        for i in range(1, 20):
-            offset = 4 * i
-            first_old_competency = Competency.objects.all()[0].competency
-
-            second_old_competency = Competency.objects.all()[1].competency
-            third_old_competency = Competency.objects.all()[2].competency
-            QuestionService.respond_to_question(3 + offset, author)
-            first_new_competency = Competency.objects.all()[0].competency
-            second_new_competency = Competency.objects.all()[1].competency
-            third_new_competency = Competency.objects.all()[2].competency
-            self.assertTrue(first_old_competency >= first_new_competency)
-            self.assertTrue(second_old_competency >= second_new_competency)
-            self.assertTrue(third_old_competency >= third_new_competency)
-
-        self.assertEqual(QuestionResponse.objects.count(), 20)
-
-        num_topics = combinations(QuestionScore.objects.all().first().question.topics.all())
-        self.assertEqual(Competency.objects.count(), len(num_topics))
-
     def test_answer_alternating_questions_many_topics(self):
         """ answer alternating questions to ensure competency scores bounce accordingly """
         author_course = self._bootstrap_courses(1)
@@ -124,27 +100,29 @@ class CompetencyTestCase(BootstrapTestCase):
         self._bootstrap_questions_same_topics(author, topic_selected, 20)
         self._bootstrap_question_choices(correct_id=2)
 
-        QuestionService.respond_to_question(3, author)
+        # Get question wrong
+        QuestionService.respond_to_question(2, author)
         for i in range(1, 10):
             offset = (4 * i) + (4 * (i - 1))
             first_old_competency = Competency.objects.all()[0].competency
             second_old_competency = Competency.objects.all()[1].competency
             third_old_competency = Competency.objects.all()[2].competency
 
-            QuestionService.respond_to_question(2 + offset, author)
+            # Get question wrong
+            QuestionService.respond_to_question(3 + offset, author)
 
             first_new_competency = Competency.objects.all()[0].competency
             second_new_competency = Competency.objects.all()[1].competency
             third_new_competency = Competency.objects.all()[2].competency
-            self.assertTrue(first_old_competency <= first_new_competency)
-            self.assertTrue(second_old_competency <= second_new_competency)
-            self.assertTrue(third_old_competency <= third_new_competency)
+            self.assertTrue(first_old_competency >= first_new_competency)
+            self.assertTrue(second_old_competency >= second_new_competency)
+            self.assertTrue(third_old_competency >= third_new_competency)
 
-            QuestionService.respond_to_question(3 + offset, author)
+            QuestionService.respond_to_question(2 + offset, author)
 
-            self.assertTrue(first_new_competency >= Competency.objects.all()[0].competency)
-            self.assertTrue(second_new_competency >= Competency.objects.all()[1].competency)
-            self.assertTrue(third_new_competency >= Competency.objects.all()[2].competency)
+            self.assertTrue(first_new_competency <= Competency.objects.all()[0].competency)
+            self.assertTrue(second_new_competency <= Competency.objects.all()[1].competency)
+            self.assertTrue(third_new_competency <= Competency.objects.all()[2].competency)
 
         self.assertEqual(QuestionResponse.objects.count(), 19)
 
@@ -199,7 +177,7 @@ class CompetencyTestCase(BootstrapTestCase):
         author = CourseUser.objects.create(user=author_user, course=author_course)
         self._bootstrap_topics(author_course)
         topic_selected = Topic.objects.all().filter(id__in=[1])
-        self._bootstrap_questions_same_topics(author, topic_selected, 30)
+        self._bootstrap_questions_same_topics(author, topic_selected, 20)
         self._bootstrap_question_choices(correct_id=2)
 
         for question in Question.objects.all():
@@ -219,5 +197,5 @@ class CompetencyTestCase(BootstrapTestCase):
         author_competency = Competency.objects.get(user = author).competency
         responder_competency = Competency.objects.get(user = responder).competency
         self.assertEqual(QuestionResponse.objects.count(), 40)
-        self.assertEqual(QuestionScore.objects.count(), 40)
+        self.assertEqual(QuestionScore.objects.count(), 20)
         self.assertTrue(author_competency <= responder_competency)
