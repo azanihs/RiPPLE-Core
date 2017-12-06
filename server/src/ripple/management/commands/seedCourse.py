@@ -302,7 +302,7 @@ class Command(BaseCommand):
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
 
-        '''print("Populating Availabilities")
+        print("Populating Availabilities")
         print("\t-Making Days")
         make_days()
 
@@ -321,7 +321,7 @@ class Command(BaseCommand):
         populate_availability(course_users, days, times)
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
-        populate_available_roles(course_users, study_roles)'''
+        populate_available_roles(course_users, study_roles)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')
