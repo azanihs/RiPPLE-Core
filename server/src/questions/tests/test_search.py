@@ -6,6 +6,8 @@ import random
 from questions.models import Topic, Question, QuestionResponse, QuestionScore
 from questions.services import SearchService, QuestionService
 from users.models import CourseUser
+from datetime import datetime
+import pytz
 
 from .common import BootstrapTestCase
 
@@ -158,3 +160,117 @@ class SearchServiceTestCase(BootstrapTestCase):
     
         self.assertEqual(Question.objects.all().first(), improve_questions.first())
         self.assertEqual(test_search.execute().count(), 1)
+
+    
+    def test_sorting_difficultyCount(self):
+        """" Test questions get sorted by difficulty in a descending order first and then in an ascending order"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+
+        #Test descending order 
+        difficulty = 1
+        for q in Question.objects.all():
+            q.difficultyCount = difficulty
+            difficulty += 1
+            q.save()
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("difficultyCount", "DESC")
+        sorted_questions = test_search.execute()
+        #make sure next question has lower difficulty
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].difficultyCount > sorted_questions[i + 1].difficultyCount)
+
+        #Test ascending order 
+        difficulty = 10
+        for q in Question.objects.all():
+            q.difficultyCount = difficulty
+            difficulty -= 1
+            q.save()
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("difficultyCount", "ASC")
+        sorted_questions = test_search.execute()
+        #make sure next question has higher difficulty
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].difficultyCount < sorted_questions[i + 1].difficultyCount)
+
+    def test_sorting_qualityCount(self):
+        """" Test questions get sorted by quality in a descending order first and then in an ascending order"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+
+        #Test descending order 
+        quality = 1
+        for q in Question.objects.all():
+            q.qualityCount = quality
+            quality += 1
+            q.save()
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("qualityCount", "DESC")
+        sorted_questions = test_search.execute()
+        #make sure next question has lower quality
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].qualityCount > sorted_questions[i + 1].qualityCount)
+
+        #Test ascending order 
+        quality = 10
+        for q in Question.objects.all():
+            q.qualityCount = quality
+            quality -= 1
+            q.save()
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("qualityCount", "ASC")
+        sorted_questions = test_search.execute()
+        #make sure next question has higher quality
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].qualityCount < sorted_questions[i + 1].qualityCount)
+
+
+    def test_sorting_created_time(self):
+        """" Test questions get sorted by created_time in a descending order first and then in an ascending order"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+        self._bootstrap_questions(author)
+
+        #Test descending order 
+        day_index = 1
+        time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
+        for q in Question.objects.all():
+            q.created_time = time_created
+            day_index += 1
+            time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
+            q.save()
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("created_time", "DESC")
+        sorted_questions = test_search.execute()
+        #make sure next question has lower created_time
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].created_time > sorted_questions[i + 1].created_time)
+
+        #Test ascending order 
+        day_index = 31
+        time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
+        for q in Question.objects.all():
+            q.created_time = time_created
+            day_index -= 1
+            time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
+            q.save()
+        
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("created_time", "ASC")
+        sorted_questions = test_search.execute()
+        #make sure next question has higher created_time
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].created_time < sorted_questions[i + 1].created_time)

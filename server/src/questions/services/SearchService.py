@@ -18,7 +18,7 @@ class SearchService(object):
         else:
             sort_modifier = ""
 
-        if sort_field in ["difficulty", "quality", "created_time"]:
+        if sort_field in ["difficultyCount", "qualityCount", "created_time"]:
             self._query = self._query.order_by(sort_modifier + sort_field)
         elif sort_field == "comments":
             pass
