@@ -55,6 +55,7 @@
 <style scoped>
 .card {
     padding: 0px !important;
+    overflow-y: hidden;
 }
 
 .cardContainer {
