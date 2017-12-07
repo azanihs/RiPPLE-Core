@@ -35,7 +35,7 @@
             </md-input-container>
         </md-layout>
         <slot></slot>
-        <page-loader :condition="nextSearchRequest"></page-loader>
+        <page-loader :condition="false"></page-loader>
     </md-layout>
 </template>
 
@@ -47,10 +47,21 @@
 .header {
     justify-content: space-between;
     width: 100%;
+    flex-wrap: nowrap;
+    position: relative;
+}
+
+.searchItem:first-of-type {
+    margin-left: 0px;
+}
+.searchItem:last-of-type {
+    margin-right: 0px;
 }
 
 .searchItem {
-    flex: none;
+    overflow: hidden;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 h2 {
@@ -143,15 +154,15 @@ export default class QuestionSearch extends Vue {
             }, {
                 name: "Responses",
                 value: "responses"
-            }, {
+            }/*, {
                 name: "Comments",
                 value: "comments"
             }, {
                 name: "Personalised Rating",
                 value: "personalisation"
-            }]
+            }*/]
         }, {
-            name: "Show With Topic",
+            name: "Topics",
             id: "filterTopics",
             type: "multiselect",
             options: this.topics.map(topic => ({
@@ -159,7 +170,7 @@ export default class QuestionSearch extends Vue {
                 value: topic.id
             }))
         }, {
-            name: "Filter Questions",
+            name: "Questions",
             id: "filterField",
             type: "select",
             options: [{

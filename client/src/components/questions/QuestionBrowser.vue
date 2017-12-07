@@ -1,5 +1,5 @@
 <template>
-<md-layout md-gutter="8">
+<md-layout md-gutter="8" class="questionBrowserWrapper">
     <md-layout class="headingContainer"
         md-flex="100">
         <variable-data-visualiser class="overview"
@@ -47,6 +47,10 @@
 </template>
 
 <style scoped>
+.questionBrowserWrapper {
+    overflow-x: hidden;
+}
+
 .questionLink {
     color: inherit !important;
     flex-grow: 1;
