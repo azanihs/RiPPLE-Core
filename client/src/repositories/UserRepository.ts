@@ -1,6 +1,6 @@
 import {
     ICourseUser, IUser, ICourse, ISearch,
-    INotification, ITopic, IPeerConnection, IEdge, IUserSummary
+    INotification, ITopic, IPeerConnection, IEdge, IUserSummary, IEngagementType
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch, apiPost } from "./APIRepository";
@@ -47,7 +47,7 @@ const notifications = Array.from({ length: notificationCount }).map((_, i: numbe
     icon: _icons[_n(4)]
 }));
 
-const engagementNodes: ITopic[] = engagementTypes.map((x, i) => ({
+const engagementNodes: IEngagementType[] = engagementTypes.map((x, i) => TopicRepository.engagementPointer({
     id: i,
     name: x
 }));
@@ -155,14 +155,6 @@ export default class UserRepository {
         });
     }
 
-    static getAllAvailableEngagementTypes(): Promise<ITopic[]> {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(engagementNodes);
-            }, Math.random() * 1000);
-        });
-    }
-
     static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<IUserSummary[]> {
         return apiFetch<IUserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
     }
@@ -193,13 +185,37 @@ export default class UserRepository {
             }));
     }
 
+    static getAllAvailableEngagementTypes(): Promise<IEngagementType[]> {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(engagementNodes);
+            }, Math.random() * 1000);
+        });
+    }
+
     static getUserEngagement(): Promise<IEdge[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(userEngagementScores.map(x => {
                     const edge: IEdge = {
-                        source: x[0] as ITopic,
-                        target: x[1] as ITopic,
+                        source: TopicRepository.engagementPointer(x[0]),
+                        target: TopicRepository.engagementPointer(x[1]),
+                        competency: Math.round(x[2]),
+                        attempts: Math.round(x[3])
+                    };
+                    return edge;
+                }));
+            }, Math.random() * 1000);
+        });
+    }
+
+    static getEngagementCompareAgainst(_compareTo: string): Promise<IEdge[]> {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(userEngagementScores.map(x => {
+                    const edge: IEdge = {
+                        source: TopicRepository.engagementPointer(x[0]),
+                        target: TopicRepository.engagementPointer(x[1]),
                         competency: Math.round(x[2]),
                         attempts: Math.round(x[3])
                     };

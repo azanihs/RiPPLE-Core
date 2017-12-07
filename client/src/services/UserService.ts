@@ -29,7 +29,7 @@ export default class UserService {
                 }
                 return carry;
             }, [])
-            .filter(x => !exclude.find(e => e === x.id));
+            .filter(x => exclude.findIndex(e => e === x.id) === -1);
 
         return {
             topics: topics, // Node List
@@ -43,7 +43,7 @@ export default class UserService {
         return Promise.all([UserRepository.getUserCompetencies(), UserRepository.getCompareAgainst(compareTo)])
             .then(data => UserService.generateGraph(data[0], data[1], excludeTopics))
             .then(graph => TopicRepository.getAllAvailableTopics()
-                .then(allTopics => allTopics.filter(x => !excludeTopics.find(e => e === x.id)))
+                .then(allTopics => allTopics.filter(x => excludeTopics.findIndex(e => e === x.id) === -1))
                 .then(topics => {
                     // Add in all self-loops
                     graph.topics = topics;
@@ -54,10 +54,9 @@ export default class UserService {
     }
 
     static getEngagementScores({ compareTo, exclude }: { compareTo: string, exclude?: undefined | number[] }) {
-        compareTo;
-
-        return Promise.all([UserRepository.getUserEngagement(), UserRepository.getUserEngagement()])
-            .then(data => UserService.generateGraph(data[0], data[1], exclude || []));
+        const excludeTopics = exclude || [];
+        return Promise.all([UserRepository.getUserEngagement(), UserRepository.getEngagementCompareAgainst(compareTo)])
+            .then(data => UserService.generateGraph(data[0], data[1], excludeTopics));
     }
 
     static getAllAvailableEngagementTypes() {

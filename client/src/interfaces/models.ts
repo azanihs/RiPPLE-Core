@@ -1,11 +1,10 @@
-export interface IEngagementType {
-    id: number,
-    name: string
-};
 export interface ITopic {
     id: number,
     name: string
 };
+export interface IEngagementType extends ITopic {
+};
+
 export interface IEdge {
     source: ITopic,
     target: ITopic,
