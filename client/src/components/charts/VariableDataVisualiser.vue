@@ -146,7 +146,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { ITopic, IEdge } from "../../interfaces/models";
+import { ITopic, IEdge, ICompareSet } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
@@ -255,7 +255,7 @@ export default class VariableDataVisualiser extends Vue {
         chartContainer.style.height = dim.height + "px";
     }
 
-    calculateChartValues(newData: { topics: ITopic[], ownScores: IEdge[], compareAgainst: IEdge[] }) {
+    calculateChartValues(newData: ICompareSet) {
         const { topics, ownScores, compareAgainst } = newData;
 
         let compareResults: any[];
@@ -272,6 +272,7 @@ export default class VariableDataVisualiser extends Vue {
                     attempts: 0
                 };
             };
+
             compareResults = newData.topics.map(topic => findOrEmpty(topic)(compareAgainst)).map(x => x.competency);
             ownResults = newData.topics.map(topic => findOrEmpty(topic)(ownScores)).map(x => x.competency);
             dataTopics = newData.topics.map(x => x.name);
@@ -319,7 +320,7 @@ export default class VariableDataVisualiser extends Vue {
         this.pChartData = chartData;
     }
 
-    updateChartData(newChartData: { topics: ITopic[], ownScores: IEdge[], compareAgainst: IEdge[] }) {
+    updateChartData(newChartData: ICompareSet) {
         this.calculateChartValues(newChartData);
     }
 
@@ -343,7 +344,7 @@ export default class VariableDataVisualiser extends Vue {
         this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
         Fetcher.get(this.pDataGeneratorFunction as any,
-            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
+            { compareTo: this.compare, exclude: this.pExcludeTopics })
             .on(this.updateChartData);
         this.$emit("changeTopics", this.dataCategories);
     }
@@ -352,7 +353,7 @@ export default class VariableDataVisualiser extends Vue {
     destroyed() {
         window.removeEventListener("resize", this.updateChart);
         Fetcher.get(this.pDataGeneratorFunction as any,
-            { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
+            { compareTo: this.compare, exclude: this.pExcludeTopics })
             .off(this.updateChartData);
     }
 
