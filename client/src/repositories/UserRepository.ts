@@ -121,7 +121,7 @@ export default class UserRepository {
 
     static getAllAvailableEngagementTypes(): Promise<Topic[]> {
         return apiFetch<Topic[]>(`/users/engagement/`)
-        .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
+            .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
 
     static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
@@ -130,15 +130,15 @@ export default class UserRepository {
 
     static getCompareAgainst(compareTo: string): Promise<Edge[]> {
         return apiFetch<ServerEdge[]>(`/questions/competencies/aggregate/${compareTo}/`)
-        .then(x => x.map(x => {
-            const edge: Edge = {
-                source: TopicRepository.topicPointer(x[0]),
-                target: TopicRepository.topicPointer(x[1]),
-                competency: Math.round(x[2] * 100),
-                attempts: Math.round(x[3] * 100)
-            };
-            return edge;
-        }));
+            .then(x => x.map(x => {
+                const edge: Edge = {
+                    source: TopicRepository.topicPointer(x[0]),
+                    target: TopicRepository.topicPointer(x[1]),
+                    competency: Math.round(x[2] * 100),
+                    attempts: Math.round(x[3] * 100)
+                };
+                return edge;
+            }));
     }
 
     static getUserCompetencies(): Promise<Edge[]> {
@@ -156,28 +156,28 @@ export default class UserRepository {
 
     static getUserEngagement(): Promise<Edge[]> {
         return apiFetch<ServerEdge[]>(`/users/engagement/all/`)
-        .then(x => x.map(x => {
-            const edge: Edge = {
-                source: TopicRepository.topicPointer(x[0]),
-                target: TopicRepository.topicPointer(x[1]),
-                competency: Math.round(x[2]*100),
-                attempts: Math.round(x[3]*100)
-            };
-            return edge;
-        }));
+            .then(x => x.map(x => {
+                const edge: Edge = {
+                    source: TopicRepository.topicPointer(x[0]),
+                    target: TopicRepository.topicPointer(x[1]),
+                    competency: Math.round(x[2]*100),
+                    attempts: Math.round(x[3]*100)
+                };
+                return edge;
+            }));
     }
 
     static getEngagementAgainst(compareTo: string): Promise<Edge[]> {
         return apiFetch<ServerEdge[]>(`/users/engagement/aggregate/${compareTo}/`)
-        .then(x => x.map(x => {
-            const edge: Edge = {
-                source: TopicRepository.topicPointer(x[0]),
-                target: TopicRepository.topicPointer(x[1]),
-                competency: Math.round(x[2] * 100),
-                attempts: Math.round(x[3] * 100)
-            };
-            return edge;
-        }));
+            .then(x => x.map(x => {
+                const edge: Edge = {
+                    source: TopicRepository.topicPointer(x[0]),
+                    target: TopicRepository.topicPointer(x[1]),
+                    competency: Math.round(x[2] * 100),
+                    attempts: Math.round(x[3] * 100)
+                };
+                return edge;
+            }));
     }
 
     static getMeetingHistory(): Promise<{name: string, id: number }[]> {
