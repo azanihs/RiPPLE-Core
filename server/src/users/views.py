@@ -7,7 +7,8 @@ import imghdr
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
-from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image
+from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image, \
+        consent_service, update_consent_form, get_consent_form
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
@@ -124,3 +125,18 @@ def get_all_notifications(request):
         data.append(n.toJSON())
     
     return JsonResponse({"data":data})
+
+def consent(request):
+    user = logged_in_user(request)
+    post_request = loads(request.body.decode("utf-8"))
+    return JsonResponse(consent_service(user, post_request))
+
+def submit_consent_form(request):
+    user = logged_in_user(request)
+    post_request = loads(request.body.decode("utf-8"))
+    return JsonResponse(update_consent_form(user, post_request))
+
+def consent_form(request):
+    user = logged_in_user(request)
+    return JsonResponse(get_consent_form)
+

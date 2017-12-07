@@ -90,3 +90,18 @@ class Notification(models.Model):
             "description": self.description,
             "icon": self.icon
         }
+
+class ConsentForm(models.Model):
+    text = models.TextField()
+    author = models.ForeignKey(CourseUser)
+
+    def toJSON(self):
+        return {
+            "text": self.text,
+            "author": self.author
+        }
+
+class Consent(models.Model):
+    user = models.ForeignKey(CourseUser)
+    form = models.ForeignKey(ConsentForm)
+    response = models.BooleanField()

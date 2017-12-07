@@ -54,10 +54,19 @@ def merge_url_parts(parts, url=""):
         return url
     return merge_url_parts(parts, urljoin(url, parts.pop(0)))
 
-
-
 def is_administrator(course_user):
     if "Instructor" in (x.role for x in course_user.roles.all()):
         return True
     else:
         return False
+
+def verify_content(content):
+    if len(content) == 0:
+        return False
+
+    soup = BeautifulSoup(content, "html.parser")
+
+    scripts = soup.find_all('script')
+    if len(scripts) > 0:
+        return False
+    return True
