@@ -1,64 +1,59 @@
-export interface Topic {
+export interface IEngagementType {
     id: number,
     name: string
 };
-export interface CompareSet {
-    topics: Topic[], // Node List
-    ownScores: Edge[], // Edge list of self
-    compareAgainst: Edge[] // Edge list of other
+export interface ITopic {
+    id: number,
+    name: string
+};
+export interface IEdge {
+    source: ITopic,
+    target: ITopic,
+    competency: number,
+    attempts: number
+};
+export interface ICompareSet {
+    topics: ITopic[], // Node List
+    ownScores: IEdge[], // IEdge list of self
+    compareAgainst: IEdge[] // IEdge list of other
 };
 
-export interface Question {
+export interface IQuestion {
     id: number,
     difficulty: number,
     quality: number,
 
-    topics: Topic[],
+    topics: ITopic[],
 
     content: string,
     explanation: string
-    solution: Distractor,
-    distractors: Distractor[],
+    solution: IDistractor,
+    distractors: IDistractor[],
     responseCount: number
 };
-export interface Distractor {
+export interface IDistractor {
     id: number,
     content: string,
     isCorrect: boolean,
     response: string
 }
-export interface QuestionResponse {
-    author: User,
+export interface IQuestionResponse {
+    author: IUser,
     upVotes: number,
     solution: number,
     content: string
 };
 
-export interface Node {
-    source: Topic,
-    target: Topic,
-    competency: number,
-    attempts: number
-};
-
-export interface Course {
-    courseCode: string,
-    courseName: string,
-    start?: number,
-    end?: number,
-    available?: boolean
-};
-
-export interface ReportQuestion {
+export interface IReportQuestion {
     question: number,
     reason: string
 };
 
-export interface NetworkResponse {
+export interface INetworkResponse {
     error?: string
 }
 
-export interface User {
+export interface IUser {
     id: number,
     name: string,
     bio: string,
@@ -66,18 +61,24 @@ export interface User {
 
     proficiencies?: string[],
     availableTime?: Date,
-    connections: PeerConnection[]
+    connections: IPeerConnection[]
 };
 
-export interface CourseUser {
-    user: User,
-    course: Course,
+export interface ICourse {
+    courseCode: string,
+    courseName: string,
+    start?: number,
+    end?: number,
+    available?: boolean
+};
+
+export interface ICourseUser {
+    user: IUser,
+    course: ICourse,
     roles: string[],
-
-    error?: string
 };
 
-export interface PeerConnection {
+export interface IPeerConnection {
     edgeStart: number, // ID of edge start. Corresponds to a User ID
     edgeEnd: number, // ID of edge end. Corresponds to a User ID
     type: "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner",
@@ -87,7 +88,7 @@ export interface PeerConnection {
     availableTime: Date
 };
 
-export interface UserSummary {
+export interface IUserSummary {
     name: string,
     image: string,
     reputation: number,
@@ -102,7 +103,7 @@ export interface UserSummary {
     logins: number
 };
 
-export interface Badge {
+export interface IBadge {
     key: string,
     name: string,
     description: string,
@@ -113,21 +114,14 @@ export interface Badge {
     dateAcquired: Date
 };
 
-export interface Notification {
+export interface INotification {
     id: number,
     name: string,
     description: string,
     icon: string
 };
 
-export interface Edge {
-    source: Topic,
-    target: Topic,
-    competency: number,
-    attempts: number
-};
-
-export interface QuestionBuilder {
+export interface IQuestionBuilder {
     content: string,
     explanation: string,
     responses: {
@@ -137,10 +131,10 @@ export interface QuestionBuilder {
         D: string
     },
     correctIndex: string,
-    topics: Topic[]
+    topics: ITopic[]
 };
 
-export interface AuthorResponse {
+export interface IAuthorResponse {
     content: string,
     isCorrect: boolean,
     payloads: {
@@ -148,24 +142,24 @@ export interface AuthorResponse {
     }
 };
 
-export interface QuestionUpload {
-    question?: AuthorResponse,
-    explanation?: AuthorResponse,
+export interface IQuestionUpload {
+    question?: IAuthorResponse,
+    explanation?: IAuthorResponse,
     responses: {
-        A?: AuthorResponse,
-        B?: AuthorResponse,
-        C?: AuthorResponse,
-        D?: AuthorResponse
+        A?: IAuthorResponse,
+        B?: IAuthorResponse,
+        C?: IAuthorResponse,
+        D?: IAuthorResponse
     },
-    topics?: Topic[]
+    topics?: ITopic[]
 };
 
-export interface Day {
+export interface IDay {
     id: number,
     day: string
 }
 
-export interface Time {
+export interface ITime {
     id: number,
     start: {
         time: string,
@@ -177,21 +171,21 @@ export interface Time {
     }
 }
 
-export interface Availability {
+export interface IAvailability {
     id: number,
-    courseUser: CourseUser,
-    day: Day,
-    time: Time
+    courseUser: ICourseUser,
+    day: IDay,
+    time: ITime
 }
 
-export interface CourseAvailability {
-    courseUser: CourseUser,
+export interface ICourseAvailability {
+    courseUser: ICourseUser,
     day: number,
     time: number,
     entries: number
 };
 
-export interface DayTime {
+export interface IDayTime {
     day: number,
     time: number
 };
@@ -208,7 +202,7 @@ export interface ILink {
 
 export interface IServerResponse<T> {
     error: string,
-    notifications: Notification[]
+    notifications: INotification[]
     data: T
 }
 
@@ -218,22 +212,22 @@ export interface StudyRole {
     description: string
 }
 
-export interface AvailableRole {
-    courseUser: CourseUser,
-    topic: Topic,
-    studyRole: StudyRole
+export interface IAvailableRole {
+    courseUser: ICourseUser,
+    topic: ITopic,
+    studyRole: IStudyRole
 }
 
-export interface StudyRole {
+export interface IStudyRole {
     id: number,
     role: string,
     description: string
 }
 
-export interface AvailableRole {
-    courseUser: CourseUser,
-    topic: Topic,
-    studyRole: StudyRole
+export interface IAvailableRole {
+    courseUser: ICourseUser,
+    topic: ITopic,
+    studyRole: IStudyRole
 }
 
 export interface ISearch {

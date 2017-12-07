@@ -113,7 +113,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Question as IQuestion, Topic as ITopic } from "../../interfaces/models";
+import { IQuestion, ITopic } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";

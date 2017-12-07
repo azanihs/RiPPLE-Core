@@ -130,7 +130,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Topic, QuestionBuilder } from "../../interfaces/models";
+import { ITopic, IQuestionBuilder } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
@@ -151,8 +151,8 @@ import Question from "../questions/Question.vue";
 })
 export default class AuthorView extends Vue {
 
-    pTopics: Topic[] = [];
-    question: QuestionBuilder = {
+    pTopics: ITopic[] = [];
+    question: IQuestionBuilder = {
         content: "",
         explanation: "",
         responses: {
@@ -197,7 +197,7 @@ export default class AuthorView extends Vue {
         changeEditor(shouldHide ? "readonly" : "design");
     }
 
-    toggleTopic(topicToToggle: Topic) {
+    toggleTopic(topicToToggle: ITopic) {
         const topicIndex = this.question.topics.indexOf(topicToToggle);
         if (topicIndex == -1) {
             this.question.topics.push(topicToToggle);
@@ -206,11 +206,11 @@ export default class AuthorView extends Vue {
         }
     }
 
-    topicIsUsed(topic: Topic) {
+    topicIsUsed(topic: ITopic) {
         return this.question.topics.indexOf(topic) >= 0;
     }
 
-    updateTopics(newTopics: Topic[]) {
+    updateTopics(newTopics: ITopic[]) {
         this.pTopics = newTopics;
     }
 
