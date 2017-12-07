@@ -29,8 +29,8 @@ def add_question(question_request, host, user):
     
     # Cleans question and explanation content before saving as Question
     questionObj = Question(
-    content=cleanContent(question_content),
-    explanation=cleanContent(explanation_content),
+    content="",
+    explanation="",
     difficulty=0,
     quality=0,
     difficultyCount=0,
@@ -43,12 +43,18 @@ def add_question(question_request, host, user):
             # Question Images
             images = question.get("payloads", None)
             if images:
-                decodeImages(str(questionObj.id), questionObj, images, "q", host)
+                decodeImages(str(questionObj.id), questionObj, question_content, images, "q", host)
+            else:
+                questionObj.content = cleanContent(question_content)
+                questionObj.save()
 
             # Explanation Images
             images = explanation.get("payloads", None)
             if images:
-                decodeImages(str(questionObj.id), questionObj, images, "e", host)
+                decodeImages(str(questionObj.id), questionObj, explanation_content, images, "e", host)
+            else:
+                questionObj.explanation = cleanContent(explanation_content)
+                questionObj.save()
 
             # Topics
             topicList = []
@@ -67,7 +73,7 @@ def add_question(question_request, host, user):
                     return {"state": "Error", "error": "Distractor content is blank"}
                 #cleans distractor content before saving
                 distractor = Distractor(
-                    content=cleanContent(distractor_content),
+                    content="",
                     isCorrect=responses[i].get("isCorrect", None),
                     response=i,
                     question=questionObj
@@ -77,15 +83,19 @@ def add_question(question_request, host, user):
                 # Distractor Images
                 images = responses[i].get("payloads", None)
                 if images:
-                    decodeImages(str(distractor.id), distractor, images, "d", host)
+                    decodeImages(str(distractor.id), distractor, distractor_content, images, "d", host)
+                else:
+                    distractor.content = cleanContent(distractor_content)
+                    distractor.save()
     except IntegrityError as e:
         return {"state": "Error", "error": str(e)}
     except Exception as e:
         return {"state": "Error", "error": str(e)}
+    print(Question.objects.get(pk=questionObj.id).toJSON())
     return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
 
-def decodeImages(image_id, obj, images, image_type, host):
+def decodeImages(image_id, obj, content, images, image_type, host):
     # type q=question, d=distractor, e=explanation
     urls = []
     database_image_types = {
@@ -108,9 +118,9 @@ def decodeImages(image_id, obj, images, image_type, host):
         urls.append(new_image.image.name)
 
     if image_type == "e":
-        obj.explanation = newSource(urls, obj.explanation, host)
+        obj.explanation = cleanContent(newSource(urls, content, host))
     else:
-        obj.content = newSource(urls, obj.content, host)
+        obj.content = cleanContent(newSource(urls, content, host))
 
     obj.save()
     return True
@@ -131,7 +141,6 @@ def newSource(urls, content, host):
 
 def cleanContent(content):
     cleaned = bleach.clean(content, tags = allowed_tags + bleach.sanitizer.ALLOWED_TAGS,
-                            attributes=allowed_attributes, styles = allowed_styles)
+            attributes=allowed_attributes, styles = allowed_styles)
     return cleaned
 
-#'<img src="blob:http://localhost:8080/089dde17-c848-40d6-b730-355015c96940" alt="download.jpg" width="241" height="209" />' 

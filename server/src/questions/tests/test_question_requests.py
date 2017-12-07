@@ -77,7 +77,7 @@ class QuestionRequestTest(BootstrapTestCase):
         util.save_image = MagicMock(return_value = 1)
         QuestionImage.objects.create = MagicMock(return_value = test)
         image_question["question"]["content"] = "<img src = 'test'>"
-        AuthorService.newSource = MagicMock(return_value = True)
+        AuthorService.newSource = MagicMock(return_value = "test")
         response = AuthorService.add_question(image_question, "/", author)
         self.assertEqual(response["state"], "Question Added")
         self.assertEqual(response["question"], Question.objects.all()[0].toJSON())
@@ -244,3 +244,4 @@ class QuestionRequestTest(BootstrapTestCase):
         added_distractor = Distractor.objects.all()[0]
         self.assertEqual(response["state"], "Question Added")
         self.assertTrue(tag_tested in added_distractor.content)
+
