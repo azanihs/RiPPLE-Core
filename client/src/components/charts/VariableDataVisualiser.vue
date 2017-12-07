@@ -237,10 +237,8 @@ export default class VariableDataVisualiser extends Vue {
 
     toggleVisible(dataItem: ITopic) {
         if (this.hiddenData[dataItem.id]) {
-            // this.hiddenData[dataItem.id] = false;
             this.$set(this.hiddenData as any, dataItem.id, false);
         } else {
-            // this.hiddenData[dataItem.id] = true;
             this.$set(this.hiddenData as any, dataItem.id, true);
         }
 
