@@ -4,11 +4,11 @@ import pytz as timezone
 
 from django.conf import settings
 from datetime import datetime
-from ripple.util.util import save_image, mean
+from ripple.util.util import save_image, mean, verify_content, is_administrator
 
 from questions.models import Topic, Competency
 from questions.services import CompetencyService
-from users.models import Course, CourseUser, User, Role, UserImage
+from users.models import Course, CourseUser, User, Role, UserImage, Consent, ConsentForm
 from users.services.TokenService import token_to_user_course
 from ripple.util import util
 
@@ -209,3 +209,53 @@ def update_user_roles(course_user, role):
 
     if saved_role not in course_user.roles.all():
         course_user.roles.add(saved_role)
+
+def consent_service(user, request):
+    form = request.get("form", None)
+    response = request.get("response", None)
+
+    if form:
+        if response:
+            c = Consent (
+                user=user,
+                form=form,
+                response=response
+            )
+            c.save()
+            return {"data": "Answer submitted"}
+        else:
+            return {"error": "No answer proivded"}
+    else:
+        return {"error": "No form provided"}
+
+def update_consent_form(user, request):
+    if not is_administrator(user):
+        return {"error": "User does not have permission in this context"}
+
+    consent_text = request.get("text", None)
+
+    if consent_text:
+        if verify_content(consent_text):
+            c = ConsentForm (
+                text=consent_text,
+                author=user
+            )
+            c.save()
+            return {"data": "Consent form updated"}
+        else:
+            return {"error": "Invalid consent text provided"}
+    else:
+        return {"error": "No consent text provided"}
+
+def get_consent_form(user):
+    course = user.course
+    course_users = CourseUser.objects.filter(course=course)
+    form = ConsentForm.objects.filter(author__in=course_users).order_by("-id")[0]
+    if form:
+        return {"data": form.toJSON()}
+    else:
+        return {"error": "No consent form for this course"}
+
+
+
+

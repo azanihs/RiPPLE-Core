@@ -27,7 +27,7 @@ def add_question(question_request, host, user):
         qualityCount=0,
         author=user
     )
-    if (verifyContent(questionObj.content) and verifyContent(questionObj.explanation)):
+    if (util.verify_content(questionObj.content) and verify_content(questionObj.explanation)):
         questionObj.save()
     else:
         # INVALID CONTENT
@@ -63,7 +63,7 @@ def add_question(question_request, host, user):
                     question=questionObj
                 )
 
-                if verifyContent(distractor.content):
+                if util.verify_content(distractor.content):
                     distractor.save()
                 else:
                     raise IntegrityError("Invalid Distractor")
@@ -122,15 +122,3 @@ def newSource(urls, content, host):
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
-
-
-def verifyContent(content):
-    if len(content) == 0:
-        return False
-
-    soup = BeautifulSoup(content, "html.parser")
-
-    scripts = soup.find_all('script')
-    if len(scripts) > 0:
-        return False
-    return True
