@@ -3,7 +3,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
-from users.models import Course, User, CourseUser
+from users.models import Course, User, CourseUser, ConsentForm
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
@@ -238,6 +238,13 @@ class Command(BaseCommand):
                 if chance(2):
                     course_users.append(
                         CourseUser.objects.create(user=user, course=course))
+
+            print("\t-Adding Consent Form")
+            form = ConsentForm (
+                text="Testing consent form",
+                author=course_users[0]
+            )
+            form.save()
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)

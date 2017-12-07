@@ -98,7 +98,7 @@ class ConsentForm(models.Model):
     def toJSON(self):
         return {
             "text": self.text,
-            "author": self.author
+            "author": self.author.toJSON()
         }
 
 class Consent(models.Model):

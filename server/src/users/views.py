@@ -7,8 +7,7 @@ import imghdr
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
-from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image, \
-        consent_service, update_consent_form, get_consent_form
+from users.services import UserService
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
@@ -26,13 +25,13 @@ def index(request):
 def me(request):
     token = request.META.get("HTTP_AUTHORIZATION", None)
     user_course = token_to_user_course(token)
-    
+
     return JsonResponse({"data": user_course.toJSON()})
 
 
 def courses(request):
-    user = logged_in_user(request)
-    return JsonResponse({"data": user_courses(user)})
+    user = UserService.logged_in_user(request)
+    return JsonResponse({"data": UserService.user_courses(user)})
 
 
 def update(request):
@@ -42,8 +41,8 @@ def update(request):
         }, status=405)
 
     post_request = loads(request.body.decode("utf-8"))
-    user = logged_in_user(request)
-    return JsonResponse({"data": update_course(user, post_request)})
+    user = UserService.logged_in_user(request)
+    return JsonResponse({"data": UserService.update_course(user, post_request)})
 
 
 def login(request, course_code):
@@ -82,7 +81,7 @@ def image_update(request):
         if len(x) == 0: return x
         return (x + "/") if x[-1] != "/" else x
 
-    course_user = logged_in_user(request)
+    course_user = UserService.logged_in_user(request)
 
     root_path = util.merge_url_parts([
         _format("//" + request.get_host()),
@@ -91,15 +90,15 @@ def image_update(request):
     ])
 
     return JsonResponse({
-        "data":update_user_image(course_user.user, root_path, new_image)
+        "data":UserService.update_user_image(course_user.user, root_path, new_image)
     })
 
 
 def get_all_user_achievements(request):
-    user = logged_in_user(request)
+    user = UserService.logged_in_user(request)
 
     achievements = Achievement.objects.all()
-    data = []    
+    data = []
     for ach in achievements:
         result = engine.check_achievement(user=user, key=ach.key)
         data.append(result)
@@ -115,7 +114,7 @@ def get_all_user_achievements(request):
     return JsonResponse({"data": data})
 
 def get_all_notifications(request):
-    user = logged_in_user(request)
+    user = UserService.logged_in_user(request)
 
     notifications = Notification.objects.filter(user=user)
     data = []
@@ -123,20 +122,24 @@ def get_all_notifications(request):
     for n in notifications:
         n.sent = True
         data.append(n.toJSON())
-    
+
     return JsonResponse({"data":data})
 
 def consent(request):
-    user = logged_in_user(request)
+    user = UserService.logged_in_user(request)
     post_request = loads(request.body.decode("utf-8"))
-    return JsonResponse(consent_service(user, post_request))
+    return JsonResponse(UserService.consent_service(user, post_request))
 
 def submit_consent_form(request):
-    user = logged_in_user(request)
+    user = UserService.logged_in_user(request)
     post_request = loads(request.body.decode("utf-8"))
-    return JsonResponse(update_consent_form(user, post_request))
+    return JsonResponse(UserService.update_consent_form(user, post_request))
 
 def consent_form(request):
-    user = logged_in_user(request)
-    return JsonResponse(get_consent_form)
+    user = UserService.logged_in_user(request)
+    return JsonResponse(UserService.get_consent_form(user))
+
+def has_consented(request):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(UserService.has_consented_course(user))
 

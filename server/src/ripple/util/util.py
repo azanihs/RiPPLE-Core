@@ -2,6 +2,7 @@ import itertools
 from django.core.files.base import ContentFile
 from base64 import b64decode
 import imghdr
+from bs4 import BeautifulSoup
 try:
     from urlparse import urljoin
 except ImportError:

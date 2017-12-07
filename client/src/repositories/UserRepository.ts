@@ -1,6 +1,6 @@
 import {
     CourseUser, User, Course,
-    Notification, Topic, PeerConnection, Edge, UserSummary
+    Notification, Topic, PeerConnection, Edge, UserSummary, ConsentForm
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
@@ -109,9 +109,27 @@ const makeUser = () => {
     return user;
 };
 
+let _courseCode = "";
+const _hasConsentedMap: Map<string, boolean> = new Map<string, boolean>();
 export default class UserRepository {
+    static userHasConsentedForCourse(): Promise<boolean> {
+        if (_hasConsentedMap.has(_courseCode)) {
+            return Promise.resolve(_hasConsentedMap.get(_courseCode)!);
+        } else {
+            return apiFetch<boolean>(`/users/has_consented/`)
+                .then(x => {
+                    _hasConsentedMap.set(_courseCode, x);
+                    return x;
+                });
+        }
+    }
+
     static getLoggedInUser(): Promise<CourseUser> {
         return apiFetch<CourseUser>(`/users/me/`);
+    }
+
+    static getConsentForm(): Promise<ConsentForm> {
+        return apiFetch<ConsentForm>(`/users/consent_form`);
     }
 
     static getUserCourses(): Promise<Course[]> {
@@ -220,6 +238,7 @@ export default class UserRepository {
     static authenticate(courseCode?: string): Promise<void> {
         return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
+                _courseCode = x.courseCode;
                 setToken(x.token);
             });
     }
@@ -249,5 +268,32 @@ export default class UserRepository {
                 image: newImage
             })
         });
+    }
+
+    static uploadConsentForm(consentForm: ConsentForm): Promise<ConsentForm> {
+        return apiFetch<{consentForm: ConsentForm}>(`/users/submit_consent_form/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(consentForm)
+        })
+            .then(x => x.consentForm);
+    }
+
+    static sendConsent(response: boolean): Promise<string> {
+        return apiFetch<{response: string}>(`/users/consent/`, {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({ "response": response })
+        })
+            .then(function(x) {
+                _hasConsentedMap.set(_courseCode, true);
+                return x.response;
+            });
     }
 }
