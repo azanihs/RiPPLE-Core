@@ -53,13 +53,15 @@ def respond(request):
     post_request = loads(request.body.decode("utf-8"))
     distractor_id = post_request.get("distractorID", None)
 
-    if distractor_id is None:
-        return JsonResponse({"error": "Missing integer distractorID in request"}, status=422)
-    if QuestionService.respond_to_question(distractor_id, UserService.logged_in_user(request)) is False:
-        return JsonResponse({"error": "Invalid distractorID"}, status=422)
-    else:
-        return JsonResponse({})
-
+    try:
+        if distractor_id is None:
+            return JsonResponse({"error": "Missing integer distractorID in request"}, status=422)
+        if QuestionService.respond_to_question(distractor_id, UserService.logged_in_user(request)) is False:
+            return JsonResponse({"error": "Invalid distractorID"}, status=422)
+        else:
+            return JsonResponse({})
+    except ValueError:
+        return JsonResponse({"error": "You are not enrolled in the course for this course"}, status=403)
 
 def rate(request):
     if request.method != 'POST':
@@ -113,7 +115,7 @@ def random_question_id(request):
     logged_in_user = UserService.logged_in_user(request)
     question = QuestionService.get_random_question(logged_in_user)
     if question is None:
-        return JsonResponse({"error": "User does not belong to course"}, status=403)
+        return JsonResponse({"error": "You are not enrolled in the course for this question"}, status=403)
 
     return JsonResponse({"data": question.id})
 
@@ -122,7 +124,7 @@ def id(request, id):
     question = QuestionService.get_question_by_id(logged_in_user, id)
 
     if question is None:
-        return JsonResponse({"error": "User does not belong to course"}, status=403)
+        return JsonResponse({"error": "You are not enrolled in the course for this question"}, status=403)
 
     return JsonResponse({"data": question.toJSON()})
 
@@ -184,8 +186,8 @@ def search(request):
     page_size = post_request.get("pageSize", 25)
 
     if sort_field is None and filter_field is None and query is None:
-        found_questions = QuestionService.all_questions()
-        return page_response(found_questions, page_index, page_size)
+        search_result = search_query.execute()
+        return page_response(search_result, page_index, page_size)
 
     if sort_field is not None:
         search_query.add_sort(sort_field, sort_order)
@@ -202,9 +204,10 @@ def search(request):
     try:
         search_result = search_query.execute()
         return page_response(search_result, page_index, page_size)
-    except TypeError:
-        all_questions = QuestionService.all_questions()
-        return page_response(all_questions, page_index, page_size)
+    except TypeError as e:
+        return JsonResponse({
+            "error": e
+        })
 
 def page_response(data, page_index, page_size=25):
     page_manager = Paginator(data, page_size)

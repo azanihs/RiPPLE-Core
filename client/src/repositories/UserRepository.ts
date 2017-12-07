@@ -1,5 +1,5 @@
 import {
-    CourseUser, User, Course,
+    CourseUser, User, Course, ISearch,
     Notification, Topic, PeerConnection, Edge, UserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
@@ -108,6 +108,19 @@ const makeUser = () => {
     };
     return user;
 };
+
+const _defaultSearch = () => ({
+    sortField: "",
+    sortDesc: false,
+    filterField: "All Questions",
+    query: "",
+    page: 0,
+    filterTopics: []
+});
+
+const _searchCaches: Map<string, ISearch> = new Map<string, ISearch>();
+
+let _currentCourse: string = "";
 
 export default class UserRepository {
     static getLoggedInUser(): Promise<CourseUser> {
@@ -221,7 +234,23 @@ export default class UserRepository {
         return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
                 setToken(x.token);
+                _currentCourse = x.courseCode;
             });
+    }
+
+    static getSearchCacheForCourse() {
+        console.log("Getting for course: " + _currentCourse, _searchCaches);
+        const cache = _searchCaches.get(_currentCourse);
+        if (!cache) {
+            _searchCaches.set(_currentCourse, _defaultSearch());
+        }
+        return Promise.resolve(_searchCaches.get(_currentCourse)!);
+    }
+
+    static setSearchCacheForCourse(search: ISearch) {
+        console.log("Setting for course: " + _currentCourse, _searchCaches);
+        const arrCopy = search.filterTopics.slice();
+        _searchCaches.set(_currentCourse, Object.assign({}, search, { filterTopics: arrCopy }));
     }
 
     static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {

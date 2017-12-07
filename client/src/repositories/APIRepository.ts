@@ -75,7 +75,20 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             } else {
                 return Promise.resolve(x.data);
             }
-        });
+        })
+        .catch((err: Response) => err.json().then((errorObject: any) => {
+            if (errorObject.error) {
+                console.log("__");
+                // TODO: Handle global things
+                addEventsToQueue([{
+                    id: performance.now(),
+                    icon: "error",
+                    name: `Server Error`,
+                    description: `${errorObject.error}`
+                }]);
+            }
+            throw err;
+        }));
 };
 
 export const setToken = (newToken: string) => {

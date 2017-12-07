@@ -1,5 +1,6 @@
 import QuestionRepository from "../repositories/QuestionRepository";
-import { Question, ReportQuestion } from "../interfaces/models";
+import UserRepository from "../repositories/UserRepository";
+import { Question, ReportQuestion, ISearch } from "../interfaces/models";
 
 interface ISearchQuery {
     sortField?: string,
@@ -47,4 +48,10 @@ export default class QuestionService {
         return QuestionRepository.getRandomCourseQuestion();
     }
 
+    static getSearchCacheForCourse() {
+        return UserRepository.getSearchCacheForCourse();
+    }
+    static setSearchCacheForCourse(search: ISearch) {
+        return UserRepository.setSearchCacheForCourse(search);
+    }
 }
