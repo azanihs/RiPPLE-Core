@@ -27,7 +27,7 @@ def add_question(question_request, host, user):
         qualityCount=0,
         author=user
     )
-    if (util.verify_content(questionObj.content) and verify_content(questionObj.explanation)):
+    if (util.verify_content(questionObj.content) and util.verify_content(questionObj.explanation)):
         questionObj.save()
     else:
         # INVALID CONTENT

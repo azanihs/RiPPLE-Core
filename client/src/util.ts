@@ -34,12 +34,22 @@ export function getLinks(): ILink[] {
         }, {
             text: "Notifications",
             href: "/profile/notifications"
+        }, {
+            text: "Consent",
+            href: "/profile/consent"
         }]
     };
     const adminLink: ILink = {
         text: "Admin",
         href: "/admin",
-        icon: "widgets"
+        icon: "widgets",
+        submenu: [{
+            text: "Overview",
+            href: "/admin"
+        }, {
+            text: "Consent Form",
+            href: "/admin/consent"
+        }]
     };
     const leaderLink: ILink = {
         text: "Leaders",

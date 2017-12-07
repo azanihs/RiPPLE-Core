@@ -59,7 +59,7 @@ def update_course(course_user, new_data):
         return {"error": "Course must have topics"}
     for t in topics:
         if not t.get("name", None):
-            return {"error": 
+            return {"error":
                 "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
     course_code = course_information.get("courseCode", None)
@@ -131,7 +131,7 @@ def _process_competencies(competencies):
         if comp.confidence < threshold:
             continue
 
-        # Only use two topics. 
+        # Only use two topics.
         nodes = comp.topics.all()
         if not(len(nodes) > 0 and len(nodes) <= 2):
             continue
@@ -150,7 +150,7 @@ def user_competencies(user):
     try:
         return _process_competencies(Competency.objects.filter(user=user))
     except TypeError:
-        return[] 
+        return[]
 
 def aggregate_competencies(user, compare_type):
     if user is None or compare_type is None:
@@ -211,18 +211,21 @@ def update_user_roles(course_user, role):
         course_user.roles.add(saved_role)
 
 def consent_service(user, request):
-    form = request.get("form", None)
+    form = get_form(user)
     response = request.get("response", None)
 
     if form:
-        if response:
+        if response is not None:
             c = Consent (
                 user=user,
                 form=form,
                 response=response
             )
             c.save()
-            return {"data": "Answer submitted"}
+            if response:
+                return {"data": {"response": "Accepted"}}
+            else:
+                return {"data": {"response": "Declined"}}
         else:
             return {"error": "No answer proivded"}
     else:
@@ -248,14 +251,27 @@ def update_consent_form(user, request):
         return {"error": "No consent text provided"}
 
 def get_consent_form(user):
-    course = user.course
-    course_users = CourseUser.objects.filter(course=course)
-    form = ConsentForm.objects.filter(author__in=course_users).order_by("-id")[0]
+    form = get_form(user)
     if form:
         return {"data": form.toJSON()}
     else:
         return {"error": "No consent form for this course"}
 
+def has_consented_course(user):
+    form = get_form(user)
+    if form:
+        consent = Consent.objects.filter(form=form, user=user)
+        if consent:
+            return {"data": True}
+        else:
+            return {"data": False}
+    else:
+        return {"error": "No consent form for this course"}
 
 
-
+def get_form(user):
+    course = user.course
+    course_users = CourseUser.objects.filter(course=course)
+    form = ConsentForm.objects.filter(author__in=course_users).order_by("-id")
+    if form:
+        return form[0]

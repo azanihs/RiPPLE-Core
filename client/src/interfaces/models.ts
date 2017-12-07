@@ -77,6 +77,18 @@ export interface CourseUser {
     error?: string
 };
 
+export interface ConsentForm {
+    text: string,
+    author: CourseUser,
+
+    error?: string
+};
+
+export interface ConsentUpload {
+    text: AuthorResponse,
+    author: CourseUser
+};
+
 export interface PeerConnection {
     edgeStart: number, // ID of edge start. Corresponds to a User ID
     edgeEnd: number, // ID of edge end. Corresponds to a User ID

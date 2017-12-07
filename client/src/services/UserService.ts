@@ -1,6 +1,13 @@
-import { Topic, Edge, Course, CompareSet } from "../interfaces/models";
+import { Topic, Edge, Course, CompareSet, ConsentForm } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
+import ImageService from "./ImageService";
+
+interface IValidate {
+    message: string,
+    args: any,
+    validateFunction: (args: any) => boolean
+};
 
 function addTopicsToEdgeList(topics: Topic[], edges: Edge[]) {
     topics.forEach(topic => {
@@ -17,6 +24,42 @@ function addTopicsToEdgeList(topics: Topic[], edges: Edge[]) {
 }
 
 export default class UserService {
+    static sendConsent(response: boolean) {
+        return UserRepository.sendConsent(response);
+    }
+
+    static validateConsentForm(consentForm: ConsentForm) {
+        const validators: IValidate[] = [{
+            message: "Consent text cannot be empty",
+            validateFunction: ImageService.domIsNotEmpty,
+            args: consentForm.text
+        }];
+        for (let i = 0; i < validators.length; ++i) {
+            const entry = validators[i];
+            if (entry.validateFunction(entry.args) === false) {
+                return entry.message;
+            }
+        }
+        return "";
+    }
+
+    static prepareConsentUpload(consentForm: ConsentForm) {
+        const upload: ConsentForm = {
+            text: "undefined",
+            author: consentForm.author
+        };
+
+        return ImageService.extractImagesFromDOM(consentForm.text)
+            .then(consentContent => {
+                upload.text = consentContent.content;
+            }).then(() => upload);
+    }
+
+    static uploadContent(upload: ConsentForm) {
+        return UserRepository.uploadConsentForm(upload);
+    }
+
+
     static generateGraph(sourceData: Edge[], otherData: Edge[], exclude: number[]): CompareSet {
         const ownScores = sourceData;
         const userGoals = otherData;
@@ -79,6 +122,10 @@ export default class UserService {
 
     static getLoggedInUser() {
         return UserRepository.getLoggedInUser();
+    }
+
+    static getConsentForm() {
+        return UserRepository.getConsentForm();
     }
 
     static getAllAvailableCategories() {
