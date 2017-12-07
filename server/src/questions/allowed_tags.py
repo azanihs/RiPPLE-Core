@@ -17,5 +17,5 @@ allowed_attributes = {'a': ['href', 'title', 'target', 'rel'], 'acronym': ['titl
 """bleach.sanitizer.ALLOWED_STYLES by default is an empty list"""
 #List of available styles to use with bleach
 allowed_styles = ['text-decoration', 'color', 'background-color', 'text-align', 'padding-left', 'border-collapse', 
-                'border-style', 'border-color']
+                'border-style', 'border-color', 'width', 'height']
                 
