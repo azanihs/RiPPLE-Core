@@ -96,6 +96,22 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
         });
 };
 
+export const apiPost = <T>(url: string, body: Object, opts?: RequestInit) => {
+    const postOptions = {
+        method: "POST",
+        headers: new Headers({
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }),
+        body: JSON.stringify(body)
+    };
+    if (opts) {
+        Object.assign(postOptions, opts);
+    }
+
+    return apiFetch<T>(url, postOptions);
+};
+
 export const setToken = (newToken: string) => {
     token = newToken;
 };

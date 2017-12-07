@@ -3,7 +3,7 @@ import {
     INotification, ITopic, IPeerConnection, IEdge, IUserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
-import { setToken, apiFetch } from "./APIRepository";
+import { setToken, apiFetch, apiPost } from "./APIRepository";
 
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
@@ -252,29 +252,12 @@ export default class UserRepository {
     }
 
     static updateCourse(course: ICourse, topics: ITopic[]): Promise<ICourseUser> {
-        return apiFetch<ICourseUser>(`/users/courses/update/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                course: course,
-                topics: topics
-            })
-        });
+        return apiPost<ICourseUser>(`/users/courses/update/`, { course, topics });
     }
 
     static updateUserImage(newImage: string): Promise<IUser> {
-        return apiFetch<IUser>(`/users/me/image/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                image: newImage
-            })
+        return apiPost<IUser>(`/users/me/image/`, {
+            image: newImage
         });
     }
 }

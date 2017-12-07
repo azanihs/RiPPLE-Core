@@ -1,5 +1,5 @@
 import { IAvailability, ICourseAvailability, IDay, ITime, IAvailableRole, IStudyRole } from "../interfaces/models";
-import { apiFetch } from "./APIRepository";
+import { apiFetch, apiPost } from "./APIRepository";
 
 export default class AvailabilityRepository {
 
@@ -20,17 +20,7 @@ export default class AvailabilityRepository {
     }
 
     static updateUserAvailability(day: number, time: number): Promise<IAvailability> {
-        return apiFetch<IAvailability>(`/recommendations/availability/update/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                day: day,
-                time: time
-            })
-        });
+        return apiPost<IAvailability>(`/recommendations/availability/update/`, { day, time });
     }
 
     static getStudyRoles(): Promise<IStudyRole[]> {
@@ -42,16 +32,6 @@ export default class AvailabilityRepository {
     }
 
     static updateUserRoles(topic: number, studyRole: number): Promise<IAvailableRole> {
-        return apiFetch<IAvailableRole>(`/recommendations/roles/update/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                topic: topic,
-                studyRole: studyRole
-            })
-        });
+        return apiPost<IAvailableRole>(`/recommendations/roles/update/`, { topic, studyRole });
     }
 }
