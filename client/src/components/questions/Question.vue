@@ -1,13 +1,14 @@
 <template>
     <md-layout class="bottomSpace">
+        <page-loader :condition="!question"></page-loader>
         <md-layout md-hide-xsmall
                    md-hide-small
                    md-hide-medium
                    class="questionNavigation">
-            <action-buttons @back="closeQuestion()" 
+            <action-buttons @back="closeQuestion()"
                     @report="openDialog()"></action-buttons>
         </md-layout>
-        <md-layout md-flex="100">
+        <md-layout md-flex="100" v-if="question">
             <md-layout md-flex="100"
                        class="questionContainer componentSeparator">
                 <md-card>
@@ -99,13 +100,6 @@
                 </form>
             </md-dialog-content>
         </md-dialog>
-        <md-snackbar md-position="bottom center"
-            ref="snackbar"
-            md-duration="4000">
-            <span>{{networkMessage}}</span>
-            <md-button class="md-accent"
-                @click="$refs.snackbar.close()">Close</md-button>
-        </md-snackbar>
     </md-layout>
 </template>
 
@@ -220,15 +214,17 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
+import { addEventsToQueue } from "../../util";
 import QuestionService from "../../services/QuestionService";
 
 import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
+import PageLoader from "../util/PageLoader.vue";
 
 import TopicChip from "../util/TopicChip.vue";
 
@@ -240,11 +236,12 @@ const _MODAL_NAME = "report_question_modal";
         QuestionRater,
         QuestionResponse,
         QuestionDetails,
-        TopicChip
+        TopicChip,
+        PageLoader
     }
 })
 export default class Question extends Vue {
-    @Prop question = p<QuestionModel>({
+    @Prop id = p<number>({
         required: true
     });
 
@@ -252,42 +249,64 @@ export default class Question extends Vue {
         default: true
     });
 
+    pQuestion: QuestionModel | undefined = undefined;
+
     reason = "";
     reasonList = ["Inappropriate Content", "Incorrect Answer", "Incorrect Tags"];
     reasonsUsed: string[] = []
-    networkMessage = "";
 
     userIsFinishedWithQuestion: boolean = false;
 
     updateUserAnswer(wasCorrect: boolean) {
         this.userIsFinishedWithQuestion = wasCorrect;
+        if (this.question !== undefined) {
+            this.question.responseCount++;
+        }
+    }
 
-        // TODO: Emit an event rather than mutate own prop.
-        this.question.responseCount++;
+    get question() {
+        return this.pQuestion;
     }
 
     nextQuestion() {
-        this.$emit("newQuestion");
+        QuestionService.getRandomCourseQuestion()
+            .then(questionId => {
+                this.$router.push({
+                    path: `/question/id/${questionId}`
+                });
+            });
     }
 
     closeQuestion() {
-        this.$emit("userAnswer");
+        this.$router.push("/question/answer");
+    }
+
+    updateQuestion() {
+        QuestionService.getQuestionById(this.id)
+            .then((question: QuestionModel | undefined) => {
+                this.pQuestion = question;
+            });
+    }
+
+    @Lifecycle
+    created() {
+        this.updateQuestion();
     }
 
     reportQuestion() {
         this.reasonsUsed.push(this.reason);
-        QuestionService.reportQuestion(this.question, this.reasonsUsed.toString())
-            .then(x => {
-                if (x.error !== undefined) {
-                    this.networkMessage = "Error Submitting Report.";
-                    (this.$refs.snackbar as any).open();
-                }
-                this.networkMessage = "Question Reported.";
-                (this.$refs.snackbar as any).open();
+        QuestionService.reportQuestion(this.id, this.reasonsUsed.toString())
+            .then(_ => {
+                addEventsToQueue([{
+                    id: -4,
+                    name: "Question Reported",
+                    description: "Question Reported.",
+                    icon: "done"
+                }]);
+                this.reasonsUsed.splice(0, this.reasonsUsed.length);
+                this.reason = "";
+
                 this.closeDialog();
-            })
-            .catch(err => {
-                this.networkMessage = err;
             });
     }
 

@@ -235,3 +235,12 @@ export interface AvailableRole {
     topic: Topic,
     studyRole: StudyRole
 }
+
+export interface ISearch {
+    sortField: string,
+    sortDesc: boolean,
+    filterField: string,
+    query: string,
+    page: number,
+    filterTopics: number[]
+};

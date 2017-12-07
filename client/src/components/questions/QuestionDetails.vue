@@ -25,7 +25,7 @@
             <div>
                 <topic-chip v-for="topic in question.topics"
                             :key="topic.id"
-                            linkTo="/view/questions">
+                            :disabled="true">
                     {{topic.name}}
                 </topic-chip>
             </div>

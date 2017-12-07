@@ -253,7 +253,11 @@ export default class QuestionResponse extends Vue {
         return this.userAnswer;
     }
 
-    set questionResponse(newValue) {
+    set questionResponse(newValue: number) {
+        if (this.userHasCorrectAnswer) {
+            return;
+        }
+
         const distractor = this.question.distractors[newValue];
         this.disabledResponses.push(distractor);
         this.userAnswer = newValue;
