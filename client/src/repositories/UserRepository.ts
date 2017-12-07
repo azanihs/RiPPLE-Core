@@ -239,7 +239,6 @@ export default class UserRepository {
     }
 
     static getSearchCacheForCourse() {
-        console.log("Getting for course: " + _currentCourse, _searchCaches);
         const cache = _searchCaches.get(_currentCourse);
         if (!cache) {
             _searchCaches.set(_currentCourse, _defaultSearch());
@@ -248,7 +247,6 @@ export default class UserRepository {
     }
 
     static setSearchCacheForCourse(search: ISearch) {
-        console.log("Setting for course: " + _currentCourse, _searchCaches);
         const arrCopy = search.filterTopics.slice();
         _searchCaches.set(_currentCourse, Object.assign({}, search, { filterTopics: arrCopy }));
     }
