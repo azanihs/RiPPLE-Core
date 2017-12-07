@@ -1,5 +1,6 @@
 <template>
-    <md-layout class="bottomSpace" v-if="question">
+    <md-layout class="bottomSpace">
+        <page-loader :condition="!question"></page-loader>
         <md-layout md-hide-xsmall
                    md-hide-small
                    md-hide-medium
@@ -7,7 +8,7 @@
             <action-buttons @back="closeQuestion()"
                     @report="openDialog()"></action-buttons>
         </md-layout>
-        <md-layout md-flex="100">
+        <md-layout md-flex="100" v-if="question">
             <md-layout md-flex="100"
                        class="questionContainer componentSeparator">
                 <md-card>
@@ -100,7 +101,6 @@
             </md-dialog-content>
         </md-dialog>
     </md-layout>
-    <page-loader v-else></page-loader>
 </template>
 
 <style>

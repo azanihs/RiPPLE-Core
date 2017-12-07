@@ -43,13 +43,13 @@
                 :data="question"></question-preview>
         </md-layout>
     </md-layout>
-    <page-loader v-if="showQuestions.length == 0"></page-loader>
 </md-layout>
 </template>
 
 <style scoped>
 .questionLink {
     color: inherit !important;
+    flex-grow: 1;
 }
 .questionLink:hover {
     text-decoration: inherit !important;
@@ -120,7 +120,6 @@ import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
 import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
-import PageLoader from "../util/PageLoader.vue";
 
 
 @Component({
@@ -129,8 +128,7 @@ import PageLoader from "../util/PageLoader.vue";
         VariableDataVisualiser,
         QuestionSearch,
         QuestionPreview,
-        Question,
-        PageLoader
+        Question
     }
 })
 export default class QuestionBrowser extends Vue {

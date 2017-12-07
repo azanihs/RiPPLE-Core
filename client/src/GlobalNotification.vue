@@ -14,7 +14,7 @@
         left: 0px;
         bottom: 0px;
         width: 100%;
-        z-index: 5000;
+        z-index: 50000;
 
         display: flex;
         justify-content: center;
