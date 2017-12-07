@@ -267,7 +267,7 @@ class QuestionTestCase(BootstrapTestCase):
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
 
-        self.assertEqual(None, QuestionService.get_question_by_id(-1))
+        self.assertEqual(None, QuestionService.get_question_by_id(author, -1))
 
     def test_questions_available(self):
         """ Only same course questions available to responder """
