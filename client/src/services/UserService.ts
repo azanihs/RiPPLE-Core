@@ -1,8 +1,8 @@
-import { Topic, Edge, Course, CompareSet } from "../interfaces/models";
+import { ITopic, IEdge, ICourse, ICompareSet } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 
-function addTopicsToEdgeList(topics: Topic[], edges: Edge[]) {
+function addTopicsToEdgeList(topics: ITopic[], edges: IEdge[]) {
     topics.forEach(topic => {
         if (!edges.find(ownScore => ownScore.source == topic && ownScore.target == topic)) {
             edges = edges.concat({
@@ -17,13 +17,13 @@ function addTopicsToEdgeList(topics: Topic[], edges: Edge[]) {
 }
 
 export default class UserService {
-    static generateGraph(sourceData: Edge[], otherData: Edge[], exclude: number[]): CompareSet {
+    static generateGraph(sourceData: IEdge[], otherData: IEdge[], exclude: number[]): ICompareSet {
         const ownScores = sourceData;
         const userGoals = otherData;
         const topics = ownScores
             .map(x => x.source)
             .concat(ownScores.map(x => x.target))
-            .reduce((carry: Topic[], topicNode: Topic) => {
+            .reduce((carry: ITopic[], topicNode: ITopic) => {
                 if (!carry.find(x => x == topicNode)) {
                     carry.push(topicNode);
                 }
@@ -33,8 +33,8 @@ export default class UserService {
 
         return {
             topics: topics, // Node List
-            ownScores: ownScores, // Edge list of self
-            compareAgainst: userGoals // Edge list of other
+            ownScores: ownScores, // IEdge list of self
+            compareAgainst: userGoals // IEdge list of other
         };
     }
 
@@ -113,7 +113,7 @@ export default class UserService {
         return UserRepository.getUserCourses();
     }
 
-    static updateCourse(data: { course: Course, topics: Topic[] }) {
+    static updateCourse(data: { course: ICourse, topics: ITopic[] }) {
         return UserRepository.updateCourse(data.course, data.topics);
     }
 }

@@ -104,7 +104,7 @@ input {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Topic, ISearch } from "../../interfaces/models";
+import { ITopic, ISearch } from "../../interfaces/models";
 
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
@@ -131,7 +131,7 @@ export default class QuestionSearch extends Vue {
         default: 25
     });
 
-    pTopics: Topic[] = [];
+    pTopics: ITopic[] = [];
 
     get searchableFields() {
         return [{
@@ -189,7 +189,7 @@ export default class QuestionSearch extends Vue {
 
     search: ISearch | undefined = undefined;
 
-    updateCourseTopics(newTopics: Topic[]) {
+    updateCourseTopics(newTopics: ITopic[]) {
         this.pTopics = newTopics;
         QuestionService.getSearchCacheForCourse()
             .then(x => {

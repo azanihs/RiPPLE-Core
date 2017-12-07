@@ -71,13 +71,13 @@
 
 <script lang="ts">
     import { Vue, Component, Lifecycle } from "av-ts";
-    import { Notification } from "./interfaces/models";
+    import { INotification } from "./interfaces/models";
     import { getBus, NEW_QUEUE_ITEM } from "./util";
 
     @Component
     export default class GlobalNotification extends Vue {
-        pEventQueue: Notification[] = [];
-        pNotification: Notification | undefined = undefined;
+        pEventQueue: INotification[] = [];
+        pNotification: INotification | undefined = undefined;
         snackbarCloseTimeout: number | undefined = undefined;
 
         snackbarIsClosed = true;
@@ -91,7 +91,7 @@
                 "closed": this.snackbarIsClosed
             };
         }
-        updateQueue(newItem: Notification) {
+        updateQueue(newItem: INotification) {
             // If the queue was quiet before, trigger first cycle
             if (this.pEventQueue.length === 0) {
                 this.$nextTick(() => this.cycleQueue());

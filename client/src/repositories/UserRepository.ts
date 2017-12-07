@@ -1,6 +1,6 @@
 import {
-    CourseUser, User, Course, ISearch,
-    Notification, Topic, PeerConnection, Edge, UserSummary
+    ICourseUser, IUser, ICourse, ISearch,
+    INotification, ITopic, IPeerConnection, IEdge, IUserSummary
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
@@ -47,19 +47,19 @@ const notifications = Array.from({ length: notificationCount }).map((_, i: numbe
     icon: _icons[_n(4)]
 }));
 
-const engagementNodes: Topic[] = engagementTypes.map((x, i) => ({
-    id: 1000 + i,
+const engagementNodes: ITopic[] = engagementTypes.map((x, i) => ({
+    id: i,
     name: x
 }));
 
-type ServerEdge = {
-    0: Topic,
-    1: Topic,
+type IServerEdge = {
+    0: ITopic,
+    1: ITopic,
     2: number,
     3: number
 };
 
-const userEngagementScores: ServerEdge[] = [];
+const userEngagementScores: IServerEdge[] = [];
 engagementNodes.forEach(engagementNode => {
     // Ensure at least one self-loop per topic
     userEngagementScores.push([engagementNode, engagementNode,
@@ -81,7 +81,7 @@ const makeUser = () => {
     };
 
     const connections = new Array(2 + _n(8)).fill(0).map(_ => {
-        const connection: PeerConnection = {
+        const connection: IPeerConnection = {
             edgeStart: 0,
             edgeEnd: 0,
             type: getType(_n(2)),
@@ -96,7 +96,7 @@ const makeUser = () => {
     const proficiencies = Array.from({ length: proficienciesLength },
         _ => _topics[_n(_topics.length)]) as string[];
 
-    const user: User = {
+    const user: IUser = {
         id: IDCounter++,
         name: "_",
         bio: "_",
@@ -123,15 +123,15 @@ const _searchCaches: Map<string, ISearch> = new Map<string, ISearch>();
 let _currentCourse: string = "";
 
 export default class UserRepository {
-    static getLoggedInUser(): Promise<CourseUser> {
-        return apiFetch<CourseUser>(`/users/me/`);
+    static getLoggedInUser(): Promise<ICourseUser> {
+        return apiFetch<ICourseUser>(`/users/me/`);
     }
 
-    static getUserCourses(): Promise<Course[]> {
-        return apiFetch<Course[]>(`/users/courses/`);
+    static getUserCourses(): Promise<ICourse[]> {
+        return apiFetch<ICourse[]>(`/users/courses/`);
     }
 
-    static getUserConnections(count: number): Promise<User[]> {
+    static getUserConnections(count: number): Promise<IUser[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(Array.from({ length: count }, makeUser));
@@ -139,7 +139,7 @@ export default class UserRepository {
         });
     }
 
-    static getUserNotifications(): Promise<Notification[]> {
+    static getUserNotifications(): Promise<INotification[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(notifications);
@@ -155,7 +155,7 @@ export default class UserRepository {
         });
     }
 
-    static getAllAvailableEngagementTypes(): Promise<Topic[]> {
+    static getAllAvailableEngagementTypes(): Promise<ITopic[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(engagementNodes);
@@ -163,14 +163,14 @@ export default class UserRepository {
         });
     }
 
-    static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
-        return apiFetch<UserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
+    static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<IUserSummary[]> {
+        return apiFetch<IUserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
     }
 
-    static getCompareAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch<ServerEdge[]>(`/questions/competencies/aggregate/${compareTo}/`)
+    static getCompareAgainst(compareTo: string): Promise<IEdge[]> {
+        return apiFetch<IServerEdge[]>(`/questions/competencies/aggregate/${compareTo}/`)
         .then(x => x.map(x => {
-            const edge: Edge = {
+            const edge: IEdge = {
                 source: TopicRepository.topicPointer(x[0]),
                 target: TopicRepository.topicPointer(x[1]),
                 competency: Math.round(x[2] * 100),
@@ -180,10 +180,10 @@ export default class UserRepository {
         }));
     }
 
-    static getUserCompetencies(): Promise<Edge[]> {
-        return apiFetch<ServerEdge[]>(`/questions/competencies/all/`)
+    static getUserCompetencies(): Promise<IEdge[]> {
+        return apiFetch<IServerEdge[]>(`/questions/competencies/all/`)
             .then(x => x.map(x => {
-                const edge: Edge = {
+                const edge: IEdge = {
                     source: TopicRepository.topicPointer(x[0]),
                     target: TopicRepository.topicPointer(x[1]),
                     competency: Math.round(x[2] * 100),
@@ -193,13 +193,13 @@ export default class UserRepository {
             }));
     }
 
-    static getUserEngagement(): Promise<Edge[]> {
+    static getUserEngagement(): Promise<IEdge[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(userEngagementScores.map(x => {
-                    const edge: Edge = {
-                        source: x[0] as Topic,
-                        target: x[1] as Topic,
+                    const edge: IEdge = {
+                        source: x[0] as ITopic,
+                        target: x[1] as ITopic,
                         competency: Math.round(x[2]),
                         attempts: Math.round(x[3])
                     };
@@ -251,8 +251,8 @@ export default class UserRepository {
         _searchCaches.set(_currentCourse, Object.assign({}, search, { filterTopics: arrCopy }));
     }
 
-    static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {
-        return apiFetch<CourseUser>(`/users/courses/update/`, {
+    static updateCourse(course: ICourse, topics: ITopic[]): Promise<ICourseUser> {
+        return apiFetch<ICourseUser>(`/users/courses/update/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -265,8 +265,8 @@ export default class UserRepository {
         });
     }
 
-    static updateUserImage(newImage: string): Promise<User> {
-        return apiFetch<User>(`/users/me/image/`, {
+    static updateUserImage(newImage: string): Promise<IUser> {
+        return apiFetch<IUser>(`/users/me/image/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",

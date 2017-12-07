@@ -1,6 +1,6 @@
 import QuestionRepository from "../repositories/QuestionRepository";
 import UserRepository from "../repositories/UserRepository";
-import { Question, ReportQuestion, ISearch } from "../interfaces/models";
+import { IQuestion, IReportQuestion, ISearch } from "../interfaces/models";
 
 interface ISearchQuery {
     sortField?: string,
@@ -13,13 +13,13 @@ interface ISearchQuery {
 };
 
 export default class QuestionService {
-    static search(searchQuery: ISearchQuery): Promise<{ questions: Question[], totalItems: number, page: number }> {
+    static search(searchQuery: ISearchQuery): Promise<{ questions: IQuestion[], totalItems: number, page: number }> {
         const { sortField, sortDesc, filterField, filterTopics, query, page, pageSize } = searchQuery;
         return QuestionRepository.search(sortField, sortDesc ? "DESC" : "ASC",
             filterField, filterTopics, query, page, pageSize);
     }
 
-    static distributionForQuestion(question: Question) {
+    static distributionForQuestion(question: IQuestion) {
         return QuestionRepository.getQuestionDistribution(question);
     }
 
@@ -33,7 +33,7 @@ export default class QuestionService {
     }
 
     static reportQuestion(questionId: number, reason: string) {
-        const upload: ReportQuestion = {
+        const upload: IReportQuestion = {
             question: questionId,
             reason: reason
         };

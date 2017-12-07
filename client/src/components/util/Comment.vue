@@ -51,11 +51,11 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
-import { QuestionResponse } from "../../interfaces/models";
+import { IQuestionResponse } from "../../interfaces/models";
 
 @Component()
 export default class Comment extends Vue {
-    @Prop comment = p<QuestionResponse[]>({
+    @Prop comment = p<IQuestionResponse[]>({
         required: true
     });
 

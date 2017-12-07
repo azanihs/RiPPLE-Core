@@ -82,7 +82,7 @@ td:hover {
 <script lang="ts">
 import { Vue, Prop, p, Lifecycle, Component, Watch } from "av-ts";
 
-import { Topic, User } from "../../interfaces/models";
+import { ITopic, IUser } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -95,7 +95,7 @@ interface IRenderWeight {
 
 @Component()
 export default class ConnectednessHeatmap extends Vue {
-    @Prop topics = p<Topic[]>({
+    @Prop topics = p<ITopic[]>({
         required: true
     });
     @Prop categories = p<string[]>({
@@ -103,9 +103,9 @@ export default class ConnectednessHeatmap extends Vue {
     });
 
     renderWeights: IRenderWeight = {};
-    pConnections: User[] = [];
+    pConnections: IUser[] = [];
 
-    updateConnections(newConnections: User[]) {
+    updateConnections(newConnections: IUser[]) {
         this.pConnections = newConnections;
     }
 

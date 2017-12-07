@@ -215,7 +215,7 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { Question as QuestionModel } from "../../interfaces/models";
+import { IQuestion } from "../../interfaces/models";
 
 import { addEventsToQueue } from "../../util";
 import QuestionService from "../../services/QuestionService";
@@ -249,7 +249,7 @@ export default class Question extends Vue {
         default: true
     });
 
-    pQuestion: QuestionModel | undefined = undefined;
+    pQuestion: IQuestion | undefined = undefined;
 
     reason = "";
     reasonList = ["Inappropriate Content", "Incorrect Answer", "Incorrect Tags"];
@@ -283,7 +283,7 @@ export default class Question extends Vue {
 
     updateQuestion() {
         QuestionService.getQuestionById(this.id)
-            .then((question: QuestionModel | undefined) => {
+            .then((question: IQuestion | undefined) => {
                 this.pQuestion = question;
             });
     }
