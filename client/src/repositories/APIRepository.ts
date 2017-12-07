@@ -78,7 +78,6 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
         })
         .catch((err: Response) => err.json().then((errorObject: any) => {
             if (errorObject.error) {
-                console.log("__");
                 // TODO: Handle global things
                 addEventsToQueue([{
                     id: performance.now(),

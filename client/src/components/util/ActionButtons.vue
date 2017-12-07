@@ -10,7 +10,7 @@
             <span>Report Question</span>
             <md-icon>error_outline</md-icon>
         </md-button>
-    
+
         <div class="border">
             <hr />
         </div>
@@ -20,7 +20,7 @@
 <style scoped>
 .border {
     width: 100%;
-    padding: 0px 16px;
+    padding: 0px;
 }
 
 hr {
@@ -35,8 +35,6 @@ hr {
     width: 100%;
     justify-content: space-between;
     margin-bottom: 1em;
-    margin-left: -16px;
-    margin-right: -16px;
 }
 </style>
 
