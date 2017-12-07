@@ -154,13 +154,7 @@ export default class QuestionSearch extends Vue {
             }, {
                 name: "Responses",
                 value: "responses"
-            }/*, {
-                name: "Comments",
-                value: "comments"
-            }, {
-                name: "Personalised Rating",
-                value: "personalisation"
-            }*/]
+            }]
         }, {
             name: "Topics",
             id: "filterTopics",
