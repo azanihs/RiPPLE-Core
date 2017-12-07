@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 
 from django.db import IntegrityError, transaction
 from questions.models import Question, Distractor, QuestionImage, ExplanationImage, DistractorImage
+import bleach
+from questions.allowed_tags import allowed_tags, allowed_attributes, allowed_styles
 
 
 def add_question(question_request, host, user):
@@ -16,22 +18,26 @@ def add_question(question_request, host, user):
     for i in ["A", "B", "C", "D"]:
         if responses.get(i, None) is None:
             return {"state": "Error", "error": "Missing response " + i}
+    
+    question_content = question.get("content", None)
+    explanation_content = explanation.get("content", None)
 
-    # Question
+    if len(question_content) == 0:
+        return {"state": "Error", "error": "Question content is blank"}
+    elif len(explanation_content) == 0:
+        return {"state": "Error", "error": "Explanation content is blank"}
+    
+    # Cleans question and explanation content before saving as Question
     questionObj = Question(
-        content=question.get("content", None),
-        explanation=explanation.get("content", None),
-        difficulty=0,
-        quality=0,
-        difficultyCount=0,
-        qualityCount=0,
-        author=user
+    content=cleanContent(question_content),
+    explanation=cleanContent(explanation_content),
+    difficulty=0,
+    quality=0,
+    difficultyCount=0,
+    qualityCount=0,
+    author=user
     )
-    if (verifyContent(questionObj.content) and verifyContent(questionObj.explanation)):
-        questionObj.save()
-    else:
-        # INVALID CONTENT
-        return {"state": "Error", "error": "Invalid Question"}
+    questionObj.save()
     try:
         with transaction.atomic():
             # Question Images
@@ -56,17 +62,17 @@ def add_question(question_request, host, user):
                 raise IntegrityError("No correct answer for question")
 
             for i in _response_choices:
+                distractor_content = responses[i].get("content", None)
+                if(len(distractor_content) == 0):
+                    return {"state": "Error", "error": "Distractor content is blank"}
+                #cleans distractor content before saving
                 distractor = Distractor(
-                    content=responses[i].get("content", None),
+                    content=cleanContent(distractor_content),
                     isCorrect=responses[i].get("isCorrect", None),
                     response=i,
                     question=questionObj
                 )
-
-                if verifyContent(distractor.content):
-                    distractor.save()
-                else:
-                    raise IntegrityError("Invalid Distractor")
+                distractor.save()
 
                 # Distractor Images
                 images = responses[i].get("payloads", None)
@@ -76,7 +82,6 @@ def add_question(question_request, host, user):
         return {"state": "Error", "error": str(e)}
     except Exception as e:
         return {"state": "Error", "error": str(e)}
-
     return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
 
@@ -124,13 +129,9 @@ def newSource(urls, content, host):
     return ''.join([str(x) for x in immediate_children])
 
 
-def verifyContent(content):
-    if len(content) == 0:
-        return False
+def cleanContent(content):
+    cleaned = bleach.clean(content, tags = allowed_tags + bleach.sanitizer.ALLOWED_TAGS,
+                            attributes=allowed_attributes, styles = allowed_styles)
+    return cleaned
 
-    soup = BeautifulSoup(content, "html.parser")
-
-    scripts = soup.find_all('script')
-    if len(scripts) > 0:
-        return False
-    return True
+#'<img src="blob:http://localhost:8080/089dde17-c848-40d6-b730-355015c96940" alt="download.jpg" width="241" height="209" />' 
