@@ -1,10 +1,9 @@
 import random
+import math
+import numpy as np
 
 from django.db.models import Count
 
-import math
-
-import numpy as np
 from ripple.util import util
 from users.models import CourseUser, Token
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore, ReportQuestion
@@ -78,9 +77,20 @@ def get_course_topics(course):
     return Topic.objects.filter(course=course).distinct()
 
 
-def get_question(id):
+def get_random_question(user):
+    course = user.course
+    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course))
+
+    count = course_questions.aggregate(count=Count('id'))['count']
+    random_index = random.randint(0, count - 1)
+    return course_questions.all()[random_index]
+
+def get_question_by_id(user, id):
     try:
-        return Question.objects.get(pk=id)
+        question = Question.objects.get(pk=id)
+        if question.author.course != user.course:
+            return None
+        return question
     except Question.DoesNotExist:
         return None
 
@@ -148,7 +158,7 @@ def rate_question(distractor_id, user_ratings, user):
 
 
 def calculate_question_score(user, question, response):
-    """ 
+    """
         calculates the questions score and updates the cached question  score. Also increments the answer count for the questions core
         Creates a QuestionScore if none exists
     """
@@ -156,7 +166,7 @@ def calculate_question_score(user, question, response):
         question_score = QuestionScore.objects.get(
             user=user, question=question)
     except QuestionScore.DoesNotExist:
-        question_score = QuestionScore(user=user, question=question, 
+        question_score = QuestionScore(user=user, question=question,
                 number_answers=0, score=0)
         question_score.save()
 
@@ -187,8 +197,8 @@ def update_competency(user, question, response):
 
     score = get_competency_score(question, response)
     calculate_children_competency(user, queryset_topics, score)
-    
-        
+
+
 def calculate_children_competency(user, queryset_topics, score):
     """ Updates children competencies"""
     # Weigh each topic
@@ -205,7 +215,7 @@ def calculate_children_competency(user, queryset_topics, score):
             user_competency = user_competency[0]
 
         old_score = competency_to_score(user_competency.competency)
-        new_score = old_score + (score*weight)      
+        new_score = old_score + (score*weight)
         new_competency =  score_to_competency(new_score)
         user_competency.competency = new_competency
         user_competency.confidence += weight
@@ -224,9 +234,9 @@ def get_competency_score(question, response):
         past_average = 0
         for score in question_scores:
             past_average += score.score
-        past_average = past_average/len(question_scores)    
+        past_average = past_average/len(question_scores)
     else:
-        past_average = 1 
+        past_average = 1
     ### When getting question wrong
     ### Easy question = less score - less weight going down
     ### Hard question = more score - more weight going down
@@ -235,8 +245,8 @@ def get_competency_score(question, response):
     else:
         difficulty = (10 - question.difficulty)/2+5
 
-    ### Array for dot product. Goal is to have 
-    ### abs(dotProd) between 0.25 and 0.5 in 
+    ### Array for dot product. Goal is to have
+    ### abs(dotProd) between 0.25 and 0.5 in
     ### most situations
     weighted_features = [
         (difficulty/10, 0.2),
@@ -271,7 +281,7 @@ def exp_moving_avg(decay_factor, question_scores):
         counter += 1
     return res/divisor
 
-        
+
 
 def report_question(user, request):
     request = request.get("questionReport", None)
@@ -297,7 +307,7 @@ def get_reports(user):
     course = user.course
     reportQuestions= ReportQuestion.objects \
         .filter(author__in=CourseUser.objects.filter(course=course))
-    
+
     return reportQuestions
 
 

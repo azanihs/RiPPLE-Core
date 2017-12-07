@@ -1,77 +1,63 @@
 <template>
-    <div class="relative">
-        <transition name="fade">
-            <md-layout v-if="selectedQuestion"
-                md-gutter="8"
-                key="1"
-                class="viewContainer">
-                <md-layout md-flex="100"
-                    class="questionContainer">
-                    <question class="question"
-                        :question="selectedQuestion"
-                        @userAnswer="setUserIsFinished"
-                        @newQuestion="selectRandom"></question>
-                </md-layout>
-            </md-layout>
-        </transition>
-        <div :class="{ hidden: selectedQuestion }"
-            key="2"
-            md-gutter="8"
-            class="viewContainer">
-            <md-layout class="headingContainer"
-                md-flex="100">
-                <variable-data-visualiser class="overview"
-                    :dataCategories="topics"
-                    :compareList="generateCompetencies">
-                </variable-data-visualiser>
-                <question-search :page="page"
-                    :pageSize="pageSize"
-                    @searched="changeDisplay">
-                    <div class="md-table-card">
-                        <md-table-pagination class="paginationControls"
-                            :md-total="totalQuestions"
-                            md-label="Questions per page"
-                            :md-size="pageSize"
-                            :md-page="page"
-                            @pagination="nextPage">
-                        </md-table-pagination>
-                    </div>
-                </question-search>
-            </md-layout>
-            <md-layout md-hide-xsmall
-                md-hide-small
-                md-hide-medium>
-                <md-layout v-for="question in showQuestions"
-                    md-flex="33"
-                    md-gutter
-                    :key="question.id"
-                    class="questionPreview"
-                    @click.native="openQuestionPreview(question)">
-                    <question-preview class="questionCard"
-                        :data="question"></question-preview>
-                </md-layout>
-            </md-layout>
-            <md-layout md-hide-large-and-up>
-                <md-layout v-for="question in showQuestions"
-                    md-flex="100"
-                    :key="question.id"
-                    class="mobileQuestionPreview"
-                    @click.native="openQuestionPreview(question)">
-                    <question-preview class="mobileQuestionCard"
-                        :data="question"></question-preview>
-                </md-layout>
-            </md-layout>
-
-        </div>
-    </div>
+<md-layout md-gutter="8" class="questionBrowserWrapper">
+    <md-layout class="headingContainer"
+        md-flex="100">
+        <variable-data-visualiser class="overview"
+            :dataCategories="topics"
+            :compareList="generateCompetencies">
+        </variable-data-visualiser>
+        <question-search :page="page"
+            :pageSize="pageSize"
+            @searched="changeDisplay">
+            <div class="md-table-card">
+                <md-table-pagination class="paginationControls"
+                    :md-total="totalQuestions"
+                    md-label="Questions per page"
+                    :md-size="pageSize"
+                    :md-page="page"
+                    @pagination="nextPage">
+                </md-table-pagination>
+            </div>
+        </question-search>
+    </md-layout>
+    <md-layout md-hide-xsmall
+        md-hide-small
+        md-hide-medium>
+        <md-layout v-for="question in showQuestions"
+            md-flex="33"
+            md-gutter
+            :key="question.id"
+            class="questionPreview">
+            <router-link :to="'/question/id/' + question.id" class="questionLink">
+                <question-preview class="questionCard"
+                    :data="question"></question-preview>
+            </router-link>
+        </md-layout>
+    </md-layout>
+    <md-layout md-hide-large-and-up>
+        <md-layout v-for="question in showQuestions"
+            md-flex="100"
+            :key="question.id"
+            class="mobileQuestionPreview">
+            <question-preview class="mobileQuestionCard"
+                :data="question"></question-preview>
+        </md-layout>
+    </md-layout>
+</md-layout>
 </template>
 
 <style scoped>
-.relative {
-    position: relative;
-    width: 100%;
+.questionBrowserWrapper {
+    overflow-x: hidden;
 }
 
+.questionLink {
+    color: inherit !important;
+    flex-grow: 1;
+}
+.questionLink:hover {
+    text-decoration: inherit !important;
+}
 .paginationControls {
     border-top: none !important;
 }
@@ -84,14 +70,6 @@
     visibility: hidden;
     height: 0px;
     overflow: hidden;
-}
-
-.viewContainer {
-    position: absolute;
-    top: 8px;
-    width: 100%;
-    overflow-x: hidden;
-    padding: 8px;
 }
 
 .fade-enter-active,
@@ -134,7 +112,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch } from "av-ts";
+import { Vue, Component, Lifecycle } from "av-ts";
 import { Question as IQuestion, Topic as ITopic } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
@@ -166,11 +144,7 @@ export default class QuestionBrowser extends Vue {
     pQuestionCount = 0;
 
     searchedQuestions: IQuestion[] = [];
-
     topicsToUse: ITopic[] = [];
-
-    selectedQuestion: undefined | IQuestion = undefined;
-    userIsFinished: boolean = false;
 
     updateTopics(topics: ITopic[]) {
         this.pTopics = topics;
@@ -196,39 +170,10 @@ export default class QuestionBrowser extends Vue {
         return this.searchedQuestions;
     }
 
-
-    @Watch("selectedQuestion")
-    questionChanged(_oldVal: IQuestion | undefined, _newVal: IQuestion | undefined) {
-        if (this.selectedQuestion !== undefined) {
-            window.scrollTo(0, 0);
-        }
-    }
-
-    setUserIsFinished(newVal: boolean) {
-        // Request new data
-        this.userIsFinished = newVal;
-        this.selectedQuestion = undefined;
-    }
-
     changeDisplay(searchedQuestions: { questions: IQuestion[], page: number, totalItems: number }) {
         this.pPage = searchedQuestions.page;
         this.searchedQuestions = searchedQuestions.questions;
         this.pQuestionCount = searchedQuestions.totalItems;
-    }
-
-    selectRandom() {
-        this.selectedQuestion = undefined;
-        Vue.nextTick(() => {
-            this.selectedQuestion = this.showQuestions[Math.floor(Math.random() * this.showQuestions.length)];
-        });
-    }
-
-    openQuestionPreview(question: IQuestion) {
-        if (this.selectedQuestion == question) {
-            this.selectedQuestion = undefined;
-        } else {
-            this.selectedQuestion = question;
-        }
     }
 
     filterQuestionTopic(topicsToUse: ITopic[]) {

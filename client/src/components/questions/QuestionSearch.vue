@@ -1,6 +1,6 @@
 <template>
     <md-layout md-flex="100"
-               class="header">
+               class="header" v-if="search">
         <md-layout v-for="field in searchableFields"
                    :key="field.displayName"
                    class="searchItem">
@@ -35,6 +35,7 @@
             </md-input-container>
         </md-layout>
         <slot></slot>
+        <page-loader :condition="false"></page-loader>
     </md-layout>
 </template>
 
@@ -46,10 +47,21 @@
 .header {
     justify-content: space-between;
     width: 100%;
+    flex-wrap: nowrap;
+    position: relative;
+}
+
+.searchItem:first-of-type {
+    margin-left: 0px;
+}
+.searchItem:last-of-type {
+    margin-right: 0px;
 }
 
 .searchItem {
-    flex: none;
+    overflow: hidden;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 h2 {
@@ -92,28 +104,22 @@ input {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Topic } from "../../interfaces/models";
+import { Topic, ISearch } from "../../interfaces/models";
 
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
 import Fetcher from "../../services/Fetcher";
 
+import PageLoader from "../util/PageLoader.vue";
 
-interface ISearch {
-    sortField: string,
-    sortDesc: boolean,
-    filterField: string,
-    query: string,
-    page: number,
-    filterTopics: number[]
-};
-
-@Component()
+@Component({
+    components: {
+        PageLoader
+    }
+})
 export default class QuestionSearch extends Vue {
 
     timeoutId: number | undefined = undefined;
-    searchInFlight = false;
-
     nextSearchRequest: Function| undefined = undefined;
 
     @Prop
@@ -126,17 +132,6 @@ export default class QuestionSearch extends Vue {
     });
 
     pTopics: Topic[] = [];
-
-    updateCourseTopics(newTopics: Topic[]) {
-        this.pTopics = newTopics;
-        if (this.search.filterTopics.length == 0) {
-            this.search.filterTopics = newTopics.map(x => x.id);
-        }
-    }
-
-    get topics() {
-        return this.pTopics;
-    }
 
     get searchableFields() {
         return [{
@@ -159,15 +154,15 @@ export default class QuestionSearch extends Vue {
             }, {
                 name: "Responses",
                 value: "responses"
-            }, {
+            }/*, {
                 name: "Comments",
                 value: "comments"
             }, {
                 name: "Personalised Rating",
                 value: "personalisation"
-            }]
+            }*/]
         }, {
-            name: "Show With Topic",
+            name: "Topics",
             id: "filterTopics",
             type: "multiselect",
             options: this.topics.map(topic => ({
@@ -175,7 +170,7 @@ export default class QuestionSearch extends Vue {
                 value: topic.id
             }))
         }, {
-            name: "Filter Questions",
+            name: "Questions",
             id: "filterField",
             type: "select",
             options: [{
@@ -198,18 +193,22 @@ export default class QuestionSearch extends Vue {
         }];
     }
 
-    search: ISearch = {
-        sortField: "",
-        sortDesc: false,
-        filterField: "All Questions",
-        query: "",
-        page: 0,
-        filterTopics: []
+    search: ISearch | undefined = undefined;
+
+    updateCourseTopics(newTopics: Topic[]) {
+        this.pTopics = newTopics;
+        QuestionService.getSearchCacheForCourse()
+            .then(x => {
+                this.search = x;
+            });
+    }
+
+    get topics() {
+        return this.pTopics;
     }
 
     @Lifecycle
     created() {
-        this.applyFilters();
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateCourseTopics);
     }
@@ -221,11 +220,16 @@ export default class QuestionSearch extends Vue {
     }
 
     sort() {
-        this.search.sortDesc = !this.search.sortDesc;
+        if (this.search !== undefined) {
+            this.search.sortDesc = !this.search.sortDesc;
+        }
     }
 
     applyFilters() {
         const search = Object.assign({}, this.search, { page: this.page, pageSize: this.pageSize });
+        if (search.filterTopics.length == 0) {
+            search.filterTopics = this.topics.map(x => x.id);
+        }
         QuestionService.search(search)
             .then(searchResult => {
                 this.timeoutId = undefined;
@@ -233,6 +237,9 @@ export default class QuestionSearch extends Vue {
                     this.nextSearchRequest();
                     this.nextSearchRequest = undefined;
                 } else {
+                    if (this.search !== undefined) {
+                        QuestionService.setSearchCacheForCourse(this.search);
+                    }
                     // Only bubble through the most recent search
                     this.$emit("searched", searchResult);
                 }
@@ -250,7 +257,7 @@ export default class QuestionSearch extends Vue {
     }
 
     @Watch("search", { deep: true })
-    searchWatch(_oldValue: ISearch, _newValue: ISearch) {
+    searchWatch(_oldValue: ISearch | undefined, _newValue: ISearch| undefined) {
         this.startSearch();
     }
 

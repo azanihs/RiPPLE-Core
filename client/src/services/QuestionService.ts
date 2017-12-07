@@ -1,5 +1,6 @@
 import QuestionRepository from "../repositories/QuestionRepository";
-import { Question, ReportQuestion } from "../interfaces/models";
+import UserRepository from "../repositories/UserRepository";
+import { Question, ReportQuestion, ISearch } from "../interfaces/models";
 
 interface ISearchQuery {
     sortField?: string,
@@ -31,12 +32,26 @@ export default class QuestionService {
         return QuestionRepository.submitRating(responseId, rateType, rateValue);
     }
 
-    static reportQuestion(question: Question, reason: string) {
+    static reportQuestion(questionId: number, reason: string) {
         const upload: ReportQuestion = {
-            question: question.id,
+            question: questionId,
             reason: reason
         };
         return QuestionRepository.uploadReport(upload);
     }
 
+    static getQuestionById(questionId: number) {
+        return QuestionRepository.getQuestionById(questionId);
+    }
+
+    static getRandomCourseQuestion() {
+        return QuestionRepository.getRandomCourseQuestion();
+    }
+
+    static getSearchCacheForCourse() {
+        return UserRepository.getSearchCacheForCourse();
+    }
+    static setSearchCacheForCourse(search: ISearch) {
+        return UserRepository.setSearchCacheForCourse(search);
+    }
 }

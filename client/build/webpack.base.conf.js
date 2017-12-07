@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require('path');
 const projectRoot = path.resolve(__dirname, '../');
 const webpack = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const env = process.env.NODE_ENV;
 function placeDefaults(fileName) {
@@ -44,42 +43,60 @@ module.exports = {
     },
     module: {
         rules: [{
-                enforce: "pre",
-                test: /.vue$/,
-                loader: "eslint-loader",
-                exclude: "/node_modules/"
+            test: /\.css$/,
+            use: [{
+                loader: "style-loader"
             }, {
-                enforce: "pre",
-                test: /.ts$/,
-                loader: "eslint-loader",
-                exclude: "/node_modules/"
-            }, {
-                test: /\.ts$/,
-                loader: 'ts-loader',
-                options: {
-                    appendTsSuffixTo: [/\.vue$/],
-                    silent: true
-                },
-                include: [path.resolve(__dirname, "../"), path.resolve(__dirname, "../typings/modules")],
-                exclude: /node_modules/
-            }, {
-                test: /\.json$/,
-                loader: 'json-loader'
-            }, {
-                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-                loader: 'url-loader',
-                query: {
-                    limit: 10000,
-                    name: 'img/[name].[hash:7].[ext]'
-                }
-            }, {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                loader: 'url-loader',
-                query: {
-                    limit: 10000,
-                    name: 'fonts/[name].[hash:7].[ext]'
-                }
+                loader: "css-loader"
+            }]
+        }, {
+            test: /\.vue$/,
+            loader: 'vue-loader',
+            options: {
+                esModule: true,
+                postcss: [
+                    require('autoprefixer')({
+                        browsers: ['last 2 versions']
+                    })
+                ]
             }
+        }, {
+            enforce: "pre",
+            test: /.vue$/,
+            loader: "eslint-loader",
+            exclude: "/node_modules/"
+        }, {
+            enforce: "pre",
+            test: /.ts$/,
+            loader: "eslint-loader",
+            exclude: "/node_modules/"
+        }, {
+            test: /\.ts$/,
+            loader: 'ts-loader',
+            options: {
+                appendTsSuffixTo: [/\.vue$/],
+                silent: true
+            },
+            include: [path.resolve(__dirname, "../"), path.resolve(__dirname, "../typings/modules")],
+            exclude: /node_modules/
+        }, {
+            test: /\.json$/,
+            loader: 'json-loader'
+        }, {
+            test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+            loader: 'url-loader',
+            query: {
+                limit: 10000,
+                name: 'img/[name].[hash:7].[ext]'
+            }
+        }, {
+            test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+            loader: 'url-loader',
+            query: {
+                limit: 10000,
+                name: 'fonts/[name].[hash:7].[ext]'
+            }
+        }
 
         ]
     }
