@@ -23,10 +23,10 @@
                         </div>
                         <md-spinner md-theme="spinner"
                             class="engagementScoreProgress"
-                            :md-stroke="2"
+                            :md-stroke="4"
                             :md-progress="100"></md-spinner>
                         <md-spinner class="progressSpinner engagementScoreProgress"
-                            :md-stroke="2"
+                            :md-stroke="4"
                             :md-progress="item.score"></md-spinner>
                     </div>
                 </md-card>
