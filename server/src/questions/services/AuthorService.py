@@ -91,7 +91,6 @@ def add_question(question_request, host, user):
         return {"state": "Error", "error": str(e)}
     except Exception as e:
         return {"state": "Error", "error": str(e)}
-    print(Question.objects.get(pk=questionObj.id).toJSON())
     return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
 
 
