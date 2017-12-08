@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import pytz as timezone
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.apps import apps
 from datetime import datetime
@@ -64,7 +65,7 @@ def update_course(course_user, new_data):
         return {"error": "Course must have topics"}
     for t in topics:
         if not t.get("name", None):
-            return {"error": 
+            return {"error":
                 "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
     course_code = course_information.get("courseCode", None)
@@ -136,7 +137,7 @@ def _process_competencies(competencies):
         if comp.confidence < threshold:
             continue
 
-        # Only use two topics. 
+        # Only use two topics.
         nodes = comp.topics.all()
         if not(len(nodes) > 0 and len(nodes) <= 2):
             continue
@@ -155,7 +156,7 @@ def user_competencies(user):
     try:
         return _process_competencies(Competency.objects.filter(user=user))
     except TypeError:
-        return[] 
+        return[]
 
 def aggregate_competencies(user, compare_type):
     if user is None or compare_type is None:
@@ -231,26 +232,34 @@ def user_engagement(user, user_type=None):
     if not user_type:
         user_type=user
 
+    #Filters
+    filters = {
+        "isCorrect": ["response_id__in", Distractor.objects.filter(isCorrect=True)]
+    }
+
     for e in engagements:
-        item = apps.get_model(e.app, e.item)
-        filter_name = e.filter_name
-        filter_cond = e.filter_cond
-        if filter_cond:
-            filter_cond = eval(filter_cond)
+        model = ContentType.objects.get(model=e.model).model_class()
+        e_filter = filters.get(e.filter_name, None)
+        if e_filter:
+            filter_name = e_filter[0]
+            filter_cond = e_filter[1]
+        else:
+            filter_name = None
+            filter_cond = None
         key_user = e.key_user
         edges.append([
             e.toJSON(),
             e.toJSON(),
-            get_engagement_result(user_type, item, filter_name, filter_cond, key_user),
+            get_engagement_result(user_type, model, filter_name, filter_cond, key_user),
             0
         ])
     return edges
 
-def get_engagement_result(user, item, filter_name, filter_cond, key_user):
+def get_engagement_result(user, model, filter_name, filter_cond, key_user):
     if filter_name:
-        correct = item.objects.filter(**{filter_name:filter_cond})
+        correct = model.objects.filter(**{filter_name:filter_cond})
     else:
-        correct = item.objects.all()
+        correct = model.objects.all()
     max_num = correct.values(key_user).annotate(num_results=Count(key_user))\
             .values("num_results").order_by("-num_results")
     if not max_num:

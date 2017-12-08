@@ -236,16 +236,14 @@ class Command(BaseCommand):
             print("\t-Adding Engagements")
             engagements = ["Questions Answered", "Questions Authored", "Questions Rated",
                     "Competent Topics", "Achievements Earned"]
-            e_apps = ["questions", "questions", "questions", "questions", "rippleAchievements"]
-            e_items = ["QuestionResponse", "Question", "QuestionRating", "Competency", 
-                    "UserAchievement"]
-            e_filter_name = ["response_id__in", "", "", "", ""]
-            e_filter_cond = ["Distractor.objects.filter(isCorrect=True)", "", "", "", ""]
+            e_models = ["questionresponse", "question", "questionrating", "competency",
+                    "userachievement"]
+            e_filter_name = ["isCorrect", "", "", "", ""]
             e_key_user = ["user_id", "author_id", "user_id", "user_id", "user"]
             for i in range(len(engagements)):
-                e = Engagement(name=engagements[i], course=course, app=e_apps[i], 
-                        item=e_items[i], filter_name=e_filter_name[i], 
-                        filter_cond=e_filter_cond[i], key_user=e_key_user[i])
+                e = Engagement(name=engagements[i], course=course,
+                        model=e_models[i], filter_name=e_filter_name[i],
+                        key_user=e_key_user[i])
                 e.save()
 
             print("\t-Enrolling Users")
