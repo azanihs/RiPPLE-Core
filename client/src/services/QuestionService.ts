@@ -31,7 +31,7 @@ export default class QuestionService {
         return QuestionRepository.submitRating(responseId, rateType, rateValue);
     }
 
-    static reportQuestion(question: Question, reason: string) {
+    static reportQuestion(question: Question, reason: string[]) {
         const upload: ReportQuestion = {
             question: question.id,
             reason: reason
@@ -39,4 +39,7 @@ export default class QuestionService {
         return QuestionRepository.uploadReport(upload);
     }
 
+    static getReportReasons() {
+        return QuestionRepository.getReportReasons();
+    }
 }

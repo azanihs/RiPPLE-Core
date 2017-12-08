@@ -121,9 +121,20 @@ class DistractorImage(models.Model):
     image = models.ImageField(upload_to='question_photo')
     distractor = models.ForeignKey(Distractor, on_delete=None)
 
+
+class ReportReason(models.Model):
+    reason = models.TextField()
+    course = models.ForeignKey(Course)
+
 class ReportQuestion(models.Model):
-    reason = models.TextField(max_length=256)
     time = models.DateTimeField(auto_now=True)
 
     question = models.ForeignKey(Question)
     user = models.ForeignKey(CourseUser)
+
+class ReportQuestionList(models.Model):
+    report_reason = models.ForeignKey(ReportReason)
+    report_question = models.ForeignKey(ReportQuestion)
+    reason_text = models.TextField()
+
+

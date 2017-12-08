@@ -51,8 +51,12 @@ export interface Course {
 
 export interface ReportQuestion {
     question: number,
-    reason: string
+    reason: string[]
 };
+
+export interface ReasonList {
+    reasonList: string[]
+}
 
 export interface NetworkResponse {
     error?: string
