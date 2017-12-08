@@ -4,7 +4,7 @@
                    md-hide-small
                    md-hide-medium
                    class="questionNavigation">
-            <action-buttons @back="closeQuestion()" 
+            <action-buttons @back="closeQuestion()"
                     @report="openDialog()"></action-buttons>
         </md-layout>
         <md-layout md-flex="100">
@@ -263,7 +263,9 @@ export default class Question extends Vue {
         this.userIsFinishedWithQuestion = wasCorrect;
 
         // TODO: Emit an event rather than mutate own prop.
-        this.question.responseCount++;
+        if (wasCorrect) {
+            this.question.responseCount++;
+        }
     }
 
     nextQuestion() {
