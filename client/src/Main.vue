@@ -10,7 +10,7 @@
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
                 ref="menuButton"
-                @click="toggleSideNav">
+                @click="toggleSideNav(undefined)">
                 <md-icon>{{menuIcon}}</md-icon>
             </md-button>
         </md-layout>
@@ -35,11 +35,11 @@
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
                     </router-link>
-                    <div v-if="currentlyOpenMenu == link.href && link.submenu !== undefined">
+                    <div v-if="link == currentlyOpenMenu || (link.submenu && link.submenu.indexOf(currentlyOpenMenu) >= 0)">
                             <li v-for="submenuLink in link.submenu"
                                 :key="submenuLink.href">
                                 <router-link :to="submenuLink.href"
-                                    @click.native="keepProfileActive(link)"
+                                    @click.native="keepProfileActive()"
                                     class ="profileSubmenu md-button routerLink">
                                     <span>{{ submenuLink.text }}</span>
                                 </router-link>
@@ -81,6 +81,7 @@
 .menuContainer h2 {
     padding-right: 16px;
     color: #999;
+
 }
 
 .menuButton {
@@ -113,6 +114,7 @@
     left: 0px;
     top: 0px;
     width: 16.25%;
+    z-index: 10;
 }
 
 .sideNavContainer.mobilePage {
@@ -217,6 +219,7 @@ export default class Main extends Vue {
     courseRoles: string[] = [];
     pUser: User | undefined = undefined;
     pCourse: Course| undefined = undefined;
+    pMenuLinks: ILink[] = getLinks();
 
     menuIcon = "menu";
     mobileMode = false;
@@ -241,16 +244,7 @@ export default class Main extends Vue {
     };
 
     get links() {
-        const links = getLinks();
-        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
-            const profileLinkIndex = links.findIndex(x => x.href == "/");
-            links.splice(profileLinkIndex, 1);
-            this.$router.push("admin");
-        } else {
-            const adminLinkIndex = links.findIndex(x => x.href == "/admin");
-            links.splice(adminLinkIndex, 1);
-        }
-        return links;
+        return this.pMenuLinks;
     }
 
     get pageSize() {
@@ -286,6 +280,21 @@ export default class Main extends Vue {
 
     @Lifecycle
     created() {
+        // Fix links
+        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
+            const profileLinkIndex = this.pMenuLinks.findIndex(x => x.href == "/");
+            if (profileLinkIndex >= 0) {
+                this.pMenuLinks.splice(profileLinkIndex, 1);
+                this.$router.push("admin");
+            }
+        } else {
+            const adminLinkIndex = this.pMenuLinks.findIndex(x => x.href == "/admin");
+            if (adminLinkIndex >= 0) {
+                this.pMenuLinks.splice(adminLinkIndex, 1);
+            }
+        }
+
+        this.currentlyOpenMenu = this.pMenuLinks[0];
         Fetcher.get(UserService.getLoggedInUser)
             .on(this.updateCourseUser);
     }
@@ -325,20 +334,23 @@ export default class Main extends Vue {
             });
     }
 
-    currentlyOpenMenu = "/";
+    currentlyOpenMenu: ILink | undefined = undefined;
 
     toggleSubmenu(link: ILink) {
-        this.currentlyOpenMenu = link.href;
+        this.currentlyOpenMenu = link;
     }
 
-    toggleSideNav(link: ILink) {
-        this.toggleSubmenu(link);
+    toggleSideNav(link: ILink | undefined) {
+        if (link !== undefined) {
+            this.toggleSubmenu(link);
+        }
+
         if (this.mobileMode) {
             this.updatePageName();
-            const menuButton = (this.$refs["menuButton"] as any).$el as HTMLElement;
-            const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
-
-            if (!container.style.transform) {
+            const menuButton = (this.$refs["menuButton"] as Vue).$el;
+            const container = (this.$refs.sidenavContainer as Vue).$el;
+            const linkHasSubmenu = link !== undefined && link.submenu !== undefined;
+            if (!container.style.transform || linkHasSubmenu) {
                 container.style.transform = "translate3d(0,0,0)";
                 container.style.opacity = "1";
                 menuButton.style.color = "#f2f2f2";
@@ -354,6 +366,11 @@ export default class Main extends Vue {
 
     keepProfileActive() {
         this.activeSubmenu = true;
+        if (this.mobileMode) {
+            const container = (this.$refs.sidenavContainer as Vue).$el;
+            container.style.transform = null;
+            this.menuIcon = "menu";
+        }
     }
 
     submenuClassNames(link: ILink) {

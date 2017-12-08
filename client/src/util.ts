@@ -14,7 +14,7 @@ export function getParameterByName(name: string, url: string) {
 export function getLinks(): ILink[] {
     const profileLink: ILink = {
         text: "Profile",
-        href: "/",
+        href: "",
         icon: "widgets",
         submenu: [{
             text: "Overview",
@@ -49,7 +49,7 @@ export function getLinks(): ILink[] {
 
     const questionLink: ILink = {
         text: "Questions",
-        href: "/question/answer",
+        href: "",
         icon: "question_answer",
         submenu: [{
             text: "Answer",
