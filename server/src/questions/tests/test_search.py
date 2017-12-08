@@ -90,7 +90,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         for i in searched_questions:
             self.assertTrue(i in Question.objects.all()[0:num_test_questions])
         self.assertEqual(test_search.execute().count(), num_test_questions)
-        
+
 
     def test_add_filter_unanswered(self):
         """Test that questions are filtered when they have not been answered before, no QuestionResponse"""
@@ -132,7 +132,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         test_search.add_filter("answered", author)
         answered_questions = test_search.execute()
 
-        # Check searched questions should be the first 2 answered ones        
+        # Check searched questions should be the first 2 answered ones
         for i in answered_questions:
             self.assertTrue(i in Question.objects.all()[0:2])
         self.assertEqual(test_search.execute().count(), 2)
@@ -140,7 +140,7 @@ class SearchServiceTestCase(BootstrapTestCase):
 
     def test_add_filter_improve(self):
         """
-            Test that questions can be filtered by questions answered where user did not get maximun score. 
+            Test that questions can be filtered by questions answered where user did not get maximun score.
             QuestionResponse exists but Question Score < 1
         """
         course = self._bootstrap_courses(1)
@@ -153,16 +153,16 @@ class SearchServiceTestCase(BootstrapTestCase):
         #answer the first question correctly after two tries
         QuestionService.respond_to_question(3, author)
         QuestionService.respond_to_question(2, author)
-        
+
         test_search = SearchService.SearchService(course)
         test_search.add_filter("improve", author)
         improve_questions = test_search.execute()
-    
+
         self.assertEqual(Question.objects.all().first(), improve_questions.first())
         self.assertEqual(test_search.execute().count(), 1)
 
-    
-    def test_sorting_difficultyCount(self):
+
+    def test_sorting_difficulty(self):
         """" Test questions get sorted by difficulty in a descending order first and then in an ascending order"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
@@ -170,36 +170,36 @@ class SearchServiceTestCase(BootstrapTestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
 
-        #Test descending order 
+        #Test descending order
         difficulty = 1
         for q in Question.objects.all():
-            q.difficultyCount = difficulty
+            q.difficulty = difficulty
             difficulty += 1
             q.save()
-        
-        test_search = SearchService.SearchService(course)
-        test_search.add_sort("difficultyCount", "DESC")
-        sorted_questions = test_search.execute()
-        #make sure next question has lower difficulty
-        for i in range(0,sorted_questions.count() - 1):
-            self.assertTrue(sorted_questions[i].difficultyCount > sorted_questions[i + 1].difficultyCount)
 
-        #Test ascending order 
+        test_search = SearchService.SearchService(course)
+        test_search.add_sort("difficulty", "DESC")
+        sorted_questions = test_search.execute()
+        # make sure next question has lower difficulty
+        for i in range(0,sorted_questions.count() - 1):
+            self.assertTrue(sorted_questions[i].difficulty > sorted_questions[i + 1].difficulty)
+
+        #Test ascending order
         difficulty = 10
         for q in Question.objects.all():
-            q.difficultyCount = difficulty
+            q.difficulty = difficulty
             difficulty -= 1
             q.save()
-        
+
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
-        test_search.add_sort("difficultyCount", "ASC")
+        test_search.add_sort("difficulty", "ASC")
         sorted_questions = test_search.execute()
         #make sure next question has higher difficulty
         for i in range(0,sorted_questions.count() - 1):
-            self.assertTrue(sorted_questions[i].difficultyCount < sorted_questions[i + 1].difficultyCount)
+            self.assertTrue(sorted_questions[i].difficulty < sorted_questions[i + 1].difficulty)
 
-    def test_sorting_qualityCount(self):
+    def test_sorting_quality(self):
         """" Test questions get sorted by quality in a descending order first and then in an ascending order"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
@@ -207,34 +207,34 @@ class SearchServiceTestCase(BootstrapTestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
 
-        #Test descending order 
+        #Test descending order
         quality = 1
         for q in Question.objects.all():
-            q.qualityCount = quality
+            q.quality = quality
             quality += 1
             q.save()
-        
+
         test_search = SearchService.SearchService(course)
-        test_search.add_sort("qualityCount", "DESC")
+        test_search.add_sort("quality", "DESC")
         sorted_questions = test_search.execute()
         #make sure next question has lower quality
         for i in range(0,sorted_questions.count() - 1):
-            self.assertTrue(sorted_questions[i].qualityCount > sorted_questions[i + 1].qualityCount)
+            self.assertTrue(sorted_questions[i].quality > sorted_questions[i + 1].quality)
 
-        #Test ascending order 
+        #Test ascending order
         quality = 10
         for q in Question.objects.all():
             q.qualityCount = quality
             quality -= 1
             q.save()
-        
+
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
-        test_search.add_sort("qualityCount", "ASC")
+        test_search.add_sort("quality", "ASC")
         sorted_questions = test_search.execute()
         #make sure next question has higher quality
         for i in range(0,sorted_questions.count() - 1):
-            self.assertTrue(sorted_questions[i].qualityCount < sorted_questions[i + 1].qualityCount)
+            self.assertTrue(sorted_questions[i].quality < sorted_questions[i + 1].quality)
 
 
     def test_sorting_created_time(self):
@@ -245,7 +245,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
 
-        #Test descending order, creates date object and changes by day 
+        #Test descending order, creates date object and changes by day
         day_index = 1
         time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
         for q in Question.objects.all():
@@ -253,7 +253,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             day_index += 1
             time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
             q.save()
-        
+
         test_search = SearchService.SearchService(course)
         test_search.add_sort("created_time", "DESC")
         sorted_questions = test_search.execute()
@@ -261,7 +261,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         for i in range(0,sorted_questions.count() - 1):
             self.assertTrue(sorted_questions[i].created_time > sorted_questions[i + 1].created_time)
 
-        #Test ascending order 
+        #Test ascending order
         day_index = 31
         time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
         for q in Question.objects.all():
@@ -269,7 +269,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             day_index -= 1
             time_created = datetime(1999, 12, day_index, 23, 59, 59, 100,  tzinfo=pytz.UTC)
             q.save()
-        
+
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
         test_search.add_sort("created_time", "ASC")
@@ -278,7 +278,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         for i in range(0,sorted_questions.count() - 1):
             self.assertTrue(sorted_questions[i].created_time < sorted_questions[i + 1].created_time)
 
-    
+
     def test_sorting_responses_descending(self):
         """Check that the questions get sorted by their number of responses in descending order """
         course = self._bootstrap_courses(1)
@@ -291,7 +291,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
-        
+
         #Last question is responded 3 times, started from the back to ensure descending sorting happens
         QuestionService.respond_to_question(17, author)
         QuestionService.respond_to_question(18, first_responder)
@@ -301,7 +301,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         QuestionService.respond_to_question(15, first_responder)
         #Third last question is responded once
         QuestionService.respond_to_question(9, author)
-        
+
         test_search = SearchService.SearchService(course)
         test_search.add_sort("responses", "DESC")
         sorted_questions = test_search.execute()
@@ -325,7 +325,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         self._bootstrap_topics(course)
         self._bootstrap_questions(author)
         self._bootstrap_question_choices(correct_id=2)
-        
+
         #First question is responded 3 times, started from the back to ensure descending sorting happens
         QuestionService.respond_to_question(1, author)
         QuestionService.respond_to_question(2, first_responder)
@@ -335,7 +335,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         QuestionService.respond_to_question(6, first_responder)
         #Third question is responded once
         QuestionService.respond_to_question(9, author)
-        
+
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
         test_search.add_sort("responses", "ASC")
