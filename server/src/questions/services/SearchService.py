@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from questions.models import Question, QuestionResponse, Topic, Distractor
+from questions.models import Question, QuestionResponse, Topic, Distractor, QuestionScore
 from users.models import CourseUser, Course
 from django.db.models import Count, Subquery, OuterRef, Func, F
 
@@ -18,7 +18,7 @@ class SearchService(object):
         else:
             sort_modifier = ""
 
-        if sort_field in ["difficulty", "quality", "created_time"]:
+        if sort_field in ["difficultyCount", "qualityCount", "created_time"]:
             self._query = self._query.order_by(sort_modifier + sort_field)
         elif sort_field == "comments":
             pass
@@ -46,13 +46,14 @@ class SearchService(object):
                 id__in=Distractor.objects.filter(
                     id__in=QuestionResponse.objects.filter(
                         user=course_user).values("response_id")).values("question_id"))
-        elif filter_field == "wrong":
-            # All answered Questions where the Response has the isCorrect=True property
+        elif filter_field == "improve":
+            # All answered Questions where the Response has the isCorrect=False property
             self._query = self._query.filter(
                 id__in=Distractor.objects.filter(
-                    isCorrect=False,
                     id__in=QuestionResponse.objects.filter(
                         user=course_user).values("response_id")).values("question_id"))
+                        
+            self._query = self._query.filter(id__in = QuestionScore.objects.filter(score__lt = 1))
 
     def text_search(self, text_query):
         self._query = self._query.filter(content__contains=text_query)

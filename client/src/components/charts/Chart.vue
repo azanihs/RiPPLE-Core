@@ -14,7 +14,7 @@
         <div v-else-if="type == 'topicDependency'"
              class="graphLegend">
             <div class="legendItem ownLine">
-                <span>Edge Thickness is Number of Attempts</span>
+                <span>IEdge Thickness is Number of Attempts</span>
             </div>
             <div class="legendItem">
                 <span class="legendLabel rect"

@@ -51,9 +51,10 @@
         </md-layout>
         <md-layout class="pageContent"
             :class="pageSize">
-            <router-view></router-view>
+            <router-view :key="$route.fullPath"></router-view>
         </md-layout>
         <global-notification></global-notification>
+        <page-loader :condition="loading"></page-loader>
     </md-layout>
 </template>
 
@@ -192,7 +193,7 @@ label {
 </style>
 <script lang="ts">
 import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
-import { ILink, User, Course, CourseUser } from "./interfaces/models";
+import { ILink, IUser, ICourse, ICourseUser } from "./interfaces/models";
 import { getLinks } from "./util";
 
 // Special case where main.vue needs to refresh application
@@ -201,12 +202,14 @@ import UserService from "./services/UserService";
 import Fetcher from "./services/Fetcher";
 
 import UserContainer from "./components/UserContainer.vue";
+import PageLoader from "./components/util/PageLoader.vue";
 import GlobalNotification from "./GlobalNotification.vue";
 
 @Component({
     components: {
         GlobalNotification,
-        UserContainer
+        UserContainer,
+        PageLoader
     }
 })
 export default class Main extends Vue {
@@ -215,23 +218,24 @@ export default class Main extends Vue {
     });
 
     courseRoles: string[] = [];
-    pUser: User | undefined = undefined;
-    pCourse: Course| undefined = undefined;
+    pUser: IUser | undefined = undefined;
+    pCourse: ICourse| undefined = undefined;
 
     menuIcon = "menu";
     mobileMode = false;
     pageTitle = "";
     activeSubmenu = false;
+    loading = false;
 
     get user() {
         return this.pUser;
     }
 
-    updateUser(newUser: User | undefined) {
+    updateUser(newUser: IUser | undefined) {
         this.pUser = newUser;
     }
 
-    updateCourseUser(courseUser: CourseUser) {
+    updateCourseUser(courseUser: ICourseUser) {
         this.updateUser(courseUser.user);
         this.courseRoles = courseUser.roles;
 
@@ -309,7 +313,7 @@ export default class Main extends Vue {
         return this.pCourse;
     }
 
-    updateCourse(newCourse: Course) {
+    updateCourse(newCourse: ICourse) {
         let oldCourseCode: string | undefined = undefined;
         if (this.pCourse && this.pCourse.courseCode) {
             oldCourseCode = this.pCourse.courseCode;
@@ -318,10 +322,14 @@ export default class Main extends Vue {
         if (newCourse === undefined) return;
 
         this.pCourse = newCourse;
+        this.loading = true;
         UserRepository.authenticate(newCourse.courseCode)
             .then(_ => {
                 const preserveCache = !(oldCourseCode == newCourse.courseCode);
-                Fetcher.forceUpdate(preserveCache);
+                Fetcher.forceUpdate(preserveCache)
+                    .then(() => {
+                        this.loading = false;
+                    });
             });
     }
 

@@ -150,7 +150,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { Topic, UserSummary, Edge, StudyRole, CompareSet } from "../../interfaces/models";
+import { ITopic, IUserSummary, IEdge, IStudyRole, ICompareSet } from "../../interfaces/models";
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
@@ -163,26 +163,22 @@ import RecommendationCard from "./RecommendationCard.vue";
 })
 export default class RecommendationSearch extends Vue {
     @Prop
-    topics = p<Topic[]>({
-        required: true,
-        type: Array
+    topics = p<ITopic[]>({
+        required: true
     });
 
     @Prop
-    recommendations = p<UserSummary[]>({
-        required: true,
-        type: Array
+    recommendations = p<IUserSummary[]>({
+        required: true
     });
 
     @Prop
-    requests = p<UserSummary[]>({
-        required: true,
-        type: Array
+    requests = p<IUserSummary[]>({
+        required: true
     });
 
     @Prop
-    studyRoles = p<StudyRole[]>({
-        type: Array,
+    studyRoles = p<IStudyRole[]>({
         default: () => {
             return [];
         }
@@ -198,9 +194,9 @@ export default class RecommendationSearch extends Vue {
 
     competencies = new Map();
 
-    updateCompetencies(newCompetencies: CompareSet) {
+    updateCompetencies(newCompetencies: ICompareSet) {
         this.competencies = newCompetencies.ownScores
-            .reduce((carry: Map<Topic, number>, x: Edge) => {
+            .reduce((carry: Map<ITopic, number>, x: IEdge) => {
                 if (carry.get(x.source) === undefined) {
                     carry.set(x.source, x.competency);
                 }
@@ -214,7 +210,7 @@ export default class RecommendationSearch extends Vue {
             .on(this.updateCompetencies);
     }
 
-    checkbox(topic: Topic, studyRole: StudyRole): boolean {
+    checkbox(topic: ITopic, studyRole: IStudyRole): boolean {
         if (!this.userRoles.has(topic.name)) {
             return false;
         } else {
@@ -226,11 +222,11 @@ export default class RecommendationSearch extends Vue {
         }
     }
 
-    checkboxChange(topic: Topic, studyRole: StudyRole) {
+    checkboxChange(topic: ITopic, studyRole: IStudyRole) {
         this.$emit("change", topic.id, studyRole.id);
     }
 
-    checkboxIsDisabled(sType: string, topic: Topic) {
+    checkboxIsDisabled(sType: string, topic: ITopic) {
         if (sType == "Provide Mentorship") {
             const weight = this.competencies.get(topic);
             return weight === undefined || weight <= 85;
@@ -249,7 +245,7 @@ export default class RecommendationSearch extends Vue {
         }
     };
 
-    getCellWeight(topic: Topic) {
+    getCellWeight(topic: ITopic) {
         const weight = this.competencies.get(topic);
         return {
             background: `${this.getColour(weight)}${0.4})`,

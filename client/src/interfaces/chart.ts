@@ -1,4 +1,4 @@
-import { Topic, Edge } from "./models";
+import { ITopic, IEdge } from "./models";
 
 import * as d3 from "d3";
 
@@ -65,14 +65,14 @@ export interface DataContainer {
     [key: string]: null | any
 };
 
-export interface ISimulationNode extends d3.SimulationNodeDatum, Topic {
+export interface ISimulationNode extends d3.SimulationNodeDatum, ITopic {
     x: number,
     y: number,
     cx: number,
     cy: number
 };
 
-export interface ISimulationEdge extends Edge {
+export interface ISimulationEdge extends IEdge {
     source: ISimulationNode
     target: ISimulationNode
 };

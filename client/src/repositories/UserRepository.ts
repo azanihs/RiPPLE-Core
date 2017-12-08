@@ -1,9 +1,9 @@
 import {
-    CourseUser, User, Course,
-    Notification, Topic, PeerConnection, Edge, UserSummary
+    ICourseUser, IUser, ICourse, ISearch,
+    INotification, ITopic, IPeerConnection, IEdge, IUserSummary, IEngagementType
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
-import { setToken, apiFetch } from "./APIRepository";
+import { setToken, apiFetch, apiPost } from "./APIRepository";
 
 let IDCounter = 0;
 const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
@@ -45,9 +45,9 @@ const notifications = Array.from({ length: notificationCount }).map((_, i: numbe
     icon: _icons[_n(4)]
 }));
 
-type ServerEdge = {
-    0: Topic,
-    1: Topic,
+type IServerEdge = {
+    0: ITopic,
+    1: ITopic,
     2: number,
     3: number
 };
@@ -58,7 +58,7 @@ const makeUser = () => {
     };
 
     const connections = new Array(2 + _n(8)).fill(0).map(_ => {
-        const connection: PeerConnection = {
+        const connection: IPeerConnection = {
             edgeStart: 0,
             edgeEnd: 0,
             type: getType(_n(2)),
@@ -73,7 +73,7 @@ const makeUser = () => {
     const proficiencies = Array.from({ length: proficienciesLength },
         _ => _topics[_n(_topics.length)]) as string[];
 
-    const user: User = {
+    const user: IUser = {
         id: IDCounter++,
         name: "_",
         bio: "_",
@@ -86,16 +86,29 @@ const makeUser = () => {
     return user;
 };
 
+const _defaultSearch = () => ({
+    sortField: "",
+    sortDesc: false,
+    filterField: "All Questions",
+    query: "",
+    page: 0,
+    filterTopics: []
+});
+
+const _searchCaches: Map<string, ISearch> = new Map<string, ISearch>();
+
+let _currentCourse: string = "";
+
 export default class UserRepository {
-    static getLoggedInUser(): Promise<CourseUser> {
-        return apiFetch<CourseUser>(`/users/me/`);
+    static getLoggedInUser(): Promise<ICourseUser> {
+        return apiFetch<ICourseUser>(`/users/me/`);
     }
 
-    static getUserCourses(): Promise<Course[]> {
-        return apiFetch<Course[]>(`/users/courses/`);
+    static getUserCourses(): Promise<ICourse[]> {
+        return apiFetch<ICourse[]>(`/users/courses/`);
     }
 
-    static getUserConnections(count: number): Promise<User[]> {
+    static getUserConnections(count: number): Promise<IUser[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(Array.from({ length: count }, makeUser));
@@ -103,7 +116,7 @@ export default class UserRepository {
         });
     }
 
-    static getUserNotifications(): Promise<Notification[]> {
+    static getUserNotifications(): Promise<INotification[]> {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve(notifications);
@@ -119,19 +132,32 @@ export default class UserRepository {
         });
     }
 
-    static getAllAvailableEngagementTypes(): Promise<Topic[]> {
-        return apiFetch<Topic[]>(`/users/engagement/`)
+    static getAllAvailableEngagementTypes(): Promise<IEngagementType[]> {
+        return apiFetch<IEngagementType[]>(`/users/engagement/`)
             .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
 
-    static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<UserSummary[]> {
-        return apiFetch<UserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
+    static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<IUserSummary[]> {
+        return apiFetch<IUserSummary[]>(`/questions/leaderboard/${sortField}/${sortOrder}/`);
     }
 
-    static getCompareAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch<ServerEdge[]>(`/questions/competencies/aggregate/${compareTo}/`)
-            .then(x => x.map(x => {
-                const edge: Edge = {
+    static getCompareAgainst(compareTo: string): Promise<IEdge[]> {
+        return apiFetch<IServerEdge[]>(`/questions/competencies/aggregate/${compareTo}/`)
+        .then(x => x.map(x => {
+            const edge: IEdge = {
+                source: TopicRepository.topicPointer(x[0]),
+                target: TopicRepository.topicPointer(x[1]),
+                competency: Math.round(x[2] * 100),
+                attempts: Math.round(x[3] * 100)
+            };
+            return edge;
+        }));
+    }
+
+    static getUserCompetencies(): Promise<IEdge[]> {
+        return apiFetch<IServerEdge[]>(`/questions/competencies/all/`)
+            .then(userEngagement => userEngagement.map(x => {
+                const edge: IEdge = {
                     source: TopicRepository.topicPointer(x[0]),
                     target: TopicRepository.topicPointer(x[1]),
                     competency: Math.round(x[2] * 100),
@@ -141,12 +167,12 @@ export default class UserRepository {
             }));
     }
 
-    static getUserCompetencies(): Promise<Edge[]> {
-        return apiFetch<ServerEdge[]>(`/questions/competencies/all/`)
-            .then(x => x.map(x => {
-                const edge: Edge = {
-                    source: TopicRepository.topicPointer(x[0]),
-                    target: TopicRepository.topicPointer(x[1]),
+    static getEngagementAgainst(compareTo: string): Promise<IEdge[]> {
+        return apiFetch<IServerEdge[]>(`/users/engagement/aggregate/${compareTo}/`)
+            .then(aggregateEngagement => aggregateEngagement.map(x => {
+                const edge: IEdge = {
+                    source: TopicRepository.engagementPointer(x[0]),
+                    target: TopicRepository.engagementPointer(x[1]),
                     competency: Math.round(x[2] * 100),
                     attempts: Math.round(x[3] * 100)
                 };
@@ -154,27 +180,14 @@ export default class UserRepository {
             }));
     }
 
-    static getUserEngagement(): Promise<Edge[]> {
-        return apiFetch<ServerEdge[]>(`/users/engagement/all/`)
-            .then(x => x.map(x => {
-                const edge: Edge = {
-                    source: TopicRepository.topicPointer(x[0]),
-                    target: TopicRepository.topicPointer(x[1]),
-                    competency: Math.round(x[2]*100),
-                    attempts: Math.round(x[3]*100)
-                };
-                return edge;
-            }));
-    }
-
-    static getEngagementAgainst(compareTo: string): Promise<Edge[]> {
-        return apiFetch<ServerEdge[]>(`/users/engagement/aggregate/${compareTo}/`)
-            .then(x => x.map(x => {
-                const edge: Edge = {
-                    source: TopicRepository.topicPointer(x[0]),
-                    target: TopicRepository.topicPointer(x[1]),
-                    competency: Math.round(x[2] * 100),
-                    attempts: Math.round(x[3] * 100)
+    static getUserEngagement(): Promise<IEdge[]> {
+        return apiFetch<IServerEdge[]>(`/users/engagement/all/`)
+            .then(userEngagementScores => userEngagementScores.map(x => {
+                const edge: IEdge = {
+                    source: TopicRepository.engagementPointer(x[0]),
+                    target: TopicRepository.engagementPointer(x[1]),
+                    competency: Math.round(x[2]),
+                    attempts: Math.round(x[3])
                 };
                 return edge;
             }));
@@ -205,33 +218,30 @@ export default class UserRepository {
         return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
                 setToken(x.token);
+                _currentCourse = x.courseCode;
             });
     }
 
-    static updateCourse(course: Course, topics: Topic[]): Promise<CourseUser> {
-        return apiFetch<CourseUser>(`/users/courses/update/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                course: course,
-                topics: topics
-            })
-        });
+    static getSearchCacheForCourse() {
+        const cache = _searchCaches.get(_currentCourse);
+        if (!cache) {
+            _searchCaches.set(_currentCourse, _defaultSearch());
+        }
+        return Promise.resolve(_searchCaches.get(_currentCourse)!);
     }
 
-    static updateUserImage(newImage: string): Promise<User> {
-        return apiFetch<User>(`/users/me/image/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                image: newImage
-            })
+    static setSearchCacheForCourse(search: ISearch) {
+        const arrCopy = search.filterTopics.slice();
+        _searchCaches.set(_currentCourse, Object.assign({}, search, { filterTopics: arrCopy }));
+    }
+
+    static updateCourse(course: ICourse, topics: ITopic[]): Promise<ICourseUser> {
+        return apiPost<ICourseUser>(`/users/courses/update/`, { course, topics });
+    }
+
+    static updateUserImage(newImage: string): Promise<IUser> {
+        return apiPost<IUser>(`/users/me/image/`, {
+            image: newImage
         });
     }
 }

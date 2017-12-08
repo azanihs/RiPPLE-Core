@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { CourseUser, User, Course } from "../interfaces/models";
+import { ICourseUser, IUser, ICourse } from "../interfaces/models";
 import { addEventsToQueue } from "../util";
 import UserService from "../services/UserService";
 import ImageService from "../services/ImageService";
@@ -73,17 +73,17 @@ import Fetcher from "../services/Fetcher";
 
 @Component()
 export default class UserContainer extends Vue {
-    @Prop user = p<User | undefined>({
+    @Prop user = p<IUser | undefined>({
         required: false
     });
-    @Prop course = p<Course | undefined>({
+    @Prop course = p<ICourse | undefined>({
         required: false
     });
 
-    pCourse: Course | undefined = undefined;
-    pCourses: Course[] = [];
+    pCourse: ICourse | undefined = undefined;
+    pCourses: ICourse[] = [];
 
-    set currentCourse(newCourse: Course | undefined) {
+    set currentCourse(newCourse: ICourse | undefined) {
         this.pCourse = newCourse;
         this.$emit("changeCourse", newCourse);
     }
@@ -92,7 +92,7 @@ export default class UserContainer extends Vue {
         return this.course || this.pCourse;
     }
 
-    updateCourses(newCourses: Course[]) {
+    updateCourses(newCourses: ICourse[]) {
         this.pCourses = newCourses;
         if (this.pCourse === undefined && newCourses.length > 0) {
             this.pCourse = newCourses[0];
@@ -129,10 +129,10 @@ export default class UserContainer extends Vue {
                     .then(file => UserService.updateUserImage({
                         newImage: (file as any).base64 as string
                     }))
-                    .then((user: User) => {
+                    .then((user: IUser) => {
                         this.$emit("changeUser", user);
                         UserService.getLoggedInUser()
-                            .then((cu: CourseUser) => {
+                            .then((cu: ICourseUser) => {
                                 this.$emit("changeUser", cu.user);
                             });
                         this.showMessage("Profile image changed", "done");

@@ -167,7 +167,7 @@ h2 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Question, Distractor } from "../../interfaces/models";
+import { IQuestion, IDistractor } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import Comment from "../util/Comment.vue";
 import QuestionRater from "./QuestionRater.vue";
@@ -176,18 +176,18 @@ import * as d3 from "d3";
 
 @Component({
     components: {
-        "question-rater": QuestionRater,
-        "comment": Comment
+        QuestionRater,
+        Comment
     }
 })
 export default class QuestionResponse extends Vue {
-    @Prop question = p<Question>({
+    @Prop question = p<IQuestion>({
         required: true
     });
 
     userAnswer: number = -1;
     hasGivenUp = false;
-    disabledResponses: Distractor[] = [];
+    disabledResponses: IDistractor[] = [];
 
     pResponseDistribution: {[id: number]: number} = {};
 
@@ -202,7 +202,7 @@ export default class QuestionResponse extends Vue {
     }
 
     @Watch("question")
-    questionChanged(_oldQuestion: Question, _newQuestion: Question) {
+    questionChanged(_oldQuestion: IQuestion, _newQuestion: IQuestion) {
         QuestionService.distributionForQuestion(this.question)
             .then(this.updateResponseDistribution);
     }
@@ -239,7 +239,7 @@ export default class QuestionResponse extends Vue {
             });
     }
 
-    getResponseStyles(answer: Distractor) {
+    getResponseStyles(answer: IDistractor) {
         const answerIcon = this.optionIcon(answer);
         return {
             answered: this.disabledResponses.find(x => x == answer) || this.userHasCorrectAnswer,
@@ -253,7 +253,11 @@ export default class QuestionResponse extends Vue {
         return this.userAnswer;
     }
 
-    set questionResponse(newValue) {
+    set questionResponse(newValue: number) {
+        if (this.userHasCorrectAnswer) {
+            return;
+        }
+
         const distractor = this.question.distractors[newValue];
         this.disabledResponses.push(distractor);
         this.userAnswer = newValue;
@@ -264,7 +268,7 @@ export default class QuestionResponse extends Vue {
             });
     }
 
-    answerOptionFill(response: Distractor) {
+    answerOptionFill(response: IDistractor) {
         if (this.userHasCorrectAnswer) {
             return {
                 width: this.pResponseDistribution[response.id] + "%"
@@ -277,7 +281,7 @@ export default class QuestionResponse extends Vue {
         return String.fromCharCode("A".charCodeAt(0) + index);
     }
 
-    optionIcon(solution: Distractor) {
+    optionIcon(solution: IDistractor) {
         return this.question.solution == solution ? "done" : "clear";
     }
 

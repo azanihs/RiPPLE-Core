@@ -9,8 +9,8 @@
                 </div>
                 <div class="bottomPanel">
                     <topic-chip v-for="topic in data.topics"
-                                :key="topic.id"
-                                linkTo="/view/questions">
+                                :disabled="true"
+                                :key="topic.id">
                         {{topic.name}}
                     </topic-chip>
                 </div>
@@ -55,6 +55,7 @@
 <style scoped>
 .card {
     padding: 0px !important;
+    overflow-y: hidden;
 }
 
 .cardContainer {
@@ -69,8 +70,6 @@
     border-right: 1px solid #ddd;
     flex: 1;
 }
-
-
 
 .rightPanel {
     padding: 8px;
@@ -107,8 +106,8 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "av-ts";
-import { Question } from "../../interfaces/models";
+import { Vue, Component, Prop, p } from "av-ts";
+import { IQuestion } from "../../interfaces/models";
 
 import QuestionDetails from "./QuestionDetails.vue";
 import TopicChip from "../util/TopicChip.vue";
@@ -120,6 +119,8 @@ import TopicChip from "../util/TopicChip.vue";
     }
 })
 export default class QuestionPreview extends Vue {
-    @Prop data: Question;
+    @Prop data = p<IQuestion>({
+        required: true
+    });
 }
 </script>
