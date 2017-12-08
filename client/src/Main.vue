@@ -1,5 +1,8 @@
 <template>
     <md-layout>
+        <div v-if="mobileMode && sideMenuIsOpen"
+        class="dimOverlay"
+        @click="hideSideBar()"></div>
         <md-layout class="offset"
             ref="isVisible"
             md-hide-medium-and-up></md-layout>
@@ -9,7 +12,7 @@
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
-                ref="menuButton"
+                :class="menuButtonClass"
                 @click="toggleSideNav(undefined)">
                 <md-icon>{{menuIcon}}</md-icon>
             </md-button>
@@ -39,7 +42,7 @@
                             <li v-for="submenuLink in link.submenu"
                                 :key="submenuLink.href">
                                 <router-link :to="submenuLink.href"
-                                    @click.native="keepProfileActive()"
+                                    @click.native="keepProfileActive(submenuLink)"
                                     class ="profileSubmenu md-button routerLink">
                                     <span>{{ submenuLink.text }}</span>
                                 </router-link>
@@ -71,6 +74,18 @@
     justify-content: flex-end;
 }
 
+.dimOverlay {
+    position:fixed;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background:rgba(0,0,0,0.6);
+    z-index: 5;
+}
+
 .profileSubmenu{
     background-color: #18181b;
     font-size: 0.8em;
@@ -81,7 +96,6 @@
 .menuContainer h2 {
     padding-right: 16px;
     color: #999;
-
 }
 
 .menuButton {
@@ -133,6 +147,7 @@
     margin-right: 1.25%;
     min-width: 97.5%;
     flex: 0 1 97.5%;
+    z-index: -1;
 }
 
 ul {
@@ -185,6 +200,11 @@ a.routerLink:hover {
     color: #111 !important;
 }
 
+.expanded {
+    transform: translate3d(0,0,0);
+    opacity: 1;
+}
+
 </style>
 
 <style>
@@ -222,6 +242,7 @@ export default class Main extends Vue {
     pMenuLinks: ILink[] = getLinks();
 
     menuIcon = "menu";
+    sideMenuIsOpen = false;
     mobileMode = false;
     pageTitle = "";
     activeSubmenu = false;
@@ -248,7 +269,16 @@ export default class Main extends Vue {
     }
 
     get pageSize() {
-        return this.mobileMode ? "mobilePage" : "largePage";
+        return {
+            "mobilePage": this.mobileMode,
+            "largePage": !this.mobileMode,
+            "expanded": this.sideMenuIsOpen
+        };
+    }
+    get menuButtonClass() {
+        return {
+            "highlighted": this.sideMenuIsOpen
+        };
     }
 
     resized() {
@@ -347,25 +377,23 @@ export default class Main extends Vue {
 
         if (this.mobileMode) {
             this.updatePageName();
-            const menuButton = (this.$refs["menuButton"] as Vue).$el;
-            const container = (this.$refs.sidenavContainer as Vue).$el;
             const linkHasSubmenu = link !== undefined && link.submenu !== undefined;
-            if (!container.style.transform || linkHasSubmenu) {
-                container.style.transform = "translate3d(0,0,0)";
-                container.style.opacity = "1";
-                menuButton.style.color = "#f2f2f2";
+            if (this.sideMenuIsOpen && linkHasSubmenu) {
+                this.sideMenuIsOpen = true;
                 this.menuIcon = "close";
+            } else if (this.sideMenuIsOpen && !linkHasSubmenu) {
+                this.sideMenuIsOpen = false;
+                this.menuIcon = "menu";
             } else {
-                menuButton.style.color = "#222";
-                container.style.transform = null;
-                container.style.display = null;
+                this.sideMenuIsOpen = true;
                 this.menuIcon = "menu";
             }
         }
     }
 
-    keepProfileActive() {
+    keepProfileActive(link: ILink) {
         this.activeSubmenu = true;
+        this.toggleSideNav(link);
         if (this.mobileMode) {
             const container = (this.$refs.sidenavContainer as Vue).$el;
             container.style.transform = null;
@@ -377,6 +405,10 @@ export default class Main extends Vue {
         if (link.submenu !== undefined) {
             return "has-submenu";
         }
+    }
+
+    hideSideBar() {
+        this.sideMenuIsOpen = false;
     }
 
 }
