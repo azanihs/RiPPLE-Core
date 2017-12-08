@@ -1,5 +1,6 @@
 import { apiFetch } from "./APIRepository";
-import { Question, QuestionUpload, Distractor, NetworkResponse, ReportQuestion } from "../interfaces/models";
+import { Question, QuestionUpload, Distractor, NetworkResponse,
+    ReportQuestion, ReasonList } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
@@ -110,5 +111,15 @@ export default class QuestionRepository {
                 questionReport
             })
         });
+    }
+
+    static getReportReasons() {
+        return apiFetch<ReasonList>("/questions/reasons/", {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "Application/json"
+            })
+        }).then(x => x.reasonList);
     }
 }

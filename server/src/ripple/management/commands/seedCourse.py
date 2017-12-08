@@ -2,7 +2,8 @@ from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
+    ExplanationImage, DistractorImage, ReportReason
 from users.models import Course, User, CourseUser
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
@@ -232,6 +233,14 @@ class Command(BaseCommand):
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
                 name=x, course=course) for x in topics]
+            print("\t-Creating Report Reasons")
+            reason_list = ["custom", "Inappropriate Content", "Incorrect Answer",  "Incorrect Tags"]
+            for r in reason_list:
+                reason = ReportReason (
+                    reason=r,
+                    course=course
+                )
+                reason.save()
             print("\t-Enrolling Users")
             course_users = []
             for user in users:

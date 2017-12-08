@@ -17,6 +17,7 @@ urlpatterns = [
 
     url(r'^add/$', views.add),
     url(r'^report/$', views.report),
+    url(r'^reasons/$', views.get_reasons),
 
     url(r'^distribution/(.*)/$', views.distribution),
 

@@ -241,3 +241,12 @@ def getReports(request):
         return JsonResponse(search_result)
     else:
         return page_response(search_result, page)
+
+def get_reasons(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    user = UserService.logged_in_user(request)
+    return JsonResponse(QuestionService.get_reason_list(user))

@@ -4,7 +4,7 @@
                    md-hide-small
                    md-hide-medium
                    class="questionNavigation">
-            <action-buttons @back="closeQuestion()" 
+            <action-buttons @back="closeQuestion()"
                     @report="openDialog()"></action-buttons>
         </md-layout>
         <md-layout md-flex="100">
@@ -74,7 +74,7 @@
             <md-dialog-content>
                 <form>
                     <label>Report question for:</label><br>
-                    <topic-chip class="topicChip" v-for="reason in reasonList"
+                    <topic-chip class="topicChip" v-for="reason in pReasonList"
                         :key="reason"
                         :disabled="!reasonIsUsed(reason)"
                         @click.native="toggleReason(reason)">
@@ -220,7 +220,7 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
 
 import QuestionService from "../../services/QuestionService";
@@ -229,6 +229,7 @@ import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
+import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
 
@@ -253,8 +254,8 @@ export default class Question extends Vue {
     });
 
     reason = "";
-    reasonList = ["Inappropriate Content", "Incorrect Answer", "Incorrect Tags"];
-    reasonsUsed: string[] = []
+    pReasonList: string[] | undefined = undefined;
+    reasonsUsed: string[] = [];
     networkMessage = "";
 
     userIsFinishedWithQuestion: boolean = false;
@@ -264,6 +265,14 @@ export default class Question extends Vue {
 
         // TODO: Emit an event rather than mutate own prop.
         this.question.responseCount++;
+    }
+
+    get reasonList() {
+        return this.pReasonList;
+    }
+
+    set reasonList(newList) {
+        this.pReasonList = newList;
     }
 
     nextQuestion() {
@@ -276,7 +285,7 @@ export default class Question extends Vue {
 
     reportQuestion() {
         this.reasonsUsed.push(this.reason);
-        QuestionService.reportQuestion(this.question, this.reasonsUsed.toString())
+        QuestionService.reportQuestion(this.question, this.reasonsUsed)
             .then(x => {
                 if (x.error !== undefined) {
                     this.networkMessage = "Error Submitting Report.";
@@ -313,6 +322,22 @@ export default class Question extends Vue {
 
     reasonIsUsed(reason: string) {
         return this.reasonsUsed.indexOf(reason) >= 0;
+    }
+
+    updateReportReasons(reasons: string[]) {
+        this.pReasonList = reasons;
+    }
+
+    @Lifecycle
+    created() {
+        Fetcher.get(QuestionService.getReportReasons)
+            .on(this.updateReportReasons);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(QuestionService.getReportReasons)
+            .off(this.updateReportReasons);
     }
 }
 </script>
