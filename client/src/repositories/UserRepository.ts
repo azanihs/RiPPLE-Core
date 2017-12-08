@@ -186,8 +186,8 @@ export default class UserRepository {
                 const edge: IEdge = {
                     source: TopicRepository.engagementPointer(x[0]),
                     target: TopicRepository.engagementPointer(x[1]),
-                    competency: Math.round(x[2]),
-                    attempts: Math.round(x[3])
+                    competency: Math.round(x[2] * 100),
+                    attempts: Math.round(x[3] * 100)
                 };
                 return edge;
             }));
