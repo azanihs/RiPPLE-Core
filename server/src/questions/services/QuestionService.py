@@ -2,7 +2,7 @@ import random
 import math
 import numpy as np
 
-from django.db.models import Count
+from django.db.models import Count, Min
 
 from ripple.util import util
 from users.models import CourseUser, Token
@@ -22,16 +22,16 @@ def question_response_distribution(question_id):
 
     question_distractors = Distractor.objects.filter(question=question)
     question_responses = QuestionResponse.objects.filter(response__in=question_distractors)
-    total_responses = question_responses.count()
+    total_responses = question_responses.values('user_id').distinct().count()
     response_distribution = {}
 
     for i in question_distractors:
-        distractor_response_count = question_responses.filter(response=i).count()
+        first_response = question_responses.values('user_id').annotate(first=Min('id')).values_list('first', flat=True)
+        distractor_response_count = question_responses.filter(id__in=first_response,  response=i).count()
         if total_responses is 0:
             response_distribution[i.id] = 0
         else:
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
-
     return response_distribution
 
 def get_course_leaders(course, sort_field, sort_order, limit=25):
