@@ -1,6 +1,6 @@
 import random
 
-from django.db.models import Count
+from django.db.models import Count, Min
 
 import math
 
@@ -23,16 +23,16 @@ def question_response_distribution(question_id):
 
     question_distractors = Distractor.objects.filter(question=question)
     question_responses = QuestionResponse.objects.filter(response__in=question_distractors)
-    total_responses = question_responses.count()
+    total_responses = question_responses.values('user_id').distinct().count()
     response_distribution = {}
 
     for i in question_distractors:
-        distractor_response_count = question_responses.filter(response=i).count()
+        first_response = question_responses.values('user_id').annotate(first=Min('id')).values_list('first', flat=True)
+        distractor_response_count = question_responses.filter(id__in=first_response,  response=i).count()
         if total_responses is 0:
             response_distribution[i.id] = 0
         else:
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
-
     return response_distribution
 
 def get_course_leaders(course, sort_field, sort_order, limit=25):
@@ -148,7 +148,7 @@ def rate_question(distractor_id, user_ratings, user):
 
 
 def calculate_question_score(user, question, response):
-    """ 
+    """
         calculates the questions score and updates the cached question  score. Also increments the answer count for the questions core
         Creates a QuestionScore if none exists
     """
@@ -156,7 +156,7 @@ def calculate_question_score(user, question, response):
         question_score = QuestionScore.objects.get(
             user=user, question=question)
     except QuestionScore.DoesNotExist:
-        question_score = QuestionScore(user=user, question=question, 
+        question_score = QuestionScore(user=user, question=question,
                 number_answers=0, score=0)
         question_score.save()
 
@@ -189,8 +189,8 @@ def update_competency(user, question, response):
 
     score = get_competency_score(question, response)
     calculate_children_competency(user, queryset_topics, score)
-    
-        
+
+
 def calculate_children_competency(user, queryset_topics, score):
     """ Updates children competencies"""
     # Weigh each topic
@@ -207,7 +207,7 @@ def calculate_children_competency(user, queryset_topics, score):
             user_competency = user_competency[0]
 
         old_score = competency_to_score(user_competency.competency)
-        new_score = old_score + (score*weight)      
+        new_score = old_score + (score*weight)
         new_competency =  score_to_competency(new_score)
         user_competency.competency = new_competency
         user_competency.confidence += weight
@@ -226,9 +226,9 @@ def get_competency_score(question, response):
         past_average = 0
         for score in question_scores:
             past_average += score.score
-        past_average = past_average/len(question_scores)    
+        past_average = past_average/len(question_scores)
     else:
-        past_average = 1 
+        past_average = 1
     ### When getting question wrong
     ### Easy question = less score - less weight going down
     ### Hard question = more score - more weight going down
@@ -237,8 +237,8 @@ def get_competency_score(question, response):
     else:
         difficulty = (10 - question.difficulty)/2+5
 
-    ### Array for dot product. Goal is to have 
-    ### abs(dotProd) between 0.25 and 0.5 in 
+    ### Array for dot product. Goal is to have
+    ### abs(dotProd) between 0.25 and 0.5 in
     ### most situations
     weighted_features = [
         (difficulty/10, 0.2),
@@ -273,7 +273,7 @@ def exp_moving_avg(decay_factor, question_scores):
         counter += 1
     return res/divisor
 
-        
+
 
 def report_question(user, request):
     request = request.get("questionReport", None)
@@ -299,7 +299,7 @@ def get_reports(user):
     course = user.course
     reportQuestions= ReportQuestion.objects \
         .filter(author__in=CourseUser.objects.filter(course=course))
-    
+
     return reportQuestions
 
 
