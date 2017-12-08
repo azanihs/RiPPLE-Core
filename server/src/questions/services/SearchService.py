@@ -10,7 +10,10 @@ class SearchService(object):
         #Some questions occur multiple times due to some having multiple tags
         #Make distinct
         self._query = Question.objects.filter(
-            author__in=CourseUser.objects.filter(course=course)).order_by("id").distinct()
+            author__in=CourseUser.objects.filter(course=course)).distinct()
+
+        # Default object order is by ID. Can possibly be overridden by search
+        self._query = self._query.order_by("id")
 
     def add_sort(self, sort_field, sort_order):
         if sort_order == "DESC":
@@ -18,7 +21,7 @@ class SearchService(object):
         else:
             sort_modifier = ""
 
-        if sort_field in ["difficultyCount", "qualityCount", "created_time"]:
+        if sort_field in ["difficulty", "quality", "created_time"]:
             self._query = self._query.order_by(sort_modifier + sort_field)
         elif sort_field == "comments":
             pass
@@ -52,7 +55,7 @@ class SearchService(object):
                 id__in=Distractor.objects.filter(
                     id__in=QuestionResponse.objects.filter(
                         user=course_user).values("response_id")).values("question_id"))
-                        
+
             self._query = self._query.filter(id__in = QuestionScore.objects.filter(score__lt = 1))
 
     def text_search(self, text_query):
