@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { ILink, Notification } from "./interfaces/models";
+import { ILink, INotification } from "./interfaces/models";
 
 // From https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/901144#901144
 export function getParameterByName(name: string, url: string) {
@@ -72,7 +72,7 @@ const _bus = new Vue();
 
 export const NEW_QUEUE_ITEM = "NEW_QUEUE_ITEM";
 
-export function addEventsToQueue(items: Notification[]) {
+export function addEventsToQueue(items: INotification[]) {
     items.forEach(x => {
         _bus.$emit(NEW_QUEUE_ITEM, x);
     });

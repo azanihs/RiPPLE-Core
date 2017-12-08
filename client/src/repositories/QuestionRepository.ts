@@ -1,16 +1,16 @@
-import { apiFetch } from "./APIRepository";
-import { Question, QuestionUpload, Distractor, NetworkResponse, ReportQuestion } from "../interfaces/models";
+import { apiFetch, apiPost } from "./APIRepository";
+import { IQuestion, IQuestionUpload, IDistractor, INetworkResponse, IReportQuestion } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
-type SearchResult = { items: Question[], searchResult: any, totalItems: number, page: number };
+type ISearchResult = { items: IQuestion[], searchResult: any, totalItems: number, page: number };
 
-function toQuestion(x: Question): Question {
-    let solution: undefined | Distractor = x.distractors.find(d => d.isCorrect === true);
+function toQuestion(x: IQuestion): IQuestion {
+    let solution: undefined | IDistractor = x.distractors.find(d => d.isCorrect === true);
     if (solution === undefined) {
         throw new Error(`Question id: ${x.id} does not have a solution`);
     }
 
-    const question: Question = {
+    const question: IQuestion = {
         id: x.id,
         difficulty: Math.round(x.difficulty),
         quality: Math.round(x.quality),
@@ -25,15 +25,8 @@ function toQuestion(x: Question): Question {
 }
 
 export default class QuestionRepository {
-    static uploadQuestion(question: QuestionUpload): Promise<Question> {
-        return apiFetch<{question: Question}>(`/questions/add/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify(question)
-        })
+    static uploadQuestion(question: IQuestionUpload): Promise<IQuestion> {
+        return apiPost<{question: IQuestion}>(`/questions/add/`, question)
             .then(x => x.question)
             .then(response => toQuestion(response));
     }
@@ -45,70 +38,46 @@ export default class QuestionRepository {
         query: string | undefined,
         page: number | undefined,
         pageSize: number | undefined) {
-        return apiFetch<SearchResult>(`/questions/search/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                sortField,
-                sortOrder,
-                filterField,
-                filterTopics,
-                query,
-                page,
-                pageSize
-            })
+        return apiPost<ISearchResult>(`/questions/search/`, {
+            sortField,
+            sortOrder,
+            filterField,
+            filterTopics,
+            query,
+            page,
+            pageSize
         })
-            .then(searchResult => ({
-                totalItems: searchResult.totalItems,
-                questions: searchResult.items.map(x => toQuestion(x)),
-                page: searchResult.page
-            }));
+        .then(searchResult => ({
+            totalItems: searchResult.totalItems,
+            questions: searchResult.items.map(x => toQuestion(x)),
+            page: searchResult.page
+        }));
     }
 
     static submitResponse(distractorID: number) {
-        return apiFetch<{}>(`/questions/respond/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                distractorID: distractorID
-            })
-        });
+        return apiPost<{}>(`/questions/respond/`, { distractorID });
     }
 
     static submitRating(distractorID: number, rateType: string, rateValue: number) {
-        return apiFetch<{}>(`/questions/rate/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                distractorID: distractorID,
-                [`${rateType}`]: rateValue
-            })
+        return apiPost<{}>(`/questions/rate/`, {
+            distractorID: distractorID,
+            [`${rateType}`]: rateValue
         });
     }
 
-    static getQuestionDistribution(question: Question): Promise<{[responseId: number]: number}> {
+    static getQuestionDistribution(question: IQuestion): Promise<{[responseId: number]: number}> {
         return apiFetch(`/questions/distribution/${question.id}/`);
     }
 
-    static uploadReport(questionReport: ReportQuestion) {
-        return apiFetch<NetworkResponse>("/questions/report/", {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "Application/json"
-            }),
-            body: JSON.stringify({
-                questionReport
-            })
-        });
+    static uploadReport(questionReport: IReportQuestion) {
+        return apiPost<INetworkResponse>("/questions/report/", { questionReport });
+    }
+
+    static getQuestionById(questionId: number) {
+        return apiFetch<IQuestion>(`/questions/id/${questionId}/`)
+            .then(toQuestion);
+    }
+    static getRandomCourseQuestion() {
+        return apiFetch<number>(`/questions/random/`);
     }
 }

@@ -22,7 +22,7 @@ def course_availability(request):
 
 def days(request):
     days = [x.toJSON() for x in AvailabilityService.get_days()]
-    return JsonResponse({"data": days})
+    return JsonResponse({"data": days })
 
 def update_availability(request):
     # HTTP.POST is required for this.

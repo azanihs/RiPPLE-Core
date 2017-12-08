@@ -9,7 +9,7 @@ urlpatterns = [
 
     url(r'^respond/$', views.respond, name='respond'),
     url(r'^rate/$', views.rate, name='rate'),
-
+    url(r'^random/$', views.random_question_id),
     url(r'^id/(.*)/$', views.id),
 
     url(r'^competencies/all/$', views.competencies),

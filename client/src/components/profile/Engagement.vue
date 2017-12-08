@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Topic } from "../../interfaces/models";
+import { ITopic } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -35,9 +35,9 @@ import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
 })
 export default class EngagementView extends Vue {
 
-    pEngagementItems: Topic[] = [];
+    pEngagementItems: ITopic[] = [];
 
-    updateEngagementItems(newEngagementItems: Topic[]) {
+    updateEngagementItems(newEngagementItems: ITopic[]) {
         this.pEngagementItems = newEngagementItems;
     };
 

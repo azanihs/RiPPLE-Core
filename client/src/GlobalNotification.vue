@@ -2,7 +2,10 @@
     <div class="snackWrapper" :class="snackbarClass">
         <div class="snackbar">
             <md-icon class="icon">{{ notification.icon }}</md-icon>
-            <span> {{ notification.description }} </span>
+            <div class="content">
+                <h6>{{ notification.name }}</h6>
+                <span>{{ notification.description }}</span>
+            </div>
             <md-button @click="closeSnackbar" class="button">Close</md-button>
         </div>
     </div>
@@ -12,9 +15,9 @@
     .snackWrapper {
         position: fixed;
         left: 0px;
-        bottom: 0px;
+        bottom: 5px;
         width: 100%;
-        z-index: 5000;
+        z-index: 50000;
 
         display: flex;
         justify-content: center;
@@ -34,12 +37,23 @@
         justify-content: space-between;
         align-items: center;
     }
+    .content {
+        margin: 6px 0px 6px 6px;
+        flex-grow: 0;
+    }
+
+    .content h6 {
+        margin: 0px;
+        font-size: 12px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 
     span {
-        margin: 6px 0px 6px 6px;
         flex-grow: 0;
         text-overflow: ellipsis;
         overflow: hidden;
+        font-size: 11px;
     }
     .icon {
         margin: 6px 0px 6px 24px;
@@ -50,20 +64,20 @@
     }
 
     .snackWrapper.closed {
-        bottom: -50px;
+        bottom: -70px;
     }
 
 </style>
 
 <script lang="ts">
     import { Vue, Component, Lifecycle } from "av-ts";
-    import { Notification } from "./interfaces/models";
+    import { INotification } from "./interfaces/models";
     import { getBus, NEW_QUEUE_ITEM } from "./util";
 
     @Component
     export default class GlobalNotification extends Vue {
-        pEventQueue: Notification[] = [];
-        pNotification: Notification | undefined = undefined;
+        pEventQueue: INotification[] = [];
+        pNotification: INotification | undefined = undefined;
         snackbarCloseTimeout: number | undefined = undefined;
 
         snackbarIsClosed = true;
@@ -77,7 +91,7 @@
                 "closed": this.snackbarIsClosed
             };
         }
-        updateQueue(newItem: Notification) {
+        updateQueue(newItem: INotification) {
             // If the queue was quiet before, trigger first cycle
             if (this.pEventQueue.length === 0) {
                 this.$nextTick(() => this.cycleQueue());

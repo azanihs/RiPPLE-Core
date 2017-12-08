@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Topic } from "../../interfaces/models";
+import { ITopic } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -42,14 +42,14 @@ import OverviewDescription from "../util/OverviewDescription.vue";
 })
 export default class ConnectionsView extends Vue {
 
-    pTopics: Topic[] = [];
+    pTopics: ITopic[] = [];
     pMentoringTypes: string[] = [];
 
     updateMentoringTypes(newMentoringTypes: string[]) {
         this.pMentoringTypes = newMentoringTypes;
     };
 
-    updateTopics(topics: Topic[]) {
+    updateTopics(topics: ITopic[]) {
         this.pTopics = topics;
     };
 

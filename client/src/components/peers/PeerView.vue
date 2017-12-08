@@ -36,7 +36,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 import {
-    AvailableRole, Availability, CourseAvailability, Day, Time, StudyRole, Topic, User
+    IAvailableRole, IAvailability, ICourseAvailability, IDay, ITime, IStudyRole, ITopic, IUser
 } from "../../interfaces/models";
 
 import TopicService from "../../services/TopicService";
@@ -55,41 +55,41 @@ import RecommendationSearch from "./RecommendationSearch.vue";
 export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
-    pTopics: Topic[] = [];
-    pRequests: User[] = [];
-    pRecommendations: User[] = [];
-    pCourseAvailability: CourseAvailability[] = [];
-    pUserAvailability: Availability[] = [];
-    pDays: Day[] = [];
-    pTimes: Time[] = [];
+    pTopics: ITopic[] = [];
+    pRequests: IUser[] = [];
+    pRecommendations: IUser[] = [];
+    pCourseAvailability: ICourseAvailability[] = [];
+    pUserAvailability: IAvailability[] = [];
+    pDays: IDay[] = [];
+    pTimes: ITime[] = [];
     pCourseDistribution: number[][] = [];
     pMaxAvailable: number = 0;
-    pStudyRoles: StudyRole[] = [];
+    pStudyRoles: IStudyRole[] = [];
     pUserAvailableRoles = new Map<string, Map<string, boolean>>();
 
-    updateTopics(newTopics: Topic[]) {
+    updateTopics(newTopics: ITopic[]) {
         this.pTopics = newTopics;
     };
-    updateConnections(newConnections: User[]) {
+    updateConnections(newConnections: IUser[]) {
         this.pRecommendations = newConnections;
     };
-    updateRequests(newRequests: User[]) {
+    updateRequests(newRequests: IUser[]) {
         this.pRequests = newRequests;
     };
-    updateCourseAvailability(availability: CourseAvailability[]) {
+    updateCourseAvailability(availability: ICourseAvailability[]) {
         this.pCourseAvailability = availability;
     };
-    updateUserAvailability(availability: Availability[]) {
+    updateUserAvailability(availability: IAvailability[]) {
         this.pUserAvailability = availability;
     };
-    updateDays(days: Day[]) {
+    updateDays(days: IDay[]) {
         this.pDays = days;
     };
-    updateTimes(times: Time[]) {
+    updateTimes(times: ITime[]) {
         this.pTimes = times;
     };
 
-    updateAvailability(courseDistribution: CourseAvailability[]) {
+    updateAvailability(courseDistribution: ICourseAvailability[]) {
         let maxAvailable = 0;
         let distribution = new Array(7);
         for (let i = 0; i < distribution.length; i++) {
@@ -106,11 +106,11 @@ export default class PeerView extends Vue {
         this.pMaxAvailable = maxAvailable;
     };
 
-    updateStudyRoles(roles: StudyRole[]) {
+    updateStudyRoles(roles: IStudyRole[]) {
         this.pStudyRoles = roles;
     };
 
-    updateUserAvailableRoles(availableRoles: AvailableRole[]) {
+    updateUserAvailableRoles(availableRoles: IAvailableRole[]) {
         const userRoles = new Map<string, Map<string, boolean>>();
         availableRoles.map(role => {
             const topic: string = role.topic.name;

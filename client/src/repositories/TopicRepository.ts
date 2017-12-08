@@ -1,19 +1,27 @@
-import "whatwg-fetch";
-import { Topic } from "../interfaces/models";
+import { ITopic, IEngagementType } from "../interfaces/models";
 import { apiFetch } from "./APIRepository";
 
-const topics: {[id: number]: Topic} = {};
+const _topics: {[id: number]: ITopic} = {};
+const _engagements: {[id: number]: IEngagementType} = {};
+
 export default class TopicRepository {
 
-    static topicPointer(topic: Topic) {
-        if (topics[topic.id] === undefined) {
-            topics[topic.id] = topic;
+    static engagementPointer(engagement: IEngagementType) {
+        if (_engagements[engagement.id] === undefined) {
+            _engagements[engagement.id] = engagement;
         }
-        return topics[topic.id];
+        return _engagements[engagement.id];
     }
 
-    static getAllAvailableTopics(): Promise<Topic[]> {
-        return apiFetch<Topic[]>(`/questions/topics/`)
+    static topicPointer(topic: ITopic) {
+        if (_topics[topic.id] === undefined) {
+            _topics[topic.id] = topic;
+        }
+        return _topics[topic.id];
+    }
+
+    static getAllAvailableTopics(): Promise<ITopic[]> {
+        return apiFetch<ITopic[]>(`/questions/topics/`)
             .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
     }
 }

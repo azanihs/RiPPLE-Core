@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from questions.models import Question, QuestionImage, ExplanationImage, DistractorImage
+from questions.models import Question, QuestionImage, ExplanationImage, DistractorImage, Distractor
 from questions.services import AuthorService
 from users.models import CourseUser
 from django.db import IntegrityError
@@ -12,6 +12,7 @@ from .common import BootstrapTestCase
 
 class QuestionRequestTest(BootstrapTestCase):
     def test_add_question(self):
+        """Tests addittion of a new simple question without images"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -24,6 +25,7 @@ class QuestionRequestTest(BootstrapTestCase):
 
 
     def test_none_field(self):
+        """Tests an invalid question added that contains none fields in its attributes, including none fields in responses"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -45,33 +47,23 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertEqual(response["state"], "Error")
         self.assertEqual(response["error"], "Missing response " + distractor)
 
-
-    def test_check_for_script_tags(self):
+    def test_no_true_answer(self):
+        """Check that an Integrity Error is raised when none of the distractors have a true response"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
-        
-        attributes = ["question", "explanation"]
-
-        script_tag = "<script> evil code </script>"
-
-        for attribute in attributes:
-            unsafe_question = self._bootstrap_question_request()
-            unsafe_question[attribute]["content"] = script_tag
-            response = AuthorService.add_question(unsafe_question, "/", author)
-            self.assertEqual(response["state"], "Error")
-            self.assertEqual(response["error"], "Invalid Question")
-        
-        unsafe_question = self._bootstrap_question_request()
-        key = next(iter(unsafe_question["responses"]))
-        unsafe_question["responses"][key]["content"] = script_tag
-        response = AuthorService.add_question(unsafe_question, "/", author)
+        question = self._bootstrap_question_request()
+        #Make all answers false
+        for i in question["responses"]:
+            question["responses"][i]["isCorrect"] = False
+        response = AuthorService.add_question(question, "/", author)
         self.assertEqual(response["state"], "Error")
-        self.assertEqual(response["error"], "Invalid Distractor")
-     
+        self.assertEqual(response["error"], "No correct answer for question")
+
  
     def test_question_with_valid_image(self):
+        """Checks that a question can be added that contains an image"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -85,7 +77,7 @@ class QuestionRequestTest(BootstrapTestCase):
         util.save_image = MagicMock(return_value = 1)
         QuestionImage.objects.create = MagicMock(return_value = test)
         image_question["question"]["content"] = "<img src = 'test'>"
-        AuthorService.newSource = MagicMock(return_value = True)
+        AuthorService.newSource = MagicMock(return_value = "test")
         response = AuthorService.add_question(image_question, "/", author)
         self.assertEqual(response["state"], "Question Added")
         self.assertEqual(response["question"], Question.objects.all()[0].toJSON())
@@ -104,6 +96,7 @@ class QuestionRequestTest(BootstrapTestCase):
 
 
     def test_question_with_invalid_image(self):
+        """Checks that a question addition fails when image is none type"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -119,6 +112,7 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertEqual(response["error"], "Image is not of valid type")
 
     def test_new_source(self):
+        """Tests that the new source function creates a new path with the past path pieces"""
         urls = ["test"]
         content = "<img src='test'>"
         host="/here/asfd/"
@@ -130,20 +124,34 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertTrue(urls[0] in result and host in result)
 
     def test_empty_content(self):
+        """Check that a question addition fails when content on an attribute is empty"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
-        new_question = self._bootstrap_question_request()
 
+        new_question = self._bootstrap_question_request()
         new_question["question"]["content"] = ""
         response = AuthorService.add_question(new_question, "/", author)
         self.assertEqual(response["state"], "Error")
-        self.assertEqual(response["error"], "Invalid Question")
+        self.assertEqual(response["error"], "Question content is blank")
+
+        new_question = self._bootstrap_question_request()
+        new_question["explanation"]["content"] = ""
+        response = AuthorService.add_question(new_question, "/", author)
+        self.assertEqual(response["state"], "Error")
+        self.assertEqual(response["error"], "Explanation content is blank")
+
+        new_question = self._bootstrap_question_request()
+        new_question["responses"]["A"]["content"] = ""
+        response = AuthorService.add_question(new_question, "/", author)
+        self.assertEqual(response["state"], "Error")
+        self.assertEqual(response["error"], "Distractor content is blank")
 
 
     @patch("questions.services.AuthorService.decodeImages")
     def test_general_exception_raised(self, mock_class):
+        """Tests that addition function behaves accordingly on a different exception that an IntegrityError"""
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
@@ -156,3 +164,84 @@ class QuestionRequestTest(BootstrapTestCase):
 
         self.assertEqual(response["state"], "Error")
         self.assertEqual(response["error"], "Exception Raised")
+
+
+    def test_clean_content_function(self):
+        """Tests that content on questions is properly cleansed"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+
+        #Checking for element tags cleansing in question content
+        unsafe_question = self._bootstrap_question_request()
+        tag_tested = '<script>evil code</script>'
+        unsafe_question["question"]["content"] = tag_tested
+        response = AuthorService.add_question(unsafe_question, "/", author)
+        added_question = Question.objects.all().first()
+        self.assertEqual(response["state"], "Question Added")
+        self.assertTrue(tag_tested not in added_question.content)
+
+        #Checking for attribute tag cleansing in explanation content
+        unsafe_question = self._bootstrap_question_request()
+        tag_tested = '<p onclick="alert("you shall not pass");">evil code</script>'
+        unsafe_question["explanation"]["content"] = tag_tested
+        response = AuthorService.add_question(unsafe_question, "/", author)
+        added_question = Question.objects.all().first()
+        self.assertEqual(response["state"], "Question Added")
+        self.assertTrue(tag_tested not in added_question.content)
+
+        #Checking for style tag cleansing in response content
+        unsafe_question = self._bootstrap_question_request()
+        tag_tested = '<p style="position:absolute;">evil code</script>'
+        unsafe_question["responses"]["A"]["content"] = tag_tested
+        response = AuthorService.add_question(unsafe_question, "/", author)
+        added_question = Question.objects.all().first()
+        self.assertEqual(response["state"], "Question Added")
+        self.assertTrue(tag_tested not in added_question.content)
+
+    """The cleaning function sometimes modifies the string such as adding spaces on style tags so in order to
+        test for equality the string must be exact    
+    """
+
+    def test_allowed_cleaning_tags(self):
+        """Tests that allowed tags pass trough the cleansing function"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+
+        #Checking allowed element tags make it trough on question content
+        unsafe_question = self._bootstrap_question_request()
+        tag_tested = '<span>happy code</span>'
+        unsafe_question["question"]["content"] = tag_tested
+        response = AuthorService.add_question(unsafe_question, "/", author)
+        added_question = Question.objects.all()[0]
+        self.assertEqual(response["state"], "Question Added")
+        self.assertTrue(tag_tested in added_question.content)
+
+        #Checking allowed attributes make it trough on explanation content
+        unsafe_question = self._bootstrap_question_request()
+        tag_tested = '<a title="this aren\'t the droids you are looking for">happy code</a>'
+        unsafe_question["explanation"]["content"] = tag_tested
+        response = AuthorService.add_question(unsafe_question, "/", author)
+        added_question = Question.objects.all()[1]
+        self.assertEqual(response["state"], "Question Added")
+        self.assertTrue(tag_tested in added_question.explanation)
+
+    def test_allowed_cleaning_tags_responses(self):
+        """Test that allowed style tags pass trough on response content, separated to avoid distractor overlap"""
+        course = self._bootstrap_courses(1)
+        user = self._bootstrap_user(1)
+        author = CourseUser.objects.create(user=user, course=course)
+        self._bootstrap_topics(course)
+
+        #Checking for style tag cleansing in response content
+        unsafe_question = self._bootstrap_question_request()
+        tag_tested = '<p style="color: #339966;">happy code</p>'
+        unsafe_question["responses"]["A"]["content"] = tag_tested
+        response = AuthorService.add_question(unsafe_question, "/", author)
+        added_distractor = Distractor.objects.all()[0]
+        self.assertEqual(response["state"], "Question Added")
+        self.assertTrue(tag_tested in added_distractor.content)
+
