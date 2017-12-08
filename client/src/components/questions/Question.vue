@@ -259,7 +259,7 @@ export default class Question extends Vue {
 
     updateUserAnswer(wasCorrect: boolean) {
         this.userIsFinishedWithQuestion = wasCorrect;
-        if (this.question !== undefined) {
+        if (this.question !== undefined && this.userIsFinishedWithQuestion) {
             this.question.responseCount++;
         }
     }
