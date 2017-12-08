@@ -94,12 +94,10 @@ class Notification(models.Model):
 class Engagement(models.Model):
     name = models.CharField(max_length=64)
     course = models.ForeignKey(Course)
-    app = models.CharField(max_length=32)
-    item = models.CharField(max_length=32)
+    model = models.CharField(max_length=32)
     filter_name = models.CharField(max_length=32)
-    filter_cond = models.CharField(max_length=64)
     key_user = models.CharField(max_length=32)
-    
+
 
     def toJSON(self):
         return {

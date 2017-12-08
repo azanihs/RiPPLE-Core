@@ -7,7 +7,7 @@ import imghdr
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
-from users.services.UserService import logged_in_user, user_courses, update_course, update_user_image, user_engagement, get_all_engagements
+from users.services.UserService import *
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
@@ -25,7 +25,7 @@ def index(request):
 def me(request):
     token = request.META.get("HTTP_AUTHORIZATION", None)
     user_course = token_to_user_course(token)
-    
+
     return JsonResponse({"data": user_course.toJSON()})
 
 
@@ -98,7 +98,7 @@ def get_all_user_achievements(request):
     user = logged_in_user(request)
 
     achievements = Achievement.objects.all()
-    data = []    
+    data = []
     for ach in achievements:
         result = engine.check_achievement(user=user, key=ach.key)
         data.append(result)
@@ -122,7 +122,7 @@ def get_all_notifications(request):
     for n in notifications:
         n.sent = True
         data.append(n.toJSON())
-    
+
     return JsonResponse({"data":data})
 
 def engagement(request):
