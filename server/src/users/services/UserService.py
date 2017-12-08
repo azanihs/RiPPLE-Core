@@ -220,8 +220,6 @@ def get_all_engagements(user):
     course = user.course
     engagements = Engagement.objects.filter(course=course)
     engagements = [x.toJSON() for x in engagements]
-    for e in engagements:
-        e["id"] = -e["id"]
     return engagements
 
 def user_engagement(user, user_type=None):
