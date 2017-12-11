@@ -53,12 +53,12 @@
                                 </md-select>
                             </md-input-container>
                             <h4>Topics to Visualise</h4>
-                            <topic-chip v-for="category in dataCategories"
-                                :key="category.id"
-                                :disabled="isDisabled(category)"
-                                @click.native="toggleVisible(category)">
-                                {{category.name}}
-                            </topic-chip>
+                            <md-layout md-flex="100">
+                                <topic-chip v-for="category in dataCategories"
+                                    :key="category.id"
+                                    :disabled="isDisabled(category)"
+                                    @click.native="toggleVisible(category)">{{category.name}}</topic-chip>
+                            </md-layout>
                         </div>
                     </div>
                 </md-layout>

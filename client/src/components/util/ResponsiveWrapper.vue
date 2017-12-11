@@ -1,13 +1,13 @@
 <template>
     <md-layout>
-            <md-layout md-hide-medium-and-up class="hidden" ref="onlyVisibleOnMobile"></md-layout>
-        <md-layout v-if="mobileMode"
+        <md-layout md-hide-medium-and-up class="hidden" ref="onlyVisibleOnMobile"></md-layout>
+        <span v-if="mobileMode"
                 :class="classWhenMobile">
             <slot></slot>
-        </md-layout>
-        <md-layout v-else>
+        </span>
+        <span v-else>
             <slot></slot>
-        </md-layout>
+        </span>
     </md-layout>
 </template>
 

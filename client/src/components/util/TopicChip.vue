@@ -1,15 +1,31 @@
 <template>
-    <router-link v-if="linkTo" :to="linkTo" class="topicChipLink" :class="status">
-        <md-chip class="topicChip">
+    <responsive-wrapper class="general">
+        <router-link v-if="linkTo" :to="linkTo" class="topicChipLink" :class="status">
+            <md-chip class="topicChip">
+                <slot></slot>
+            </md-chip>
+        </router-link>
+        <md-chip v-else class="topicChip" :class="status">
             <slot></slot>
         </md-chip>
-    </router-link>
-    <md-chip v-else class="topicChip" :class="status">
-        <slot></slot>
-    </md-chip>
+    </responsive-wrapper>
 </template>
 
+<style>
+.topicChip > .md-chip-container {
+    max-width: 100px;
+    overflow: hidden;
+    white-space: pre;
+    text-overflow: ellipsis;
+}
+</style>
+
 <style scoped>
+
+.general {
+    flex:0;
+}
+
 a.topicChipLink,
 a.topicChipLink:visited {
     color: #333;
@@ -50,8 +66,13 @@ a.topicChipLink:hover {
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
+import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 
-@Component()
+@Component({
+    components: {
+        ResponsiveWrapper
+    }
+})
 export default class TopicChip extends Vue {
     @Prop linkTo = p<string>({
         required: false,
