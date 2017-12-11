@@ -7,11 +7,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.apps import apps
 from datetime import datetime
-from ripple.util.util import save_image, mean
+from ripple.util.util import save_image, mean, verify_content, is_administrator
 
 from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating
 from questions.services import CompetencyService
-from users.models import Course, CourseUser, User, Role, UserImage, Engagement
+from users.models import Course, CourseUser, User, Role, UserImage, Engagement, Consent, ConsentForm
 from rippleAchievements.models import UserAchievement
 from users.services.TokenService import token_to_user_course
 from ripple.util import util
@@ -270,3 +270,69 @@ def get_engagement_result(user, model, filter_name, filter_cond, key_user):
     else:
         user_correct = correct.filter(**{key_user:user}).count()
         return user_correct/max_num
+
+def consent_service(user, request):
+    form = get_form(user)
+    response = request.get("response", None)
+
+    if form:
+        if response is not None:
+            c = Consent (
+                user=user,
+                form=form,
+                response=response
+            )
+            c.save()
+            if response:
+                return {"data": {"response": "Accepted"}}
+            else:
+                return {"data": {"response": "Declined"}}
+        else:
+            return {"error": "No answer proivded"}
+    else:
+        return {"error": "No form provided"}
+
+def update_consent_form(user, request):
+    if not is_administrator(user):
+        return {"error": "User does not have permission in this context"}
+
+    consent_text = request.get("text", None)
+
+    if consent_text:
+        if verify_content(consent_text):
+            c = ConsentForm (
+                text=consent_text,
+                author=user
+            )
+            c.save()
+            return {"data": "Consent form updated"}
+        else:
+            return {"error": "Invalid consent text provided"}
+    else:
+        return {"error": "No consent text provided"}
+
+def get_consent_form(user):
+    form = get_form(user)
+    if form:
+        return {"data": form.toJSON()}
+    else:
+        return {"error": "No consent form for this course"}
+
+def has_consented_course(user):
+    form = get_form(user)
+    if form:
+        consent = Consent.objects.filter(form=form, user=user)
+        if consent:
+            return {"data": True}
+        else:
+            return {"data": False}
+    else:
+        return {"error": "No consent form for this course"}
+
+
+def get_form(user):
+    course = user.course
+    course_users = CourseUser.objects.filter(course=course)
+    form = ConsentForm.objects.filter(author__in=course_users).order_by("-id")
+    if form:
+        return form[0]

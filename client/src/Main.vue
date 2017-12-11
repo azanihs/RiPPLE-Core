@@ -246,13 +246,23 @@ export default class Main extends Vue {
 
     get links() {
         const links = getLinks();
+        const adminLinkIndex = links.findIndex(x => x.href == "/admin");
+        const profileLinkIndex = links.findIndex(x => x.href == "/");
+        if (adminLinkIndex == -1) {
+            throw new Error("Could not find admin link index");
+        }
+        if (profileLinkIndex == -1) {
+            throw new Error("Could not find profile link index");
+        }
         if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
-            const profileLinkIndex = links.findIndex(x => x.href == "/");
             links.splice(profileLinkIndex, 1);
             this.$router.push("admin");
+            this.toggleSubmenu(links[adminLinkIndex]);
         } else {
-            const adminLinkIndex = links.findIndex(x => x.href == "/admin");
+            // Is student
             links.splice(adminLinkIndex, 1);
+            const updatedProfileLinkIndex = links.findIndex(x => x.href == "/");
+            this.toggleSubmenu(links[updatedProfileLinkIndex]);
         }
         return links;
     }

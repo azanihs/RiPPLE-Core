@@ -81,6 +81,18 @@ export interface ICourseUser {
     roles: string[],
 };
 
+export interface IConsentForm {
+    text: string,
+    author: CourseUser,
+
+    error?: string
+};
+
+export interface IConsentUpload {
+    text: AuthorResponse,
+    author: CourseUser
+};
+
 export interface IPeerConnection {
     edgeStart: number, // ID of edge start. Corresponds to a User ID
     edgeEnd: number, // ID of edge end. Corresponds to a User ID

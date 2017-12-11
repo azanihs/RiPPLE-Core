@@ -125,11 +125,6 @@ h3 {
     justify-content: space-around;
 }
 
-.uploadButton.done {
-    background-color: #256 !important;
-    color: #f2f2f2 !important;
-}
-
 .uploadContainer {
     position: relative;
 }
@@ -190,6 +185,8 @@ export default class AuthorView extends Vue {
     };
 
     uploadDone = false;
+    correctQuestion = "";
+    networkMessage = "";
     uploadProgress = 0;
 
     prevDisabled = true;
@@ -308,41 +305,6 @@ export default class AuthorView extends Vue {
         this.pTopics = newTopics;
     }
 
-    handleFileClick(resolve: any, _currentFieldValue: any, fieldMeta: any) {
-        if (fieldMeta.filetype != "image") {
-            return;
-        }
-
-        const input = document.createElement("input")!;
-        input.type = "file";
-
-        input.addEventListener("change", () => {
-            const inputFiles = input.files!;
-            if (inputFiles.length != 1) {
-                return;
-            }
-            const file = inputFiles[0];
-            ImageService.fileToBase64EncodeString(file)
-                .then(x => {
-                    // * tinyMCE will encode the uploaded image with an window.createObjectURL until it loses focus.
-                    // ** It will use the base64 encoding when focus is lost.
-                    // * When upload time happens, just pull all img srcs from the DOM object, and if they are not a base64 then encode the object to be so
-                    resolve(x.base64, x._meta);
-                })
-                .catch(err => {
-                    console.warn(err);
-                });
-        });
-
-        // Dispatch a click event
-        const clickEvent = new MouseEvent("click", {
-            "view": window,
-            "bubbles": true,
-            "cancelable": true
-        });
-        input.dispatchEvent(clickEvent);
-    }
-
     get topics() {
         return this.pTopics;
     }
@@ -357,7 +319,7 @@ export default class AuthorView extends Vue {
             toolbar: tinyMCEPlugins.toolbar,
             image_advtab: true,
             file_browser_callback_types: "image",
-            file_picker_callback: this.handleFileClick,
+            file_picker_callback: ImageService.handleFileClick,
             file_picker_types: "image"
         };
     }

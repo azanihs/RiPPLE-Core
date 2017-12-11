@@ -15,6 +15,20 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='Consent',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('response', models.BooleanField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ConsentForm',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('text', models.TextField()),
+            ],
+        ),
+        migrations.CreateModel(
             name='Course',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -102,5 +116,20 @@ class Migration(migrations.Migration):
             model_name='courseuser',
             name='user',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.User'),
+        ),
+        migrations.AddField(
+            model_name='consentform',
+            name='author',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.CourseUser'),
+        ),
+        migrations.AddField(
+            model_name='consent',
+            name='form',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.ConsentForm'),
+        ),
+        migrations.AddField(
+            model_name='consent',
+            name='user',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.CourseUser'),
         ),
     ]
