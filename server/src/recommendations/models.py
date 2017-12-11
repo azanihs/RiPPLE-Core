@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
-from users.models import CourseUser
+from users.models import CourseUser, User
 from questions.models import Topic
 
 class Day(models.Model):
@@ -64,7 +64,57 @@ class AvailableRole(models.Model):
 
     def toJSON(self):
         return {
-            "course_user": self.course_user.toJSON(),
+            "courseUser": self.course_user.toJSON(),
             "topic": self.topic.toJSON(),
             "studyRole": self.study_role.toJSON()
+        }
+
+class PeerRecommendation(models.Model):
+    course_user = models.ForeignKey(CourseUser, related_name="course_user")
+    recommended_course_user = models.ForeignKey(CourseUser, related_name="recommended_course_user")
+
+    def toJSON(self):
+        return {
+            "courseUser": self.user.toJSON(),
+            "recommendedCourseUser": self.recommended_user.toJSON()
+        }
+
+class RoleRecommendation(models.Model):
+    peer_recommendation = models.ForeignKey(PeerRecommendation)
+    user_role = models.ForeignKey(AvailableRole, related_name="user_role")
+    recomended_user_role = models.ForeignKey(AvailableRole, related_name="recommended_user_role")
+
+    def toJSON(self):
+        return {
+            "peerRecommendation": self.peer_recommendation.toJSON(),
+            "userRole": self.user_role.toJSON(),
+            "recomendedUserRole": self.recomended_user_role.toJSON()
+        }
+
+class TimeRecommendation(models.Model):
+    peer_recommendation = models.ForeignKey(PeerRecommendation)
+    user_availability = models.ForeignKey(Availability, related_name="user_availability")
+    recommended_user_availability = models.ForeignKey(Availability, related_name="recommended_user_availability")
+
+    def toJSON(self):
+        return {
+            "peerRecommendation": self.peer_recommendation.toJSON(),
+            "user_availability": self.user_availability.toJSON(),
+            "recommended_user_availability": self.recommended_user_availability.toJSON()
+        }
+
+class Connection(models.Model):
+    peer_recommendation = models.ForeignKey(PeerRecommendation)
+    role_recommendation = models.ForeignKey(RoleRecommendation)
+    time_recommendation = models.ForeignKey(TimeRecommendation)
+    user_status = models.CharField(max_length=20)
+    recommended_user_status = models.CharField(max_length=20)
+
+    def toJSON(self):
+        return {
+            "peerRecommendation": self.peer_recommendation.toJSON(),
+            "roleRecommendation": self.role_recommendation.toJSON(),
+            "timeRecommendation": self.time_recommendation.toJSON(),
+            "userStatus": self.user_status.toJSON(),
+            "recommendedUserStatus": self.recommended_user_status.toJSON()
         }
