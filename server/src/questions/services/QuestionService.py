@@ -6,7 +6,7 @@ import math
 
 import numpy as np
 from ripple.util import util
-from users.models import CourseUser, Token
+from users.models import CourseUser, Token, User
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList
 from questions.services import CompetencyService
@@ -308,18 +308,36 @@ def report_question(user, request):
     return {}
 
 def get_reports(user):
-    if not util.is_administrator(user):
-        return {"error": "User does not have administrative permission for current context"}
+    #if not util.is_administrator(user):
+    #    return {"error": "User does not have administrative permission for current context"}
     course = user.course
-    reportQuestions= ReportQuestion.objects \
-        .filter(author__in=CourseUser.objects.filter(course=course))
+    report_questions = ReportQuestion.objects \
+        .filter(user__in=CourseUser.objects.filter(course=course))
 
-    return reportQuestions
+    report_JSON = {"reported": {}}
+    for q in report_questions:
+        report_JSON["reported"][q.question_id] = {}
+        report_JSON["reported"][q.question_id]["author"] = \
+            q.user.user.first_name + " " + q.user.user.last_name
+        report_JSON["reported"][q.question_id]["reasons"] = {}
+
+        for r in get_reason_list(user)["reasonList"]:
+            report_JSON["reported"][q.question_id]["reasons"][r] = False
+
+        report_reasons = ReportQuestionList.objects \
+            .filter(report_question=q)
+        for r in report_reasons:
+            if r.reason_text in get_reason_list(user)["reasonList"]:
+                report_JSON["reported"][q.question_id]["reasons"][r.reason_text] = True
+            else:
+                report_JSON["reported"][q.question_id]["reasons"]["Custom"] = r.reason_text
+
+    return report_JSON
 
 
 def get_reason_list(user):
     course = user.course
     reasons = ReportReason.objects.filter(course=course)
     r_list = [r.reason for r in reasons if r.reason != "custom"]
-    return {"data": {"reasonList": r_list}}
+    return {"reasonList": r_list}
 
