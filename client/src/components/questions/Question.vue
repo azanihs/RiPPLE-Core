@@ -1,6 +1,5 @@
 <template>
     <md-layout class="bottomSpace">
-        <page-loader :condition="!question"></page-loader>
         <md-layout md-hide-xsmall
                    md-hide-small
                    md-hide-medium
@@ -8,7 +7,7 @@
             <action-buttons @back="closeQuestion()"
                     @report="openDialog()"></action-buttons>
         </md-layout>
-        <md-layout md-flex="100" v-if="question">
+        <md-layout md-flex="100">
             <md-layout md-flex="100"
                        class="questionContainer componentSeparator">
                 <md-card>
@@ -214,7 +213,7 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Prop, p } from "av-ts";
 import { IQuestion } from "../../interfaces/models";
 
 import { addEventsToQueue } from "../../util";
@@ -224,7 +223,7 @@ import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
-import PageLoader from "../util/PageLoader.vue";
+
 
 import TopicChip from "../util/TopicChip.vue";
 
@@ -236,20 +235,17 @@ const _MODAL_NAME = "report_question_modal";
         QuestionRater,
         QuestionResponse,
         QuestionDetails,
-        TopicChip,
-        PageLoader
+        TopicChip
     }
 })
 export default class Question extends Vue {
-    @Prop id = p<number>({
+    @Prop question = p<IQuestion>({
         required: true
     });
 
     @Prop showSpeedDial = p<boolean>({
         default: true
     });
-
-    pQuestion: IQuestion | undefined = undefined;
 
     reason = "";
     reasonList = ["Inappropriate Content", "Incorrect Answer", "Incorrect Tags"];
@@ -262,10 +258,6 @@ export default class Question extends Vue {
         if (this.question !== undefined && this.userIsFinishedWithQuestion) {
             this.question.responseCount++;
         }
-    }
-
-    get question() {
-        return this.pQuestion;
     }
 
     nextQuestion() {
@@ -281,21 +273,9 @@ export default class Question extends Vue {
         this.$router.push("/question/answer");
     }
 
-    updateQuestion() {
-        QuestionService.getQuestionById(this.id)
-            .then((question: IQuestion | undefined) => {
-                this.pQuestion = question;
-            });
-    }
-
-    @Lifecycle
-    created() {
-        this.updateQuestion();
-    }
-
     reportQuestion() {
         this.reasonsUsed.push(this.reason);
-        QuestionService.reportQuestion(this.id, this.reasonsUsed.toString())
+        QuestionService.reportQuestion(this.question.id, this.reasonsUsed.toString())
             .then(_ => {
                 addEventsToQueue([{
                     id: -4,
