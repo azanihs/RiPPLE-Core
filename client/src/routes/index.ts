@@ -5,6 +5,7 @@ import Main from "../Main.vue";
 import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
+import QuestionWrapper from "../components/questions/QuestionWrapper.vue";
 import ProfileView from "../components/profile/ProfileView.vue";
 import AchievementsView from "../components/profile/Achievements.vue";
 import CompetenciesView from "../components/profile/Competencies.vue";
@@ -30,6 +31,10 @@ const routes = [{
         initCourseCode: x.query.course_code
     }),
     children: [{
+        path: "/question/id/:id",
+        props: true,
+        component: QuestionWrapper
+    }, {
         path: "/",
         name: "profile",
         component: ProfileView
@@ -95,4 +100,3 @@ const routes = [{
 export default new VueRouter({
     routes
 });
-

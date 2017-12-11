@@ -13,7 +13,7 @@ svg {}
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
-import { Edge, Topic } from "../../interfaces/models";
+import { IEdge, ITopic } from "../../interfaces/models";
 import { ISimulationNode, ISimulationEdge } from "../../interfaces/chart";
 import * as d3 from "d3";
 
@@ -30,11 +30,11 @@ export default class Graph extends Vue {
 
     width = 0;
     height = 0;
-    @Prop edges = p<Edge[]>({
+    @Prop edges = p<IEdge[]>({
         required: true
     });
 
-    @Prop nodes = p<Topic[]>({
+    @Prop nodes = p<ITopic[]>({
         required: true
     });
 
@@ -63,7 +63,7 @@ export default class Graph extends Vue {
         const lineColour = d3.interpolate("pink", "#256");
         const maxColour = Math.max(...edges.map(x => x.competency));
         const minColour = Math.min(...edges.map(x => x.competency));
-        const getStrokeColour = (d: Edge) => lineColour((d.competency - maxColour) / (minColour - maxColour));
+        const getStrokeColour = (d: IEdge) => lineColour((d.competency - maxColour) / (minColour - maxColour));
 
         const svg = d3.select(this.$refs["svg"] as HTMLElement);
         svg.html(null);
@@ -150,12 +150,12 @@ export default class Graph extends Vue {
     }
 
     @Watch("edges")
-    edgeChange(_oldEdges: Edge[], _newEdges: Edge[]) {
+    edgeChange(_oldEdges: IEdge[], _newEdges: IEdge[]) {
         this.render();
     }
 
     @Watch("nodes")
-    nodeChange(_oldNodes: Topic[], _newNodes: Topic[]) {
+    nodeChange(_oldNodes: ITopic[], _newNodes: ITopic[]) {
         this.render();
     }
 

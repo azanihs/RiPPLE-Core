@@ -37,6 +37,9 @@ class Question(models.Model):
         return self.content[:20]
 
     def toJSON(self):
+        responses = QuestionResponse.objects.filter(response_id__in=self.distractor_set.all())\
+            .values('user_id').distinct().count()
+
         return {
             "id": self.id,
             "content": self.content,
@@ -47,7 +50,7 @@ class Question(models.Model):
             "qualityCount": self.qualityCount,
             "topics": [x.toJSON() for x in self.topics.all()],
             "responses": [],
-            "responseCount": sum((x.questionresponse_set.count() for x in self.distractor_set.all())),
+            "responseCount": responses,
             "distractors": [x.toJSON() for x in self.distractor_set.all()]
         }
 

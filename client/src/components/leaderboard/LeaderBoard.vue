@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { UserSummary } from "../../interfaces/models";
+import { IUserSummary } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 
@@ -84,8 +84,8 @@ export default class LeaderBoard extends Vue {
     sortType: string = "reputation";
     reverse: boolean = false;
 
-    pUsers: UserSummary[] = [];
-    updateUsers(newUsers: UserSummary[]) {
+    pUsers: IUserSummary[] = [];
+    updateUsers(newUsers: IUserSummary[]) {
         this.pUsers = newUsers;
         this.$emit("userData", newUsers);
     };

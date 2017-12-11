@@ -99,13 +99,6 @@
                 </form>
             </md-dialog-content>
         </md-dialog>
-        <md-snackbar md-position="bottom center"
-            ref="snackbar"
-            md-duration="4000">
-            <span>{{networkMessage}}</span>
-            <md-button class="md-accent"
-                @click="$refs.snackbar.close()">Close</md-button>
-        </md-snackbar>
     </md-layout>
 </template>
 
@@ -220,9 +213,15 @@ h2 {
 </style>
 
 <script lang="ts">
+<<<<<<< HEAD
 import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
 import { Question as QuestionModel } from "../../interfaces/models";
+=======
+import { Vue, Component, Prop, p } from "av-ts";
+import { IQuestion } from "../../interfaces/models";
+>>>>>>> RIPPLE-#228
 
+import { addEventsToQueue } from "../../util";
 import QuestionService from "../../services/QuestionService";
 
 import ActionButtons from "../util/ActionButtons.vue";
@@ -230,6 +229,7 @@ import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";
 import Fetcher from "../../services/Fetcher";
+
 
 import TopicChip from "../util/TopicChip.vue";
 
@@ -245,7 +245,7 @@ const _MODAL_NAME = "report_question_modal";
     }
 })
 export default class Question extends Vue {
-    @Prop question = p<QuestionModel>({
+    @Prop question = p<IQuestion>({
         required: true
     });
 
@@ -254,17 +254,22 @@ export default class Question extends Vue {
     });
 
     reason = "";
+<<<<<<< HEAD
     pReasonList: string[] | undefined = undefined;
     reasonsUsed: string[] = [];
     networkMessage = "";
+=======
+    reasonList = ["Inappropriate Content", "Incorrect Answer", "Incorrect Tags"];
+    reasonsUsed: string[] = []
+>>>>>>> RIPPLE-#228
 
     userIsFinishedWithQuestion: boolean = false;
 
     updateUserAnswer(wasCorrect: boolean) {
         this.userIsFinishedWithQuestion = wasCorrect;
-
-        // TODO: Emit an event rather than mutate own prop.
-        this.question.responseCount++;
+        if (this.question !== undefined && this.userIsFinishedWithQuestion) {
+            this.question.responseCount++;
+        }
     }
 
     get reasonList() {
@@ -276,15 +281,21 @@ export default class Question extends Vue {
     }
 
     nextQuestion() {
-        this.$emit("newQuestion");
+        QuestionService.getRandomCourseQuestion()
+            .then(questionId => {
+                this.$router.push({
+                    path: `/question/id/${questionId}`
+                });
+            });
     }
 
     closeQuestion() {
-        this.$emit("userAnswer");
+        this.$router.push("/question/answer");
     }
 
     reportQuestion() {
         this.reasonsUsed.push(this.reason);
+<<<<<<< HEAD
         QuestionService.reportQuestion(this.question, this.reasonsUsed)
             .then(x => {
                 if (x.error !== undefined) {
@@ -293,10 +304,20 @@ export default class Question extends Vue {
                 }
                 this.networkMessage = "Question Reported.";
                 (this.$refs.snackbar as any).open();
+=======
+        QuestionService.reportQuestion(this.question.id, this.reasonsUsed.toString())
+            .then(_ => {
+                addEventsToQueue([{
+                    id: -4,
+                    name: "Question Reported",
+                    description: "Question Reported.",
+                    icon: "done"
+                }]);
+                this.reasonsUsed.splice(0, this.reasonsUsed.length);
+                this.reason = "";
+
+>>>>>>> RIPPLE-#228
                 this.closeDialog();
-            })
-            .catch(err => {
-                this.networkMessage = err;
             });
     }
 

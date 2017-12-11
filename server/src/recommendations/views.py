@@ -22,7 +22,7 @@ def course_availability(request):
 
 def days(request):
     days = [x.toJSON() for x in AvailabilityService.get_days()]
-    return JsonResponse({"data": days }, safe=False)
+    return JsonResponse({"data": days })
 
 def update_availability(request):
     # HTTP.POST is required for this.
@@ -44,16 +44,16 @@ def update_availability(request):
 
 def utc_times(request):
     times = [x.toJSON() for x in AvailabilityService.get_utc_times()]
-    return JsonResponse({"data": times}, safe=False)
+    return JsonResponse({"data": times})
 
 def study_roles(request):
     roles = [x.toJSON() for x in AvailabilityService.get_study_roles()]
-    return JsonResponse(roles, safe=False)
+    return JsonResponse({"data": roles})
 
 def user_roles(request):
     logged_in_user = UserService.logged_in_user(request)
     available_roles = [x.toJSON() for x in AvailabilityService.get_user_available_roles(logged_in_user)]
-    return JsonResponse({"data": available_roles}, safe=False)
+    return JsonResponse({"data": available_roles})
 
 def update_role(request):
     # HTTP.POST is required for this.

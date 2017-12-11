@@ -84,7 +84,7 @@ import DatePicker from "vue-flatpickr-component";
 import Papa from "papaparse";
 
 import { Vue, Component, Lifecycle } from "av-ts";
-import { UserSummary, User, Course, CourseUser, Topic } from "../../interfaces/models";
+import { IUserSummary, IUser, ICourse, ICourseUser, ITopic } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -95,7 +95,7 @@ import TopicChip from "../util/TopicChip.vue";
 
 const _MODAL_NAME = "course_create_modal";
 
-interface ConstructTopic {
+interface IConstructTopic {
     id?: number,
     name: string;
 };
@@ -108,18 +108,18 @@ interface ConstructTopic {
     }
 })
 export default class AdminView extends Vue {
-    pTopics: Topic[] = [];
+    pTopics: ITopic[] = [];
     pCourseCode = "";
 
     teachingStart: string | undefined = undefined;
     teachingEnd: string | undefined = undefined;
 
-    pUser: User | undefined = undefined;
-    pCourse: Course| undefined = undefined;
+    pUser: IUser | undefined = undefined;
+    pCourse: ICourse| undefined = undefined;
     pCsvString: string = "";
     networkError: string = "";
 
-    updateCourseUser(courseUser: CourseUser) {
+    updateCourseUser(courseUser: ICourseUser) {
         if (courseUser.roles.indexOf("Instructor") == -1) {
             this.$router.push("error/403");
         }
@@ -153,8 +153,8 @@ export default class AdminView extends Vue {
         this.editableTopics = newTopics;
     }
 
-    set editableTopics(newTopics: (Topic | string)[]) {
-        const normalisedTopics: ConstructTopic[] = newTopics.map(x => {
+    set editableTopics(newTopics: (ITopic | string)[]) {
+        const normalisedTopics: IConstructTopic[] = newTopics.map(x => {
             if (typeof x === "string") {
                 return {
                     id: undefined,
@@ -164,15 +164,15 @@ export default class AdminView extends Vue {
             return x;
         });
 
-        this.pTopics = normalisedTopics.reduce((carry: Topic[], topic: ConstructTopic) => {
+        this.pTopics = normalisedTopics.reduce((carry: ITopic[], topic: IConstructTopic) => {
             if (carry.find(x => topic.name.toLowerCase() === x.name.toLowerCase()) === undefined) {
-                carry.push(topic as Topic);
+                carry.push(topic as ITopic);
             }
             return carry;
         }, []);
     }
 
-    updateCourseTopics(topics: Topic[]) {
+    updateCourseTopics(topics: ITopic[]) {
         this.pTopics = topics;
     }
 
@@ -243,9 +243,6 @@ export default class AdminView extends Vue {
             topics: this.topics
         })
             .then(x => {
-                if (x.error !== undefined) {
-                    return this.networkError = x.error;
-                }
                 this.updateCourseUser(x);
                 this.closeDialog();
             })
@@ -254,7 +251,7 @@ export default class AdminView extends Vue {
             });
     };
 
-    generateCSVString(userData: UserSummary[]) {
+    generateCSVString(userData: IUserSummary[]) {
         if (userData.length == 0) {
             return;
         }

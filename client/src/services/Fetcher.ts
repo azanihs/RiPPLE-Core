@@ -25,10 +25,13 @@ export default class Fetcher<T extends any> {
         if (clearCache) {
             cache.clear();
         }
+        const asyncUpdates: Promise<any>[] = [];
         // Cause a refresh of all async data by firing all functions on event bus
         Fetcher.functionParamMap.forEach((value, _key) => {
-            value.run();
+            asyncUpdates.push(value.run());
         });
+
+        return Promise.all(asyncUpdates);
     }
 
     static subscriptionLookup(subscription: Function) {
@@ -78,7 +81,7 @@ export default class Fetcher<T extends any> {
             value: undefined
         };
         cache.set(this.identifier, cacheResult);
-        this.fn(this.params)
+        return this.fn(this.params)
             .then((x: any) => {
                 cacheResult.value = x;
                 Fetcher.sharedBus.$emit(this.identifier, x);
