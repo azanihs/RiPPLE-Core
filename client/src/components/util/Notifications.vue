@@ -12,9 +12,11 @@
                 </div>
 
             <responsive-wrapper class="rightPanel">
-                <h3>{{notification.name}}</h3>
-                <p>{{notification.description}}</p>
-                <span class="date">{{ notificationDate }}</span>
+                <div>
+                    <h3>{{notification.name}}</h3>
+                    <p>{{notification.description}}</p>
+                    <span class="date">{{ notificationDate }}</span>
+                </div>
              </responsive-wrapper>
 
             </md-card>
@@ -32,8 +34,9 @@
 
 <style scoped>
 
-
-
+.mobileStyle span{
+    position: initial;
+}
 
 .centre {
     justify-content: center;
@@ -52,6 +55,7 @@ h3 {
 p {
     margin-top: 0.25em;
     margin-bottom: 0px;
+    margin-bottom: 0.3em;
 }
 
 p + p {
@@ -77,6 +81,8 @@ p + p {
 
 .rightPanel {
     padding: 16px;
+    padding-bottom: 5px;
+    display: block;
 }
 
 .notification {

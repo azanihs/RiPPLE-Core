@@ -18,7 +18,9 @@
         flex-grow: 0;
         flex-basis: 0%;
     }
+
 </style>
+
 
 <script lang="ts">
 import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
