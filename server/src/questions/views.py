@@ -224,7 +224,7 @@ def report(request):
 
     post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
-    return JsonResponse(QuestionService.report_question(user, post_request))
+    return JsonResponse({"data": QuestionService.report_question(user, post_request)})
 
 def getReports(request):
     if request.method != 'POST':
@@ -236,11 +236,11 @@ def getReports(request):
     user = UserService.logged_in_user(request)
     page=post_request.get("page", None)
 
-    search_result = QuestionService.get_reports(user)
-    if search_result["error"]:
-        return JsonResponse(search_result)
+    result = QuestionService.get_reports(user)
+    if result["error"]:
+        return JsonResponse(result)
     else:
-        return page_response(search_result, page)
+        return JsonResponse({"data": result})
 
 def get_reasons(request):
     if request.method != 'POST':
@@ -249,4 +249,4 @@ def get_reasons(request):
         }, status=405)
 
     user = UserService.logged_in_user(request)
-    return JsonResponse(QuestionService.get_reason_list(user))
+    return JsonResponse({"data": QuestionService.get_reason_list(user)})
