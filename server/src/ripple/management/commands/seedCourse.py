@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser, Engagement
-from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
+from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole, PeerRecommendation, RoleRecommendation, TimeRecommendation, Connection
 from base64 import b64decode
 import imghdr
 import sys
@@ -285,6 +285,98 @@ class Command(BaseCommand):
                         study_role = study_roles[2]
                         availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
 
+        def create_role_recommendation(peer_recommendation, user, recommended_user):
+            recommended_roles = AvailableRole.objects.filter(course_user=recommended_user)
+            if len(recommended_roles) > 0:
+                recommended_role = recommended_roles[0]
+
+                topic = recommended_role.topic
+                role = None
+                if recommended_role.study_role.role == "mentor":
+                    role = StudyRole.objects.filter(role="mentee")[0]
+                elif recommended_role.study_role.role == "mentee":
+                    role = StudyRole.objects.filter(role="mentor")[0]
+                elif recommended_role.study_role.role == "partner":
+                    role = StudyRole.objects.filter(role="partner")[0]
+
+                if role:
+                    available_role = AvailableRole.objects.create(course_user=user, topic=topic, study_role=role)
+                    available_role.save()
+
+                    role_recommendation = RoleRecommendation.objects.create(
+                        peer_recommendation=peer_recommendation,
+                        user_role=available_role,
+                        recomended_user_role=recommended_role
+                    )
+
+                    role_recommendation.save()
+                    return role_recommendation
+            return None
+
+        def create_time_recommendation(peer_recommendation, user, recommended_user):
+            recommended_availabilities = Availability.objects.filter(course_user=recommended_user)
+            if len(recommended_availabilities):
+                recommended_availability = recommended_availabilities[0]
+                availability = Availability.objects.create(
+                    course_user=user,
+                    day=recommended_availability.day,
+                    time=recommended_availability.time
+                )
+                availability.save()
+
+                time_recommendation = TimeRecommendation.objects.create(
+                    peer_recommendation=peer_recommendation,
+                    user_availability=availability,
+                    recommended_user_availability=recommended_availability
+                )
+                time_recommendation.save()
+                return time_recommendation
+            return None
+
+        def populate_connections(course_users):
+            # Get two compatible course_users
+            for course_user in course_users:
+                user = course_user.user
+                course = course_user.course
+                compatable_course_users = CourseUser.objects.filter(course=course).exclude(user=user)
+                if len(compatable_course_users) > 0:
+                    compatable_course_user = compatable_course_users[0]
+
+                    peer_recommendation_check = PeerRecommendation.objects.filter(
+                        course_user=course_user,
+                        recommended_course_user=compatable_course_users
+                    )
+
+                    if len(peer_recommendation_check) > 0:
+                        continue
+
+                    # Create a peer recommendation
+                    peer_recommendation = PeerRecommendation.objects.create(
+                        course_user=course_user,
+                        recommended_course_user= compatable_course_user)
+                    peer_recommendation.save()
+
+                    role_recommendation = create_role_recommendation(
+                        peer_recommendation, course_user, compatable_course_user)
+
+                    if (role_recommendation is None):
+                        continue
+
+                    time_recommendation = create_time_recommendation(
+                        peer_recommendation, course_user, compatable_course_user)
+
+                    if (time_recommendation is None):
+                        continue
+
+                    connection = Connection.objects.create(
+                        peer_recommendation=peer_recommendation,
+                        role_recommendation=role_recommendation,
+                        time_recommendation=time_recommendation,
+                        user_status="pending",
+                        recommended_user_status="pending"
+                    )
+                    connection.save()
+
         courses = []
         for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
@@ -320,6 +412,7 @@ class Command(BaseCommand):
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
         populate_available_roles(course_users, study_roles)
+        populate_connections(course_users)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')
