@@ -262,6 +262,13 @@ class Command(BaseCommand):
                     course_users.append(
                         CourseUser.objects.create(user=user, course=course))
 
+            print("\t-Adding Consent Form")
+            form = ConsentForm (
+                text="Testing consent form",
+                author=course_users[0]
+            )
+            form.save()
+
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)
 

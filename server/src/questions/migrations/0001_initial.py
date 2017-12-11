@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ReportQuestion',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'))
                 ('time', models.DateTimeField(auto_now=True)),
                 ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='questions.Question')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.CourseUser')),

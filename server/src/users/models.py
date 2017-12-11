@@ -104,3 +104,17 @@ class Engagement(models.Model):
             "id": self.id,
             "name": self.name
         }
+class ConsentForm(models.Model):
+    text = models.TextField()
+    author = models.ForeignKey(CourseUser)
+
+    def toJSON(self):
+        return {
+            "text": self.text,
+            "author": self.author.toJSON()
+        }
+
+class Consent(models.Model):
+    user = models.ForeignKey(CourseUser)
+    form = models.ForeignKey(ConsentForm)
+    response = models.BooleanField()

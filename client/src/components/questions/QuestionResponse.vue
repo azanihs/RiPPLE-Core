@@ -253,8 +253,8 @@ export default class QuestionResponse extends Vue {
         const answerIcon = this.optionIcon(answer);
         return {
             answered: this.disabledResponses.find(x => x == answer) || this.userHasCorrectAnswer,
-            correct: answerIcon == "done",
-            incorrect: answerIcon != "done"
+            correct: this.userHasCorrectAnswer && answerIcon == "done",
+            incorrect: this.userHasCorrectAnswer && answerIcon != "done"
         };
     }
 

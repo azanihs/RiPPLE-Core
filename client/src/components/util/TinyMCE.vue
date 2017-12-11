@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, p, Lifecycle } from "av-ts";
+import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
 
 @Component
 export default class TinyMCE extends Vue {
@@ -14,19 +14,9 @@ export default class TinyMCE extends Vue {
         required: false,
         default: () => {}
     });
-    @Prop content = p<string | undefined>({
-        required: false,
-        default: ""
-    });
     @Prop value = p<string | undefined>({
         required: false
     });
-
-
-    @Watch("content")
-    contentChanged(_oldContent: string, _newContent: string) {
-        tinymce.get(this.id).setContent(this.content);
-    }
 
     @Lifecycle
     mounted() {
@@ -39,11 +29,11 @@ export default class TinyMCE extends Vue {
             });
 
             editor.on("init", (_e: any) => {
-                if (this.content != undefined) {
-                    tinymce.get(this.id).setContent(this.content);
+                if (this.value != undefined) {
+                    tinymce.get(this.id).setContent(this.value);
                 }
 
-                this.$emit("input", this.content);
+                // this.$emit("input", this.value);
             });
         };
 

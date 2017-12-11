@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Main from "../Main.vue";
 
 import AdminView from "../components/admin/AdminView.vue";
+import ConsentView from "../components/admin/Consent.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
 import QuestionWrapper from "../components/questions/QuestionWrapper.vue";
@@ -12,6 +13,7 @@ import CompetenciesView from "../components/profile/Competencies.vue";
 import ConnectionsView from "../components/profile/Connections.vue";
 import EngagementView from "../components/profile/Engagement.vue";
 import NotificationsView from "../components/profile/Notifications.vue";
+import UserConsentView from "../components/profile/UserConsent.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import PeerView from "../components/peers/PeerView.vue";
@@ -19,6 +21,7 @@ import LeaderBoard from "../components/leaderboard/LeaderBoard.vue";
 import AuthorView from "../components/author/AuthorView.vue";
 
 import WIP from "../components/WIP.vue";
+import UserRepository from "../repositories/UserRepository";
 
 Vue.use(VueRouter);
 
@@ -59,6 +62,10 @@ const routes = [{
         name: "notifications",
         component: NotificationsView
     }, {
+        path: "/profile/consent",
+        name: "userConsent",
+        component: UserConsentView
+    }, {
         path: "/question/answer",
         name: "answer",
         component: QuestionBrowser
@@ -87,6 +94,10 @@ const routes = [{
         name: "admin",
         component: AdminView
     }, {
+        path: "/admin/consent",
+        name: "consent",
+        component: ConsentView
+    }, {
         path: "/error/403",
         name: "errorPermission",
         component: ErrorPermission
@@ -97,6 +108,25 @@ const routes = [{
     }]
 }];
 
-export default new VueRouter({
+const router = new VueRouter({
     routes
 });
+<<<<<<< HEAD
+=======
+
+export default router;
+
+router.beforeEach((to, _from, next) => {
+    if (to.path == "/admin" || to.path == "/profile/consent") {
+        next();
+    } else {
+        UserRepository.userHasConsentedForCourse()
+            .then(hasConsented => {
+                if (!hasConsented) {
+                    return next("/profile/consent");
+                }
+                next();
+            });
+    }
+});
+>>>>>>> ripple-#211

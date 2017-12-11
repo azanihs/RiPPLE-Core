@@ -18,7 +18,7 @@ def add_question(question_request, host, user):
     for i in ["A", "B", "C", "D"]:
         if responses.get(i, None) is None:
             return {"state": "Error", "error": "Missing response " + i}
-    
+
     question_content = question.get("content", None)
     explanation_content = explanation.get("content", None)
 
@@ -26,7 +26,7 @@ def add_question(question_request, host, user):
         return {"state": "Error", "error": "Question content is blank"}
     elif len(explanation_content) == 0:
         return {"state": "Error", "error": "Explanation content is blank"}
-    
+
     # Cleans question and explanation content before saving as Question
     questionObj = Question(
     content="",
@@ -37,7 +37,11 @@ def add_question(question_request, host, user):
     qualityCount=0,
     author=user
     )
-    questionObj.save()
+    if (util.verify_content(questionObj.content) and util.verify_content(questionObj.explanation)):
+        questionObj.save()
+    else:
+        # INVALID CONTENT
+        return {"state": "Error", "error": "Invalid Question"}
     try:
         with transaction.atomic():
             # Question Images
@@ -78,7 +82,11 @@ def add_question(question_request, host, user):
                     response=i,
                     question=questionObj
                 )
-                distractor.save()
+
+                if util.verify_content(distractor.content):
+                    distractor.save()
+                else:
+                    raise IntegrityError("Invalid Distractor")
 
                 # Distractor Images
                 images = responses[i].get("payloads", None)

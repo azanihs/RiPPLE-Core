@@ -180,12 +180,16 @@ export default class AdminView extends Vue {
         return this.pCourse;
     }
 
+    get courseCode() {
+        return this.pCourseCode;
+    }
+
     get courseIsAvailable() {
         return this.course && this.course.available;
     }
 
     @Lifecycle
-    created() {
+    mounted() {
         Fetcher.get(UserService.getLoggedInUser)
             .on(this.updateCourseUser);
         Fetcher.get(TopicService.getAllAvailableTopics)

@@ -1,6 +1,13 @@
-import { ITopic, IEdge, ICourse, ICompareSet } from "../interfaces/models";
+import { ITopic, IEdge, ICourse, ICompareSet, IConsentForm } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
+import ImageService from "./ImageService";
+
+interface IValidate {
+    message: string,
+    args: any,
+    validateFunction: (args: any) => boolean
+};
 
 function addTopicsToEdgeList(topics: ITopic[], edges: IEdge[]) {
     topics.forEach(topic => {
@@ -17,6 +24,42 @@ function addTopicsToEdgeList(topics: ITopic[], edges: IEdge[]) {
 }
 
 export default class UserService {
+    static sendConsent(response: boolean) {
+        return UserRepository.sendConsent(response);
+    }
+
+    static validateConsentForm(consentForm: IConsentForm) {
+        const validators: IValidate[] = [{
+            message: "Consent text cannot be empty",
+            validateFunction: ImageService.domIsNotEmpty,
+            args: consentForm.text
+        }];
+        for (let i = 0; i < validators.length; ++i) {
+            const entry = validators[i];
+            if (entry.validateFunction(entry.args) === false) {
+                return entry.message;
+            }
+        }
+        return "";
+    }
+
+    static prepareConsentUpload(consentForm: IConsentForm) {
+        const upload: IConsentForm = {
+            text: "undefined",
+            author: consentForm.author
+        };
+
+        return ImageService.extractImagesFromDOM(consentForm.text)
+            .then(consentContent => {
+                upload.text = consentContent.content;
+            }).then(() => upload);
+    }
+
+    static uploadContent(upload: IConsentForm) {
+        return UserRepository.uploadConsentForm(upload);
+    }
+
+
     static generateGraph(sourceData: IEdge[], otherData: IEdge[], exclude: number[]): ICompareSet {
         const ownScores = sourceData;
         const userGoals = otherData;
@@ -78,6 +121,10 @@ export default class UserService {
 
     static getLoggedInUser() {
         return UserRepository.getLoggedInUser();
+    }
+
+    static getConsentForm() {
+        return UserRepository.getConsentForm();
     }
 
     static getAllAvailableCategories() {
