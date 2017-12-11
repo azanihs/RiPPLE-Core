@@ -1,10 +1,9 @@
 import random
-
-from django.db.models import Count
-
 import math
-
 import numpy as np
+
+from django.db.models import Count, Min
+
 from ripple.util import util
 from users.models import CourseUser, Token, User
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
@@ -24,16 +23,16 @@ def question_response_distribution(question_id):
 
     question_distractors = Distractor.objects.filter(question=question)
     question_responses = QuestionResponse.objects.filter(response__in=question_distractors)
-    total_responses = question_responses.count()
+    total_responses = question_responses.values('user_id').distinct().count()
     response_distribution = {}
 
     for i in question_distractors:
-        distractor_response_count = question_responses.filter(response=i).count()
+        first_response = question_responses.values('user_id').annotate(first=Min('id')).values_list('first', flat=True)
+        distractor_response_count = question_responses.filter(id__in=first_response,  response=i).count()
         if total_responses is 0:
             response_distribution[i.id] = 0
         else:
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
-
     return response_distribution
 
 def get_course_leaders(course, sort_field, sort_order, limit=25):
@@ -79,9 +78,20 @@ def get_course_topics(course):
     return Topic.objects.filter(course=course).distinct()
 
 
-def get_question(id):
+def get_random_question(user):
+    course = user.course
+    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course))
+
+    count = course_questions.aggregate(count=Count('id'))['count']
+    random_index = random.randint(0, count - 1)
+    return course_questions.all()[random_index]
+
+def get_question_by_id(user, id):
     try:
-        return Question.objects.get(pk=id)
+        question = Question.objects.get(pk=id)
+        if question.author.course != user.course:
+            return None
+        return question
     except Question.DoesNotExist:
         return None
 
@@ -100,8 +110,8 @@ def respond_to_question(distractor_id, user):
         response=answered_option
     )
     response.save()
-    if answered_option.isCorrect:
-        update_competency(user, answered_option.question, response)
+    calculate_question_score(user, answered_option.question, response)
+    update_competency(user, answered_option.question, response)
     return True
 
 def update_running_mean(value, count, new_weight):
@@ -184,8 +194,6 @@ def update_competency(user, question, response):
     """
         Updates the user's competency for all topic combinations in the given question
     """
-    calculate_question_score(user, question, response)
-
     queryset_topics = question.topics.all()
 
     score = get_competency_score(question, response)
@@ -203,7 +211,7 @@ def calculate_children_competency(user, queryset_topics, score):
         user_competency = CompetencyService.get_user_competency_for_topics(user, topics)
 
         if user_competency is None or len(user_competency) == 0:
-            user_competency = CompetencyService.add_competency(0.5, 0, user, topics)
+            user_competency = CompetencyService.add_competency(0.1, 0, user, topics)
         else:
             user_competency = user_competency[0]
 

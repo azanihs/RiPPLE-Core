@@ -1,4 +1,4 @@
-import { QuestionUpload, AuthorResponse, QuestionBuilder, Topic } from "../interfaces/models";
+import { IQuestionUpload, IAuthorResponse, IQuestionBuilder, ITopic } from "../interfaces/models";
 
 import { blobFetch } from "../repositories/APIRepository";
 import ImageService from "./ImageService";
@@ -12,11 +12,11 @@ interface IValidate {
 
 export default class AuthorService {
 
-    static uploadContent(upload: QuestionUpload) {
+    static uploadContent(upload: IQuestionUpload) {
         return QuestionRepository.uploadQuestion(upload);
     }
 
-    static extractImagesFromDOM(body: string): Promise<AuthorResponse> {
+    static extractImagesFromDOM(body: string): Promise<IAuthorResponse> {
         // Extracts the base64 strings from all image tags in the provided HTMLBodyElement
         // Assigns them ID's to identify image tags with their respective content
         // Returns this object representation ready for server upload
@@ -54,8 +54,8 @@ export default class AuthorService {
     }
 
 
-    static prepareUpload(question: QuestionBuilder) {
-        const upload: QuestionUpload = {
+    static prepareUpload(question: IQuestionBuilder) {
+        const upload: IQuestionUpload = {
             question: undefined,
             explanation: undefined,
             responses: {
@@ -97,14 +97,14 @@ export default class AuthorService {
         return questionBody.length > 0;
     }
 
-    static validateQuestions(question: QuestionBuilder) {
+    static validateQuestions(question: IQuestionBuilder) {
         const validators: IValidate[] = [{
             message: "Question cannot be empty",
             validateFunction: this.domIsNotEmpty,
             args: question.content
         }, {
             message: "Question must have between 1 and 4 topics",
-            validateFunction: (topics: Topic[]) => topics.length >= 1 && topics.length <= 4,
+            validateFunction: (topics: ITopic[]) => topics.length >= 1 && topics.length <= 4,
             args: question.topics
         }, {
             message: "Question response 'A' cannot be empty",

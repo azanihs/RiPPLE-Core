@@ -3,14 +3,20 @@ from __future__ import unicode_literals
 import pytz as timezone
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
+from django.apps import apps
 from datetime import datetime
 from ripple.util.util import save_image, mean
 
-from questions.models import Topic, Competency
+from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating
 from questions.services import CompetencyService
-from users.models import Course, CourseUser, User, Role, UserImage
+from users.models import Course, CourseUser, User, Role, UserImage, Engagement
+from rippleAchievements.models import UserAchievement
 from users.services.TokenService import token_to_user_course
 from ripple.util import util
+
+competency_threshold = settings.RUNTIME_CONFIGURATION["min_competency_value"]
 
 def update_user_image(user, server_root, new_image):
     if new_image is None:
@@ -59,7 +65,7 @@ def update_course(course_user, new_data):
         return {"error": "Course must have topics"}
     for t in topics:
         if not t.get("name", None):
-            return {"error": 
+            return {"error":
                 "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
     course_code = course_information.get("courseCode", None)
@@ -131,7 +137,7 @@ def _process_competencies(competencies):
         if comp.confidence < threshold:
             continue
 
-        # Only use two topics. 
+        # Only use two topics.
         nodes = comp.topics.all()
         if not(len(nodes) > 0 and len(nodes) <= 2):
             continue
@@ -150,12 +156,12 @@ def user_competencies(user):
     try:
         return _process_competencies(Competency.objects.filter(user=user))
     except TypeError:
-        return[] 
+        return[]
 
 def aggregate_competencies(user, compare_type):
     if user is None or compare_type is None:
         return []
-    if compare_type == "peer":
+    if compare_type == "peers":
         competencies = Competency.objects.filter(user__in=CourseUser.objects.filter(course=user.course))
     else:
         # TODO: handle other compare_types
@@ -209,3 +215,58 @@ def update_user_roles(course_user, role):
 
     if saved_role not in course_user.roles.all():
         course_user.roles.add(saved_role)
+
+def get_all_engagements(user):
+    course = user.course
+    engagements = Engagement.objects.filter(course=course)
+    engagements = [x.toJSON() for x in engagements]
+    return engagements
+
+def user_engagement(user, user_type=None):
+    edges = []
+    engagements = Engagement.objects.filter(course=user.course)
+
+    #Compare against self
+    if not user_type:
+        user_type=user
+
+    #Filters
+    filters = {
+        "isCorrect": ["response_id__in", Distractor.objects.filter(isCorrect=True)]
+    }
+
+    for e in engagements:
+        model = ContentType.objects.get(model=e.model).model_class()
+        e_filter = filters.get(e.filter_name, None)
+        if e_filter:
+            filter_name = e_filter[0]
+            filter_cond = e_filter[1]
+        else:
+            filter_name = None
+            filter_cond = None
+        key_user = e.key_user
+        edges.append([
+            e.toJSON(),
+            e.toJSON(),
+            get_engagement_result(user_type, model, filter_name, filter_cond, key_user),
+            0
+        ])
+    return edges
+
+def get_engagement_result(user, model, filter_name, filter_cond, key_user):
+    if filter_name:
+        correct = model.objects.filter(**{filter_name:filter_cond})
+    else:
+        correct = model.objects.all()
+    max_num = correct.values(key_user).annotate(num_results=Count(key_user))\
+            .values("num_results").order_by("-num_results")
+    if not max_num:
+        return 0
+    max_num = max_num[0]["num_results"]
+    if user == "peers":
+        num_users = correct.values(key_user).distinct().count()
+        avg_correct = correct.count()/num_users
+        return avg_correct/max_num
+    else:
+        user_correct = correct.filter(**{key_user:user}).count()
+        return user_correct/max_num

@@ -1,3 +1,6 @@
+[run]
+    branch = True
+
 [report]
 ignore_errors = True
 omit =

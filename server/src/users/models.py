@@ -90,3 +90,17 @@ class Notification(models.Model):
             "description": self.description,
             "icon": self.icon
         }
+
+class Engagement(models.Model):
+    name = models.CharField(max_length=64)
+    course = models.ForeignKey(Course)
+    model = models.CharField(max_length=32)
+    filter_name = models.CharField(max_length=32)
+    key_user = models.CharField(max_length=32)
+
+
+    def toJSON(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }

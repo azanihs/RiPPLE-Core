@@ -75,7 +75,41 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             } else {
                 return Promise.resolve(x.data);
             }
+        })
+        .catch((err: Response) => {
+            if (typeof err.json !== "function") {
+                throw err;
+            } else {
+                return err.json().then((errorObject: any) => {
+                    if (errorObject.error) {
+                        // TODO: Handle global things
+                        addEventsToQueue([{
+                            id: performance.now(),
+                            icon: "error",
+                            name: `Server Error`,
+                            description: `${errorObject.error}`
+                        }]);
+                    }
+                    throw err;
+                });
+            }
         });
+};
+
+export const apiPost = <T>(url: string, body: Object, opts?: RequestInit) => {
+    const postOptions = {
+        method: "POST",
+        headers: new Headers({
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }),
+        body: JSON.stringify(body)
+    };
+    if (opts) {
+        Object.assign(postOptions, opts);
+    }
+
+    return apiFetch<T>(url, postOptions);
 };
 
 export const setToken = (newToken: string) => {

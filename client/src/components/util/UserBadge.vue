@@ -89,12 +89,12 @@
 <script lang="ts">
 import { Vue, Prop, Component, p } from "av-ts";
 
-import { Badge } from "../../interfaces/models";
+import { IBadge } from "../../interfaces/models";
 import BadgeService from "../../services/BadgeService";
 
 @Component()
 export default class Badges extends Vue {
-    @Prop badge = p<Badge>({
+    @Prop badge = p<IBadge>({
         required: true
     });
 

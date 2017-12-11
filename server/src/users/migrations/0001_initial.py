@@ -35,6 +35,19 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='Engagement',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=64)),
+                ('app', models.CharField(max_length=32)),
+                ('item', models.CharField(max_length=32)),
+                ('filter_name', models.CharField(max_length=32)),
+                ('filter_cond', models.CharField(max_length=64)),
+                ('key_user', models.CharField(max_length=32)),
+                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.Course')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Notification',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),

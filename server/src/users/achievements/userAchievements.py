@@ -1,3 +1,4 @@
+from django.conf import settings
 from rippleAchievements.signals import achievement_unlocked
 from questions.models import Question, QuestionResponse, Distractor, Competency
 from rippleAchievements.models import Task
@@ -10,6 +11,8 @@ else:
     ABC = abc.ABCMeta('ABC', (), {})
 abstractproperty = abc.abstractproperty
 abstractmethod = abc.abstractmethod
+
+competency_threshold = settings.RUNTIME_CONFIGURATION["min_competency_value"]
 
 ################################################
 # Setup reference tables linking views and tasks
@@ -183,7 +186,7 @@ class BeginnerCompetencyAchievement(AbstractAchievementClass):
     tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
-        count = Competency.objects.filter(user=user, competency__gte=50).count()
+        count = Competency.objects.filter(user=user, competency__gte=competency_threshold).count()
         progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
@@ -198,7 +201,7 @@ class IntermediateCompetencyAchievement(AbstractAchievementClass):
     tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
-        count = Competency.objects.filter(user=user, competency__gte=50).count()
+        count = Competency.objects.filter(user=user, competency__gte=competency_threshold).count()
         progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 
@@ -213,7 +216,7 @@ class AdvancedCompetencyAchievement(AbstractAchievementClass):
     tasks = ["question_response"]
 
     def evaluate(self, user, *args, **kwargs):
-        count = Competency.objects.filter(user=user, competency__gte=50).count()
+        count = Competency.objects.filter(user=user, competency__gte=competency_threshold).count()
         progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
 

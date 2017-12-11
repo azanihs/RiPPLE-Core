@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { User } from "../../interfaces/models";
+import { IUser } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -93,7 +93,7 @@ interface IMeetingHistory {
     }
 })
 export default class RecommendationCard extends Vue {
-    @Prop user = p<User>({
+    @Prop user = p<IUser>({
         required: true
     });
 

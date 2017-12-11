@@ -36,7 +36,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Prop, Lifecycle, Component, p } from "av-ts";
-import { Badge } from "../../interfaces/models";
+import { IBadge } from "../../interfaces/models";
 
 import UserBadge from "../util/UserBadge.vue";
 import BadgeService from "../../services/BadgeService";
@@ -52,9 +52,9 @@ export default class CollectedBadges extends Vue {
         required: true
     });
 
-    pAvailableBadges: Badge[] = [];
+    pAvailableBadges: IBadge[] = [];
 
-    updateAvailableBadges(newBadges: Badge[]) {
+    updateAvailableBadges(newBadges: IBadge[]) {
         this.pAvailableBadges = newBadges;
     };
 

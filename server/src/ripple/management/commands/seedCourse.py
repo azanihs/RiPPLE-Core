@@ -2,9 +2,14 @@ from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
+<<<<<<< HEAD
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
 from users.models import Course, User, CourseUser
+=======
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
+from users.models import Course, User, CourseUser, Engagement
+>>>>>>> RIPPLE-#228
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
@@ -241,6 +246,20 @@ class Command(BaseCommand):
                     course=course
                 )
                 reason.save()
+
+            print("\t-Adding Engagements")
+            engagements = ["Questions Answered", "Questions Authored", "Questions Rated",
+                    "Competent Topics", "Achievements Earned"]
+            e_models = ["questionresponse", "question", "questionrating", "competency",
+                    "userachievement"]
+            e_filter_name = ["isCorrect", "", "", "", ""]
+            e_key_user = ["user_id", "author_id", "user_id", "user_id", "user"]
+            for i in range(len(engagements)):
+                e = Engagement(name=engagements[i], course=course,
+                        model=e_models[i], filter_name=e_filter_name[i],
+                        key_user=e_key_user[i])
+                e.save()
+
             print("\t-Enrolling Users")
             course_users = []
             for user in users:
@@ -294,6 +313,7 @@ class Command(BaseCommand):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
+
         print("Populating Availabilities")
         print("\t-Making Days")
         make_days()
