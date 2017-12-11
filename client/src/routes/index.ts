@@ -5,7 +5,7 @@ import Main from "../Main.vue";
 import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
-import Question from "../components/questions/Question.vue";
+import QuestionWrapper from "../components/questions/QuestionWrapper.vue";
 import ProfileView from "../components/profile/ProfileView.vue";
 import AchievementsView from "../components/profile/Achievements.vue";
 import CompetenciesView from "../components/profile/Competencies.vue";
@@ -33,7 +33,7 @@ const routes = [{
     children: [{
         path: "/question/id/:id",
         props: true,
-        component: Question
+        component: QuestionWrapper
     }, {
         path: "/",
         name: "profile",
@@ -100,4 +100,3 @@ const routes = [{
 export default new VueRouter({
     routes
 });
-
