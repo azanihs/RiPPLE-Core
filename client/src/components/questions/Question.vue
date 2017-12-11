@@ -1,8 +1,9 @@
 <template>
-    <md-layout class="bottomSpace">
+    <md-layout :class="bottomSpaceClass">
         <md-layout md-hide-xsmall
                    md-hide-small
                    md-hide-medium
+                   v-if="showNavBar"
                    class="questionNavigation">
             <action-buttons @back="closeQuestion()"
                     @report="openDialog()"></action-buttons>
@@ -19,9 +20,10 @@
             </md-layout>
             <question-response class="responseContainer componentSeparator"
                                :question="question"
+                               :preview="preview"
                                @userAnswer="updateUserAnswer">
                 <md-layout md-flex="100"
-                           v-if="userIsFinishedWithQuestion">
+                           v-if="userIsFinishedWithQuestion && !preview">
                     <md-layout class="between"
                                md-hide-xsmall
                                md-hide-small>
@@ -213,7 +215,7 @@ h2 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { IQuestion } from "../../interfaces/models";
 
 import { addEventsToQueue } from "../../util";
@@ -246,6 +248,14 @@ export default class Question extends Vue {
 
     @Prop showSpeedDial = p<boolean>({
         default: true
+    });
+
+    @Prop showNavBar = p<boolean>({
+        default: true
+    });
+
+    @Prop preview = p<boolean>({
+        default: false
     });
 
     reason = "";
@@ -338,6 +348,14 @@ export default class Question extends Vue {
     destroyed() {
         Fetcher.get(QuestionService.getReportReasons)
             .off(this.updateReportReasons);
+    }
+
+    get bottomSpaceClass(): string {
+        if (this.showSpeedDial) {
+            return "bottomSpace";
+        } else {
+            return "";
+        }
     }
 }
 </script>

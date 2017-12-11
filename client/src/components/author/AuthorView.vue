@@ -1,88 +1,102 @@
 <template>
-    <md-layout md-flex="100">
-        <md-layout md-flex="100"
-            class="cardSeparator">
-            <md-card>
-                <md-layout md-flex="100"
-                    class="componentSeparator">
-                    <h2>Question Body</h2>
-                    <TinyMCE id="questionEditor"
-                        v-model="question.content"
-                        :options="options"></TinyMCE>
-                </md-layout>
-                <md-layout md-flex="100">
-                    <h2>Topics</h2>
-                    <topic-chip v-for="topic in topics"
-                        :key="topic.id"
-                        :disabled="!topicIsUsed(topic)"
-                        @click.native="toggleTopic(topic)">
-                        {{topic.name}}
-                    </topic-chip>
-                </md-layout>
-            </md-card>
-        </md-layout>
-        <md-layout md-flex="100"
-            class="cardSeparator">
-            <md-card class="removePadding">
-                <md-tabs md-fixed
-                    :mdNavigation="false"
-                    class="md-transparent tabContainer">
-                    <md-tab v-for="i in ['A', 'B', 'C', 'D']"
-                        :key="i"
-                        :id="'tab_' + i"
-                        :md-label="'Response ' + i">
-                        <h3>Response {{i}}</h3>
-                        <TinyMCE :id="'editor_' + i"
-                            v-model="question.responses[i]"
-                            :options="options"></TinyMCE>
-                    </md-tab>
-                </md-tabs>
-            </md-card>
-        </md-layout>
-        <md-layout md-flex="100"
-            class="cardSeparator">
-            <md-card>
-                <h3>Correct Answer</h3>
-                <md-layout md-flex="100"
-                    class="flexAround">
-                    <md-radio v-for="i in ['A', 'B', 'C', 'D']"
-                        :key="i"
-                        v-model="question.correctIndex"
-                        :md-value="i"
-                        name="correctQuestionGroup">{{i}}</md-radio>
-                </md-layout>
-            </md-card>
-        </md-layout>
-        <md-layout md-flex="100"
-            class="cardSeparator">
-            <md-card>
-                <md-layout md-flex="100"
-                    class="componentSeparator">
-                    <h2>Question Explanation</h2>
-                    <TinyMCE id="questionExplanation"
-                        v-model="question.explanation"
-                        :options="options"></TinyMCE>
-                </md-layout>
-            </md-card>
-        </md-layout>
-        <md-layout md-flex="100"
-            class="rightAlign">
-            <div class="uploadContainer cardSeparator">
-                <md-tooltip v-if="!uploadDone"
-                    md-direction="top">Upload Question</md-tooltip>
-                <md-tooltip v-if="uploadDone"
-                    md-direction="top">Question Uploaded</md-tooltip>
-                <md-button class="md-fab md-raised uploadButton"
-                    @click="validateUpload"
-                    :class="{'done': uploadDone}">
-                    <md-icon v-if="!uploadDone">cloud_upload</md-icon>
-                    <md-icon v-if="uploadDone">done</md-icon>
-                </md-button>
-                <md-spinner class="progressSpinner uploadSpinner"
-                    :md-size="74"
-                    :md-stroke="3"
-                    :md-progress="uploadProgress"></md-spinner>
-            </div>
+    <md-layout :class="bottomSpaceClass">
+        <md-layout md-flex="100">
+            <md-tabs md-fixed
+                :mdNavigation="false"
+                class="md-transparent tabContainer"
+                @change="tabSelected">
+                <md-tab md-label="Write Question">
+                    <md-layout md-flex="100">
+                        <md-card>
+                            <md-layout md-flex="100"
+                                class="componentSeparator">
+                                <h2>Question Body</h2>
+                                <TinyMCE id="questionEditor"
+                                    v-model="question.content"
+                                    :options="options"></TinyMCE>
+                            </md-layout>
+                            <md-layout md-flex="100">
+                                <h2>Topics</h2>
+                                <topic-chip v-for="topic in topics"
+                                    :key="topic.id"
+                                    :disabled="!topicIsUsed(topic)"
+                                    @click.native="toggleTopic(topic)">
+                                    {{topic.name}}
+                                </topic-chip>
+                            </md-layout>
+                        </md-card>
+                    </md-layout>
+                    <md-layout md-flex="100"
+                        class="cardSeparator">
+                        <md-card class="removePadding">
+                            <md-tabs md-fixed
+                                :mdNavigation="false"
+                                class="md-transparent tabContainer">
+                                <md-tab v-for="i in ['A', 'B', 'C', 'D']"
+                                    :key="i"
+                                    :id="'tab_' + i"
+                                    :md-label="'Response ' + i">
+                                    <TinyMCE :id="'editor_' + i"
+                                        v-model="question.responses[i]"
+                                        :options="options"></TinyMCE>
+                                </md-tab>
+                            </md-tabs>
+                        </md-card>
+                    </md-layout>
+                    <md-layout md-flex="100"
+                        class="cardSeparator">
+                        <md-card>
+                            <h3>Correct Answer</h3>
+                            <md-layout md-flex="100"
+                                class="flexAround">
+                                <md-radio v-for="i in ['A', 'B', 'C', 'D']"
+                                    :key="i"
+                                    v-model="question.correctIndex"
+                                    :md-value="i"
+                                    name="correctQuestionGroup">{{i}}</md-radio>
+                            </md-layout>
+                        </md-card>
+                    </md-layout>
+                    <md-layout md-flex="100"
+                        class="cardSeparator">
+                        <md-card>
+                            <md-layout md-flex="100"
+                                class="componentSeparator">
+                                <h2>Question Explanation</h2>
+                                <TinyMCE id="questionExplanation"
+                                    v-model="question.explanation"
+                                    :options="options"></TinyMCE>
+                            </md-layout>
+                        </md-card>
+                    </md-layout>
+                </md-tab>
+                <md-tab :md-label="prevLabel" :md-disabled="prevDisabled"
+                    :md-tooltip="prevTooltip">
+                        <question v-if="questionPrev" :question="questionPrev"
+                            :preview="true"
+                            :showSpeedDial="false"
+                            :showNavBar="false"></question>
+                </md-tab>
+            </md-tabs>
+            <md-layout md-flex="100"
+                class="rightAlign">
+                <div class="uploadContainer md-fab-bottom-right floatingAction">
+                    <md-tooltip v-if="!uploadDone"
+                        md-direction="top">Upload Question</md-tooltip>
+                    <md-tooltip v-if="uploadDone"
+                        md-direction="top">Question Uploaded</md-tooltip>
+                    <md-button class="md-fab md-raised uploadButton"
+                        @click="validateUpload"
+                        :class="{'done': uploadDone}">
+                        <md-icon v-if="!uploadDone">cloud_upload</md-icon>
+                        <md-icon v-if="uploadDone">done</md-icon>
+                    </md-button>
+                    <md-spinner class="progressSpinner uploadSpinner"
+                        :md-size="74"
+                        :md-stroke="3"
+                        :md-progress="uploadProgress"></md-spinner>
+                </div>
+            </md-layout>
         </md-layout>
     </md-layout>
 </template>
@@ -125,12 +139,22 @@ h3 {
     top: -3px;
     left: -1px;
 }
+
+.floatingAction {
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 16px !important;
+}
+
+.bottomSpace {
+    margin-bottom: 5em;
+}
 </style>
 
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { ITopic, IQuestionBuilder } from "../../interfaces/models";
+import { ITopic, IQuestionBuilder, IQuestion, IDistractor } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
@@ -168,7 +192,77 @@ export default class AuthorView extends Vue {
     uploadDone = false;
     uploadProgress = 0;
 
+    prevDisabled = true;
+    prevLabel: string = "Please fill out all question fields to see preview";
+    prevTooltip: string | undefined = "Please fill out all question fields to see preview.";
     pDisabled = false;
+
+    bottomSpaceClass: string = "bottomSpace"
+
+    get questionPrev():IQuestion | undefined {
+        const error = AuthorService.validateQuestions(this.question);
+        let qPrev: IQuestion | undefined;
+        if (error === "") {
+            let qSolution: IDistractor;
+
+            const qDistractors: IDistractor[] = [
+                {
+                    id: -1,
+                    content: this.question.responses["A"],
+                    isCorrect: false,
+                    response: "A"
+                }, {
+                    id: -2,
+                    content: this.question.responses["B"],
+                    isCorrect: false,
+                    response: "B"
+                }, {
+                    id: -3,
+                    content: this.question.responses["C"],
+                    isCorrect: false,
+                    response: "C"
+                }, {
+                    id: -4,
+                    content: this.question.responses["D"],
+                    isCorrect: false,
+                    response: "D"
+                }
+            ];
+
+            //qSolution = qDistractors[0];
+            qSolution = {
+                id: -5,
+                content: "",
+                isCorrect: true,
+                response: ""
+            };
+            for (let d of qDistractors) {
+                if (d.response == this.question.correctIndex) {
+                    d.isCorrect=true;
+                    qSolution = d;
+                }
+            }
+
+            qPrev = {
+                id: -1,
+                difficulty: 0,
+                quality: 0,
+                topics: this.question.topics,
+                content: this.question.content,
+                explanation: this.question.explanation,
+                solution: qSolution,
+                distractors: qDistractors,
+                responseCount: 0
+            };
+            this.prevDisabled = false;
+            this.prevLabel = "Preview Question";
+        } else {
+            qPrev = undefined;
+            this.prevDisabled = true;
+            this.prevLabel = error;
+        }
+        return qPrev;
+    }
 
     @Lifecycle
     created() {
@@ -291,6 +385,15 @@ export default class AuthorView extends Vue {
                 });
         }
     }
+
+    tabSelected(index: number) {
+        if (index==1) {
+            this.bottomSpaceClass="";
+        } else {
+            this.bottomSpaceClass = "bottomSpace";
+        }
+    }
+
 }
 
 </script>
