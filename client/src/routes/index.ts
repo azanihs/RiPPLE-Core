@@ -5,7 +5,7 @@ import Main from "../Main.vue";
 import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
-import ProfileView from "../components/profile/ProfileView.vue";
+import Overview from "../components/profile/Overview.vue";
 import AchievementsView from "../components/profile/Achievements.vue";
 import CompetenciesView from "../components/profile/Competencies.vue";
 import ConnectionsView from "../components/profile/Connections.vue";
@@ -31,8 +31,8 @@ const routes = [{
     }),
     children: [{
         path: "/",
-        name: "profile",
-        component: ProfileView
+        name: "overview",
+        component: Overview
     }, {
         path: "/profile/engagement",
         name: "engagement",

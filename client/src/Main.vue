@@ -72,6 +72,7 @@
         0 3px 1px -2px rgba(0, 0, 0, 0.12);
 
     justify-content: flex-end;
+    z-index: 2;
 }
 
 .dimOverlay {
@@ -82,7 +83,7 @@
     left:0;
     width: 100%;
     height: 100%;
-    background:rgba(0,0,0,0.6);
+    background:rgba(0,0,0,0.5);
     z-index: 5;
 }
 
@@ -105,6 +106,7 @@
     position: fixed;
     left: 0px;
     top: 0px;
+    z-index: 2;
 }
 
 .offset {
@@ -147,7 +149,7 @@
     margin-right: 1.25%;
     min-width: 97.5%;
     flex: 0 1 97.5%;
-    z-index: -1;
+    z-index: 0;
 }
 
 ul {
@@ -292,19 +294,20 @@ export default class Main extends Vue {
         const isVisible = visible.$el;
         if (window.getComputedStyle(isVisible).display !== "none") {
             this.mobileMode = true;
-            this.menuIcon = "menu";
             container.style.transform = null;
         } else {
             this.mobileMode = false;
-            this.menuIcon = "menu";
             container.style.transform = "translate3d(0,0,0)";
         }
     }
 
     updatePageName() {
-        const link = this.links.find(x => x.text.toLowerCase() == this.path);
-        if (link !== undefined) {
-            this.pageTitle = link.text + " Page";
+        if (this.currentlyOpenMenu !== undefined) {
+            if (this.currentlyOpenMenu.href != "") {
+                this.pageTitle = this.currentlyOpenMenu.text;
+            } else if (this.currentlyOpenMenu.href == "") {
+                this.pageTitle = this.path.charAt(0).toUpperCase() + this.path.slice(1);
+            }
         }
     }
 
@@ -368,6 +371,7 @@ export default class Main extends Vue {
 
     toggleSubmenu(link: ILink) {
         this.currentlyOpenMenu = link;
+        this.updatePageName();
     }
 
     toggleSideNav(link: ILink | undefined) {
@@ -380,13 +384,10 @@ export default class Main extends Vue {
             const linkHasSubmenu = link !== undefined && link.submenu !== undefined;
             if (this.sideMenuIsOpen && linkHasSubmenu) {
                 this.sideMenuIsOpen = true;
-                this.menuIcon = "close";
             } else if (this.sideMenuIsOpen && !linkHasSubmenu) {
                 this.sideMenuIsOpen = false;
-                this.menuIcon = "menu";
             } else {
                 this.sideMenuIsOpen = true;
-                this.menuIcon = "menu";
             }
         }
     }
