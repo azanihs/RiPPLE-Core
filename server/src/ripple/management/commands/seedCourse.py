@@ -2,14 +2,9 @@ from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
-<<<<<<< HEAD
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
-from users.models import Course, User, CourseUser
-=======
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
 from users.models import Course, User, CourseUser, Engagement
->>>>>>> RIPPLE-#228
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
