@@ -1,5 +1,6 @@
 import { apiFetch, apiPost } from "./APIRepository";
-import { IQuestion, IQuestionUpload, IDistractor, INetworkResponse, IReportQuestion, IReasonList } from "../interfaces/models";
+import { IQuestion, IQuestionUpload, IDistractor, INetworkResponse,
+    IReportQuestion, IReasonList } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type ISearchResult = { items: IQuestion[], searchResult: any, totalItems: number, page: number };
