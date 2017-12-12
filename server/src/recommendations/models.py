@@ -109,6 +109,7 @@ class Connection(models.Model):
     time_recommendation = models.ForeignKey(TimeRecommendation)
     user_status = models.CharField(max_length=20)
     recommended_user_status = models.CharField(max_length=20)
+    location = models.CharField(max_length=100)
 
     def toJSON(self):
         return {
@@ -116,5 +117,6 @@ class Connection(models.Model):
             "roleRecommendation": self.role_recommendation.toJSON(),
             "timeRecommendation": self.time_recommendation.toJSON(),
             "userStatus": self.user_status.toJSON(),
-            "recommendedUserStatus": self.recommended_user_status.toJSON()
+            "recommendedUserStatus": self.recommended_user_status.toJSON(),
+            "location": self.location.toJSON()
         }

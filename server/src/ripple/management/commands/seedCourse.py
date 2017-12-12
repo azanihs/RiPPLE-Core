@@ -373,7 +373,8 @@ class Command(BaseCommand):
                         role_recommendation=role_recommendation,
                         time_recommendation=time_recommendation,
                         user_status="pending",
-                        recommended_user_status="pending"
+                        recommended_user_status="pending",
+                        location=""
                     )
                     connection.save()
 
