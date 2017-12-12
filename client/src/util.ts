@@ -36,7 +36,7 @@ export function getDefaultConsentForm() {
             participation data for research into how we can improve our teaching.
         </strong>
     </h2>
-    <h3>PARTICIPATION INFORMATION SHEET :</h3>
+    <h3>PARTICIPATION INFORMATION SHEET: </h3>
     <div>
         <p>
             <em>
@@ -44,8 +44,8 @@ export function getDefaultConsentForm() {
                 active learning course architecture.
             </em>
         </p>
-        <p>Dear student, The University of Queensland seeks your participation in a project run by the course
-            coordinators of ENGG1200 at the University of Queensland. The purpose of the proposed study is to:
+        <p>Dear student, __ seeks your participation in a project run by the course
+            coordinators of __ at __. The purpose of the proposed study is to:
         </p>
         <p>
             <em>
@@ -56,7 +56,7 @@ export function getDefaultConsentForm() {
             </em>
         </p>
         <p>
-            The study will be completed over the duration of ENGG1200. Information gathered will be used in the design
+            The study will be completed over the duration of __. Information gathered will be used in the design
             of authentic first year learning environments. This information will also allow a comparison to be made
             between active learning environments and traditional learning environments to see which approach is best in
             developing both engineering technical competencies, as well as professional engineering identities. We
@@ -90,7 +90,7 @@ export function getDefaultConsentForm() {
             permission for your information to be used at any time. If you choose to withdraw after any of the data has
             been collected, the data records which relate to you will be immediately deleted or destroyed and not used
             in the study. To withdraw from the study or any sections of the study, you need to email the data manager
-            at <a href="mailto:elipsedata@eait.uq.edu.au">elipsedata@eait.uq.edu.au</a>. The information regarding your
+            at <a href="__@__">__@__</a>. The information regarding your
             withdrawal will only be viewed by independent researchers and data management staff. For future reference,
             the Participant Information Sheet can be found under the Learning Resources tab on the course site. We
             appreciate your participation in this study. We will provide you with a summary of the information gathered
@@ -100,27 +100,26 @@ export function getDefaultConsentForm() {
             This study has been cleared by the human ethics committees of the University of Queensland in accordance
             with the guidelines of the National Health and Medical Research Council, the Australian Human Ethics
             Committee and the Human Research Ethics Committee. You are free to discuss taking part in this study with
-            the researcher (Melanie Fleming, 33654114). If you would like to speak to an officer of the University of
-            Queensland not involved in the study, you may contact the Ethics Officer on 07 - 3365 3924.
+            the researcher (__, __). If you would like to speak to an officer of the __
+            not involved in the study, you may contact the Ethics Officer on __.
         </p>
         <p> Yours sincerely, </p>
-        <p> Associate Professors Lydia Kavanagh and Carl Reidsema </p>
-        <p>Faculty of Engineering, Architecture and Information Technology </p>
-        <p> University of Queensland </p>
-        <p> Brisbane QLD 4072, Australia </p>
-        <p> Phone: +617 3365 3596 </p>
+        <p> __ </p>
+        <p> __ </p>
+        <p> __ </p>
+        <p> __ </p>
+        <p> __ </p>
     </div>
     <h2><strong>Title of the Project: </strong></h2>
     <h2>
         <em>
-            Enhancing academic and practitioner skills in first year Engineers using an active learning course
-            architecture
+            Project Title
         </em>
     </h2>
     <h3>Researcher Contact Details:</h3>
-        <h3>Ms Melanie Fleming</h3>
-        <h4>Email: <em>melanie.fleming@uq.edu.au</em></h4>
-        <h4>Phone: <em>3365 4114</em> </h4>
+        <h3>__</h3>
+        <h4>Email: <em>__</em></h4>
+        <h4>Phone: <em>__</em> </h4>
         <h3>By clicking "I Agree", you consent to participate in this study and agree to the following:</h3>
         <ul>
             <li>
@@ -142,7 +141,7 @@ export function getDefaultConsentForm() {
             </li>
             <li>
                 I understand I can request that all or some of my data to be withdrawn at any time by emailing the data
-                manager at <a href="mailto:elipsedata@eait.uq.edu.au">elipsedata@eait.uq.edu.au</a>
+                manager at <a href="__@__">__@__</a>
             </li>
             <li>
                 I am aware that the Participant Information Sheet, and the contact details for the data manager are on
