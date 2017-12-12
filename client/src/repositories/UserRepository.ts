@@ -1,6 +1,7 @@
 import {
     CourseUser, User, Course,
-    Notification, Topic, PeerConnection, Edge, UserSummary, ConsentForm
+    Notification, Topic, PeerConnection, Edge, UserSummary, IConsentForm,
+    IConsentUpload
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch } from "./APIRepository";
@@ -118,6 +119,10 @@ export default class UserRepository {
         } else {
             return apiFetch<boolean>(`/users/has_consented/`)
                 .then(x => {
+                    if (typeof x !== "boolean") {
+                        x = false;
+                    }
+
                     _hasConsentedMap.set(_courseCode, x);
                     return x;
                 });
@@ -128,9 +133,14 @@ export default class UserRepository {
         return apiFetch<CourseUser>(`/users/me/`);
     }
 
-    static getConsentForm(): Promise<ConsentForm> {
-        return apiFetch<ConsentForm>(`/users/consent_form`);
+    static getConsentForm(): Promise<IConsentForm> {
+        return apiFetch<IConsentForm>(`/users/consent_form/`);
     }
+
+    static getUserConsentFormResponse(): Promise<string> {
+        return apiFetch<string>(`/users/consent/`);
+    }
+
 
     static getUserCourses(): Promise<Course[]> {
         return apiFetch<Course[]>(`/users/courses/`);
@@ -270,16 +280,15 @@ export default class UserRepository {
         });
     }
 
-    static uploadConsentForm(consentForm: ConsentForm): Promise<ConsentForm> {
-        return apiFetch<{consentForm: ConsentForm}>(`/users/submit_consent_form/`, {
+    static uploadConsentForm(consentForm: IConsentUpload): Promise<string> {
+        return apiFetch<string>(`/users/submit_consent_form/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "application/json"
             }),
             body: JSON.stringify(consentForm)
-        })
-            .then(x => x.consentForm);
+        });
     }
 
     static sendConsent(response: boolean): Promise<string> {

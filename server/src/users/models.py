@@ -46,7 +46,6 @@ class UserImage(models.Model):
     image = models.ImageField(upload_to='user_photo')
     user = models.ForeignKey(User, on_delete=None)
 
-
 class Role(models.Model):
     role = models.CharField(max_length=32)
 
@@ -92,16 +91,25 @@ class Notification(models.Model):
         }
 
 class ConsentForm(models.Model):
-    text = models.TextField()
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
     author = models.ForeignKey(CourseUser)
 
     def toJSON(self):
         return {
-            "text": self.text,
+            "content": self.content,
             "author": self.author.toJSON()
         }
+
 
 class Consent(models.Model):
     user = models.ForeignKey(CourseUser)
     form = models.ForeignKey(ConsentForm)
     response = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ConsentImage(models.Model):
+    image = models.ImageField(upload_to='consent_images')
+    form = models.ForeignKey(ConsentForm, on_delete=None)

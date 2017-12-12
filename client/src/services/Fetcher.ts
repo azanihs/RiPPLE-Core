@@ -78,7 +78,7 @@ export default class Fetcher<T extends any> {
             value: undefined
         };
         cache.set(this.identifier, cacheResult);
-        this.fn(this.params)
+        return this.fn(this.params)
             .then((x: any) => {
                 cacheResult.value = x;
                 Fetcher.sharedBus.$emit(this.identifier, x);

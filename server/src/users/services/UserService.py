@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 import pytz as timezone
 
 from django.conf import settings
+from django.db import IntegrityError, transaction
 from datetime import datetime
-from ripple.util.util import save_image, mean, verify_content, is_administrator
+from ripple.util.util import save_image, mean, verify_content, is_administrator, extract_image_from_html, generate_static_path
 
 from questions.models import Topic, Competency
 from questions.services import CompetencyService
@@ -87,6 +88,7 @@ def update_course(course_user, new_data):
             course.end = datetime.fromtimestamp(int(end), timezone.utc)
         else:
             return {"error": "Given end timestamp is not valid: " + str(end)}
+    course.available = available
 
     course.save()
     original_topics = course.topic_set.all()
@@ -179,8 +181,7 @@ def insert_user_if_not_exists(user):
     try:
         return User.objects.get(user_id=user.get("user_id"))
     except User.DoesNotExist:
-        if user.get("first_name", None) is None or user.get("last_name", None) is None \
-                or user.get("image", None) is None:
+        if user.get("first_name", None) is None or user.get("last_name", None) is None:
             return {"error": "Invalid User Provided"}
         return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image="")
 
@@ -210,6 +211,18 @@ def update_user_roles(course_user, role):
     if saved_role not in course_user.roles.all():
         course_user.roles.add(saved_role)
 
+def get_user_consent(user):
+    form = get_form(user)
+    if form:
+        user_consent = Consent.objects.filter(user=user, form=form).order_by("-created_at").first()
+        return {
+            "data": user_consent.response if user_consent is not None else None
+        }
+    else:
+        return {
+            "error": "No consent form for course"
+        }
+
 def consent_service(user, request):
     form = get_form(user)
     response = request.get("response", None)
@@ -231,24 +244,35 @@ def consent_service(user, request):
     else:
         return {"error": "No form provided"}
 
-def update_consent_form(user, request):
+def update_consent_form(user, consent_form_data, host):
     if not is_administrator(user):
         return {"error": "User does not have permission in this context"}
 
-    consent_text = request.get("text", None)
+    payload = consent_form_data.get("payload", None)
+    if payload is None:
+        return {"error": "No consent form provided"}
 
-    if consent_text:
-        if verify_content(consent_text):
-            c = ConsentForm (
-                text=consent_text,
+    consent_text = payload.get("content", None)
+    if not verify_content(consent_text):
+        return {"error": "Invalid consent text provided"}
+    payloads = payload.get("payloads", None)
+
+    root_path = generate_static_path(host)
+    try:
+        with transaction.atomic():
+            consent_form = ConsentForm.objects.create(
+                content=consent_text,
                 author=user
             )
-            c.save()
-            return {"data": "Consent form updated"}
-        else:
-            return {"error": "Invalid consent text provided"}
-    else:
-        return {"error": "No consent text provided"}
+        if payloads:
+            extract_image_from_html(user.course.id, consent_form, payloads, "c", root_path)
+
+        return { "data": "Consent form saved" }
+    except IntegrityError as e:
+        return {"state": "Error", "error": str(e)}
+    except Exception as e:
+        return {"state": "Error", "error": str(e)}
+
 
 def get_consent_form(user):
     form = get_form(user)
@@ -258,6 +282,9 @@ def get_consent_form(user):
         return {"error": "No consent form for this course"}
 
 def has_consented_course(user):
+    if "Instructor" in [x.role for x in user.roles.all()]:
+        return {"data": True}
+
     form = get_form(user)
     if form:
         consent = Consent.objects.filter(form=form, user=user)
@@ -272,6 +299,7 @@ def has_consented_course(user):
 def get_form(user):
     course = user.course
     course_users = CourseUser.objects.filter(course=course)
-    form = ConsentForm.objects.filter(author__in=course_users).order_by("-id")
-    if form:
-        return form[0]
+
+    form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
+
+    return form
