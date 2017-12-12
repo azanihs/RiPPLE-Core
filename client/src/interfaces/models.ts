@@ -237,3 +237,14 @@ export interface ISearch {
     page: number,
     filterTopics: number[]
 };
+
+export interface IRecommendedRole {
+  topic: ITopic,
+  studyRole: IStudyRole
+}
+
+export interface IRecommendation {
+  recommendedCourseUser: ICourseUser,
+  recommendedRole: IRecommendedRole[],
+  dayTime: IDayTime[]
+}

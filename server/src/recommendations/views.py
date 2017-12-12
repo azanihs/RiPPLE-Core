@@ -6,7 +6,7 @@ from users.models import CourseUser
 from django.http import JsonResponse, HttpResponse
 
 from users.services import UserService
-from recommendations.services import AvailabilityService
+from recommendations.services import AvailabilityService, RecommendationService
 
 def user_availability(request):
     logged_in_user = UserService.logged_in_user(request)
@@ -74,3 +74,13 @@ def update_role(request):
         return JsonResponse({"error": "Invalid topic/studyRole/availableRole combination"}, status=422)
     else:
         return JsonResponse(updated_role.toJSON())
+
+def get_user_find_recommendations(request):
+    logged_in_user = UserService.logged_in_user(request)
+    recommendations = RecommendationService.get_user_find_recommendations(logged_in_user)
+    return JsonResponse({"data": recommendations})
+
+def get_user_review_recommendations(request):
+    logged_in_user = UserService.logged_in_user(request)
+    recommendations = RecommendationService.get_user_review_recommendations(logged_in_user)
+    return JsonResponse({"data": recommendations})
