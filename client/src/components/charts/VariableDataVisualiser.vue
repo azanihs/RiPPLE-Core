@@ -35,11 +35,11 @@
                                 </md-select>
                             </md-input-container>
                             <md-input-container>
-                                <label for="visulisationCompare">
+                                <label for="visualisationCompare">
                                     Compare Data
                                 </label>
-                                <md-select name="visulisationCompare"
-                                    id="visulisationCompare"
+                                <md-select name="visualisationCompare"
+                                    id="visualisationCompare"
                                     v-model="compare">
                                     <md-option value="personalGoals">
                                         Personal Goals
@@ -56,8 +56,13 @@
                             <md-layout md-flex="100">
                                 <topic-chip v-for="category in dataCategories"
                                     :key="category.id"
-                                    :disabled="isDisabled(category)"
-                                    @click.native="toggleVisible(category)">{{category.name}}</topic-chip>
+                                    :disabled="!isVisible(category) && !zeroCompetency(category)"
+                                    :class="{ 'gray-out': !(!isVisible(category) && !zeroCompetency(category)) && zeroCompetency(category) }"
+                                    @click.native="toggleVisible(category)">{{category.name}}
+                                    <md-tooltip class="chip-tooltip" md-direction="top">{{category.name}}<br>
+                                         {{zeroCompetency(category) ? "You have no competency for this category": ""}}
+                                    </md-tooltip>
+                                </topic-chip>
                             </md-layout>
                         </div>
                     </div>
@@ -68,6 +73,19 @@
 </template>
 
 <style scoped>
+.chip-tooltip {
+    background-color: rgba(25,25,25, 0.9);
+    font-size: 0.8em;
+    height: auto;
+    text-align: center;
+}
+
+.gray-out {
+    color: #bbb !important;
+    background-color: #eee !important;
+    cursor: default !important;
+}
+
 .fullWidth {
     width: 100%;
     user-select: none;
@@ -196,14 +214,16 @@ export default class VariableDataVisualiser extends Vue {
     });
 
     pDataGeneratorFunction: Function | undefined = undefined;
-    pChartData: any = {
+    pChartData: { data: any | undefined, options: any | undefined } | undefined = {
         data: undefined,
         options: undefined
     };
 
-    hiddenData: {[topicId: number]: boolean} = {};
+    showTopics: {[topicId: number]: boolean} = {};
     pChartType: string = "";
     pExcludeTopics: number[] = [];
+    pZeroCompetencyTopics: number[] = [];
+    zeroCompetencyClass: boolean = false;
 
     pCompareAgainst: string = "peers";
 
@@ -217,8 +237,8 @@ export default class VariableDataVisualiser extends Vue {
             .off(this.updateChartData);
 
         this.pChartType = newVal;
-        this.pChartData = undefined;
-        this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
+        // this.pChartData = undefined;
+        this.pExcludeTopics = this.dataCategories.filter(x => !this.isVisible(x)).map(x => x.id);
 
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
         Fetcher.get(this.pDataGeneratorFunction as any,
@@ -236,15 +256,15 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     toggleVisible(dataItem: Topic) {
-        if (this.hiddenData[dataItem.id]) {
+        if (this.showTopics[dataItem.id]) {
             // this.hiddenData[dataItem.id] = false;
-            this.$set(this.hiddenData as any, dataItem.id, false);
+            this.$set(this.showTopics as any, dataItem.id, false);
         } else {
             // this.hiddenData[dataItem.id] = true;
-            this.$set(this.hiddenData as any, dataItem.id, true);
+            this.$set(this.showTopics as any, dataItem.id, true);
         }
 
-        const topicsToShow = this.dataCategories.filter(x => !this.isDisabled(x));
+        const topicsToShow = this.dataCategories.filter(x => !this.isVisible(x));
         this.chart = this.chart;
         this.$emit("changeTopics", topicsToShow);
     }
@@ -261,6 +281,7 @@ export default class VariableDataVisualiser extends Vue {
         let compareResults: any[];
         let ownResults: any[];
         let dataTopics: any[];
+        this.pChartData = undefined;
 
         if (this.chart != "topicDependency") {
             // Get all self loops from edge list, and use that competency.
@@ -325,6 +346,12 @@ export default class VariableDataVisualiser extends Vue {
 
     @Watch("dataCategories")
     changedDataCategories(_oldTopics: Topic[], _newTopics: Topic[]) {
+        this.pExcludeTopics = this.dataCategories.filter(x => !this.isVisible(x)).map(x => x.id);
+        this.dataCategories.forEach(x=> {
+            if (this.showTopics[x.id] === undefined) {
+                this.showTopics[x.id] = true;
+            }
+        });
         this.$emit("changeTopics", this.dataCategories);
     }
 
@@ -339,8 +366,11 @@ export default class VariableDataVisualiser extends Vue {
     @Lifecycle
     created() {
         this.pDataGeneratorFunction = this.compareList();
+        this.dataCategories.forEach(x=> {
+            this.showTopics[x.id] = true;
+        });
 
-        this.pExcludeTopics = this.dataCategories.filter(x => this.isDisabled(x)).map(x => x.id);
+        this.pExcludeTopics = this.dataCategories.filter(x => !this.isVisible(x)).map(x => x.id);
         // Register this.compareList with the event bus to ensure synchrocity with the rest of the app
         Fetcher.get(this.pDataGeneratorFunction as any,
             { compareTo: this.compare, excludeTopicIds: this.pExcludeTopics })
@@ -366,8 +396,8 @@ export default class VariableDataVisualiser extends Vue {
         }
     };
 
-    isDisabled(dataItem: Topic) {
-        return !!this.hiddenData[dataItem.id];
+    isVisible(dataItem: Topic) {
+        return !!this.showTopics[dataItem.id];
     }
 
     getChartClass(chartValue: string) {
@@ -400,6 +430,27 @@ export default class VariableDataVisualiser extends Vue {
         }
         return this.pChartData;
     }
+
+    zeroCompetency(topic: Topic) {
+        if (this.pChartData == undefined || this.pChartData.data == undefined) {
+            // const zero = { data: this.pChartData.data,
+                // class: "gray-out" };
+            return false;
+        }
+
+        const index = this.pChartData.data.labels.indexOf(topic.name);
+        const value = this.pChartData.data.datasets["0"].data[index];
+        if (value == 0) {
+            // const zero = { data: this.pChartData.data,
+            //     class: "gray-out" };
+            return true;
+        }
+
+        // Topic is not selected for render or competency is > 0
+        // Do not gray out
+        return false;
+    }
+
 
 }
 </script>

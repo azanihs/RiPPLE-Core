@@ -1,14 +1,12 @@
 <template>
-    <responsive-wrapper class="general">
-        <router-link v-if="linkTo" :to="linkTo" class="topicChipLink" :class="status">
+        <router-link v-if="linkTo" :to="linkTo" class="topicChipLink" :class="[status]">
             <md-chip class="topicChip">
                 <slot></slot>
             </md-chip>
         </router-link>
-        <md-chip v-else class="topicChip" :class="status">
+        <md-chip v-else class="topicChip" :class="[status]">
             <slot></slot>
         </md-chip>
-    </responsive-wrapper>
 </template>
 
 <style>
@@ -21,10 +19,6 @@
 </style>
 
 <style scoped>
-
-.general {
-    flex:0;
-}
 
 a.topicChipLink,
 a.topicChipLink:visited {
