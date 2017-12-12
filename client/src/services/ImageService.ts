@@ -94,13 +94,19 @@ export default class ImageService {
                             image.src = "#:" + i;
                             resolve(payloads[i]);
                         });
+                } else {
+                    resolve(image.src);
                 }
+            } else {
+                resolve(image.src);
             }
-        }))).then(_ => ({
-            content: dom.innerHTML,
-            payloads: payloads,
-            isCorrect: false
-        }));
+        }))).then(_ => {
+            return {
+                content: dom.innerHTML,
+                payloads: payloads,
+                isCorrect: false
+            };
+        });
     }
 
     static domIsNotEmpty(questionDOMString: string) {

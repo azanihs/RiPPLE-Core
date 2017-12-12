@@ -77,15 +77,15 @@ export interface CourseUser {
     error?: string
 };
 
-export interface ConsentForm {
-    text: string,
+export interface IConsentForm {
+    content: string,
     author: CourseUser,
 
     error?: string
 };
 
-export interface ConsentUpload {
-    text: AuthorResponse,
+export interface IConsentUpload {
+    payload?: AuthorResponse | undefined,
     author: CourseUser
 };
 

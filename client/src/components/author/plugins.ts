@@ -2,7 +2,6 @@ export default {
     plugins: ["print",
         "code",
         "preview",
-        "fullpage",
         "searchreplace",
         "autolink",
         "directionality",
