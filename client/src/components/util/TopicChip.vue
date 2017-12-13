@@ -11,10 +11,9 @@
 
 <style>
 .topicChip > .md-chip-container {
-    max-width: 100px;
-    overflow: hidden;
-    white-space: pre;
-    text-overflow: ellipsis;
+    max-width: inherit;
+    overflow: inherit;
+    text-overflow: inherit;
 }
 </style>
 

@@ -59,8 +59,8 @@
                                         :key="category.id"
                                         :disabled="!isVisible(category) && !zeroCompetency(category)"
                                         :class="{ 'gray-out': !(!isVisible(category) && !zeroCompetency(category)) && zeroCompetency(category) }"
+                                        class="chipsOverflow"
                                         @click.native="toggleVisible(category)">{{category.name}}
-
                                         <md-tooltip class="chip-tooltip" md-direction="top">{{category.name}}<br>
                                             {{zeroCompetency(category) ? "You need to answer more questions in this topic": ""}}
                                         </md-tooltip>
@@ -76,11 +76,6 @@
 </template>
 
 <style scoped>
-.mobileStyle > .chip-tooltip{
-    letter-spacing: 0;
-    white-space: normal;
-    color: red !important;
-}
 
 .chip-tooltip {
     background-color: rgba(25,25,25, 0.9);
@@ -89,6 +84,13 @@
     text-align: center;
     letter-spacing: 1;
     white-space: normal;
+}
+
+.chipsOverflow{
+    max-width: 130px;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .gray-out {
