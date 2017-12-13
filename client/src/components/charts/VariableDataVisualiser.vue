@@ -53,17 +53,20 @@
                                 </md-select>
                             </md-input-container>
                             <h4>Topics to Visualise</h4>
-                            <md-layout md-flex="100">
-                                <topic-chip v-for="category in dataCategories"
-                                    :key="category.id"
-                                    :disabled="!isVisible(category) && !zeroCompetency(category)"
-                                    :class="{ 'gray-out': !(!isVisible(category) && !zeroCompetency(category)) && zeroCompetency(category) }"
-                                    @click.native="toggleVisible(category)">{{category.name}}
-                                    <md-tooltip class="chip-tooltip" md-direction="top">{{category.name}}<br>
-                                         {{zeroCompetency(category) ? "You have no competency for this category": ""}}
-                                    </md-tooltip>
-                                </topic-chip>
-                            </md-layout>
+                            <responsive-wrapper>
+                                <md-layout md-flex="100">
+                                    <topic-chip v-for="category in dataCategories"
+                                        :key="category.id"
+                                        :disabled="!isVisible(category) && !zeroCompetency(category)"
+                                        :class="{ 'gray-out': !(!isVisible(category) && !zeroCompetency(category)) && zeroCompetency(category) }"
+                                        @click.native="toggleVisible(category)">{{category.name}}
+
+                                        <md-tooltip class="chip-tooltip" md-direction="top">{{category.name}}<br>
+                                            {{zeroCompetency(category) ? "You need to answer more questions in this topic": ""}}
+                                        </md-tooltip>
+                                    </topic-chip>
+                                </md-layout>
+                            </responsive-wrapper>
                         </div>
                     </div>
                 </md-layout>
@@ -73,11 +76,19 @@
 </template>
 
 <style scoped>
+.mobileStyle > .chip-tooltip{
+    letter-spacing: 0;
+    white-space: normal;
+    color: red !important;
+}
+
 .chip-tooltip {
     background-color: rgba(25,25,25, 0.9);
     font-size: 0.8em;
     height: auto;
     text-align: center;
+    letter-spacing: 1;
+    white-space: normal;
 }
 
 .gray-out {
@@ -166,7 +177,7 @@ h3 {
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { Topic, Edge } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
-
+import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Chart from "./Chart.vue";
 
@@ -178,7 +189,8 @@ interface IChartType {
 @Component({
     components: {
         Chart,
-        TopicChip
+        TopicChip,
+        ResponsiveWrapper
     }
 })
 export default class VariableDataVisualiser extends Vue {
