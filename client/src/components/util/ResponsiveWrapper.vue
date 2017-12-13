@@ -43,7 +43,6 @@ export default class ResponsiveWrapper extends Vue {
         } else {
             this.mobileMode = false;
         }
-        console.log(this.mobileMode);
     }
 }
 
