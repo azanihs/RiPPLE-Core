@@ -3,7 +3,7 @@ import VueRouter from "vue-router";
 import Main from "../Main.vue";
 
 import AdminView from "../components/admin/AdminView.vue";
-import ConsentView from "../components/admin/Consent.vue";
+import ConsentEditor from "../components/admin/ConsentEditor.vue";
 import ReportedQuestions from "../components/admin/ReportedQuestions.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
@@ -14,7 +14,7 @@ import CompetenciesView from "../components/profile/Competencies.vue";
 import ConnectionsView from "../components/profile/Connections.vue";
 import EngagementView from "../components/profile/Engagement.vue";
 import NotificationsView from "../components/profile/Notifications.vue";
-import UserConsentView from "../components/profile/UserConsent.vue";
+import ConsentFormWrapper from "../components/profile/ConsentFormWrapper.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import PeerView from "../components/peers/PeerView.vue";
@@ -66,7 +66,7 @@ const routes = [{
     }, {
         path: "/profile/consent",
         name: "userConsent",
-        component: UserConsentView
+        component: ConsentFormWrapper
     }, {
         path: "/question/answer",
         name: "answer",
@@ -103,7 +103,7 @@ const routes = [{
     }, {
         path: "/admin/consent",
         name: "consent",
-        component: ConsentView
+        component: ConsentEditor
     }, {
         path: "/admin/reported",
         name: "reported",
@@ -123,10 +123,8 @@ const router = new VueRouter({
     routes
 });
 
-export default router;
-
-router.beforeEach((to, _from, next) => {
-    if (to.path == "/admin" || to.path == "/profile/consent") {
+router.beforeEach((_to, _from, next) => {
+    if (_to.path == "/admin/consent" || _to.path == "/profile/consent") {
         next();
     } else {
         UserRepository.userHasConsentedForCourse()
@@ -138,3 +136,5 @@ router.beforeEach((to, _from, next) => {
             });
     }
 });
+
+export default router;
