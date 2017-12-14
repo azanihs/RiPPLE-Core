@@ -186,23 +186,15 @@ export default class AuthorView extends Vue {
             topics: []
         })
     });
-    /* = {
-        content: "",
-        explanation: "",
-        responses: {
-            A: "",
-            B: "",
-            C: "",
-            D: ""
-        },
-        correctIndex: "",
-        topics: []
-    };*/
+    @Prop id = p<number>({
+        default: -1
+    });
 
     uploadDone = false;
     correctQuestion = "";
     networkMessage = "";
     uploadProgress = 0;
+    path = "/questions/add/"
 
     prevDisabled = true;
     prevLabel: string = "Please fill out all question fields to see preview";
@@ -355,8 +347,11 @@ export default class AuthorView extends Vue {
             }]);
         } else {
             this.disabled = true;
+            if (this.id >= 0) {
+                this.path = "/questions/update/"+this.id+"/";
+            }
             AuthorService.prepareUpload(this.question)
-                .then(preparedUpload => AuthorService.uploadContent(preparedUpload))
+                .then(preparedUpload => AuthorService.uploadContent(preparedUpload, this.path))
                 .then(response => {
                     this.$router.push(`/question/id/${response.id}`);
                 });

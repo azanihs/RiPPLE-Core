@@ -28,8 +28,10 @@ export interface IQuestion {
     explanation: string
     solution: IDistractor,
     distractors: IDistractor[],
-    responseCount: number
+    responseCount: number,
+    canEdit?: boolean | undefined
 };
+
 export interface IDistractor {
     id: number,
     content: string,

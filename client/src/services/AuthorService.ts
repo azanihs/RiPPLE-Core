@@ -11,8 +11,8 @@ interface IValidate {
 
 export default class AuthorService {
 
-    static uploadContent(upload: IQuestionUpload) {
-        return QuestionRepository.uploadQuestion(upload);
+    static uploadContent(upload: IQuestionUpload, path: string) {
+        return QuestionRepository.uploadQuestion(upload, path);
     }
 
     static prepareUpload(question: IQuestionBuilder) {

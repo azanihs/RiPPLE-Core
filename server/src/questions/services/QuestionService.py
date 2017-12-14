@@ -5,12 +5,13 @@ import pytz as timezone
 from datetime import datetime
 
 from django.db.models import Count, Min, Max
+from django.db import IntegrityError, transaction
 
 from ripple.util import util
 from users.models import CourseUser, Token, User
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
-    Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList
-from questions.services import CompetencyService
+    Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
+from questions.services import CompetencyService, AuthorService
 
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
@@ -95,7 +96,12 @@ def get_question_by_id(user, id):
         question = Question.objects.get(pk=id)
         if question.author.course != user.course:
             return None
-        return question
+        q_JSON =  question.toJSON()
+        if util.is_administrator(user) or question.author == user:
+            q_JSON["canEdit"] = True
+        else:
+            q_JSON["canEdit"] = False
+        return q_JSON
     except Question.DoesNotExist:
         return None
 
@@ -354,3 +360,55 @@ def all_reports(user):
         reports.append(report_list)
     reports = {"reports": reports}
     return reports
+
+def delete_question(user, qid):
+    try:
+        question = Question.objects.get(id=qid)
+        if (util.is_administrator(user) or user == question.author):
+            with transaction.atomic():
+                deleted = DeletedQuestion(
+                    content = question.content,
+                    explanation = question.explanation,
+                    quality = question.quality,
+                    difficultyCount = quesiton.difficultyCount,
+                    qualityCount = question.qualityCount,
+                    created_time = question.created_time,
+                    topics = question.topics,
+                    author = question.author,
+                    active_question = question
+                )
+                deleted.save()
+            return {}
+        else:
+            return {"error": "Permission Denied"}
+    except Question.DoesNotExist:
+        return {"error": "Question does not exist"}
+    except IntegrityError as e:
+        return {"error": str(e)}
+
+
+def update_question(post_request, root_path, user, qid):
+    try:
+        question = Question.objects.get(id=qid)
+        if (util.is_administrator(user) or user == question.author):
+            with transaction.atomic():
+                deleted = DeletedQuestion(
+                    content = question.content,
+                    explanation = question.explanation,
+                    difficulty = question.difficulty,
+                    quality = question.quality,
+                    difficultyCount = question.difficultyCount,
+                    qualityCount = question.qualityCount,
+                    created_time = question.created_time,
+                    author = question.author,
+                    active_question = question
+                )
+                deleted.save()
+                deleted.topics.set(question.topics.all())
+                return AuthorService.add_question(post_request, root_path, user, question)
+        else:
+            return {"state": "Error", "error": "Permission Denied"}
+    except Question.DoesNotExist:
+        return {"state": "Error", "error": "Question does not exist"}
+    except IntegrityError as e:
+        return {"state": "Error", "error": str(e)}

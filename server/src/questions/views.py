@@ -11,6 +11,7 @@ from users.services import UserService
 from questions.services import QuestionService, SearchService, AuthorService
 
 
+
 def add(request):
     if request.method != 'POST':
         return JsonResponse({
@@ -43,6 +44,46 @@ def add(request):
             }
         })
 
+def delete(request, qid):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    user = UserService.logged_in_user(request)
+    QuestionService.delete_question(user, qid)
+
+def update(request, qid):
+    if request.method != 'POST':
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    def _format(x):
+        if len(x) == 0: return x
+        return (x + "/") if x[-1] != "/" else x
+    root_path = merge_url_parts([
+        _format("//" + request.get_host()),
+        _format(settings.FORCE_SCRIPT_NAME),
+        _format("static")
+    ])
+
+    post_request = loads(request.body.decode("utf-8"))
+
+    if post_request is None:
+        return JsonResponse({"error": "Missing question in request"}, status=422)
+
+    response = QuestionService.update_question(
+        post_request, root_path, UserService.logged_in_user(request), qid)
+
+    if response['state'] == "Error":
+        return JsonResponse({"error": response['error']}, status=422)
+    else:
+        return JsonResponse({
+            "data": {
+                "question": response['question']
+            }
+        })
 
 def respond(request):
     if request.method != 'POST':
@@ -126,7 +167,7 @@ def id(request, id):
     if question is None:
         return JsonResponse({"error": "You are not enrolled in the course for this question"}, status=403)
 
-    return JsonResponse({"data": question.toJSON()})
+    return JsonResponse({"data": question})
 
 
 def competencies(request):

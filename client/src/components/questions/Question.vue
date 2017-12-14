@@ -5,8 +5,16 @@
                    md-hide-medium
                    v-if="showNavBar"
                    class="questionNavigation">
-            <action-buttons @back="closeQuestion()"
-                    @report="openDialog()"></action-buttons>
+            <action-buttons
+                onBack="/question/answer">">
+                <md-button
+                        slot="right"
+                        class="md-warn"
+                        @click="openDialog()">
+                    <span>Report Question</span>
+                    <md-icon>error_outline</md-icon>
+                </md-button>
+            </action-buttons>
         </md-layout>
         <md-layout md-flex="100">
             <md-layout md-flex="100"
