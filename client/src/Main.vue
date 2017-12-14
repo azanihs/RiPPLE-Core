@@ -194,7 +194,7 @@ label {
 <script lang="ts">
 import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
 import { ILink, IUser, ICourse, ICourseUser } from "./interfaces/models";
-import { getLinks } from "./util";
+import { getLinks } from "./routes/links";
 
 // Special case where main.vue needs to refresh application
 import UserRepository from "./repositories/UserRepository";

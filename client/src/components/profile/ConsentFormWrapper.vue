@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { IConsentForm, CourseUser } from "../../interfaces/models";
+import { IConsentForm, ICourseUser } from "../../interfaces/models";
 
 import { addEventsToQueue } from "../../util";
 
@@ -45,7 +45,7 @@ import Fetcher from "../../services/Fetcher";
     }
 })
 export default class ConsentFormWrapper extends Vue {
-    pCourseUser: CourseUser | undefined = undefined;
+    pCourseUser: ICourseUser | undefined = undefined;
     pCourseCode: string | undefined = undefined;
     pResponse: boolean | undefined = undefined;
     pConsentForm: IConsentForm | undefined = undefined;
@@ -64,7 +64,7 @@ export default class ConsentFormWrapper extends Vue {
         this.$router.push({ "name": "profile" });
     }
 
-    updateCourseUser(user: CourseUser) {
+    updateCourseUser(user: ICourseUser) {
         this.pCourseCode = user.course.courseCode;
         this.pCourseUser = user;
     }
