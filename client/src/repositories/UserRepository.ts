@@ -111,20 +111,21 @@ const makeUser = () => {
 };
 
 let _courseCode = "";
-const _hasConsentedMap: Map<string, boolean> = new Map<string, boolean>();
+const _userConsentMap: Map<string, boolean | undefined> = new Map<string, boolean | undefined>();
 export default class UserRepository {
     static userHasConsentedForCourse(): Promise<boolean> {
-        if (_hasConsentedMap.has(_courseCode)) {
-            return Promise.resolve(_hasConsentedMap.get(_courseCode)!);
+        if (_userConsentMap.has(_courseCode)) {
+            return Promise.resolve(_userConsentMap.get(_courseCode) !== undefined);
         } else {
-            return apiFetch<boolean>(`/users/has_consented/`)
+            return apiFetch<boolean | undefined>(`/users/consent/`)
                 .then(x => {
-                    if (typeof x !== "boolean") {
-                        x = false;
+                    if (x !== undefined && typeof x !== "boolean") {
+                        x = undefined;
                     }
 
-                    _hasConsentedMap.set(_courseCode, x);
-                    return x;
+                    _userConsentMap.set(_courseCode, x);
+
+                    return x !== undefined;
                 });
         }
     }
@@ -137,8 +138,19 @@ export default class UserRepository {
         return apiFetch<IConsentForm>(`/users/consent_form/`);
     }
 
-    static getUserConsentFormResponse(): Promise<string> {
-        return apiFetch<string>(`/users/consent/`);
+    static getUserConsentFormResponse(): Promise<boolean | undefined> {
+        const cachedUserConsent = _userConsentMap.get(_courseCode);
+        if (cachedUserConsent !== undefined) {
+            return Promise.resolve(cachedUserConsent);
+        }
+
+        return apiFetch<boolean | undefined>(`/users/consent/`)
+            .then(x => {
+                if (x === undefined || typeof x == "boolean") {
+                    return x;
+                }
+                return undefined;
+            });
     }
 
 
@@ -233,14 +245,6 @@ export default class UserRepository {
         });
     }
 
-    static getCurrentCourse(courseCode: string) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(courseCode);
-            }, Math.random() * 1000);
-        });
-    }
-
     static setCurrentToken(token: string) {
         setToken(token);
     }
@@ -291,8 +295,9 @@ export default class UserRepository {
         });
     }
 
-    static sendConsent(response: boolean): Promise<string> {
-        return apiFetch<{response: string}>(`/users/consent/`, {
+    static sendConsent(response: boolean): Promise<boolean> {
+        _userConsentMap.set(_courseCode, response);
+        return apiFetch<{response: boolean}>(`/users/consent/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -301,7 +306,6 @@ export default class UserRepository {
             body: JSON.stringify({ "response": response })
         })
             .then(function(x) {
-                _hasConsentedMap.set(_courseCode, true);
                 return x.response;
             });
     }

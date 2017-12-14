@@ -51,8 +51,7 @@ def user_courses(course_user):
 
 
 def update_course(course_user, new_data):
-    if course_user is None or new_data is None \
-            or not course_user or not new_data:
+    if not course_user or not new_data:
         return {"error": "Course user and update data must be provided"}
     course_information = new_data.get("course", {})
     topics = new_data.get("topics", None)
@@ -88,7 +87,9 @@ def update_course(course_user, new_data):
             course.end = datetime.fromtimestamp(int(end), timezone.utc)
         else:
             return {"error": "Given end timestamp is not valid: " + str(end)}
-    course.available = available
+    # Important to check for None, since available is boolean
+    if available is not None:
+        course.available = available
 
     course.save()
     original_topics = course.topic_set.all()
@@ -236,9 +237,9 @@ def consent_service(user, request):
             )
             c.save()
             if response:
-                return {"data": {"response": "Accepted"}}
+                return {"data": {"response": True }}
             else:
-                return {"data": {"response": "Declined"}}
+                return {"data": {"response": False }}
         else:
             return {"error": "No answer proivded"}
     else:
