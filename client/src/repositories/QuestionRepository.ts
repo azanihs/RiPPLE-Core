@@ -27,10 +27,13 @@ function toQuestion(x: IQuestion): IQuestion {
 
 export default class QuestionRepository {
     static uploadQuestion(question: IQuestionUpload, path: string): Promise<IQuestion> {
-        console.log(path);
         return apiPost<{question: IQuestion}>(path, question)
             .then(x => x.question)
             .then(response => toQuestion(response));
+    }
+
+    static deleteQuestion(id: number) {
+        return apiFetch<{}>(`/questions/delete/${id}/`);
     }
 
     static search(sortField: string | undefined,

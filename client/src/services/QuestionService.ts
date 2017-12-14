@@ -66,4 +66,8 @@ export default class QuestionService {
     static setSearchCacheForCourse(search: ISearch) {
         return UserRepository.setSearchCacheForCourse(search);
     }
+
+    static deleteQuestion(id: number) {
+        return QuestionRepository.deleteQuestion(id);
+    }
 }
