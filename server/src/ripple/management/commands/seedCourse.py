@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
-from users.models import Course, User, CourseUser, Engagement
+from users.models import Course, User, CourseUser, Engagement, ConsentForm
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr

@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { CourseUser, ConsentForm } from "../../interfaces/models";
+import { ICourseUser, IConsentForm } from "../../interfaces/models";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -56,15 +56,15 @@ import { addEventsToQueue } from "../../util";
 export default class ConsentView extends Vue {
     pCourseCode = "";
 
-    pCourseUser: CourseUser | undefined = undefined;
+    pCourseUser: ICourseUser | undefined = undefined;
     pPreviousAuthor: string | undefined = undefined;
 
-    pConsentForm: ConsentForm | undefined = undefined;
+    pConsentForm: IConsentForm | undefined = undefined;
 
     uploadDone = false;
     pDisabled = false;
 
-    updateCourseUser(user: CourseUser) {
+    updateCourseUser(user: ICourseUser) {
         if (user.roles.indexOf("Instructor") == -1) {
             this.$router.push("../error/403");
         }
@@ -73,7 +73,7 @@ export default class ConsentView extends Vue {
         this.pCourseUser = user;
     }
 
-    setConsentForm(consentForm: ConsentForm | undefined) {
+    setConsentForm(consentForm: IConsentForm | undefined) {
         if (consentForm !== undefined && consentForm.text) {
             this.pPreviousAuthor = consentForm.author.user.name;
             this.pConsentForm = consentForm;
@@ -97,7 +97,7 @@ export default class ConsentView extends Vue {
         return this.pConsentForm;
     }
 
-    set consentForm(newConsentForm: ConsentForm | undefined) {
+    set consentForm(newConsentForm: IConsentForm | undefined) {
         this.pConsentForm = newConsentForm;
     }
 

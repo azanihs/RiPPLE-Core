@@ -294,7 +294,18 @@ export default class Question extends Vue {
     }
 
     reportQuestion() {
-        this.reasonsUsed.push(this.reason);
+        if (this.reason.length > 0) {
+            this.reasonsUsed.push(this.reason);
+        }
+        if (this.reasonsUsed.length == 0) {
+            addEventsToQueue([{
+                id: -4,
+                name: "Not enough reasons",
+                description: "You must provide at least one reason.",
+                icon: "error"
+            }]);
+            return;
+        }
         QuestionService.reportQuestion(this.question.id, this.reasonsUsed)
             .then(_ => {
                 addEventsToQueue([{

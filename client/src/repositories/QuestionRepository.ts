@@ -1,6 +1,6 @@
 import { apiFetch, apiPost } from "./APIRepository";
 import { IQuestion, IQuestionUpload, IDistractor, INetworkResponse,
-    IReportQuestion, IReasonList } from "../interfaces/models";
+    IReportQuestion, IReasonList, IReport, IServerReportFull } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type ISearchResult = { items: IQuestion[], searchResult: any, totalItems: number, page: number };
@@ -74,6 +74,10 @@ export default class QuestionRepository {
         return apiPost<INetworkResponse>("/questions/report/", { questionReport });
     }
 
+    static getReportedQuestions(sortField: string, sortOrder: "ASC" | "DESC") {
+        return apiFetch<IReport[]>(`/questions/report/all/${sortField}/${sortOrder}/`);
+    }
+
     static getQuestionById(questionId: number) {
         return apiFetch<IQuestion>(`/questions/id/${questionId}/`)
             .then(toQuestion);
@@ -83,12 +87,16 @@ export default class QuestionRepository {
     }
 
     static getReportReasons() {
-        return apiFetch<IReasonList>("/questions/reasons/", {
+        return apiFetch<IReasonList>("/questions/report/reasons/", {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "Application/json"
             })
         }).then(x => x.reasonList);
+    }
+
+    static getReportAggregates() {
+        return apiFetch<IServerReportFull[]>(`/questions/report/all/`);
     }
 }

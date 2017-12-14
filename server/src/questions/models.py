@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 from django.db import models
 from users.models import Course, CourseUser
 from datetime import datetime
+import pytz as timezone
+
+_epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 
 class Topic(models.Model):
@@ -130,14 +133,35 @@ class ReportReason(models.Model):
     course = models.ForeignKey(Course)
 
 class ReportQuestion(models.Model):
-    time = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     question = models.ForeignKey(Question)
     user = models.ForeignKey(CourseUser)
+
+    def toJSON(self):
+        return {
+            "id": self.question.id,
+            "author": self.user.toJSON(),
+            "createdAt": (self.created_at.replace(tzinfo=timezone.utc) - _epoch).total_seconds(),
+            "reasons": [x.toJSON() for x in ReportQuestionList.objects.filter(report_question=self)]
+        }
+
+    def toJSON_summary(self):
+        return {
+            "createdAt":(self.created_at.replace(tzinfo=timezone.utc) - _epoch).total_seconds(),
+            "author": self.user.user.first_name+" "+self.user.user.last_name,
+            "reasons": [x.toJSON() for x in ReportQuestionList.objects.filter(report_question=self)]
+        }
 
 class ReportQuestionList(models.Model):
     report_reason = models.ForeignKey(ReportReason)
     report_question = models.ForeignKey(ReportQuestion)
     reason_text = models.TextField()
+
+    def toJSON(self):
+        return {
+            "reportReason": self.report_reason.reason,
+            "reasonText": self.reason_text
+        }
 
 

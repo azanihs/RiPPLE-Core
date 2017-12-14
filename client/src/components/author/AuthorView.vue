@@ -70,8 +70,9 @@
                         </md-card>
                     </md-layout>
                 </md-tab>
-                <md-tab :md-label="prevLabel" :md-disabled="prevDisabled"
-                    :md-tooltip="prevTooltip">
+                <md-tab
+                    :md-label="prevLabel"
+                    :md-disabled="prevDisabled">
                         <question v-if="questionPrev" :question="questionPrev"
                             :preview="true"
                             :showSpeedDial="false"
@@ -148,7 +149,7 @@ h3 {
 
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { ITopic, IQuestionBuilder, IQuestion, IDistractor } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
@@ -171,7 +172,21 @@ import Question from "../questions/Question.vue";
 export default class AuthorView extends Vue {
 
     pTopics: ITopic[] = [];
-    question: IQuestionBuilder = {
+    @Prop question = p<IQuestionBuilder>({
+        default: () => ({
+            content: "",
+            explanation: "",
+            responses: {
+                A: "",
+                B: "",
+                C: "",
+                D: ""
+            },
+            correctIndex: "",
+            topics: []
+        })
+    });
+    /* = {
         content: "",
         explanation: "",
         responses: {
@@ -182,7 +197,7 @@ export default class AuthorView extends Vue {
         },
         correctIndex: "",
         topics: []
-    };
+    };*/
 
     uploadDone = false;
     correctQuestion = "";

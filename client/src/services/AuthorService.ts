@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { IQuestionUpload, IAuthorResponse, IQuestionBuilder, ITopic } from "../interfaces/models";
-=======
-import { QuestionUpload, QuestionBuilder, Topic } from "../interfaces/models";
->>>>>>> ripple-#211
+import { IQuestionUpload, IQuestionBuilder, ITopic } from "../interfaces/models";
 
 import ImageService from "./ImageService";
 import QuestionRepository from "../repositories/QuestionRepository";

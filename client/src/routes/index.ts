@@ -4,6 +4,7 @@ import Main from "../Main.vue";
 
 import AdminView from "../components/admin/AdminView.vue";
 import ConsentView from "../components/admin/Consent.vue";
+import ReportedQuestions from "../components/admin/ReportedQuestions.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
 import QuestionWrapper from "../components/questions/QuestionWrapper.vue";
@@ -19,6 +20,7 @@ import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
 import PeerView from "../components/peers/PeerView.vue";
 import LeaderBoard from "../components/leaderboard/LeaderBoard.vue";
 import AuthorView from "../components/author/AuthorView.vue";
+import AuthorWrapper from "../components/author/AuthorWrapper.vue";
 
 import WIP from "../components/WIP.vue";
 import UserRepository from "../repositories/UserRepository";
@@ -74,6 +76,11 @@ const routes = [{
         name: "create",
         component: AuthorView
     }, {
+        path: "/question/edit/:id",
+        name: "edit",
+        component: AuthorWrapper,
+        props: true
+    }, {
         path: "/view/friends",
         name: "friends",
         component: FriendView
@@ -98,6 +105,10 @@ const routes = [{
         name: "consent",
         component: ConsentView
     }, {
+        path: "/admin/reported",
+        name: "reported",
+        component: ReportedQuestions
+    }, {
         path: "/error/403",
         name: "errorPermission",
         component: ErrorPermission
@@ -111,8 +122,6 @@ const routes = [{
 const router = new VueRouter({
     routes
 });
-<<<<<<< HEAD
-=======
 
 export default router;
 
@@ -129,4 +138,3 @@ router.beforeEach((to, _from, next) => {
             });
     }
 });
->>>>>>> ripple-#211
