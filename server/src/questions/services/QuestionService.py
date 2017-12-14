@@ -1,14 +1,18 @@
 import random
 import math
 import numpy as np
+import pytz as timezone
+from datetime import datetime
 
-from django.db.models import Count, Min
+from django.db.models import Count, Min, Max
 
 from ripple.util import util
 from users.models import CourseUser, Token, User
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList
 from questions.services import CompetencyService
+
+_epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
@@ -311,37 +315,7 @@ def report_question(user, request):
             reason_text = r
         )
         report_reason.save()
-
-
     return {}
-
-def get_reports(user):
-    #if not util.is_administrator(user):
-    #    return {"error": "User does not have administrative permission for current context"}
-    course = user.course
-    report_questions = ReportQuestion.objects \
-        .filter(user__in=CourseUser.objects.filter(course=course))
-
-    report_JSON = {"reported": {}}
-    for q in report_questions:
-        report_JSON["reported"][q.question_id] = {}
-        report_JSON["reported"][q.question_id]["author"] = \
-            q.user.user.first_name + " " + q.user.user.last_name
-        report_JSON["reported"][q.question_id]["reasons"] = {}
-
-        for r in get_reason_list(user)["reasonList"]:
-            report_JSON["reported"][q.question_id]["reasons"][r] = False
-
-        report_reasons = ReportQuestionList.objects \
-            .filter(report_question=q)
-        for r in report_reasons:
-            if r.reason_text in get_reason_list(user)["reasonList"]:
-                report_JSON["reported"][q.question_id]["reasons"][r.reason_text] = True
-            else:
-                report_JSON["reported"][q.question_id]["reasons"]["Custom"] = r.reason_text
-
-    return report_JSON
-
 
 def get_reason_list(user):
     course = user.course
@@ -349,3 +323,34 @@ def get_reason_list(user):
     r_list = [r.reason for r in reasons if r.reason != "custom"]
     return {"reasonList": r_list}
 
+def report_aggregate(user):
+    #if not util.is_administrator(user):
+    #    return {"error": "User does not have administrative permission for current context"}
+    course = user.course
+    report_questions = ReportQuestion.objects \
+        .filter(user__in=CourseUser.objects.filter(course=course))
+
+    report_aggregates = report_questions.values("question")\
+            .annotate(total=Count("question")).annotate(last_report=Max("created_at")).order_by("-total")
+    reports = []
+    for q in report_aggregates:
+        reports.append({
+            "questionID": q["question"],
+            "totalReports": q["total"],
+            "lastReport": (q["last_report"].replace(tzinfo=timezone.utc) - _epoch).total_seconds()
+        })
+    return reports
+
+def all_reports(user):
+    reports = []
+    aggregates = report_aggregate(user)
+    reports.append(aggregates)
+    for rep in aggregates:
+        qid = rep["questionID"]
+        q_reports = ReportQuestion.objects.filter(question=qid).order_by("-id")
+        report_list = []
+        for r in q_reports:
+            report_list.append(r.toJSON_summary())
+        reports.append(report_list)
+    reports = {"reports": reports}
+    return reports

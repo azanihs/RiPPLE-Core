@@ -86,16 +86,27 @@ const makeUser = () => {
     return user;
 };
 
-let _courseCode = "";
+const _defaultSearch = () => ({
+    sortField: "",
+    sortDesc: false,
+    filterField: "All Questions",
+    query: "",
+    page: 0,
+    filterTopics: []
+});
+
+const _searchCaches: Map<string, ISearch> = new Map<string, ISearch>();
+let _currentCourse: string = "";
+
 const _hasConsentedMap: Map<string, boolean> = new Map<string, boolean>();
 export default class UserRepository {
     static userHasConsentedForCourse(): Promise<boolean> {
-        if (_hasConsentedMap.has(_courseCode)) {
-            return Promise.resolve(_hasConsentedMap.get(_courseCode)!);
+        if (_hasConsentedMap.has(_currentCourse)) {
+            return Promise.resolve(_hasConsentedMap.get(_currentCourse)!);
         } else {
             return apiFetch<boolean>(`/users/has_consented/`)
                 .then(x => {
-                    _hasConsentedMap.set(_courseCode, x);
+                    _hasConsentedMap.set(_currentCourse, x);
                     return x;
                 });
         }
@@ -222,7 +233,6 @@ export default class UserRepository {
     static authenticate(courseCode?: string): Promise<void> {
         return apiFetch<{token: string, courseCode: string}>(`/users/login/${courseCode || " "}`)
             .then(x => {
-                _courseCode = x.courseCode;
                 setToken(x.token);
                 _currentCourse = x.courseCode;
             });
@@ -273,7 +283,7 @@ export default class UserRepository {
             body: JSON.stringify({ "response": response })
         })
             .then(function(x) {
-                _hasConsentedMap.set(_courseCode, true);
+                _hasConsentedMap.set(_currentCourse, true);
                 return x.response;
             });
     }

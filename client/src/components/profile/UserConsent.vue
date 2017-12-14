@@ -36,7 +36,7 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
 
-import { CourseUser, ConsentForm } from "../../interfaces/models";
+import { ICourseUser, IConsentForm } from "../../interfaces/models";
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 import { addEventsToQueue } from "../../util";
@@ -52,9 +52,9 @@ export default class UserConsentView extends Vue {
 
     pResponse: string | undefined = undefined;
 
-    pCourseUser: CourseUser | undefined = undefined;
+    pCourseUser: ICourseUser | undefined = undefined;
 
-    pConsentForm: ConsentForm | undefined = undefined;
+    pConsentForm: IConsentForm | undefined = undefined;
 
     get courseCode() {
         return this.pCourseCode;
@@ -76,12 +76,12 @@ export default class UserConsentView extends Vue {
         return this.pResponse && this.pResponse !== undefined;
     }
 
-    updateCourseUser(user: CourseUser) {
+    updateCourseUser(user: ICourseUser) {
         this.pCourseCode = user.course.courseCode;
         this.pCourseUser = user;
     }
 
-    setConsentForm(consentForm: ConsentForm | undefined) {
+    setConsentForm(consentForm: IConsentForm | undefined) {
         if (consentForm !== undefined && consentForm.text) {
             this.pConsentForm = consentForm;
         } else {

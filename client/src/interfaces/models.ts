@@ -48,6 +48,40 @@ export interface IReportQuestion {
     reason: string[]
 };
 
+export interface IServerReportAggregate {
+    questionID: number,
+    totalReports: number,
+    lastReport: number
+}
+
+export interface IServerReport {
+    author: string,
+    createdAt: number,
+    reasons: IServerReason[]
+}
+
+export interface IServerReason {
+    reasonText: string,
+    reportReason: string
+}
+
+export interface IServerReportFull {
+    reports: (IServerReportAggregate | IServerReport)[][]
+    [key: number]: (IServerReportAggregate | IServerReport)[]
+}
+
+export interface IReportAggregate {
+    questionID: number,
+    totalReports: number,
+    lastReport: string
+}
+
+export interface IReport {
+    createdAt: string,
+    author: string,
+    reason: string
+}
+
 export interface IReasonList {
     reasonList: string[]
 }
@@ -83,14 +117,14 @@ export interface ICourseUser {
 
 export interface IConsentForm {
     text: string,
-    author: CourseUser,
+    author: ICourseUser,
 
     error?: string
 };
 
 export interface IConsentUpload {
-    text: AuthorResponse,
-    author: CourseUser
+    text: IAuthorResponse,
+    author: ICourseUser
 };
 
 export interface IPeerConnection {

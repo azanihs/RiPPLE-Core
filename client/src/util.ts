@@ -49,6 +49,9 @@ export function getLinks(): ILink[] {
         }, {
             text: "Consent Form",
             href: "/admin/consent"
+        }, {
+            text: "Reported Questions",
+            href: "/admin/reported"
         }]
     };
     const leaderLink: ILink = {
@@ -90,4 +93,19 @@ export function addEventsToQueue(items: INotification[]) {
 
 export function getBus() {
     return _bus;
+}
+
+export function serverToLocal(UTCTimestamp: number) {
+    const date = new Date(0);
+    date.setUTCSeconds(UTCTimestamp);
+
+    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+}
+
+export function localToUTC(date?: string) {
+    if (date === undefined) return undefined;
+
+    const [year, month, day] = date.split("-");
+    // Convert to UTC and from milliseconds to seconds
+    return Date.UTC(+year, +month, +day) / 1000;
 }

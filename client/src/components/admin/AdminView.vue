@@ -67,7 +67,7 @@
                     class="md-primary"
                     @click="closeDialog()">Close</md-button>
                 <md-button class="md-primary"
-                    @click="saveCourseInformation()">{{courseIsAvailable ? "Upadte" : "Create"}}</md-button>
+                    @click="saveCourseInformation()">{{courseIsAvailable ? "Update" : "Create"}}</md-button>
             </md-dialog-actions>
         </md-dialog>
     </md-layout>
@@ -89,6 +89,7 @@ import { IUserSummary, IUser, ICourse, ICourseUser, ITopic } from "../../interfa
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
+import { serverToLocal, localToUTC } from "../../util";
 
 import LeaderBoard from "../leaderboard/LeaderBoard.vue";
 import TopicChip from "../util/TopicChip.vue";
@@ -134,10 +135,10 @@ export default class AdminView extends Vue {
         }
 
         if (this.pCourse.start) {
-            this.teachingStart = this.serverToLocal(this.pCourse.start);
+            this.teachingStart = serverToLocal(this.pCourse.start);
         }
         if (this.pCourse.end) {
-            this.teachingEnd = this.serverToLocal(this.pCourse.end);
+            this.teachingEnd = serverToLocal(this.pCourse.end);
         }
     }
 
@@ -211,22 +212,6 @@ export default class AdminView extends Vue {
         }
     };
 
-    localToUTC(date?: string) {
-        if (date === undefined) return undefined;
-
-        const [year, month, day] = date.split("-");
-        // Convert to UTC and from milliseconds to seconds
-        return Date.UTC(+year, +month, +day) / 1000;
-    }
-
-    serverToLocal(UTCTimestamp: number) {
-        const date = new Date(0);
-        date.setUTCSeconds(UTCTimestamp);
-
-        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-    }
-
-
     closeDialog() {
         (this.$refs[_MODAL_NAME] as any).close();
     }
@@ -240,8 +225,8 @@ export default class AdminView extends Vue {
             course: {
                 courseCode: this.pCourseCode,
                 courseName: this.pCourse.courseName,
-                start: this.localToUTC(this.teachingStart),
-                end: this.localToUTC(this.teachingEnd),
+                start: localToUTC(this.teachingStart),
+                end: localToUTC(this.teachingEnd),
                 available: true
             },
             topics: this.topics

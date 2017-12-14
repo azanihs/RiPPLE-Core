@@ -319,6 +319,8 @@ def get_consent_form(user):
         return {"error": "No consent form for this course"}
 
 def has_consented_course(user):
+    if util.is_administrator(user):
+        return {"data": True}
     form = get_form(user)
     if form:
         consent = Consent.objects.filter(form=form, user=user)

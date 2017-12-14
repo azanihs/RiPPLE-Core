@@ -238,21 +238,15 @@ def report(request):
     user = UserService.logged_in_user(request)
     return JsonResponse({"data": QuestionService.report_question(user, post_request)})
 
-def getReports(request):
-    if request.method != 'POST':
-        return JsonResponse({
-            "error": "Must use POST to this endpoint"
-        }, status=405)
-
-    post_request = loads(request.body.decode("utf-8"))
+def all_reports(request):
     user = UserService.logged_in_user(request)
-    page=post_request.get("page", None)
 
-    result = QuestionService.get_reports(user)
-    if result["error"]:
+    result = QuestionService.all_reports(user)
+    if type(result) != list and result.get("error", None) is not None:
         return JsonResponse(result)
     else:
         return JsonResponse({"data": result})
+
 
 def get_reasons(request):
     if request.method != 'POST':

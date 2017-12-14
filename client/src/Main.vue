@@ -256,7 +256,7 @@ export default class Main extends Vue {
         }
         if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
             links.splice(profileLinkIndex, 1);
-            this.$router.push("admin");
+            this.$router.push("/admin");
             this.toggleSubmenu(links[adminLinkIndex]);
         } else {
             // Is student

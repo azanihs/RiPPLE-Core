@@ -1,5 +1,5 @@
 import { blobFetch } from "../repositories/APIRepository";
-import { AuthorResponse } from "../interfaces/models";
+import { IAuthorResponse } from "../interfaces/models";
 
 interface ConvertedFile {
     file: string,
@@ -66,7 +66,7 @@ export default class ImageService {
         input.dispatchEvent(clickEvent);
     }
 
-    static extractImagesFromDOM(body: string): Promise<AuthorResponse> {
+    static extractImagesFromDOM(body: string): Promise<IAuthorResponse> {
         // Extracts the base64 strings from all image tags in the provided HTMLBodyElement
         // Assigns them ID's to identify image tags with their respective content
         // Returns this object representation ready for server upload
