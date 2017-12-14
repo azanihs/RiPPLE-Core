@@ -32,8 +32,6 @@ export default class TinyMCE extends Vue {
                 if (this.value != undefined) {
                     tinymce.get(this.id).setContent(this.value);
                 }
-
-                // this.$emit("input", this.value);
             });
         };
 

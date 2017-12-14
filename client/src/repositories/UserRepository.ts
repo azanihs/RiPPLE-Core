@@ -1,6 +1,6 @@
 import {
-    ICourseUser, IUser, ICourse, ISearch,
-    INotification, ITopic, IPeerConnection, IEdge, IUserSummary, IEngagementType, IConsentForm
+    ICourseUser, IUser, ICourse, INotification, ITopic, IPeerConnection, ISearch,
+    IEdge, IUserSummary, IEngagementType, IConsentForm, IConsentUpload
 } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 import { setToken, apiFetch, apiPost } from "./APIRepository";
@@ -96,18 +96,22 @@ const _defaultSearch = () => ({
 });
 
 const _searchCaches: Map<string, ISearch> = new Map<string, ISearch>();
-let _currentCourse: string = "";
-
-const _hasConsentedMap: Map<string, boolean> = new Map<string, boolean>();
+let _currentCourse = "";
+const _userConsentMap: Map<string, boolean | undefined> = new Map<string, boolean | undefined>();
 export default class UserRepository {
     static userHasConsentedForCourse(): Promise<boolean> {
-        if (_hasConsentedMap.has(_currentCourse)) {
-            return Promise.resolve(_hasConsentedMap.get(_currentCourse)!);
+        if (_userConsentMap.has(_currentCourse)) {
+            return Promise.resolve(_userConsentMap.get(_currentCourse) !== undefined);
         } else {
-            return apiFetch<boolean>(`/users/has_consented/`)
+            return apiFetch<boolean | undefined>(`/users/consent/`)
                 .then(x => {
-                    _hasConsentedMap.set(_currentCourse, x);
-                    return x;
+                    if (x !== undefined && typeof x !== "boolean") {
+                        x = undefined;
+                    }
+
+                    _userConsentMap.set(_currentCourse, x);
+
+                    return x !== undefined;
                 });
         }
     }
@@ -117,7 +121,22 @@ export default class UserRepository {
     }
 
     static getConsentForm(): Promise<IConsentForm> {
-        return apiFetch<IConsentForm>(`/users/consent_form`);
+        return apiFetch<IConsentForm>(`/users/consent_form/`);
+    }
+
+    static getUserConsentFormResponse(): Promise<boolean | undefined> {
+        const cachedUserConsent = _userConsentMap.get(_currentCourse);
+        if (cachedUserConsent !== undefined) {
+            return Promise.resolve(cachedUserConsent);
+        }
+
+        return apiFetch<boolean | undefined>(`/users/consent/`)
+            .then(x => {
+                if (x === undefined || typeof x == "boolean") {
+                    return x;
+                }
+                return undefined;
+            });
     }
 
     static getUserCourses(): Promise<ICourse[]> {
@@ -218,14 +237,6 @@ export default class UserRepository {
         });
     }
 
-    static getCurrentCourse(courseCode: string) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(courseCode);
-            }, Math.random() * 1000);
-        });
-    }
-
     static setCurrentToken(token: string) {
         setToken(token);
     }
@@ -261,20 +272,20 @@ export default class UserRepository {
         });
     }
 
-    static uploadConsentForm(consentForm: IConsentForm): Promise<IConsentForm> {
-        return apiFetch<{consentForm: IConsentForm}>(`/users/submit_consent_form/`, {
+    static uploadConsentForm(consentForm: IConsentUpload): Promise<string> {
+        return apiFetch<string>(`/users/submit_consent_form/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
                 "Content-Type": "application/json"
             }),
             body: JSON.stringify(consentForm)
-        })
-            .then(x => x.consentForm);
+        });
     }
 
-    static sendConsent(response: boolean): Promise<string> {
-        return apiFetch<{response: string}>(`/users/consent/`, {
+    static sendConsent(response: boolean): Promise<boolean> {
+        _userConsentMap.set(_currentCourse, response);
+        return apiFetch<{response: boolean}>(`/users/consent/`, {
             method: "POST",
             headers: new Headers({
                 "Accept": "application/json",
@@ -283,7 +294,6 @@ export default class UserRepository {
             body: JSON.stringify({ "response": response })
         })
             .then(function(x) {
-                _hasConsentedMap.set(_currentCourse, true);
                 return x.response;
             });
     }

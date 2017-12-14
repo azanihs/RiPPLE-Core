@@ -77,17 +77,9 @@ def image_update(request):
             "error": "Missing image payload"
         }, status=405)
 
-    def _format(x):
-        if len(x) == 0: return x
-        return (x + "/") if x[-1] != "/" else x
-
     course_user = UserService.logged_in_user(request)
 
-    root_path = util.merge_url_parts([
-        _format("//" + request.get_host()),
-        _format(settings.FORCE_SCRIPT_NAME),
-        _format("static")
-    ])
+    root_path = util.generate_static_path(request.get_host())
 
     return JsonResponse({
         "data":UserService.update_user_image(course_user.user, root_path, new_image)
@@ -123,7 +115,7 @@ def get_all_notifications(request):
         n.sent = True
         data.append(n.toJSON())
 
-    return JsonResponse({"data":data})
+    return JsonResponse({"data": data })
 
 def engagement(request):
     user = UserService.logged_in_user(request)
@@ -142,13 +134,17 @@ def engagement_aggregate(request, compare_type):
 
 def consent(request):
     user = UserService.logged_in_user(request)
-    post_request = loads(request.body.decode("utf-8"))
-    return JsonResponse(UserService.consent_service(user, post_request))
+    if request.method == 'POST':
+        post_request = loads(request.body.decode("utf-8"))
+        return JsonResponse(UserService.consent_service(user, post_request))
+    else:
+        return JsonResponse(UserService.get_user_consent(user))
+
 
 def submit_consent_form(request):
     user = UserService.logged_in_user(request)
     post_request = loads(request.body.decode("utf-8"))
-    return JsonResponse(UserService.update_consent_form(user, post_request))
+    return JsonResponse(UserService.update_consent_form(user, post_request, request.get_host()))
 
 def consent_form(request):
     user = UserService.logged_in_user(request)

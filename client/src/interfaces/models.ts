@@ -116,14 +116,14 @@ export interface ICourseUser {
 };
 
 export interface IConsentForm {
-    text: string,
+    content: string,
     author: ICourseUser,
 
     error?: string
 };
 
 export interface IConsentUpload {
-    text: IAuthorResponse,
+    payload?: IAuthorResponse | undefined,
     author: ICourseUser
 };
 

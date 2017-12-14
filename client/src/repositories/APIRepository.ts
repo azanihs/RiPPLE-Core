@@ -64,9 +64,8 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             }
 
             if (x.error) {
-                // TODO: Handle global things
                 addEventsToQueue([{
-                    id: performance.now(),
+                    id: -10,
                     icon: "error",
                     name: `Server Error`,
                     description: `${x.error}`

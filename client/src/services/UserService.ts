@@ -1,4 +1,4 @@
-import { ITopic, IEdge, ICourse, ICompareSet, IConsentForm } from "../interfaces/models";
+import { ITopic, IEdge, ICourse, ICompareSet, IConsentForm, IConsentUpload } from "../interfaces/models";
 import UserRepository from "../repositories/UserRepository";
 import TopicRepository from "../repositories/TopicRepository";
 import ImageService from "./ImageService";
@@ -32,7 +32,7 @@ export default class UserService {
         const validators: IValidate[] = [{
             message: "Consent text cannot be empty",
             validateFunction: ImageService.domIsNotEmpty,
-            args: consentForm.text
+            args: consentForm.content
         }];
         for (let i = 0; i < validators.length; ++i) {
             const entry = validators[i];
@@ -43,19 +43,20 @@ export default class UserService {
         return "";
     }
 
-    static prepareConsentUpload(consentForm: IConsentForm) {
-        const upload: IConsentForm = {
-            text: "undefined",
+    static prepareConsentUpload(consentForm: IConsentForm): Promise<IConsentUpload> {
+        const upload: IConsentUpload = {
+            payload: undefined,
             author: consentForm.author
         };
 
-        return ImageService.extractImagesFromDOM(consentForm.text)
+        return ImageService.extractImagesFromDOM(consentForm.content)
             .then(consentContent => {
-                upload.text = consentContent.content;
-            }).then(() => upload);
+                upload.payload = consentContent;
+            })
+            .then(() => upload);
     }
 
-    static uploadContent(upload: IConsentForm) {
+    static uploadContent(upload: IConsentUpload) {
         return UserRepository.uploadConsentForm(upload);
     }
 
@@ -125,6 +126,9 @@ export default class UserService {
 
     static getConsentForm() {
         return UserRepository.getConsentForm();
+    }
+    static getUserConsentFormResponse() {
+        return UserRepository.getUserConsentFormResponse();
     }
 
     static getAllAvailableCategories() {

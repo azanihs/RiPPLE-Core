@@ -6,6 +6,7 @@ from questions.models import Question, Distractor, QuestionImage, ExplanationIma
 import bleach
 from questions.allowed_tags import allowed_tags, allowed_attributes, allowed_styles
 
+from ripple.util import util
 
 def add_question(question_request, host, user):
     explanation = question_request.get("explanation", None)
@@ -47,7 +48,7 @@ def add_question(question_request, host, user):
             # Question Images
             images = question.get("payloads", None)
             if images:
-                decodeImages(str(questionObj.id), questionObj, question_content, images, "q", host)
+                util.extract_image_from_html(str(questionObj.id), questionObj, images, "q", host)
             else:
                 questionObj.content = cleanContent(question_content)
                 questionObj.save()
@@ -55,7 +56,7 @@ def add_question(question_request, host, user):
             # Explanation Images
             images = explanation.get("payloads", None)
             if images:
-                decodeImages(str(questionObj.id), questionObj, explanation_content, images, "e", host)
+                util.extract_image_from_html(str(questionObj.id), questionObj, images, "e", host)
             else:
                 questionObj.explanation = cleanContent(explanation_content)
                 questionObj.save()
@@ -91,7 +92,7 @@ def add_question(question_request, host, user):
                 # Distractor Images
                 images = responses[i].get("payloads", None)
                 if images:
-                    decodeImages(str(distractor.id), distractor, distractor_content, images, "d", host)
+                    util.extract_image_from_html(str(distractor.id), distractor, images, "d", host)
                 else:
                     distractor.content = cleanContent(distractor_content)
                     distractor.save()
@@ -100,51 +101,6 @@ def add_question(question_request, host, user):
     except Exception as e:
         return {"state": "Error", "error": str(e)}
     return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
-
-
-def decodeImages(image_id, obj, content, images, image_type, host):
-    # type q=question, d=distractor, e=explanation
-    urls = []
-    database_image_types = {
-        "q": QuestionImage,
-        "d": DistractorImage,
-        "e": ExplanationImage
-    }
-    ImageToSaveClass = database_image_types.get(image_type, None)
-
-    for i, image in images.items():
-        contentfile_image = util.save_image(image, image_id)
-        if contentfile_image is None:
-            raise IntegrityError("Image is not of valid type")
-
-        # Question + Explanation in the same object
-        if image_type == "q" or image_type == "e":
-            new_image = ImageToSaveClass.objects.create(question=obj, image=contentfile_image)
-        else:
-            new_image = ImageToSaveClass.objects.create(distractor=obj, image=contentfile_image)
-        urls.append(new_image.image.name)
-
-    if image_type == "e":
-        obj.explanation = cleanContent(newSource(urls, content, host))
-    else:
-        obj.content = cleanContent(newSource(urls, content, host))
-
-    obj.save()
-    return True
-
-
-def newSource(urls, content, host):
-    soup = BeautifulSoup(content, "html.parser")
-
-    images = soup.find_all('img')
-    for i in range(0, len(urls)):
-        if urls[i] is None:
-            continue
-        images[i]['src'] = "//" + host + urls[i]
-        images[i]['src'] = util.merge_url_parts([host, urls[i]])
-    immediate_children = soup.findChildren(recursive=False)
-    return ''.join([str(x) for x in immediate_children])
-
 
 def cleanContent(content):
     cleaned = bleach.clean(content, tags = allowed_tags + bleach.sanitizer.ALLOWED_TAGS,
