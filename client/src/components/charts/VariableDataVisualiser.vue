@@ -446,7 +446,7 @@ export default class VariableDataVisualiser extends Vue {
         return this.pChartData;
     }
 
-    zeroCompetency(topic: Topic) {
+    zeroCompetency(topic: ITopic) {
         if (this.pChartData == undefined || this.pChartData.data == undefined) {
             // const zero = { data: this.pChartData.data,
                 // class: "gray-out" };

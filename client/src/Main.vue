@@ -259,8 +259,8 @@ export default class Main extends Vue {
     });
 
     courseRoles: string[] = [];
-    pUser: User | undefined = undefined;
-    pCourse: Course| undefined = undefined;
+    pUser: IUser | undefined = undefined;
+    pCourse: ICourse| undefined = undefined;
     pMenuLinks: ILink[] = getLinks();
 
     menuIcon = "menu";
