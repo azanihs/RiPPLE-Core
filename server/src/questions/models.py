@@ -57,6 +57,41 @@ class Question(models.Model):
             "distractors": [x.toJSON() for x in self.distractor_set.all()]
         }
 
+class DeletedQuestion(models.Model):
+    content = models.TextField()
+    explanation = models.TextField()
+    difficulty = models.FloatField()
+    quality = models.FloatField()
+    difficultyCount = models.IntegerField()
+    qualityCount = models.IntegerField()
+
+    created_time = models.DateTimeField(auto_now_add=True)
+
+    topics = models.ManyToManyField(Topic)
+    author = models.ForeignKey(CourseUser)
+    active_question = models.ForeignKey(Question)
+
+    def __str__(self):
+        return self.content[:20]
+
+    def toJSON(self):
+        responses = QuestionResponse.objects.filter(response_id__in=self.distractor_set.all())\
+            .values('user_id').distinct().count()
+
+        return {
+            "id": self.id,
+            "content": self.content,
+            "explanation": self.explanation,
+            "difficulty": self.difficulty,
+            "quality": self.quality,
+            "difficultyCount": self.difficultyCount,
+            "qualityCount": self.qualityCount,
+            "topics": [x.toJSON() for x in self.topics.all()],
+            "responses": [],
+            "responseCount": responses,
+            "distractors": [x.toJSON() for x in self.distractor_set.all()]
+        }
+
 
 class Distractor(models.Model):
     content = models.TextField()

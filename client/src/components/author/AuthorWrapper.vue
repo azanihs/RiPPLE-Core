@@ -1,7 +1,41 @@
 <template>
-    <author-view v-if="question" :question="question"></author-view>
+    <md-layout v-if="question" class="flex-vertical">
+        <span class="flex-card">
+            <action-buttons>
+                <md-button
+                    class="primary-colour"
+                    slot="centreRight">
+                    <span>Save Question</span>
+                </md-button>
+                <md-button
+                    class="md-warn"
+                    slot="right">
+                    <span>Delete Question</span>
+                </md-button>
+            </action-buttons>
+        </span>
+        <author-view :question="question" :id="this.id"></author-view>
+    </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
 </template>
+
+<style scoped>
+.flex-vertical {
+    display:flex;
+    flex-direction: column;
+}
+.flex-card {
+    flex-grow:0;
+    flex-basis:0;
+}
+.border {
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+.primary-colour {
+    color:#256
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
@@ -10,11 +44,13 @@ import QuestionService from "../../services/QuestionService";
 import PageLoader from "../util/PageLoader.vue";
 import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
+import ActionButtons from "../util/ActionButtons.vue";
 
 @Component({
     components: {
         AuthorView,
-        PageLoader
+        PageLoader,
+        ActionButtons
     }
 })
 
@@ -28,6 +64,9 @@ export default class AuthorWrapper extends Vue {
     updateQuestion() {
         QuestionService.getQuestionById(this.id)
             .then((question: IQuestion | undefined) => {
+                if (question && question.canEdit !== undefined && question.canEdit) {
+                    this.$router.push(`/error/403`);
+                }
                 this.pQuestion = this.questionToBuilder(question);
             });
     }
@@ -64,7 +103,6 @@ export default class AuthorWrapper extends Vue {
     created() {
         this.updateQuestion();
     }
-
 
 }
 </script>

@@ -8,12 +8,11 @@ from questions.allowed_tags import allowed_tags, allowed_attributes, allowed_sty
 
 from ripple.util import util
 
-def add_question(question_request, host, user):
+def add_question(question_request, host, user, question_obj=None):
     explanation = question_request.get("explanation", None)
     question = question_request.get("question", None)
     responses = question_request.get("responses", None)
     topics = question_request.get("topics", None)
-
     if explanation is None or question is None or responses is None or topics is None:
         return {"state": "Error", "error": "Invalid Question"}
     for i in ["A", "B", "C", "D"]:
@@ -29,43 +28,39 @@ def add_question(question_request, host, user):
         return {"state": "Error", "error": "Explanation content is blank"}
 
     # Cleans question and explanation content before saving as Question
-    questionObj = Question(
-    content="",
-    explanation="",
-    difficulty=0,
-    quality=0,
-    difficultyCount=0,
-    qualityCount=0,
-    author=user
-    )
-    if (util.verify_content(questionObj.content) and util.verify_content(questionObj.explanation)):
-        questionObj.save()
-    else:
-        # INVALID CONTENT
-        return {"state": "Error", "error": "Invalid Question"}
+    if question_obj is None:
+        question_obj = Question(
+        content="",
+        explanation="",
+        difficulty=0,
+        quality=0,
+        difficultyCount=0,
+        qualityCount=0,
+        author=user
+        )
     try:
         with transaction.atomic():
             # Question Images
             images = question.get("payloads", None)
             if images:
-                util.extract_image_from_html(str(questionObj.id), questionObj, images, "q", host)
+                util.extract_image_from_html(str(question_obj.id), question_obj, images, "q", host)
             else:
-                questionObj.content = cleanContent(question_content)
-                questionObj.save()
+                question_obj.content = cleanContent(question_content)
+                question_obj.save()
 
             # Explanation Images
             images = explanation.get("payloads", None)
             if images:
-                util.extract_image_from_html(str(questionObj.id), questionObj, images, "e", host)
+                util.extract_image_from_html(str(question_obj.id), question_obj, images, "e", host)
             else:
-                questionObj.explanation = cleanContent(explanation_content)
-                questionObj.save()
+                question_obj.explanation = cleanContent(explanation_content)
+                question_obj.save()
 
             # Topics
             topicList = []
             for i in topics:
                 topicList.append(i.get("id", None))
-            questionObj.topics = topicList
+            question_obj.topics = topicList
 
             # Distractors
             _response_choices = ["A", "B", "C", "D"]
@@ -81,14 +76,8 @@ def add_question(question_request, host, user):
                     content="",
                     isCorrect=responses[i].get("isCorrect", None),
                     response=i,
-                    question=questionObj
+                    question=question_obj
                 )
-
-                if util.verify_content(distractor.content):
-                    distractor.save()
-                else:
-                    raise IntegrityError("Invalid Distractor")
-
                 # Distractor Images
                 images = responses[i].get("payloads", None)
                 if images:
@@ -100,7 +89,7 @@ def add_question(question_request, host, user):
         return {"state": "Error", "error": str(e)}
     except Exception as e:
         return {"state": "Error", "error": str(e)}
-    return {"state": "Question Added", "question": Question.objects.get(pk=questionObj.id).toJSON()}
+    return {"state": "Question Added", "question": Question.objects.get(pk=question_obj.id).toJSON()}
 
 def cleanContent(content):
     cleaned = bleach.clean(content, tags = allowed_tags + bleach.sanitizer.ALLOWED_TAGS,
