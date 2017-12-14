@@ -59,7 +59,7 @@ def update_course(course_user, new_data):
         return {"error": "Course must have topics"}
     for t in topics:
         if not t.get("name", None):
-            return {"error": 
+            return {"error":
                 "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
     course_code = course_information.get("courseCode", None)
@@ -131,7 +131,7 @@ def _process_competencies(competencies):
         if comp.confidence < threshold:
             continue
 
-        # Only use two topics. 
+        # Only use two topics.
         nodes = comp.topics.all()
         if not(len(nodes) > 0 and len(nodes) <= 2):
             continue
@@ -150,7 +150,7 @@ def user_competencies(user):
     try:
         return _process_competencies(Competency.objects.filter(user=user))
     except TypeError:
-        return[] 
+        return[]
 
 def aggregate_competencies(user, compare_type):
     if user is None or compare_type is None:
@@ -179,8 +179,7 @@ def insert_user_if_not_exists(user):
     try:
         return User.objects.get(user_id=user.get("user_id"))
     except User.DoesNotExist:
-        if user.get("first_name", None) is None or user.get("last_name", None) is None \
-                or user.get("image", None) is None:
+        if user.get("first_name", None) is None or user.get("last_name", None) is None:
             return {"error": "Invalid User Provided"}
         return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image="")
 

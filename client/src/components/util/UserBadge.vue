@@ -80,6 +80,10 @@
     border: 0.3em solid #256;
 }
 
+.obtained .md-spinner {
+    width: 0px !important;
+}
+
 .badgeContainer:not(.obtained).progress, .badgeContainer:not(.obtained):hover {
     color: #256;
 }

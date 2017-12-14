@@ -39,6 +39,10 @@
                         <md-ink-ripple></md-ink-ripple>
                     </router-link>
                     <div v-if="link == currentlyOpenMenu || (link.submenu && link.submenu.indexOf(currentlyOpenMenu) >= 0)">
+                        <transition-group name="slide" tag="ul"
+                            appear
+                            appear-class="slide-appear-class"
+                            appear-active-class="slide-appear-active-class">
                             <li v-for="submenuLink in link.submenu"
                                 :key="submenuLink.href">
                                 <router-link :to="submenuLink.href"
@@ -47,7 +51,7 @@
                                     <span>{{ submenuLink.text }}</span>
                                 </router-link>
                             </li>
-                        </div>
+                        </transition-group>
                     </div>
                 </li>
             </ul>
@@ -74,6 +78,19 @@
     justify-content: flex-end;
     z-index: 2;
 }
+
+
+.slide-appear-active-class{
+    opacity: 1;
+    max-height: 36px;
+    transition: all 0.4s;
+}
+
+.slide-appear-class {
+    opacity: 0;
+    max-height: 0px;
+}
+
 
 .dimOverlay {
     position:fixed;
@@ -267,7 +284,22 @@ export default class Main extends Vue {
     };
 
     get links() {
-        return this.pMenuLinks;
+        const _linkCopy = this.pMenuLinks.slice();
+        // Fix links
+        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
+            const profileLinkIndex = _linkCopy.findIndex(x => x.text == "Profile");
+            if (profileLinkIndex >= 0) {
+                _linkCopy.splice(profileLinkIndex, 1);
+            }
+            this.$router.push("/admin");
+        } else {
+            const adminLinkIndex = _linkCopy.findIndex(x => x.text == "Admin");
+            if (adminLinkIndex >= 0) {
+                _linkCopy.splice(adminLinkIndex, 1);
+            }
+        }
+
+        return _linkCopy;
     }
 
     get pageSize() {
@@ -313,21 +345,6 @@ export default class Main extends Vue {
 
     @Lifecycle
     created() {
-        // Fix links
-        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
-            const profileLinkIndex = this.pMenuLinks.findIndex(x => x.href == "/");
-            if (profileLinkIndex >= 0) {
-                this.pMenuLinks.splice(profileLinkIndex, 1);
-                this.$router.push("admin");
-            }
-        } else {
-            const adminLinkIndex = this.pMenuLinks.findIndex(x => x.href == "/admin");
-            if (adminLinkIndex >= 0) {
-                this.pMenuLinks.splice(adminLinkIndex, 1);
-            }
-        }
-
-        this.currentlyOpenMenu = this.pMenuLinks[0];
         Fetcher.get(UserService.getLoggedInUser)
             .on(this.updateCourseUser);
     }
