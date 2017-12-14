@@ -366,18 +366,8 @@ def delete_question(user, qid):
         question = Question.objects.get(id=qid)
         if (util.is_administrator(user) or user == question.author):
             with transaction.atomic():
-                deleted = DeletedQuestion(
-                    content = question.content,
-                    explanation = question.explanation,
-                    quality = question.quality,
-                    difficultyCount = quesiton.difficultyCount,
-                    qualityCount = question.qualityCount,
-                    created_time = question.created_time,
-                    topics = question.topics,
-                    author = question.author,
-                    active_question = question
-                )
-                deleted.save()
+                deleted = make_deleted_question(question)
+                deleted.topics.set(question.topics.all())
             return {}
         else:
             return {"error": "Permission Denied"}
@@ -392,18 +382,7 @@ def update_question(post_request, root_path, user, qid):
         question = Question.objects.get(id=qid)
         if (util.is_administrator(user) or user == question.author):
             with transaction.atomic():
-                deleted = DeletedQuestion(
-                    content = question.content,
-                    explanation = question.explanation,
-                    difficulty = question.difficulty,
-                    quality = question.quality,
-                    difficultyCount = question.difficultyCount,
-                    qualityCount = question.qualityCount,
-                    created_time = question.created_time,
-                    author = question.author,
-                    active_question = question
-                )
-                deleted.save()
+                deleted = make_deleted_question(question)
                 deleted.topics.set(question.topics.all())
                 return AuthorService.add_question(post_request, root_path, user, question)
         else:
@@ -412,3 +391,16 @@ def update_question(post_request, root_path, user, qid):
         return {"state": "Error", "error": "Question does not exist"}
     except IntegrityError as e:
         return {"state": "Error", "error": str(e)}
+
+def make_deleted_question(question):
+    return DeletedQuestion(
+        content = question.content,
+        explanation = question.explanation,
+        difficulty = question.difficulty,
+        quality = question.quality,
+        difficultyCount = question.difficultyCount,
+        qualityCount = question.qualityCount,
+        created_time = question.created_time,
+        author = question.author,
+        active_question = question
+    ).save()
