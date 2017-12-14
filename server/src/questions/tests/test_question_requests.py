@@ -37,7 +37,7 @@ class QuestionRequestTest(BootstrapTestCase):
             response = AuthorService.add_question(invalid_question, "/", author)
             self.assertEqual(response["state"], "Error")
             self.assertEqual(response["error"], "Invalid Question")
-        
+
         invalid_question = self._bootstrap_question_request()
         distractor = next(iter(invalid_question["responses"]))
         invalid_question["responses"][distractor] = None
@@ -51,7 +51,7 @@ class QuestionRequestTest(BootstrapTestCase):
         user = self._bootstrap_user(1)
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
-        
+
         attributes = ["question", "explanation"]
 
         script_tag = "<script> evil code </script>"
@@ -62,15 +62,15 @@ class QuestionRequestTest(BootstrapTestCase):
             response = AuthorService.add_question(unsafe_question, "/", author)
             self.assertEqual(response["state"], "Error")
             self.assertEqual(response["error"], "Invalid Question")
-        
+
         unsafe_question = self._bootstrap_question_request()
         key = next(iter(unsafe_question["responses"]))
         unsafe_question["responses"][key]["content"] = script_tag
         response = AuthorService.add_question(unsafe_question, "/", author)
         self.assertEqual(response["state"], "Error")
         self.assertEqual(response["error"], "Invalid Distractor")
-     
- 
+
+
     def test_question_with_valid_image(self):
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)
@@ -85,7 +85,7 @@ class QuestionRequestTest(BootstrapTestCase):
         util.save_image = MagicMock(return_value = 1)
         QuestionImage.objects.create = MagicMock(return_value = test)
         image_question["question"]["content"] = "<img src = 'test'>"
-        AuthorService.newSource = MagicMock(return_value = True)
+        util.update_image_sources = MagicMock(return_value = True)
         response = AuthorService.add_question(image_question, "/", author)
         self.assertEqual(response["state"], "Question Added")
         self.assertEqual(response["question"], Question.objects.all()[0].toJSON())
@@ -109,7 +109,7 @@ class QuestionRequestTest(BootstrapTestCase):
         author = CourseUser.objects.create(user=user, course=course)
         self._bootstrap_topics(course)
         image_question = self._bootstrap_question_request()
-        
+
         util.save_image = MagicMock(return_value=None)
 
         image_question["question"]["payloads"] = {"0": "data:image/jpeg;base64,..."}
@@ -120,13 +120,14 @@ class QuestionRequestTest(BootstrapTestCase):
 
     def test_new_source(self):
         urls = ["test"]
-        content = "<img src='test'>"
-        host="/here/asfd/"
-        result = AuthorService.newSource(urls, content, host)
+        content = "<img src='#:0'>"
+        host = "/here/asfd/"
+        result = util.update_image_sources(urls, content, host)
         self.assertTrue(urls[0] in result and host in result)
 
-        urls = ["test", None]
-        result = AuthorService.newSource(urls, content, host)
+        content = "<img src='#:0' /><img src='//url_not_to_replace/' /><img src='#:1' />"
+        urls = ["test", "test_2"]
+        result = util.update_image_sources(urls, content, host)
         self.assertTrue(urls[0] in result and host in result)
 
     def test_empty_content(self):
@@ -142,7 +143,7 @@ class QuestionRequestTest(BootstrapTestCase):
         self.assertEqual(response["error"], "Invalid Question")
 
 
-    @patch("questions.services.AuthorService.decodeImages")
+    @patch("ripple.util.util.extract_image_from_html")
     def test_general_exception_raised(self, mock_class):
         course = self._bootstrap_courses(1)
         user = self._bootstrap_user(1)

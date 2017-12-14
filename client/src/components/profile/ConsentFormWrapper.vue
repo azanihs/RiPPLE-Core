@@ -1,15 +1,31 @@
 <template>
-    <consent-form v-if="consentForm" @change="updateUserConsent" :consentForm="consentForm" :courseCode="courseCode" :response="response"></consent-form>
-    <md-layout md-flex="100" md-gutter v-else>
-        <md-card>
-            Your course instructor has not set up a consent form for your course.
-            You will be unable to use this tool until the consent form is set up.
-        </md-card>
+    <md-layout md-flex="100" md-gutter>
+        <consent-form class="hoistAboveOverlay" v-if="consentForm" @change="updateUserConsent" :consentForm="consentForm" :courseCode="courseCode" :response="response"></consent-form>
+        <md-layout md-class="hoistAboveOverlay" flex="100" md-gutter v-else>
+            <md-card>
+                Your course instructor has not set up a consent form for your course.
+                You will be unable to use this tool until the consent form is set up.
+            </md-card>
+        </md-layout>
+        <div v-if="response === undefined" class="overlay"></div>
     </md-layout>
 </template>
 
 <style scoped>
-
+.hoistAboveOverlay {
+    z-index: 2;
+    margin-top: 8px;
+}
+.overlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: #333;
+    opacity: 0.25;
+}
 </style>
 
 <script lang="ts">
@@ -31,18 +47,20 @@ import Fetcher from "../../services/Fetcher";
 export default class ConsentFormWrapper extends Vue {
     pCourseUser: CourseUser | undefined = undefined;
     pCourseCode: string | undefined = undefined;
-    pResponse: string | undefined = undefined;
+    pResponse: boolean | undefined = undefined;
     pConsentForm: IConsentForm | undefined = undefined;
 
-    updateUserConsent(newConsent: string) {
+    updateUserConsent(newConsent: boolean) {
         this.updateConsentResponse(newConsent);
+        UserService.sendConsent(newConsent);
 
         addEventsToQueue([{
             id: -6,
             name: "Consent Altered",
-            description: "Response is now: " + newConsent,
+            description: "Response is now: " + (newConsent == true ? "Accepted" : "Declined"),
             icon: "cached"
         }]);
+
         this.$router.push({ "name": "profile" });
     }
 
@@ -59,7 +77,7 @@ export default class ConsentFormWrapper extends Vue {
         }
     }
 
-    updateConsentResponse(newResponse: string) {
+    updateConsentResponse(newResponse: boolean | undefined) {
         this.pResponse = newResponse;
     }
 
@@ -69,8 +87,10 @@ export default class ConsentFormWrapper extends Vue {
             .on(this.updateCourseUser);
         Fetcher.get(UserService.getConsentForm)
             .on(this.setConsentForm);
-        Fetcher.get(UserService.getUserConsentFormResponse)
-            .on(this.updateConsentResponse);
+
+        // Don't subscribe to this queue; since we are the ones managing it
+        UserService.getUserConsentFormResponse()
+            .then(x => this.updateConsentResponse(x));
     }
 
     @Lifecycle
@@ -79,8 +99,6 @@ export default class ConsentFormWrapper extends Vue {
             .off(this.updateCourseUser);
         Fetcher.get(UserService.getConsentForm)
             .off(this.setConsentForm);
-        Fetcher.get(UserService.getUserConsentFormResponse)
-            .off(this.updateConsentResponse);
     }
 
     get courseCode() {
