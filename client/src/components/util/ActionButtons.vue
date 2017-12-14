@@ -36,7 +36,7 @@ hr {
 .buttonContainer {
     width: 100%;
     justify-content: space-between;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
 }
 
 .right {

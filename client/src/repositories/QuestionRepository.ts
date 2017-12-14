@@ -10,7 +10,6 @@ function toQuestion(x: IQuestion): IQuestion {
     if (solution === undefined) {
         throw new Error(`Question id: ${x.id} does not have a solution`);
     }
-    console.log(x.canEdit);
     const question: IQuestion = {
         id: x.id,
         difficulty: Math.round(x.difficulty),
@@ -23,7 +22,6 @@ function toQuestion(x: IQuestion): IQuestion {
         responseCount: x.responseCount,
         canEdit: x.canEdit
     };
-    console.log(question.canEdit);
     return question;
 }
 
