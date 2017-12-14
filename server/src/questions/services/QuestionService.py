@@ -368,7 +368,8 @@ def delete_question(user, qid):
             with transaction.atomic():
                 deleted = make_deleted_question(question)
                 deleted.topics.set(question.topics.all())
-            return {}
+                question.delete()
+            return {"data": {}}
         else:
             return {"error": "Permission Denied"}
     except Question.DoesNotExist:
@@ -393,7 +394,7 @@ def update_question(post_request, root_path, user, qid):
         return {"state": "Error", "error": str(e)}
 
 def make_deleted_question(question):
-    return DeletedQuestion(
+    d_question = DeletedQuestion(
         content = question.content,
         explanation = question.explanation,
         difficulty = question.difficulty,
@@ -403,4 +404,6 @@ def make_deleted_question(question):
         created_time = question.created_time,
         author = question.author,
         active_question = question
-    ).save()
+    )
+    d_question.save()
+    return d_question

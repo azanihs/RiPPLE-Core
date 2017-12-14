@@ -50,7 +50,7 @@ def add(request):
     if not v[0]:
         return v[1]
 
-    b, root_path, post_request = v
+    root_path, post_request = v
 
     response = AuthorService.add_question(
         post_request, root_path, UserService.logged_in_user(request))
@@ -62,7 +62,7 @@ def update(request, qid):
     if not val[0]:
         return val[1]
 
-    b, root_path, post_request = val
+    root_path, post_request = val
 
     response = QuestionService.update_question(
         post_request, root_path, UserService.logged_in_user(request), qid)
@@ -70,13 +70,8 @@ def update(request, qid):
     return validate_response(response)
 
 def delete(request, qid):
-    if request.method != 'POST':
-        return JsonResponse({
-            "error": "Must use POST to this endpoint"
-        }, status=405)
-
     user = UserService.logged_in_user(request)
-    QuestionService.delete_question(user, qid)
+    return JsonResponse(QuestionService.delete_question(user, qid))
 
 def respond(request):
     if request.method != 'POST':

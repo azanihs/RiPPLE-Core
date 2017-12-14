@@ -194,7 +194,9 @@ export default class AuthorView extends Vue {
     correctQuestion = "";
     networkMessage = "";
     uploadProgress = 0;
-    path = "/questions/add/"
+    path = "/questions/add/";
+    messageTitle = "Added Question";
+    message = "Successfully added question";
 
     prevDisabled = true;
     prevLabel: string = "Please fill out all question fields to see preview";
@@ -349,10 +351,18 @@ export default class AuthorView extends Vue {
             this.disabled = true;
             if (this.id >= 0) {
                 this.path = "/questions/update/"+this.id+"/";
+                this.messageTitle = "Updated Question";
+                this.message = "Successfully updated question";
             }
             AuthorService.prepareUpload(this.question)
                 .then(preparedUpload => AuthorService.uploadContent(preparedUpload, this.path))
                 .then(response => {
+                    addEventsToQueue([{
+                        id: -8,
+                        name: this.messageTitle,
+                        description: this.message,
+                        icon: "done"
+                    }]);
                     this.$router.push(`/question/id/${response.id}`);
                 });
         }

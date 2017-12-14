@@ -4,17 +4,19 @@
             <action-buttons>
                 <md-button
                     class="primary-colour"
-                    slot="centreRight">
+                    slot="centreRight"
+                    @click="saveQuestion">
                     <span>Save Question</span>
                 </md-button>
                 <md-button
                     class="md-warn"
-                    slot="right">
+                    slot="right"
+                    @click="deleteQuestion">
                     <span>Delete Question</span>
                 </md-button>
             </action-buttons>
         </span>
-        <author-view :question="question" :id="this.id"></author-view>
+        <author-view ref="authView" :question="question" :id="this.id"></author-view>
     </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
 </template>
@@ -45,6 +47,7 @@ import PageLoader from "../util/PageLoader.vue";
 import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
 import ActionButtons from "../util/ActionButtons.vue";
+import { addEventsToQueue } from "../../util";
 
 @Component({
     components: {
@@ -102,6 +105,26 @@ export default class AuthorWrapper extends Vue {
     @Lifecycle
     created() {
         this.updateQuestion();
+    }
+
+    saveQuestion() {
+        let aView: AuthorView = <AuthorView> this.$refs.authView;
+        aView.validateUpload();
+    }
+
+    deleteQuestion() {
+        QuestionService.deleteQuestion(this.id)
+            .then(() => {
+                addEventsToQueue([{
+                    id: -7,
+                    name: "Question Deleted",
+                    description: "Successfully deleted question",
+                    icon: "done"
+                }]);
+            })
+            .then(() => {
+                this.$router.go(-1);
+            });
     }
 
 }
