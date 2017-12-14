@@ -241,7 +241,7 @@ class Command(BaseCommand):
 
             print("\t-Adding Consent Form")
             form = ConsentForm (
-                text="Testing consent form",
+                content="Testing consent form",
                 author=course_users[0]
             )
             form.save()
