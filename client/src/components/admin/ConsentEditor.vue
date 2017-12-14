@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { CourseUser, IConsentForm } from "../../interfaces/models";
+import { ICourseUser, IConsentForm } from "../../interfaces/models";
 
 import { getDefaultConsentForm } from "../../util";
 
@@ -73,7 +73,7 @@ import ConsentForm from "../profile/ConsentForm.vue";
 export default class ConsentEditor extends Vue {
     pCourseCode = "";
 
-    pCourseUser: CourseUser | undefined = undefined;
+    pCourseUser: ICourseUser | undefined = undefined;
     pPreviousAuthor: string | undefined = undefined;
 
     pConsentForm: IConsentForm | undefined = undefined;
@@ -83,7 +83,7 @@ export default class ConsentEditor extends Vue {
     uploadDone = false;
     pDisabled = false;
 
-    updateCourseUser(user: CourseUser) {
+    updateCourseUser(user: ICourseUser) {
         if (user.roles.indexOf("Instructor") == -1) {
             this.$router.push("../error/403");
         }
