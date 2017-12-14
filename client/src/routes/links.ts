@@ -38,6 +38,9 @@ export function getLinks(): ILink[] {
         }, {
             text: "Consent Form",
             href: "/admin/consent"
+        }, {
+            text: "Reported Questions",
+            href: "/admin/reported"
         }]
     };
     const leaderLink: ILink = {
