@@ -197,7 +197,6 @@ const _MODAL_NAME = "report_question_modal";
 
 @Component({
     components: {
-        ActionButtons,
         QuestionRater,
         QuestionResponse,
         QuestionDetails,
