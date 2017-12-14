@@ -6,6 +6,7 @@ import AdminView from "../components/admin/AdminView.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
 import Overview from "../components/profile/Overview.vue";
+import Question from "../components/questions/Question.vue";
 import AchievementsView from "../components/profile/Achievements.vue";
 import CompetenciesView from "../components/profile/Competencies.vue";
 import ConnectionsView from "../components/profile/Connections.vue";
@@ -30,6 +31,10 @@ const routes = [{
         initCourseCode: x.query.course_code
     }),
     children: [{
+        path: "/question/id/:id",
+        props: true,
+        component: Question
+    }, {
         path: "/",
         name: "overview",
         component: Overview

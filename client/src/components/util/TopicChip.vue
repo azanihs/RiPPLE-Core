@@ -40,6 +40,10 @@ a.topicChipLink:hover {
     transition: 500ms ease background-color;
     cursor: pointer;
 }
+.md-chip.topicChip:hover {
+    background-color: #256;
+    color: #f2f2f2;
+}
 
 .selected.md-chip.topicChip {
     background-color: #256;
@@ -54,6 +58,12 @@ a.topicChipLink:hover {
 .disabled.md-chip.topicChip {
     color: #333;
 }
+.disabled.md-chip.topicChip:hover {
+    background-color: #fff;
+    color: #222;
+}
+
+
 
 </style>
 

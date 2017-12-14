@@ -6,35 +6,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const Dotenv = require("dotenv-webpack");
 
-const extractCSS = new ExtractTextPlugin("[name].[contenthash].css");
-const cssAutoprefixer = require("autoprefixer");
 var webpackConfig = merge(baseWebpackConfig, {
-    module: {
-        rules: [{
-            test: /\.css$/,
-            use: extractCSS.extract({
-                use: ["css-loader"],
-                fallback: "style-loader"
-            })
-        }, {
-            test: /\.vue$/,
-            loader: "vue-loader",
-            options: {
-                esModule: true,
-                loaders: {
-                    css: extractCSS.extract({
-                        use: "css-loader",
-                        fallback: "vue-style-loader"
-                    })
-                },
-                postcss: [
-                    cssAutoprefixer({
-                        browsers: ["last 2 versions"]
-                    })
-                ]
-            }
-        }]
-    },
     devtool: "#source-map",
     output: {
         path: path.resolve(__dirname, '../dist'),
@@ -42,7 +14,6 @@ var webpackConfig = merge(baseWebpackConfig, {
         chunkFilename: "static/js/[id].[chunkhash].js"
     },
     plugins: [
-        extractCSS,
         // http://vuejs.github.io/vue-loader/en/workflow/production.html
         new Dotenv({
             path: "./.env.prod",

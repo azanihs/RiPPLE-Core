@@ -25,7 +25,7 @@
             <div>
                 <topic-chip v-for="topic in question.topics"
                             :key="topic.id"
-                            linkTo="/view/questions">
+                            :disabled="true">
                     {{topic.name}}
                 </topic-chip>
             </div>
@@ -56,7 +56,7 @@ hr {
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
-import { Question } from "../../interfaces/models";
+import { IQuestion } from "../../interfaces/models";
 import TopicChip from "../util/TopicChip.vue";
 
 @Component({
@@ -65,9 +65,9 @@ import TopicChip from "../util/TopicChip.vue";
     }
 })
 export default class QuestionDetails extends Vue {
-    @Prop question = p({
+    @Prop question = p<IQuestion>({
         required: true
-    }) as Question;
+    });
 
 
     get starIcons(): string[] {

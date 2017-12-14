@@ -1,57 +1,37 @@
-import { Availability, CourseAvailability, Day, Time, AvailableRole, StudyRole } from "../interfaces/models";
-import { apiFetch } from "./APIRepository";
+import { IAvailability, ICourseAvailability, IDay, ITime, IAvailableRole, IStudyRole } from "../interfaces/models";
+import { apiFetch, apiPost } from "./APIRepository";
 
 export default class AvailabilityRepository {
 
-    static getUTCTimeSlots(): Promise<Time[]> {
-        return apiFetch<Time[]>("/recommendations/availability/times/");
+    static getUTCTimeSlots(): Promise<ITime[]> {
+        return apiFetch<ITime[]>("/recommendations/availability/times/");
     }
 
-    static getCourseAvailability(): Promise<CourseAvailability[]> {
-        return apiFetch<CourseAvailability[]>("/recommendations/availability/all/");
+    static getCourseAvailability(): Promise<ICourseAvailability[]> {
+        return apiFetch<ICourseAvailability[]>("/recommendations/availability/all/");
     }
 
-    static getDays(): Promise<Day[]> {
-        return apiFetch<Day[]>("/recommendations/availability/days/");
+    static getDays(): Promise<IDay[]> {
+        return apiFetch<IDay[]>("/recommendations/availability/days/");
     }
 
-    static getUserAvailability(): Promise<Availability[]> {
-        return apiFetch<Availability[]>("/recommendations/availability/");
+    static getUserAvailability(): Promise<IAvailability[]> {
+        return apiFetch<IAvailability[]>("/recommendations/availability/");
     }
 
-    static updateUserAvailability(day: number, time: number): Promise<Availability> {
-        return apiFetch<Availability>(`/recommendations/availability/update/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                day: day,
-                time: time
-            })
-        });
+    static updateUserAvailability(day: number, time: number): Promise<IAvailability> {
+        return apiPost<IAvailability>(`/recommendations/availability/update/`, { day, time });
     }
 
-    static getStudyRoles(): Promise<StudyRole[]> {
-        return apiFetch<StudyRole[]>("/recommendations/roles/all/");
+    static getStudyRoles(): Promise<IStudyRole[]> {
+        return apiFetch<IStudyRole[]>("/recommendations/roles/all/");
     }
 
-    static getUserAvailableRoles(): Promise<AvailableRole[]> {
-        return apiFetch<AvailableRole[]>("/recommendations/roles/");
+    static getUserAvailableRoles(): Promise<IAvailableRole[]> {
+        return apiFetch<IAvailableRole[]>("/recommendations/roles/");
     }
 
-    static updateUserRoles(topic: number, studyRole: number): Promise<AvailableRole> {
-        return apiFetch<AvailableRole>(`/recommendations/roles/update/`, {
-            method: "POST",
-            headers: new Headers({
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
-                topic: topic,
-                studyRole: studyRole
-            })
-        });
+    static updateUserRoles(topic: number, studyRole: number): Promise<IAvailableRole> {
+        return apiPost<IAvailableRole>(`/recommendations/roles/update/`, { topic, studyRole });
     }
 }

@@ -1,5 +1,6 @@
 import QuestionRepository from "../repositories/QuestionRepository";
-import { Question, ReportQuestion } from "../interfaces/models";
+import UserRepository from "../repositories/UserRepository";
+import { IQuestion, IReportQuestion, ISearch } from "../interfaces/models";
 
 interface ISearchQuery {
     sortField?: string,
@@ -12,13 +13,13 @@ interface ISearchQuery {
 };
 
 export default class QuestionService {
-    static search(searchQuery: ISearchQuery): Promise<{ questions: Question[], totalItems: number, page: number }> {
+    static search(searchQuery: ISearchQuery): Promise<{ questions: IQuestion[], totalItems: number, page: number }> {
         const { sortField, sortDesc, filterField, filterTopics, query, page, pageSize } = searchQuery;
         return QuestionRepository.search(sortField, sortDesc ? "DESC" : "ASC",
             filterField, filterTopics, query, page, pageSize);
     }
 
-    static distributionForQuestion(question: Question) {
+    static distributionForQuestion(question: IQuestion) {
         return QuestionRepository.getQuestionDistribution(question);
     }
 
@@ -31,12 +32,26 @@ export default class QuestionService {
         return QuestionRepository.submitRating(responseId, rateType, rateValue);
     }
 
-    static reportQuestion(question: Question, reason: string) {
-        const upload: ReportQuestion = {
-            question: question.id,
+    static reportQuestion(questionId: number, reason: string) {
+        const upload: IReportQuestion = {
+            question: questionId,
             reason: reason
         };
         return QuestionRepository.uploadReport(upload);
     }
 
+    static getQuestionById(questionId: number) {
+        return QuestionRepository.getQuestionById(questionId);
+    }
+
+    static getRandomCourseQuestion() {
+        return QuestionRepository.getRandomCourseQuestion();
+    }
+
+    static getSearchCacheForCourse() {
+        return UserRepository.getSearchCacheForCourse();
+    }
+    static setSearchCacheForCourse(search: ISearch) {
+        return UserRepository.setSearchCacheForCourse(search);
+    }
 }

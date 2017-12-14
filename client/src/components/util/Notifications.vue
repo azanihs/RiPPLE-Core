@@ -101,7 +101,7 @@ p + p {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { Notification } from "../../interfaces/models";
+import { INotification } from "../../interfaces/models";
 import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 
 import UserService from "../../services/UserService";
@@ -118,8 +118,8 @@ export default class Notifications extends Vue {
         default: 10
     });
 
-    pNotifications: Notification[] = [];
-    updateNotifications(newNotifications: Notification[]) {
+    pNotifications: INotification[] = [];
+    updateNotifications(newNotifications: INotification[]) {
         this.pNotifications = newNotifications.slice(0, this.showCount);
     };
 

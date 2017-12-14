@@ -1,16 +1,6 @@
 <template>
     <md-layout md-flex="100">
-        <md-layout v-if="serverQuestionResponse" class="viewContainer">
-            <md-layout md-flex="100" class="questionContainer">
-                <question class="question"
-                    :showSpeedDial="false"
-                    @userAnswer="navigateToAnswer"
-                    @newQuestion="navigateToAnswer"
-                    :question="serverQuestionResponse"></question>
-            </md-layout>
-        </md-layout>
         <md-layout md-flex="100"
-            v-if="serverQuestionResponse === undefined"
             class="cardSeparator">
             <md-card>
                 <md-layout md-flex="100"
@@ -32,7 +22,6 @@
             </md-card>
         </md-layout>
         <md-layout md-flex="100"
-            v-if="serverQuestionResponse === undefined"
             class="cardSeparator">
             <md-card class="removePadding">
                 <md-tabs md-fixed
@@ -51,7 +40,6 @@
             </md-card>
         </md-layout>
         <md-layout md-flex="100"
-            v-if="serverQuestionResponse === undefined"
             class="cardSeparator">
             <md-card>
                 <h3>Correct Answer</h3>
@@ -66,7 +54,6 @@
             </md-card>
         </md-layout>
         <md-layout md-flex="100"
-            v-if="serverQuestionResponse === undefined"
             class="cardSeparator">
             <md-card>
                 <md-layout md-flex="100"
@@ -79,7 +66,6 @@
             </md-card>
         </md-layout>
         <md-layout md-flex="100"
-            v-if="serverQuestionResponse === undefined"
             class="rightAlign">
             <div class="uploadContainer cardSeparator">
                 <md-tooltip v-if="!uploadDone"
@@ -144,7 +130,7 @@ h3 {
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { Question as QuestionModel, Topic, QuestionBuilder } from "../../interfaces/models";
+import { ITopic, IQuestionBuilder } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
 import AuthorService from "../../services/AuthorService";
@@ -165,8 +151,8 @@ import Question from "../questions/Question.vue";
 })
 export default class AuthorView extends Vue {
 
-    pTopics: Topic[] = [];
-    question: QuestionBuilder = {
+    pTopics: ITopic[] = [];
+    question: IQuestionBuilder = {
         content: "",
         explanation: "",
         responses: {
@@ -179,13 +165,10 @@ export default class AuthorView extends Vue {
         topics: []
     };
 
-    correctQuestion = "";
-    networkMessage = "";
     uploadDone = false;
     uploadProgress = 0;
 
     pDisabled = false;
-    serverQuestionResponse: QuestionModel | undefined = undefined;
 
     @Lifecycle
     created() {
@@ -214,7 +197,7 @@ export default class AuthorView extends Vue {
         changeEditor(shouldHide ? "readonly" : "design");
     }
 
-    toggleTopic(topicToToggle: Topic) {
+    toggleTopic(topicToToggle: ITopic) {
         const topicIndex = this.question.topics.indexOf(topicToToggle);
         if (topicIndex == -1) {
             this.question.topics.push(topicToToggle);
@@ -223,11 +206,11 @@ export default class AuthorView extends Vue {
         }
     }
 
-    topicIsUsed(topic: Topic) {
+    topicIsUsed(topic: ITopic) {
         return this.question.topics.indexOf(topic) >= 0;
     }
 
-    updateTopics(newTopics: Topic[]) {
+    updateTopics(newTopics: ITopic[]) {
         this.pTopics = newTopics;
     }
 
@@ -303,7 +286,9 @@ export default class AuthorView extends Vue {
             this.disabled = true;
             AuthorService.prepareUpload(this.question)
                 .then(preparedUpload => AuthorService.uploadContent(preparedUpload))
-                .then(response => this.serverQuestionResponse = response);
+                .then(response => {
+                    this.$router.push(`/question/id/${response.id}`);
+                });
         }
     }
 }

@@ -9,5 +9,8 @@ urlpatterns = [
     url(r'^me/image/$', views.image_update, name='image_update'),
     url(r'^me/$', views.me, name='me'),
     url(r'^get_user/(.*)$', views.get_user, name='get_user'),
-    url(r'^achievements/progress/$', views.get_all_user_achievements, name="get_all_user_achievements")
+    url(r'^achievements/progress/$', views.get_all_user_achievements, name="get_all_user_achievements"),
+    url(r'^engagement/$', views.engagement),
+    url(r'^engagement/all/$', views.engagement_all),
+    url(r'^engagement/aggregate/(.*)/$', views.engagement_aggregate),
 ]

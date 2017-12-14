@@ -32,7 +32,7 @@
 <script lang="ts">
 import Graph from "./Graph.vue";
 import { Vue, Component, Prop, p } from "av-ts";
-import { Topic } from "../../interfaces/models";
+import { ITopic } from "../../interfaces/models";
 import { ISimulationNode, ISimulationEdge } from "../../interfaces/chart";
 
 interface IGraphRepresentation {
@@ -51,7 +51,7 @@ export default class GraphComparator extends Vue {
         required: true
     });
 
-    @Prop nodes = p<Topic[]>({
+    @Prop nodes = p<ITopic[]>({
         required: true
     });
 
