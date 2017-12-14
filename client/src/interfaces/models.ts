@@ -29,7 +29,7 @@ export interface IQuestion {
     solution: IDistractor,
     distractors: IDistractor[],
     responseCount: number,
-    canEdit?: boolean | undefined
+    canEdit?: boolean
 };
 
 export interface IDistractor {

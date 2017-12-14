@@ -50,10 +50,6 @@ import { Vue, Component } from "av-ts";
 @Component()
 export default class ActionButtons extends Vue {
 
-    /*@Prop onBack = p<string>({
-        required: true
-    });*/
-
     back() {
         this.$router.go(-1);
     }
