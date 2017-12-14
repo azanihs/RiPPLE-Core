@@ -1,21 +1,5 @@
 <template>
     <md-layout :class="bottomSpaceClass">
-        <md-layout md-hide-xsmall
-                   md-hide-small
-                   md-hide-medium
-                   v-if="showNavBar"
-                   class="questionNavigation">
-            <action-buttons
-                onBack="/question/answer">">
-                <md-button
-                        slot="right"
-                        class="md-warn"
-                        @click="openDialog()">
-                    <span>Report Question</span>
-                    <md-icon>error_outline</md-icon>
-                </md-button>
-            </action-buttons>
-        </md-layout>
         <md-layout md-flex="100">
             <md-layout md-flex="100"
                        class="questionContainer componentSeparator">
@@ -125,11 +109,6 @@
 </style>
 
 <style scoped>
-.questionNavigation {
-    width: 100%;
-    min-width: 100%;
-}
-
 .fade-enter-active {
     transition: opacity 250ms ease;
 }
@@ -137,16 +116,6 @@
 .fade-enter {
     opacity: 0;
 }
-
-.reportButton {
-    margin-left: auto;
-    margin-right: 0px;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    border: 1px solid #eee;
-    width: 100%;
-}
-
 h2 {
     width: 100%;
 }
@@ -186,19 +155,6 @@ h2 {
     flex-direction: row;
 }
 
-.actionContainer {
-    justify-content: flex-end;
-}
-
-.actionButtons {
-    flex: none !important;
-}
-
-.actionButtons .button {
-    margin-top: auto;
-    margin-bottom: auto;
-}
-
 .floatingAction {
     position: fixed !important;
     bottom: 16px !important;
@@ -229,7 +185,6 @@ import { IQuestion } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import QuestionService from "../../services/QuestionService";
 
-import ActionButtons from "../util/ActionButtons.vue";
 import QuestionRater from "./QuestionRater.vue";
 import QuestionDetails from "./QuestionDetails.vue";
 import QuestionResponse from "./QuestionResponse.vue";

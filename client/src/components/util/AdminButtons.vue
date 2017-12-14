@@ -1,5 +1,5 @@
 <template>
-    <span class="flex-card">
+    <md-layout class="buttonContainer">
         <action-buttons>
             <md-button
                 class="primary-colour"
@@ -14,16 +14,17 @@
                 <span>Delete Question</span>
             </md-button>
         </action-buttons>
-    </span>
+    </md-layout>
 </template>
 
 <style scoped>
-.flex-card {
-    flex-grow:0;
-    flex-basis:0;
-}
 .primary-colour {
     color:#256
+}
+.buttonContainer {
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 0.5;
 }
 </style>
 
