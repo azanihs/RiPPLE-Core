@@ -1,21 +1,6 @@
 <template>
     <md-layout v-if="question" class="flex-vertical">
-        <span class="flex-card">
-            <action-buttons>
-                <md-button
-                    class="primary-colour"
-                    slot="centreRight"
-                    @click="saveQuestion">
-                    <span>Save Question</span>
-                </md-button>
-                <md-button
-                    class="md-warn"
-                    slot="right"
-                    @click="deleteQuestion">
-                    <span>Delete Question</span>
-                </md-button>
-            </action-buttons>
-        </span>
+        <admin-buttons></admin-buttons>
         <author-view ref="authView" :question="question" :id="this.id"></author-view>
     </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
@@ -26,17 +11,6 @@
     display:flex;
     flex-direction: column;
 }
-.flex-card {
-    flex-grow:0;
-    flex-basis:0;
-}
-.border {
-    border: none;
-    border-bottom: 1px solid #ddd;
-}
-.primary-colour {
-    color:#256
-}
 </style>
 
 <script lang="ts">
@@ -46,14 +20,14 @@ import QuestionService from "../../services/QuestionService";
 import PageLoader from "../util/PageLoader.vue";
 import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
-import ActionButtons from "../util/ActionButtons.vue";
+import AdminButtons from "../util/AdminButtons.vue";
 import { addEventsToQueue } from "../../util";
 
 @Component({
     components: {
         AuthorView,
         PageLoader,
-        ActionButtons
+        AdminButtons
     }
 })
 
@@ -67,7 +41,7 @@ export default class AuthorWrapper extends Vue {
     updateQuestion() {
         QuestionService.getQuestionById(this.id)
             .then((question: IQuestion | undefined) => {
-                if (question && question.canEdit !== undefined && question.canEdit) {
+                if (question && question.canEdit !== undefined && !question.canEdit) {
                     this.$router.push(`/error/403`);
                 }
                 this.pQuestion = this.questionToBuilder(question);
