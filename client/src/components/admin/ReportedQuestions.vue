@@ -1,5 +1,5 @@
 <template>
-    <md-layout>
+    <md-layout style="flex-grow:1">
         <md-card md-flex="100" class="column">
             <h2>Reported Questions for: {{ pCourseCode }}</h2>
             <md-list>

@@ -25,7 +25,10 @@ export function getBus() {
     return _bus;
 }
 
-export function serverToLocal(UTCTimestamp: number) {
+export function serverToLocal(UTCTimestamp: number | undefined) {
+    if (UTCTimestamp === undefined) {
+        return "";
+    }
     const date = new Date(0);
     date.setUTCSeconds(UTCTimestamp);
 

@@ -1,7 +1,7 @@
 <template>
     <md-layout v-if="question">
         <md-layout class="question-navigation">
-            <admin-buttons v-if="canEdit"></admin-buttons>
+            <admin-buttons v-if="canEdit" :id="id" :canEdit="canEdit"></admin-buttons>
             <action-buttons v-else>
                 <md-button
                         slot="right"

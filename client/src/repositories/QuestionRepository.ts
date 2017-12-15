@@ -20,7 +20,8 @@ function toQuestion(x: IQuestion): IQuestion {
         solution: solution,
         distractors: x.distractors,
         responseCount: x.responseCount,
-        canEdit: x.canEdit
+        canEdit: x.canEdit,
+        createdAt: x.createdAt
     };
     return question;
 }
@@ -34,6 +35,11 @@ export default class QuestionRepository {
 
     static deleteQuestion(id: number) {
         return apiFetch<{}>(`/questions/delete/${id}/`);
+    }
+
+    static getPreviousQuestions(id: number) {
+        return apiFetch<IQuestion[]>(`/questions/previous/${id}/`)
+            .then(questions => questions.map(toQuestion));
     }
 
     static search(sortField: string | undefined,

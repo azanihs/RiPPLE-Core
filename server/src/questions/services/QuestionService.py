@@ -10,7 +10,8 @@ from django.db import IntegrityError, transaction
 from ripple.util import util
 from users.models import CourseUser, Token, User
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
-    Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
+    Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion,\
+    DeletedDistractor
 from questions.services import CompetencyService, AuthorService
 
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
@@ -406,4 +407,36 @@ def make_deleted_question(question):
         active_question = question
     )
     d_question.save()
+
+    for d in question.distractor_set.all():
+        d_distractor = DeletedDistractor(
+            content = d.content,
+            response = d.response,
+            isCorrect = d.isCorrect,
+            question=d_question
+        )
+        d_distractor.save()
+        d.delete()
     return d_question
+
+def previous_versions(user, qid):
+    try:
+        question = Question.objects.get(id=qid)
+        if user.course != question.author.course:
+            return {"error": "Question is not from this course"}
+
+        old_questions = question.deletedquestion_set.all().order_by("-id")
+        question_list = [x.toJSON() for x in old_questions]
+
+        if util.is_administrator(user) or question.author == user:
+           canEdit = True
+        else:
+            canEdit = False
+
+        for q in question_list:
+            q["canEdit"] = canEdit
+
+        return {"data": question_list}
+
+    except Question.DoesNotExist:
+        return{"error": "Question does not exist"}

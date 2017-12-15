@@ -1,15 +1,22 @@
 <template>
-    <md-layout v-if="question" class="flex-vertical">
-        <admin-buttons></admin-buttons>
+    <md-layout v-if="question" class="question-navigation">
+        <admin-buttons :id="id"
+        :canSave="canSave"
+        :prevQuestions="prevQuestions"
+        @saveQuestion="saveQuestion"
+        @version="version"></admin-buttons>
         <author-view ref="authView" :question="question" :id="this.id"></author-view>
+        <div> {{ prevQuestions }} </div>
     </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
 </template>
 
 <style scoped>
-.flex-vertical {
-    display:flex;
+.question-navigation {
+    width: 100%;
+    min-width: 100%;
     flex-direction: column;
+    flex: inherit;
 }
 </style>
 
@@ -21,6 +28,7 @@ import PageLoader from "../util/PageLoader.vue";
 import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
 import AdminButtons from "../util/AdminButtons.vue";
+import { serverToLocal } from "../../util";
 import { addEventsToQueue } from "../../util";
 
 @Component({
@@ -36,7 +44,10 @@ export default class AuthorWrapper extends Vue {
         required: true
     });
 
+    canSave: boolean = false;
     pQuestion: IQuestionBuilder | undefined = undefined;
+    pCurrent: IQuestionBuilder;
+    prevQuestions: IQuestionBuilder[] = [];
 
     updateQuestion() {
         QuestionService.getQuestionById(this.id)
@@ -44,14 +55,29 @@ export default class AuthorWrapper extends Vue {
                 if (question && question.canEdit !== undefined && !question.canEdit) {
                     this.$router.push(`/error/403`);
                 }
-                this.pQuestion = this.questionToBuilder(question);
+                if (question === undefined) {
+                    addEventsToQueue([{
+                        id: -9,
+                        name: "Error",
+                        description: "Question does not exist",
+                        icon: "error"
+                    }]);
+                    this.$router.go(-1);
+                }
+                this.pQuestion = this.questionToBuilder(<IQuestion>question);
+                this.pCurrent = this.questionToBuilder(<IQuestion>question);
+                this.canSave = true;
+            });
+        QuestionService.getPreviousQuestions(this.id)
+            .then((questionList: IQuestion[]) => {
+                this.prevQuestions = [];
+                questionList.forEach( question => {
+                    this.prevQuestions.push(this.questionToBuilder(question));
+                });
             });
     }
 
-    questionToBuilder(question: IQuestion | undefined) {
-        if (question === undefined) {
-            return undefined;
-        }
+    questionToBuilder(question: IQuestion) {
         let builder: IQuestionBuilder = {
             content: question.content,
             explanation: question.explanation,
@@ -62,7 +88,8 @@ export default class AuthorWrapper extends Vue {
                 D: question.distractors[3].content
             },
             correctIndex: "A",
-            topics: question.topics
+            topics: question.topics,
+            createdAt: serverToLocal(question.createdAt)
         };
         question.distractors.forEach(d => {
             if (d.isCorrect) {
@@ -76,6 +103,10 @@ export default class AuthorWrapper extends Vue {
         return this.pQuestion;
     }
 
+    set question(newQuestion: IQuestionBuilder | undefined) {
+        this.pQuestion = newQuestion;
+    }
+
     @Lifecycle
     created() {
         this.updateQuestion();
@@ -86,19 +117,12 @@ export default class AuthorWrapper extends Vue {
         aView.validateUpload();
     }
 
-    deleteQuestion() {
-        QuestionService.deleteQuestion(this.id)
-            .then(() => {
-                addEventsToQueue([{
-                    id: -7,
-                    name: "Question Deleted",
-                    description: "Successfully deleted question",
-                    icon: "done"
-                }]);
-            })
-            .then(() => {
-                this.$router.go(-1);
-            });
+    version(version: number) {
+        if (version == 0) {
+            this.question = this.pCurrent;
+        } else {
+            this.question = this.prevQuestions[version-1];
+        }
     }
 
 }

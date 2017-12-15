@@ -70,4 +70,8 @@ export default class QuestionService {
     static deleteQuestion(id: number) {
         return QuestionRepository.deleteQuestion(id);
     }
+
+    static getPreviousQuestions(id: number) {
+        return QuestionRepository.getPreviousQuestions(id);
+    }
 }
