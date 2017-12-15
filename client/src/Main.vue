@@ -287,15 +287,19 @@ export default class Main extends Vue {
             this.pCourse = courseUser.course;
         }
 
-        const _linkCopy = getLinks();
+        const _linkCopy = this.pMenuLinks.slice();
         // Fix links
-        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0
-            && this.currentlyOpenMenu === undefined) {
+        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
             const profileLinkIndex = _linkCopy.findIndex(x => x.text == "Profile");
             if (profileLinkIndex >= 0) {
                 _linkCopy.splice(profileLinkIndex, 1);
             }
-            this.$router.push("/admin");
+
+            // Only redirect when no menu is open
+            if (this.currentlyOpenMenu === undefined) {
+                this.currentlyOpenMenu = this.pMenuLinks[0];
+                this.$router.push("/admin");
+            }
         } else {
             const adminLinkIndex = _linkCopy.findIndex(x => x.text == "Admin");
             if (adminLinkIndex >= 0) {

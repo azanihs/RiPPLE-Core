@@ -3,7 +3,7 @@ import { ILink } from "../interfaces/models";
 export function getLinks(): ILink[] {
     const profileLink: ILink = {
         text: "Profile",
-        href: "/",
+        href: "",
         icon: "widgets",
         submenu: [{
             text: "Overview",
@@ -30,7 +30,7 @@ export function getLinks(): ILink[] {
     };
     const adminLink: ILink = {
         text: "Admin",
-        href: "/admin",
+        href: "",
         icon: "widgets",
         submenu: [{
             text: "Overview",
