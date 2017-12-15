@@ -274,6 +274,11 @@ def get_engagement_result(user, model, filter_name, filter_cond, key_user):
         return user_correct/max_num
 
 def get_user_consent(user):
+    if is_administrator(user):
+        return {
+            "data": True
+        }
+
     form = get_form(user)
     if form:
         user_consent = Consent.objects.filter(user=user, form=form).order_by("-created_at").first()
