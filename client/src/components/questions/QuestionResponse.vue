@@ -28,6 +28,7 @@
         </ul>
         <transition name="feedbackGroup"
             @enter="feedbackEnter"
+            @after-enter="scrollToExplanation"
             @leave="feedbackLeave"
             :css="false">
             <md-layout md-flex="100"
@@ -236,6 +237,10 @@ export default class QuestionResponse extends Vue {
                 el.style.height = "auto";
                 done();
             });
+    }
+
+    scrollToExplanation(el: HTMLElement) {
+        el.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
     }
 
     feedbackLeave(el: HTMLElement, done: Function) {

@@ -61,7 +61,7 @@ export default class ConsentFormWrapper extends Vue {
             icon: "cached"
         }]);
 
-        this.$router.push({ "name": "profile" });
+        this.$router.push({ "name": "overview" });
     }
 
     updateCourseUser(user: ICourseUser) {

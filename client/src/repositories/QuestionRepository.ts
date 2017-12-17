@@ -20,8 +20,8 @@ function toQuestion(x: IQuestion): IQuestion {
         solution: solution,
         distractors: x.distractors,
         responseCount: x.responseCount,
-        canEdit: x.canEdit,
-        createdAt: x.createdAt
+        createdAt: x.createdAt,
+        canEdit: x.canEdit
     };
     return question;
 }

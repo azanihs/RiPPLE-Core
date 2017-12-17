@@ -36,9 +36,15 @@ export function serverToLocal(UTCTimestamp: number | undefined) {
 }
 
 export function localToUTC(date?: string) {
-    if (date === undefined) return undefined;
-
-    const [year, month, day] = date.split("-");
+    if (date === undefined) {
+        return undefined;
+    }
+    const dateParts = date.split("-");
+    if (dateParts.length != 3) {
+        return undefined;
+    }
+    
+    const [year, month, day] = dateParts;
     // Convert to UTC and from milliseconds to seconds
     return Date.UTC(+year, +month, +day) / 1000;
 }
