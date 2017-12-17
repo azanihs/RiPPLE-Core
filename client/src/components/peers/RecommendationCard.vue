@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { IUser } from "../../interfaces/models";
+import { IUser, IDayTime } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -108,6 +108,32 @@ export default class RecommendationCard extends Vue {
     created() {
         Fetcher.get(UserService.getMeetingHistory)
             .on(this.updateMeetingHistory);
+    }
+
+    createMeetingDate(dayTime: IDayTime) {
+        // Create a utc date with three days grace to the utc
+        const local = new Date();
+        const offset = local.getTimezoneOffset() * 60 * 1000;
+        const utc = new Date(local.getTime() + 3 * 24 * 60 * 60 * 1000);
+        // Get the day of the week
+
+        // Get the day offset
+        let dayOffset = dayTime.day % 7 - utc.getDay();
+        if (dayOffset < 0) {
+            dayOffset = dayOffset + 8;
+        }
+
+        // Set the time
+        const utcTime = utc.getMilliseconds() + utc.getSeconds() * 1000 +
+            utc.getMinutes() * 1000 * 60 + utc.getHours() * 1000 * 60 * 60;
+
+        const eventTime = dayTime.time * 60 * 60 * 1000;
+
+        const eventOffset = eventTime - utcTime;
+
+        const meetingTime = new Date(utc.getTime() + offset + dayOffset * 24 * 60 * 60 * 1000 + eventOffset);
+
+        return meetingTime;
     }
 
     findItem(toSearch: IMeetingHistory[], query: string) {
