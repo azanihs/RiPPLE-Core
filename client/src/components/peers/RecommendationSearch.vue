@@ -150,8 +150,9 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { ITopic, IUserSummary, IEdge, IStudyRole, ICompareSet } from "../../interfaces/models";
+import { ITopic, IUserSummary, IEdge, IStudyRole, ICompareSet, IRecommendation } from "../../interfaces/models";
 import UserService from "../../services/UserService";
+import RecommendationService from "../../services/RecommendationService";
 import Fetcher from "../../services/Fetcher";
 
 import RecommendationCard from "./RecommendationCard.vue";
@@ -193,6 +194,7 @@ export default class RecommendationSearch extends Vue {
     });
 
     competencies = new Map();
+    pFindRecommendations: IRecommendation[] = [];
 
     updateCompetencies(newCompetencies: ICompareSet) {
         this.competencies = newCompetencies.ownScores
@@ -204,10 +206,24 @@ export default class RecommendationSearch extends Vue {
             }, new Map());
     };
 
+    updateFindRecommendations(recommendations: IRecommendation[]) {
+        this.pFindRecommendations = recommendations;
+    };
+
     @Lifecycle
     created() {
         Fetcher.get(UserService.userCompetencies)
             .on(this.updateCompetencies);
+        Fetcher.get(RecommendationService.findRecommendations)
+            .on(this.updateFindRecommendations);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.userCompetencies)
+            .off(this.updateCompetencies);
+        Fetcher.get(RecommendationService.findRecommendations)
+            .off(this.updateFindRecommendations);
     }
 
     checkbox(topic: ITopic, studyRole: IStudyRole): boolean {

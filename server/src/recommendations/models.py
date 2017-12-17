@@ -75,8 +75,8 @@ class PeerRecommendation(models.Model):
 
     def toJSON(self):
         return {
-            "courseUser": self.user.toJSON(),
-            "recommendedCourseUser": self.recommended_user.toJSON()
+            "courseUser": self.course_user.toJSON(),
+            "recommendedCourseUser": self.recommended_course_user.toJSON()
         }
 
 class RoleRecommendation(models.Model):

@@ -413,6 +413,7 @@ class Command(BaseCommand):
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
         populate_available_roles(course_users, study_roles)
+        print("\t-Populating Connections")
         populate_connections(course_users)
 
 def save_image_course_seeder(encoded_image, image_id):

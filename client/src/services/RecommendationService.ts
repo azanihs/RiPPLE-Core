@@ -1,12 +1,13 @@
+import { IRecommendation } from "../interfaces/models";
 import RecommendationRepository from "../repositories/RecommendationRepository";
 
 export default class RecommendationService {
 
-    static getFindRecommendations(): Promise<IRecommendation[]> {
-        return RecommendationRepository.getFindRecommendations();
+    static findRecommendations(): Promise<IRecommendation[]> {
+        return RecommendationRepository.findRecommendations();
     }
 
-    static getReviewRecommendations(): Promise<IRecommendation[]> {
-        return RecommendationRepository.getReviewRecommendations();
+    static reviewRecommendations(): Promise<IRecommendation[]> {
+        return RecommendationRepository.reviewRecommendations();
     }
 }

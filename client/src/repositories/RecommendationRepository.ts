@@ -1,13 +1,13 @@
 import { IRecommendation } from "../interfaces/models";
-import { apiFetch, apiPost } from "./APIRepository";
+import { apiFetch } from "./APIRepository";
 
 export default class RecommendationRepository {
 
-    static getFindRecommendations(): Promise<IRecommendation[]> {
-      return apiFetch<IRecommendation[]>("/recommendations/find/all/");
+    static findRecommendations(): Promise<IRecommendation[]> {
+        return apiFetch<IRecommendation[]>("/recommendations/recommendations/find/all/");
     }
 
-    static getReviewRecommendations(): Promise<IRecommendation[]> {
-      return apiFetch<IRecommendation[]>("/recommendations/review/all/");
+    static reviewRecommendations(): Promise<IRecommendation[]> {
+        return apiFetch<IRecommendation[]>("/recommendations/recommendations/review/all/");
     }
 }
