@@ -1,5 +1,5 @@
 <template>
-    <md-layout v-if="question" class="question-navigation">
+    <md-layout v-if="question" class="questionNavigation">
         <admin-buttons :id="id"
         :canSave="canSave"
         :prevQuestions="prevQuestions"
@@ -12,11 +12,11 @@
 </template>
 
 <style scoped>
-.question-navigation {
+.questionNavigation {
     width: 100%;
     min-width: 100%;
     flex-direction: column;
-    flex: inherit;
+    display: flex;
 }
 </style>
 
@@ -28,8 +28,7 @@ import PageLoader from "../util/PageLoader.vue";
 import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
 import AdminButtons from "../util/AdminButtons.vue";
-import { serverToLocal } from "../../util";
-import { addEventsToQueue } from "../../util";
+import { addEventsToQueue, serverToLocal } from "../../util";
 
 @Component({
     components: {
@@ -63,20 +62,24 @@ export default class AuthorWrapper extends Vue {
                         icon: "error"
                     }]);
                     this.$router.go(-1);
+                    return;
                 }
-                this.pQuestion = this.questionToBuilder(<IQuestion>question);
-                this.pCurrent = this.questionToBuilder(<IQuestion>question);
+
+                this.pQuestion = this.questionToBuilder(question)!;
+                this.pCurrent = this.questionToBuilder(question);
                 this.canSave = true;
             });
         QuestionService.getPreviousQuestions(this.id)
             .then((questionList: IQuestion[]) => {
                 this.prevQuestions = [];
-                questionList.forEach( question => {
-                    this.prevQuestions.push(this.questionToBuilder(question));
+                questionList.forEach(question => {
+                    if (question !== undefined) {
+                        this.prevQuestions.push(this.questionToBuilder(question));
+                    }
                 });
             });
     }
-
+    
     questionToBuilder(question: IQuestion) {
         let builder: IQuestionBuilder = {
             content: question.content,
@@ -123,6 +126,21 @@ export default class AuthorWrapper extends Vue {
         } else {
             this.question = this.prevQuestions[version-1];
         }
+    }
+    
+    deleteQuestion() {
+        QuestionService.deleteQuestion(this.id)
+            .then(() => {
+                addEventsToQueue([{
+                    id: -7,
+                    name: "Question Deleted",
+                    description: "Successfully deleted question",
+                    icon: "done"
+                }]);
+            })
+            .then(() => {
+                this.$router.push("/question/answer/");
+            });
     }
 
 }

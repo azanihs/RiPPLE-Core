@@ -304,7 +304,6 @@ export default class AuthorView extends Vue {
         } else {
             this.question.topics.splice(topicIndex, 1);
         }
-        console.log(this.question.topics);
     }
 
     topicIsUsed(topic: ITopic) {

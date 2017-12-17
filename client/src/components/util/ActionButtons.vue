@@ -37,7 +37,7 @@ hr {
     width: 100%;
     justify-content: space-between;
     margin-bottom: 0.5em;
-    flex:unset;
+    flex: unset;
 }
 
 .right {

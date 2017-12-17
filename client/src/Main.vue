@@ -1,5 +1,8 @@
 <template>
     <md-layout>
+        <div v-if="mobileMode && sideMenuIsOpen"
+        class="dimOverlay"
+        @click="hideSideBar()"></div>
         <md-layout class="offset"
             ref="isVisible"
             md-hide-medium-and-up></md-layout>
@@ -9,8 +12,8 @@
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
-                ref="menuButton"
-                @click="toggleSideNav">
+                :class="menuButtonClass"
+                @click="toggleSideNav(undefined)">
                 <md-icon>{{menuIcon}}</md-icon>
             </md-button>
         </md-layout>
@@ -35,16 +38,20 @@
                         <md-icon>{{link.icon}}</md-icon>
                         <md-ink-ripple></md-ink-ripple>
                     </router-link>
-                    <div v-if="currentlyOpenMenu == link.href && link.submenu !== undefined">
+                    <div v-if="link == currentlyOpenMenu || (link.submenu && link.submenu.indexOf(currentlyOpenMenu) >= 0)">
+                        <transition-group name="slide" tag="ul"
+                            appear
+                            appear-class="slide-appear-class"
+                            appear-active-class="slide-appear-active-class">
                             <li v-for="submenuLink in link.submenu"
                                 :key="submenuLink.href">
                                 <router-link :to="submenuLink.href"
-                                    @click.native="keepProfileActive(link)"
+                                    @click.native="keepProfileActive(submenuLink)"
                                     class ="profileSubmenu md-button routerLink">
                                     <span>{{ submenuLink.text }}</span>
                                 </router-link>
                             </li>
-                        </div>
+                        </transition-group>
                     </div>
                 </li>
             </ul>
@@ -70,6 +77,32 @@
         0 3px 1px -2px rgba(0, 0, 0, 0.12);
 
     justify-content: flex-end;
+    z-index: 2;
+}
+
+
+.slide-appear-active-class {
+    opacity: 1;
+    max-height: 36px;
+    transition: all 0.4s;
+}
+
+.slide-appear-class {
+    opacity: 0;
+    max-height: 0px;
+}
+
+
+.dimOverlay {
+    position:fixed;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background:rgba(0,0,0,0.5);
+    z-index: 5;
 }
 
 .profileSubmenu{
@@ -91,6 +124,7 @@
     position: fixed;
     left: 0px;
     top: 0px;
+    z-index: 2;
 }
 
 .offset {
@@ -114,6 +148,7 @@
     left: 0px;
     top: 0px;
     width: 16.25%;
+    z-index: 10;
 }
 
 .sideNavContainer.mobilePage {
@@ -132,6 +167,7 @@
     margin-right: 1.25%;
     min-width: 97.5%;
     flex: 0 1 97.5%;
+    z-index: 0;
 }
 
 ul {
@@ -184,6 +220,11 @@ a.routerLink:hover {
     color: #111 !important;
 }
 
+.expanded {
+    transform: translate3d(0,0,0);
+    opacity: 1;
+}
+
 </style>
 
 <style>
@@ -220,8 +261,11 @@ export default class Main extends Vue {
     courseRoles: string[] = [];
     pUser: IUser | undefined = undefined;
     pCourse: ICourse| undefined = undefined;
+    pMenuLinks: ILink[] = getLinks();
+    currentlyOpenMenu: ILink | undefined = undefined;
 
     menuIcon = "menu";
+    sideMenuIsOpen = false;
     mobileMode = false;
     pageTitle = "";
     activeSubmenu = false;
@@ -242,33 +286,45 @@ export default class Main extends Vue {
         if (this.pCourse === undefined) {
             this.pCourse = courseUser.course;
         }
+
+        const _linkCopy = this.pMenuLinks.slice();
+        // Fix links
+        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
+            const profileLinkIndex = _linkCopy.findIndex(x => x.text == "Profile");
+            if (profileLinkIndex >= 0) {
+                _linkCopy.splice(profileLinkIndex, 1);
+            }
+
+            // Only redirect when no menu is open
+            if (this.currentlyOpenMenu === undefined) {
+                this.currentlyOpenMenu = this.pMenuLinks[0];
+                this.$router.push("/admin");
+            }
+        } else {
+            const adminLinkIndex = _linkCopy.findIndex(x => x.text == "Admin");
+            if (adminLinkIndex >= 0) {
+                _linkCopy.splice(adminLinkIndex, 1);
+            }
+        }
+
+        this.pMenuLinks = _linkCopy;
     };
 
     get links() {
-        const links = getLinks();
-        const adminLinkIndex = links.findIndex(x => x.href == "/admin");
-        const profileLinkIndex = links.findIndex(x => x.href == "/");
-        if (adminLinkIndex == -1) {
-            throw new Error("Could not find admin link index");
-        }
-        if (profileLinkIndex == -1) {
-            throw new Error("Could not find profile link index");
-        }
-        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
-            links.splice(profileLinkIndex, 1);
-            this.$router.push("/admin");
-            this.toggleSubmenu(links[adminLinkIndex]);
-        } else {
-            // Is student
-            links.splice(adminLinkIndex, 1);
-            const updatedProfileLinkIndex = links.findIndex(x => x.href == "/");
-            this.toggleSubmenu(links[updatedProfileLinkIndex]);
-        }
-        return links;
+        return this.pMenuLinks;
     }
 
     get pageSize() {
-        return this.mobileMode ? "mobilePage" : "largePage";
+        return {
+            "mobilePage": this.mobileMode,
+            "largePage": !this.mobileMode,
+            "expanded": this.sideMenuIsOpen
+        };
+    }
+    get menuButtonClass() {
+        return {
+            "highlighted": this.sideMenuIsOpen
+        };
     }
 
     resized() {
@@ -282,19 +338,20 @@ export default class Main extends Vue {
         const isVisible = visible.$el;
         if (window.getComputedStyle(isVisible).display !== "none") {
             this.mobileMode = true;
-            this.menuIcon = "menu";
             container.style.transform = null;
         } else {
             this.mobileMode = false;
-            this.menuIcon = "menu";
             container.style.transform = "translate3d(0,0,0)";
         }
     }
 
     updatePageName() {
-        const link = this.links.find(x => x.text.toLowerCase() == this.path);
-        if (link !== undefined) {
-            this.pageTitle = link.text + " Page";
+        if (this.currentlyOpenMenu !== undefined) {
+            if (this.currentlyOpenMenu.href != "") {
+                this.pageTitle = this.currentlyOpenMenu.text;
+            } else if (this.currentlyOpenMenu.href == "") {
+                this.pageTitle = this.path.charAt(0).toUpperCase() + this.path.slice(1);
+            }
         }
     }
 
@@ -343,41 +400,47 @@ export default class Main extends Vue {
             });
     }
 
-    currentlyOpenMenu = "/";
-
     toggleSubmenu(link: ILink) {
-        this.currentlyOpenMenu = link.href;
+        this.currentlyOpenMenu = link;
+        this.updatePageName();
     }
 
-    toggleSideNav(link: ILink) {
-        this.toggleSubmenu(link);
+    toggleSideNav(link: ILink | undefined) {
+        if (link !== undefined) {
+            this.toggleSubmenu(link);
+        }
+
         if (this.mobileMode) {
             this.updatePageName();
-            const menuButton = (this.$refs["menuButton"] as any).$el as HTMLElement;
-            const container = (this.$refs.sidenavContainer as any).$el as HTMLElement;
-
-            if (!container.style.transform) {
-                container.style.transform = "translate3d(0,0,0)";
-                container.style.opacity = "1";
-                menuButton.style.color = "#f2f2f2";
-                this.menuIcon = "close";
+            const linkHasSubmenu = link !== undefined && link.submenu !== undefined;
+            if (this.sideMenuIsOpen && linkHasSubmenu) {
+                this.sideMenuIsOpen = true;
+            } else if (this.sideMenuIsOpen && !linkHasSubmenu) {
+                this.sideMenuIsOpen = false;
             } else {
-                menuButton.style.color = "#222";
-                container.style.transform = null;
-                container.style.display = null;
-                this.menuIcon = "menu";
+                this.sideMenuIsOpen = true;
             }
         }
     }
 
-    keepProfileActive() {
+    keepProfileActive(link: ILink) {
         this.activeSubmenu = true;
+        this.toggleSideNav(link);
+        if (this.mobileMode) {
+            const container = (this.$refs.sidenavContainer as Vue).$el;
+            container.style.transform = null;
+            this.menuIcon = "menu";
+        }
     }
 
     submenuClassNames(link: ILink) {
         if (link.submenu !== undefined) {
             return "has-submenu";
         }
+    }
+
+    hideSideBar() {
+        this.sideMenuIsOpen = false;
     }
 
 }
