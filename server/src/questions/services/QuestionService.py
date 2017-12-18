@@ -81,7 +81,7 @@ def get_course_leaders(course, sort_field, sort_order, limit=25, user):
     achievement_counts = leaderboard_sort(UserAchievement, "user_id")
 
     leaderboard_users = [{
-        "id": u.id,
+        "rank": u.id,
         "name": u.user.first_name,
         "image": u.user.image,
         "questionsAuthored": lookup_total("author_id", u.id, question_counts),
@@ -103,14 +103,15 @@ def get_course_leaders(course, sort_field, sort_order, limit=25, user):
     if not is_administrator(user):
         counter = 0
         for i in range(0,len(leaderboard_users)):
-            if leaderboard_users[i]["id"] == user.id:
+            if leaderboard_users[i]["rank"] == user.id:
+                counter += 1
+                leaderboard_users[i]["rank"] = counter
                 break
             counter += 1
+            leaderboard_users[i]["rank"] = counter
+
     if counter >= limit:
         leaderboard.append(leaderboard_users[i])
-
-    for l in leaderboard:
-        l.pop('id', None)
 
     return leaderboard
 
