@@ -96,6 +96,8 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
         leaderboard_users = sorted(
             leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
 
+    found = 0
+    for i in leaderboard_users:
     if not util.is_administrator(user):
         for i in range(0,len(leaderboard_users)):
             if leaderboard_users[i]["rank"] == user.id:
@@ -109,7 +111,6 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
     leaderboard = leaderboard_users[0:limit]
     if found >= limit:
         leaderboard.append(leaderboard_users[found])
-
     return leaderboard
 
 
