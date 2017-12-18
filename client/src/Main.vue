@@ -128,6 +128,10 @@
     padding: 0px 20px !important;
 }
 
+.profileSubmenu.md-button:hover:not([disabled]):not(.md-raised) {
+    background-color: rgba(153, 153, 153, 0.5);
+}
+
 .menuContainer h2 {
     padding-right: 16px;
     color: #999;
