@@ -67,8 +67,8 @@ def make_question_responses(user, correct, incorrect, ability):
 def choose_answer(correct, incorrect, ability):
     #Will be used with chance to get 33% probability of answering correctly
     lowPercentage = 3
-    #Will be used with not chance to get 66% probability of answering correctly
-    mediumPercentage = 3
+    #Will be used with not chance to get 75% probability of answering correctly
+    mediumPercentage = 4
     #Will be used with not chance to get 90% probability of answering correctly
     highPercentage = 10
     if (ability == "low" and chance(lowPercentage)):
