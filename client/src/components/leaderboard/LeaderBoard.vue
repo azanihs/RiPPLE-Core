@@ -40,7 +40,8 @@
             </md-table-header>
             <md-table-body>
                 <md-table-row v-for="user in users"
-                              :key="user.id">
+                              :key="user.id"
+                              v-bind:class="{ userRow: user.id }">
                     <md-table-cell>{{ user.rank }}</md-table-cell>
                     <md-table-cell>
                         <md-image class="avatar"
@@ -75,6 +76,10 @@
     height: 50px;
     border: 2px solid #ccc;
     box-shadow: 2px 2px 10px #888;
+}
+
+.userRow {
+    font-weight: bold;
 }
 </style>
 

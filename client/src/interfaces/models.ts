@@ -148,7 +148,8 @@ export interface IUserSummary {
     questionsAnswered: number,
     questionsAnsweredCorrectly: number,
     questionsRated: number,
-    achievementsEarned: number
+    achievementsEarned: number,
+    id?: number
 };
 
 export interface IBadge {
