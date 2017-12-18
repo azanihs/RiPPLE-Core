@@ -1,5 +1,6 @@
 import { apiFetch, apiPost } from "./APIRepository";
-import { IQuestion, IQuestionUpload, IDistractor, INetworkResponse, IReportQuestion } from "../interfaces/models";
+import { IQuestion, IQuestionUpload, IDistractor, INetworkResponse,
+    IReportQuestion, IReasonList, IReport, IServerReportFull } from "../interfaces/models";
 import TopicRepository from "./TopicRepository";
 
 type ISearchResult = { items: IQuestion[], searchResult: any, totalItems: number, page: number };
@@ -9,7 +10,6 @@ function toQuestion(x: IQuestion): IQuestion {
     if (solution === undefined) {
         throw new Error(`Question id: ${x.id} does not have a solution`);
     }
-
     const question: IQuestion = {
         id: x.id,
         difficulty: Math.round(x.difficulty),
@@ -19,16 +19,21 @@ function toQuestion(x: IQuestion): IQuestion {
         explanation: x.explanation,
         solution: solution,
         distractors: x.distractors,
-        responseCount: x.responseCount
+        responseCount: x.responseCount,
+        canEdit: x.canEdit
     };
     return question;
 }
 
 export default class QuestionRepository {
-    static uploadQuestion(question: IQuestionUpload): Promise<IQuestion> {
-        return apiPost<{question: IQuestion}>(`/questions/add/`, question)
+    static uploadQuestion(question: IQuestionUpload, path: string): Promise<IQuestion> {
+        return apiPost<{question: IQuestion}>(path, question)
             .then(x => x.question)
             .then(response => toQuestion(response));
+    }
+
+    static deleteQuestion(id: number) {
+        return apiFetch<{}>(`/questions/delete/${id}/`);
     }
 
     static search(sortField: string | undefined,
@@ -73,11 +78,29 @@ export default class QuestionRepository {
         return apiPost<INetworkResponse>("/questions/report/", { questionReport });
     }
 
+    static getReportedQuestions(sortField: string, sortOrder: "ASC" | "DESC") {
+        return apiFetch<IReport[]>(`/questions/report/all/${sortField}/${sortOrder}/`);
+    }
+
     static getQuestionById(questionId: number) {
         return apiFetch<IQuestion>(`/questions/id/${questionId}/`)
             .then(toQuestion);
     }
     static getRandomCourseQuestion() {
         return apiFetch<number>(`/questions/random/`);
+    }
+
+    static getReportReasons() {
+        return apiFetch<IReasonList>("/questions/report/reasons/", {
+            method: "POST",
+            headers: new Headers({
+                "Accept": "application/json",
+                "Content-Type": "Application/json"
+            })
+        }).then(x => x.reasonList);
+    }
+
+    static getReportAggregates() {
+        return apiFetch<IServerReportFull[]>(`/questions/report/all/`);
     }
 }

@@ -3,17 +3,22 @@
         <div class="notification"
              v-for="notification in notifications"
              :key="notification.id">
+
             <md-card md-with-hover
                      class="card"
                      :class="{disabled: notification.read}">
                 <div class="leftPanel">
                     <md-icon>{{notification.icon}}</md-icon>
                 </div>
-                <div class="rightPanel">
+
+            <responsive-wrapper class="rightPanel">
+                <div>
                     <h3>{{notification.name}}</h3>
                     <p>{{notification.description}}</p>
                     <span class="date">{{ notificationDate }}</span>
                 </div>
+             </responsive-wrapper>
+
             </md-card>
         </div>
     </md-layout>
@@ -28,6 +33,11 @@
 </template>
 
 <style scoped>
+
+.mobileStyle span{
+    position: initial;
+}
+
 .centre {
     justify-content: center;
     align-items: center;
@@ -45,6 +55,7 @@ h3 {
 p {
     margin-top: 0.25em;
     margin-bottom: 0px;
+    margin-bottom: 0.3em;
 }
 
 p + p {
@@ -70,6 +81,8 @@ p + p {
 
 .rightPanel {
     padding: 16px;
+    padding-bottom: 5px;
+    display: block;
 }
 
 .notification {
@@ -89,11 +102,16 @@ p + p {
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { INotification } from "../../interfaces/models";
+import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
-@Component
+@Component({
+    components: {
+        ResponsiveWrapper
+    }
+})
 export default class Notifications extends Vue {
     @Prop
     showCount = p<number>({

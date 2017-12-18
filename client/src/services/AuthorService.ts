@@ -1,6 +1,5 @@
-import { IQuestionUpload, IAuthorResponse, IQuestionBuilder, ITopic } from "../interfaces/models";
+import { IQuestionUpload, IQuestionBuilder, ITopic } from "../interfaces/models";
 
-import { blobFetch } from "../repositories/APIRepository";
 import ImageService from "./ImageService";
 import QuestionRepository from "../repositories/QuestionRepository";
 
@@ -12,47 +11,9 @@ interface IValidate {
 
 export default class AuthorService {
 
-    static uploadContent(upload: IQuestionUpload) {
-        return QuestionRepository.uploadQuestion(upload);
+    static uploadContent(upload: IQuestionUpload, path: string) {
+        return QuestionRepository.uploadQuestion(upload, path);
     }
-
-    static extractImagesFromDOM(body: string): Promise<IAuthorResponse> {
-        // Extracts the base64 strings from all image tags in the provided HTMLBodyElement
-        // Assigns them ID's to identify image tags with their respective content
-        // Returns this object representation ready for server upload
-        const parser = new DOMParser();
-        const dom = parser.parseFromString(body, "text/html").querySelector("body")!;
-
-        const images = Array.from(dom.querySelectorAll("img"));
-        const payloads: { [id: number]: string } = {};
-
-        return Promise.all(images.map((image, i) => new Promise(resolve => {
-            const url = new URL(image.src);
-            if (url.hostname == "" || url.hostname == window.location.hostname) {
-                if (url.protocol == "data:") {
-                    // Is a base64 image already
-                    payloads[i] = image.src;
-                    image.src = "#:" + i;
-                    resolve(payloads[i]);
-                } else if (url.protocol == "blob:") {
-                    // Is a createObjectURL()
-                    blobFetch(url.href)
-                        .then(response => response.blob() as Promise<File>)
-                        .then(fileBlob => ImageService.fileToBase64EncodeString(fileBlob))
-                        .then(file => {
-                            payloads[i] = file.base64;
-                            image.src = "#:" + i;
-                            resolve(payloads[i]);
-                        });
-                }
-            }
-        }))).then(_ => ({
-            content: dom.innerHTML,
-            payloads: payloads,
-            isCorrect: false
-        }));
-    }
-
 
     static prepareUpload(question: IQuestionBuilder) {
         const upload: IQuestionUpload = {
@@ -68,17 +29,17 @@ export default class AuthorService {
         };
 
         const responseHelper = (index: "A" | "B" | "C" | "D") => {
-            return AuthorService.extractImagesFromDOM(question.responses[index]).then(response => {
+            return ImageService.extractImagesFromDOM(question.responses[index]).then(response => {
                 response.isCorrect = question.correctIndex === index;
                 upload.responses[index] = response;
             });
         };
 
-        return AuthorService.extractImagesFromDOM(question.content)
+        return ImageService.extractImagesFromDOM(question.content)
             .then(questionContent => {
                 upload.question = questionContent;
             })
-            .then(() => AuthorService.extractImagesFromDOM(question.explanation))
+            .then(() => ImageService.extractImagesFromDOM(question.explanation))
             .then(questionExplanation => {
                 upload.explanation = questionExplanation;
             })
@@ -100,7 +61,7 @@ export default class AuthorService {
     static validateQuestions(question: IQuestionBuilder) {
         const validators: IValidate[] = [{
             message: "Question cannot be empty",
-            validateFunction: this.domIsNotEmpty,
+            validateFunction: ImageService.domIsNotEmpty,
             args: question.content
         }, {
             message: "Question must have between 1 and 4 topics",
@@ -108,19 +69,19 @@ export default class AuthorService {
             args: question.topics
         }, {
             message: "Question response 'A' cannot be empty",
-            validateFunction: this.domIsNotEmpty,
+            validateFunction: ImageService.domIsNotEmpty,
             args: question.responses.A
         }, {
             message: "Question response 'B' cannot be empty",
-            validateFunction: this.domIsNotEmpty,
+            validateFunction: ImageService.domIsNotEmpty,
             args: question.responses.B
         }, {
             message: "Question response 'C' cannot be empty",
-            validateFunction: this.domIsNotEmpty,
+            validateFunction: ImageService.domIsNotEmpty,
             args: question.responses.C
         }, {
             message: "Question response 'D' cannot be empty",
-            validateFunction: this.domIsNotEmpty,
+            validateFunction: ImageService.domIsNotEmpty,
             args: question.responses.D
         }, {
             message: "You must select which response is correct",
@@ -128,7 +89,7 @@ export default class AuthorService {
             args: ""
         }, {
             message: "Question explanation cannot be empty",
-            validateFunction: this.domIsNotEmpty,
+            validateFunction: ImageService.domIsNotEmpty,
             args: question.explanation
         }];
 

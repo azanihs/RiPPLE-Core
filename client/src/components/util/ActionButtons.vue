@@ -1,15 +1,17 @@
 <template>
     <md-layout class="buttonContainer">
-        <md-button @click="back">
-            <md-icon>keyboard_return</md-icon>
-            <span>Return</span>
-            <md-tooltip>Return To Questions</md-tooltip>
-        </md-button>
-        <md-button class="md-warn"
-                   @click="report">
-            <span>Report Question</span>
-            <md-icon>error_outline</md-icon>
-        </md-button>
+        <md-layout>
+            <md-button
+                @click="back()">
+                <md-icon>keyboard_return</md-icon>
+                <span>Return</span>
+            </md-button>
+            <slot name="centreLeft"></slot>
+        </md-layout>
+        <md-layout class="right">
+            <slot name="centreRight"></slot>
+            <slot name="right"></slot>
+        </md-layout>
 
         <div class="border">
             <hr />
@@ -34,7 +36,11 @@ hr {
 .buttonContainer {
     width: 100%;
     justify-content: space-between;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
+}
+
+.right {
+    justify-content:flex-end
 }
 </style>
 
@@ -45,7 +51,7 @@ import { Vue, Component } from "av-ts";
 export default class ActionButtons extends Vue {
 
     back() {
-        this.$emit("back");
+        this.$router.go(-1);
     }
     report() {
         this.$emit("report");

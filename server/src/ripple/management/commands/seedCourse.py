@@ -2,8 +2,9 @@ from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
-from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage, ExplanationImage, DistractorImage
-from users.models import Course, User, CourseUser, Engagement
+from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
+    ExplanationImage, DistractorImage, ReportReason
+from users.models import Course, User, CourseUser, Engagement, ConsentForm
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
@@ -250,6 +251,14 @@ class Command(BaseCommand):
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
                 name=x, course=course) for x in topics]
+            print("\t-Creating Report Reasons")
+            reason_list = ["custom", "Inappropriate Content", "Incorrect Answer",  "Incorrect Tags"]
+            for r in reason_list:
+                reason = ReportReason (
+                    reason=r,
+                    course=course
+                )
+                reason.save()
 
             print("\t-Adding Engagements")
             engagements = ["Questions Answered", "Questions Authored", "Questions Rated",
@@ -270,6 +279,13 @@ class Command(BaseCommand):
                 if chance(2):
                     course_users.append(
                         CourseUser.objects.create(user=user, course=course))
+
+            print("\t-Adding Consent Form")
+            form = ConsentForm (
+                content="Testing consent form",
+                author=course_users[0]
+            )
+            form.save()
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)
@@ -313,7 +329,7 @@ class Command(BaseCommand):
                         availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
 
         courses = []
-        for i in range(0,1):
+        for i in range(0,len(course_names)):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
@@ -327,26 +343,26 @@ class Command(BaseCommand):
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
 
-        # print("Populating Availabilities")
-        # print("\t-Making Days")
-        # make_days()
+        print("Populating Availabilities")
+        print("\t-Making Days")
+        make_days()
 
-        # print("\t-Making Times")
-        # time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
-        # time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
-        # make_times(time_inputs)
+        print("\t-Making Times")
+        time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
+        time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
+        make_times(time_inputs)
 
-        # print("\t-Making Study Roles")
-        # make_study_roles()
+        print("\t-Making Study Roles")
+        make_study_roles()
 
-        # course_users = CourseUser.objects.all()
-        # days = Day.objects.all()
-        # times = Time.objects.all()
-        # print("\t-Populating Availabilities")
-        # populate_availability(course_users, days, times)
-        # study_roles = StudyRole.objects.all()
-        # print("\t-Populating Study Roles")
-        # populate_available_roles(course_users, study_roles)
+        course_users = CourseUser.objects.all()
+        days = Day.objects.all()
+        times = Time.objects.all()
+        print("\t-Populating Availabilities")
+        populate_availability(course_users, days, times)
+        study_roles = StudyRole.objects.all()
+        print("\t-Populating Study Roles")
+        populate_available_roles(course_users, study_roles)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')

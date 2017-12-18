@@ -28,8 +28,10 @@ export interface IQuestion {
     explanation: string
     solution: IDistractor,
     distractors: IDistractor[],
-    responseCount: number
+    responseCount: number,
+    canEdit?: boolean
 };
+
 export interface IDistractor {
     id: number,
     content: string,
@@ -45,8 +47,46 @@ export interface IQuestionResponse {
 
 export interface IReportQuestion {
     question: number,
-    reason: string
+    reason: string[]
 };
+
+export interface IServerReportAggregate {
+    questionID: number,
+    totalReports: number,
+    lastReport: number
+}
+
+export interface IServerReport {
+    author: string,
+    createdAt: number,
+    reasons: IServerReason[]
+}
+
+export interface IServerReason {
+    reasonText: string,
+    reportReason: string
+}
+
+export interface IServerReportFull {
+    reports: (IServerReportAggregate | IServerReport)[][]
+    [key: number]: (IServerReportAggregate | IServerReport)[]
+}
+
+export interface IReportAggregate {
+    questionID: number,
+    totalReports: number,
+    lastReport: string
+}
+
+export interface IReport {
+    createdAt: string,
+    author: string,
+    reason: string
+}
+
+export interface IReasonList {
+    reasonList: string[]
+}
 
 export interface INetworkResponse {
     error?: string
@@ -75,6 +115,18 @@ export interface ICourseUser {
     user: IUser,
     course: ICourse,
     roles: string[],
+};
+
+export interface IConsentForm {
+    content: string,
+    author: ICourseUser,
+
+    error?: string
+};
+
+export interface IConsentUpload {
+    payload?: IAuthorResponse | undefined,
+    author: ICourseUser
 };
 
 export interface IPeerConnection {

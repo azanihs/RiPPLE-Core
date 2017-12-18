@@ -16,7 +16,11 @@ urlpatterns = [
     url(r'^competencies/aggregate/(.*)/$', views.aggregate),
 
     url(r'^add/$', views.add),
+    url(r'^delete/(.*)/$', views.delete),
+    url(r'^update/(.*)/$', views.update),
     url(r'^report/$', views.report),
+    url(r'^report/reasons/$', views.get_reasons),
+    url(r'^report/all/$', views.all_reports),
 
     url(r'^distribution/(.*)/$', views.distribution),
 

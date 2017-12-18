@@ -19,12 +19,12 @@
             <div class="legendItem">
                 <span class="legendLabel rect"
                       style="background-color: pink"></span>
-                <span>Poor Competency</span>
+                <span>Low Competency</span>
             </div>
             <div class="legendItem">
                 <span class="legendLabel rect"
                       style="background-color: #256"></span>
-                <span>Superior Competency</span>
+                <span>High Competency</span>
             </div>
         </div>
 
@@ -129,6 +129,18 @@ export default class ChartWrapper extends Vue {
                 if (chartOptions.legend === undefined) {
                     chartOptions.legend = {};
                 }
+                chartOptions.scales = {
+                    yAxes: [{
+                        ticks: {
+                            max: 100
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }]
+                };
                 chartOptions.legend.display = false;
             } else if (this.type == "radar") {
                 chartOptions.scales = {

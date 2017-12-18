@@ -46,7 +46,6 @@ class UserImage(models.Model):
     image = models.ImageField(upload_to='user_photo')
     user = models.ForeignKey(User, on_delete=None)
 
-
 class Role(models.Model):
     role = models.CharField(max_length=32)
 
@@ -104,3 +103,26 @@ class Engagement(models.Model):
             "id": self.id,
             "name": self.name
         }
+class ConsentForm(models.Model):
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    author = models.ForeignKey(CourseUser)
+
+    def toJSON(self):
+        return {
+            "content": self.content,
+            "author": self.author.toJSON()
+        }
+
+
+class Consent(models.Model):
+    user = models.ForeignKey(CourseUser)
+    form = models.ForeignKey(ConsentForm)
+    response = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ConsentImage(models.Model):
+    image = models.ImageField(upload_to='consent_images')
+    form = models.ForeignKey(ConsentForm, on_delete=None)

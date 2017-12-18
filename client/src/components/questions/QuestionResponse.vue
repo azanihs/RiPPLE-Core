@@ -28,6 +28,7 @@
         </ul>
         <transition name="feedbackGroup"
             @enter="feedbackEnter"
+            @after-enter="scrollToExplanation"
             @leave="feedbackLeave"
             :css="false">
             <md-layout md-flex="100"
@@ -42,7 +43,9 @@
                     </md-card>
                 </md-layout>
 
-                <md-layout md-flex="100"
+                <md-layout
+                    v-if="!preview"
+                    md-flex="100"
                     md-gutter
                     class="componentSeparator">
                     <md-card class="placeBetween">
@@ -185,6 +188,10 @@ export default class QuestionResponse extends Vue {
         required: true
     });
 
+    @Prop preview = p<boolean>({
+        default: false
+    });
+
     userAnswer: number = -1;
     hasGivenUp = false;
     disabledResponses: IDistractor[] = [];
@@ -197,14 +204,18 @@ export default class QuestionResponse extends Vue {
 
     @Lifecycle
     created() {
-        QuestionService.distributionForQuestion(this.question)
-            .then(this.updateResponseDistribution);
+        if (!this.preview) {
+            QuestionService.distributionForQuestion(this.question)
+                .then(this.updateResponseDistribution);
+        }
     }
 
     @Watch("question")
     questionChanged(_oldQuestion: IQuestion, _newQuestion: IQuestion) {
-        QuestionService.distributionForQuestion(this.question)
-            .then(this.updateResponseDistribution);
+        if (!this.preview) {
+            QuestionService.distributionForQuestion(this.question)
+                .then(this.updateResponseDistribution);
+        }
     }
 
     feedbackEnter(el: HTMLElement, done: Function) {
@@ -228,6 +239,10 @@ export default class QuestionResponse extends Vue {
             });
     }
 
+    scrollToExplanation(el: HTMLElement) {
+        el.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+    }
+
     feedbackLeave(el: HTMLElement, done: Function) {
         d3.select(el)
             .transition()
@@ -243,8 +258,8 @@ export default class QuestionResponse extends Vue {
         const answerIcon = this.optionIcon(answer);
         return {
             answered: this.disabledResponses.find(x => x == answer) || this.userHasCorrectAnswer,
-            correct: answerIcon == "done",
-            incorrect: answerIcon != "done"
+            correct: this.userHasCorrectAnswer && answerIcon == "done",
+            incorrect: this.userHasCorrectAnswer && answerIcon != "done"
         };
     }
 
@@ -262,10 +277,12 @@ export default class QuestionResponse extends Vue {
         this.disabledResponses.push(distractor);
         this.userAnswer = newValue;
 
-        QuestionService.submitResponse({ responseId: distractor.id })
-            .then(() => {
-                this.$emit("userAnswer", this.userHasCorrectAnswer);
-            });
+        if (!this.preview) {
+            QuestionService.submitResponse({ responseId: distractor.id })
+                .then(() => {
+                    this.$emit("userAnswer", this.userHasCorrectAnswer);
+                });
+        }
     }
 
     answerOptionFill(response: IDistractor) {
@@ -309,21 +326,25 @@ export default class QuestionResponse extends Vue {
     }
 
     rate(rateType: string) {
-        return (rateValue: number) => {
-            QuestionService.submitRating({
-                responseId: this.question.distractors[this.userAnswer].id,
-                rateType: rateType,
-                rateValue: rateValue
-            })
-            .then(() => {
-                addEventsToQueue([{
-                    id: -3,
-                    name: "Question Rated",
-                    description: "Successfully rated question " + rateType,
-                    icon: "done"
-                }]);
-            });
-        };
+        if (!this.preview) {
+            return (rateValue: number) => {
+                QuestionService.submitRating({
+                    responseId: this.question.distractors[this.userAnswer].id,
+                    rateType: rateType,
+                    rateValue: rateValue
+                })
+                .then(() => {
+                    addEventsToQueue([{
+                        id: -3,
+                        name: "Question Rated",
+                        description: "Successfully rated question " + rateType,
+                        icon: "done"
+                    }]);
+                });
+            };
+        } else {
+            return "";
+        }
     }
 }
 </script>

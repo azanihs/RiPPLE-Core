@@ -32,12 +32,24 @@ export default class QuestionService {
         return QuestionRepository.submitRating(responseId, rateType, rateValue);
     }
 
-    static reportQuestion(questionId: number, reason: string) {
+    static reportQuestion(questionId: number, reason: string[]) {
         const upload: IReportQuestion = {
             question: questionId,
             reason: reason
         };
         return QuestionRepository.uploadReport(upload);
+    }
+
+    static getReportReasons() {
+        return QuestionRepository.getReportReasons();
+    }
+
+    static getReportedQuestions( { sortField, sortOrder }: { sortField:string, sortOrder: "ASC" | "DESC" }) {
+        return QuestionRepository.getReportedQuestions(sortField, sortOrder);
+    }
+
+    static getReportAggregates() {
+        return QuestionRepository.getReportAggregates();
     }
 
     static getQuestionById(questionId: number) {
@@ -53,5 +65,9 @@ export default class QuestionService {
     }
     static setSearchCacheForCourse(search: ISearch) {
         return UserRepository.setSearchCacheForCourse(search);
+    }
+
+    static deleteQuestion(id: number) {
+        return QuestionRepository.deleteQuestion(id);
     }
 }

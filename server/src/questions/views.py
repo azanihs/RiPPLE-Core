@@ -10,30 +10,32 @@ from ripple.util.util import is_number, merge_url_parts
 from users.services import UserService
 from questions.services import QuestionService, SearchService, AuthorService
 
-
-def add(request):
-    if request.method != 'POST':
-        return JsonResponse({
-            "error": "Must use POST to this endpoint"
-        }, status=405)
-
+def get_root_path(request):
     def _format(x):
         if len(x) == 0: return x
         return (x + "/") if x[-1] != "/" else x
-    root_path = merge_url_parts([
+
+    return merge_url_parts([
         _format("//" + request.get_host()),
         _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
 
+def validate_request(request):
+    if request.method != 'POST':
+        return (False, JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405))
+
+    root_path = get_root_path(request)
     post_request = loads(request.body.decode("utf-8"))
 
     if post_request is None:
-        return JsonResponse({"error": "Missing question in request"}, status=422)
+        return (False, JsonResponse({"error": "Missing question in request"}, status=422))
 
-    response = AuthorService.add_question(
-        post_request, root_path, UserService.logged_in_user(request))
+    return (root_path, post_request)
 
+def validate_response(response):
     if response['state'] == "Error":
         return JsonResponse({"error": response['error']}, status=422)
     else:
@@ -43,6 +45,33 @@ def add(request):
             }
         })
 
+def add(request):
+    v = validate_request(request)
+    if not v[0]:
+        return v[1]
+
+    root_path, post_request = v
+
+    response = AuthorService.add_question(
+        post_request, root_path, UserService.logged_in_user(request))
+
+    return validate_response(response)
+
+def update(request, qid):
+    val = validate_request(request)
+    if not val[0]:
+        return val[1]
+
+    root_path, post_request = val
+
+    response = QuestionService.update_question(
+        post_request, root_path, UserService.logged_in_user(request), qid)
+
+    return validate_response(response)
+
+def delete(request, qid):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(QuestionService.delete_question(user, qid))
 
 def respond(request):
     if request.method != 'POST':
@@ -126,7 +155,7 @@ def id(request, id):
     if question is None:
         return JsonResponse({"error": "You are not enrolled in the course for this question"}, status=403)
 
-    return JsonResponse({"data": question.toJSON()})
+    return JsonResponse({"data": question})
 
 
 def competencies(request):
@@ -236,20 +265,23 @@ def report(request):
 
     post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
-    return JsonResponse(QuestionService.report_question(user, post_request))
+    return JsonResponse({"data": QuestionService.report_question(user, post_request)})
 
-def getReports(request):
+def all_reports(request):
+    user = UserService.logged_in_user(request)
+
+    result = QuestionService.all_reports(user)
+    if type(result) != list and result.get("error", None) is not None:
+        return JsonResponse(result)
+    else:
+        return JsonResponse({"data": result})
+
+
+def get_reasons(request):
     if request.method != 'POST':
         return JsonResponse({
             "error": "Must use POST to this endpoint"
         }, status=405)
 
-    post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
-    page=post_request.get("page", None)
-
-    search_result = QuestionService.get_reports(user)
-    if search_result["error"]:
-        return JsonResponse(search_result)
-    else:
-        return page_response(search_result, page)
+    return JsonResponse({"data": QuestionService.get_reason_list(user)})

@@ -7,7 +7,7 @@ import imghdr
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
-from users.services.UserService import *
+from users.services import UserService
 from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
@@ -30,8 +30,8 @@ def me(request):
 
 
 def courses(request):
-    user = logged_in_user(request)
-    return JsonResponse({"data": user_courses(user)})
+    user = UserService.logged_in_user(request)
+    return JsonResponse({"data": UserService.user_courses(user)})
 
 
 def update(request):
@@ -41,8 +41,8 @@ def update(request):
         }, status=405)
 
     post_request = loads(request.body.decode("utf-8"))
-    user = logged_in_user(request)
-    return JsonResponse({"data": update_course(user, post_request)})
+    user = UserService.logged_in_user(request)
+    return JsonResponse({"data": UserService.update_course(user, post_request)})
 
 
 def login(request, course_code):
@@ -77,25 +77,17 @@ def image_update(request):
             "error": "Missing image payload"
         }, status=405)
 
-    def _format(x):
-        if len(x) == 0: return x
-        return (x + "/") if x[-1] != "/" else x
+    course_user = UserService.logged_in_user(request)
 
-    course_user = logged_in_user(request)
-
-    root_path = util.merge_url_parts([
-        _format("//" + request.get_host()),
-        _format(settings.FORCE_SCRIPT_NAME),
-        _format("static")
-    ])
+    root_path = util.generate_static_path(request.get_host())
 
     return JsonResponse({
-        "data":update_user_image(course_user.user, root_path, new_image)
+        "data":UserService.update_user_image(course_user.user, root_path, new_image)
     })
 
 
 def get_all_user_achievements(request):
-    user = logged_in_user(request)
+    user = UserService.logged_in_user(request)
 
     achievements = Achievement.objects.all()
     data = []
@@ -114,7 +106,7 @@ def get_all_user_achievements(request):
     return JsonResponse({"data": data})
 
 def get_all_notifications(request):
-    user = logged_in_user(request)
+    user = UserService.logged_in_user(request)
 
     notifications = Notification.objects.filter(user=user)
     data = []
@@ -123,19 +115,42 @@ def get_all_notifications(request):
         n.sent = True
         data.append(n.toJSON())
 
-    return JsonResponse({"data":data})
+    return JsonResponse({"data": data })
 
 def engagement(request):
-    user = logged_in_user(request)
-    engagement_list = get_all_engagements(user)
+    user = UserService.logged_in_user(request)
+    engagement_list = UserService.get_all_engagements(user)
     return JsonResponse({"data": engagement_list})
 
 def engagement_all(request):
-    user = logged_in_user(request)
-    engagement = user_engagement(user)
+    user = UserService.logged_in_user(request)
+    engagement = UserService.user_engagement(user)
     return JsonResponse({"data": engagement})
 
 def engagement_aggregate(request, compare_type):
-    user = logged_in_user(request)
-    engagement = user_engagement(user, compare_type)
+    user = UserService.logged_in_user(request)
+    engagement = UserService.user_engagement(user, compare_type)
     return JsonResponse({"data": engagement})
+
+def consent(request):
+    user = UserService.logged_in_user(request)
+    if request.method == 'POST':
+        post_request = loads(request.body.decode("utf-8"))
+        return JsonResponse(UserService.consent_service(user, post_request))
+    else:
+        return JsonResponse(UserService.get_user_consent(user))
+
+
+def submit_consent_form(request):
+    user = UserService.logged_in_user(request)
+    post_request = loads(request.body.decode("utf-8"))
+    return JsonResponse(UserService.update_consent_form(user, post_request, request.get_host()))
+
+def consent_form(request):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(UserService.get_consent_form(user))
+
+def has_consented(request):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(UserService.has_consented_course(user))
+

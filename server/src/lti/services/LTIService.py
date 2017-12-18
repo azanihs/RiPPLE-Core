@@ -81,3 +81,5 @@ def create_course_user(course, user, lti_params):
 
     for i in user_roles:
         update_user_roles(course_user, i)
+
+    return course_user

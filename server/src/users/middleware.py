@@ -53,8 +53,10 @@ class NotificationMiddleware(object):
                 i.save()
 
             response.content = json.dumps(data)
-        except json.JSONDecodeError:
+        # Catch JSON decode error
+        except ValueError:
             pass
+
         return response
 
 class AchievementChecker(object):

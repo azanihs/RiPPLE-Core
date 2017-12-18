@@ -1,13 +1,19 @@
 import random
 import math
 import numpy as np
+import pytz as timezone
+from datetime import datetime
 
-from django.db.models import Count, Min
+from django.db.models import Count, Min, Max
+from django.db import IntegrityError, transaction
 
 from ripple.util import util
-from users.models import CourseUser, Token
-from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse, Competency, QuestionScore, ReportQuestion
-from questions.services import CompetencyService
+from users.models import CourseUser, Token, User
+from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
+    Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
+from questions.services import CompetencyService, AuthorService
+
+_epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 def leaderboard_sort(class_instance, user_column):
     query = class_instance.objects.values(
@@ -90,7 +96,12 @@ def get_question_by_id(user, id):
         question = Question.objects.get(pk=id)
         if question.author.course != user.course:
             return None
-        return question
+        q_JSON =  question.toJSON()
+        if util.is_administrator(user) or question.author == user:
+            q_JSON["canEdit"] = True
+        else:
+            q_JSON["canEdit"] = False
+        return q_JSON
     except Question.DoesNotExist:
         return None
 
@@ -109,6 +120,7 @@ def respond_to_question(distractor_id, user):
         response=answered_option
     )
     response.save()
+    calculate_question_score(user, answered_option.question, response)
     update_competency(user, answered_option.question, response)
     return True
 
@@ -192,8 +204,6 @@ def update_competency(user, question, response):
     """
         Updates the user's competency for all topic combinations in the given question
     """
-
-    calculate_question_score(user, question, response)
     queryset_topics = question.topics.all()
 
     score = get_competency_score(question, response)
@@ -251,7 +261,7 @@ def get_competency_score(question, response):
     ### most situations
     weighted_features = [
         (difficulty/10, 0.2),
-        (past_average, 0.4),
+        (past_average, 0.1),
         (exp_moving_avg(0.9, question_scores), 0.3)
     ]
 
@@ -289,28 +299,111 @@ def report_question(user, request):
     reason = request.get("reason", None)
     question = request.get("question", None)
 
-    if reason is None or question is None:
+    if reason is None or len(reason) == 0 or question is None:
         return {"error": "Please provide a reason and question ID"}
 
     question = Question.objects.get(pk=question)
 
     report = ReportQuestion(
         question=question,
-        user=user,
-        reason=reason
+        user=user
     )
     report.save()
+
+    for r in reason:
+        try:
+            report_reason = ReportReason.objects.get(course=user.course, reason=r)
+        except ReportReason.DoesNotExist:
+            report_reason = ReportReason.objects.get(course=user.course, reason="custom")
+        report_reason = ReportQuestionList (
+            report_question = report,
+            report_reason = report_reason,
+            reason_text = r
+        )
+        report_reason.save()
     return {}
 
-def get_reports(user):
-    if not util.is_administrator(user):
-        return {"error": "User does not have administrative permission for current context"}
+def get_reason_list(user):
     course = user.course
-    reportQuestions= ReportQuestion.objects \
-        .filter(author__in=CourseUser.objects.filter(course=course))
+    reasons = ReportReason.objects.filter(course=course)
+    r_list = [r.reason for r in reasons if r.reason != "custom"]
+    return {"reasonList": r_list}
 
-    return reportQuestions
+def report_aggregate(user):
+    #if not util.is_administrator(user):
+    #    return {"error": "User does not have administrative permission for current context"}
+    course = user.course
+    report_questions = ReportQuestion.objects \
+        .filter(user__in=CourseUser.objects.filter(course=course))
+
+    report_aggregates = report_questions.values("question")\
+            .annotate(total=Count("question")).annotate(last_report=Max("created_at")).order_by("-total")
+    reports = []
+    for q in report_aggregates:
+        reports.append({
+            "questionID": q["question"],
+            "totalReports": q["total"],
+            "lastReport": (q["last_report"].replace(tzinfo=timezone.utc) - _epoch).total_seconds()
+        })
+    return reports
+
+def all_reports(user):
+    reports = []
+    aggregates = report_aggregate(user)
+    reports.append(aggregates)
+    for rep in aggregates:
+        qid = rep["questionID"]
+        q_reports = ReportQuestion.objects.filter(question=qid).order_by("-id")
+        report_list = []
+        for r in q_reports:
+            report_list.append(r.toJSON_summary())
+        reports.append(report_list)
+    reports = {"reports": reports}
+    return reports
+
+def delete_question(user, qid):
+    try:
+        question = Question.objects.get(id=qid)
+        if (util.is_administrator(user) or user == question.author):
+            with transaction.atomic():
+                deleted = make_deleted_question(question)
+                deleted.topics.set(question.topics.all())
+                question.delete()
+            return {"data": {}}
+        else:
+            return {"error": "Permission Denied"}
+    except Question.DoesNotExist:
+        return {"error": "Question does not exist"}
+    except IntegrityError as e:
+        return {"error": str(e)}
 
 
+def update_question(post_request, root_path, user, qid):
+    try:
+        question = Question.objects.get(id=qid)
+        if (util.is_administrator(user) or user == question.author):
+            with transaction.atomic():
+                deleted = make_deleted_question(question)
+                deleted.topics.set(question.topics.all())
+                return AuthorService.add_question(post_request, root_path, user, question)
+        else:
+            return {"state": "Error", "error": "Permission Denied"}
+    except Question.DoesNotExist:
+        return {"state": "Error", "error": "Question does not exist"}
+    except IntegrityError as e:
+        return {"state": "Error", "error": str(e)}
 
-
+def make_deleted_question(question):
+    d_question = DeletedQuestion(
+        content = question.content,
+        explanation = question.explanation,
+        difficulty = question.difficulty,
+        quality = question.quality,
+        difficultyCount = question.difficultyCount,
+        qualityCount = question.qualityCount,
+        created_time = question.created_time,
+        author = question.author,
+        active_question = question
+    )
+    d_question.save()
+    return d_question
