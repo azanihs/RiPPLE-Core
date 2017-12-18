@@ -2,6 +2,14 @@
     <md-layout class="buttonContainer">
         <action-buttons>
             <md-button
+                v-if="showEdit"
+                class="primary-colour"
+                slot="centreRight"
+                @click="editQuestion">
+                <span>Edit Question</span>
+            </md-button>
+            <md-button
+                v-else
                 class="primary-colour"
                 slot="centreRight"
                 @click="saveQuestion">
@@ -29,7 +37,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component } from "av-ts";
+import { Vue, Component, Prop, p } from "av-ts";
 import ActionButtons from "./ActionButtons.vue";
 
 @Component({
@@ -39,12 +47,20 @@ import ActionButtons from "./ActionButtons.vue";
 })
 
 export default class AdminButtons extends Vue {
+    @Prop showEdit = p<boolean>({
+        required: true
+    });
+
     saveQuestion() {
         this.$emit("saveQuestion");
     }
 
     deleteQuestion() {
         this.$emit("deleteQuestion");
+    }
+
+    editQuestion() {
+        this.$emit("editQuestion");
     }
 }
 </script>

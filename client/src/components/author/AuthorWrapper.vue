@@ -1,6 +1,6 @@
 <template>
     <md-layout v-if="question" class="flex-vertical">
-        <admin-buttons></admin-buttons>
+        <admin-buttons :canEdit="false"></admin-buttons>
         <author-view ref="authView" :question="question" :id="this.id"></author-view>
     </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
