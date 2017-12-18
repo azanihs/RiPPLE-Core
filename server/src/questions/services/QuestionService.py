@@ -120,7 +120,6 @@ def respond_to_question(distractor_id, user):
         response=answered_option
     )
     response.save()
-    calculate_question_score(user, answered_option.question, response)
     update_competency(user, answered_option.question, response)
     return True
 
@@ -204,6 +203,8 @@ def update_competency(user, question, response):
     """
         Updates the user's competency for all topic combinations in the given question
     """
+    calculate_question_score(user, question, response)
+
     queryset_topics = question.topics.all()
 
     score = get_competency_score(question, response)

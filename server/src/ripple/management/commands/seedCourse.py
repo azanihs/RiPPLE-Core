@@ -43,9 +43,9 @@ def merge_url_parts(parts, url=""):
     return merge_url_parts(parts, urljoin(url, parts.pop(0)))
 
 
-def make_question_responses(user, distractors):
+def make_question_responses(user, correct, incorrect, ability):
     if chance(2):
-        user_choice = choice(distractors)
+        user_choice = choose_answer(correct, incorrect, ability)
         response = QuestionResponse(
             response=user_choice,
             user=user
@@ -62,6 +62,24 @@ def make_question_responses(user, distractors):
                 user=user
             )
             rating.save()
+
+
+def choose_answer(correct, incorrect, ability):
+    #Will be used with chance to get 33% probability of answering correctly
+    lowPercentage = 3
+    #Will be used with not chance to get 66% probability of answering correctly
+    mediumPercentage = 3
+    #Will be used with not chance to get 90% probability of answering correctly
+    highPercentage = 10
+    if (ability == "low" and chance(lowPercentage)):
+        user_choice = choice(correct)
+    elif (ability == "medium" and not chance(mediumPercentage)):
+        user_choice = choice(correct)
+    elif (ability == "high" and not chance(highPercentage)):
+        user_choice = choice(correct)
+    else:
+        user_choice = choice(incorrect)
+    return user_choice
 
 
 def get_topics(file):
@@ -271,11 +289,20 @@ class Command(BaseCommand):
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)
+            correct_distractors = []
+            incorrect_distractors = []
+            for item in distractors:
+                if (item.isCorrect):
+                    correct_distractors.append(item)
+                else:
+                    incorrect_distractors.append(item)
 
             print("\t-Answering and Rating Questions")
+            abilities = ["low", "medium", "high"]
             for user in course_users:
-                for i in range(0, 10):
-                    make_question_responses(user, distractors)
+                studentAbility = abilities[choice(range(3))]
+                for i in range(0, 100):
+                    make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
         def populate_availability(course_users, days, times):
             for i in range(len(course_users)):
