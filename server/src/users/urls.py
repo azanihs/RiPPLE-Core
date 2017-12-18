@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^engagement/$', views.engagement),
     url(r'^engagement/all/$', views.engagement_all),
     url(r'^engagement/aggregate/(.*)/$', views.engagement_aggregate),
+    url(r'^notifications/all/$', views.get_all_notifications, name="get_all_notifications"),
     url(r'^consent/$', views.consent, name='consent'),
     url(r'^submit_consent_form/$', views.submit_consent_form, name='submit_consent_form'),
     url(r'^consent_form/$', views.consent_form, name='consent_form'),

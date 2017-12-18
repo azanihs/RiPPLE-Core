@@ -29,7 +29,7 @@ export function serverToLocal(UTCTimestamp: number) {
     const date = new Date(0);
     date.setUTCSeconds(UTCTimestamp);
 
-    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    return ("0" + date.getDate()).slice(-2) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + date.getFullYear();
 }
 
 export function localToUTC(date?: string) {

@@ -169,7 +169,8 @@ export interface INotification {
     id: number,
     name: string,
     description: string,
-    icon: string
+    icon: string,
+    created?: number
 };
 
 export interface IQuestionBuilder {

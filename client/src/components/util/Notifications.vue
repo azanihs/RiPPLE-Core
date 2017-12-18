@@ -1,5 +1,5 @@
 <template>
-    <md-layout v-if="notifications.length > 0" md-flex="100">
+    <md-layout v-if="notifications.length > 0" md-flex="100" class="column">
         <div class="notification"
              v-for="notification in notifications"
              :key="notification.id">
@@ -15,7 +15,7 @@
                 <div>
                     <h3>{{notification.name}}</h3>
                     <p>{{notification.description}}</p>
-                    <span class="date">{{ notificationDate }}</span>
+                    <span class="date">{{ notificationDate(notification) }}</span>
                 </div>
              </responsive-wrapper>
 
@@ -90,6 +90,10 @@ p + p {
     width: 100%;
 }
 
+.column {
+    flex-direction:column;
+}
+
 .date {
     position: absolute;
     right: 16px;
@@ -106,6 +110,7 @@ import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
+import { serverToLocal } from "../../util";
 
 @Component({
     components: {
@@ -137,16 +142,8 @@ export default class Notifications extends Vue {
             .off(this.updateNotifications);
     }
 
-    get notificationDate() {
-        return `${this.date.getFullYear()}`.slice(2, 4)
-            + "/"
-            + (this.date.getMonth() + 1)
-            + "/" +
-            this.date.getDate()
-            + " "
-            + this.date.getHours()
-            + ":"
-            + this.date.getMinutes();
+    notificationDate(notification: INotification) {
+        return serverToLocal(<number> notification.created);
     }
 
     get notifications() {

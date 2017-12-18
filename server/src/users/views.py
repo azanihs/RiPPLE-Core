@@ -108,7 +108,7 @@ def get_all_user_achievements(request):
 def get_all_notifications(request):
     user = UserService.logged_in_user(request)
 
-    notifications = Notification.objects.filter(user=user)
+    notifications = Notification.objects.filter(user=user).order_by("-id")
     data = []
 
     for n in notifications:
