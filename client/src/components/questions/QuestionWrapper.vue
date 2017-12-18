@@ -15,7 +15,7 @@
                 </md-button>
             </action-buttons>
         </md-layout>
-        <question :question="question"></question>
+        <question :question="question" ref="questionComponent"></question>
     </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
 </template>
@@ -72,6 +72,10 @@ export default class QuestionWrapper extends Vue {
 
     editQuestion() {
         this.$router.push({ path: `/question/edit/${this.id}` });
+    }
+
+    openDialog() {
+        (<Question> this.$refs.questionComponent).openDialog();
     }
 
     @Lifecycle

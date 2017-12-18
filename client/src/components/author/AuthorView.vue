@@ -3,11 +3,11 @@
         <md-layout md-flex="100">
             <md-tabs md-fixed
                 :mdNavigation="false"
-                class="md-transparent tabContainer"
+                class="md-transparent tabContainer mainTab"
                 @change="tabSelected">
                 <md-tab md-label="Write Question">
                     <md-layout md-flex="100">
-                        <md-card>
+                        <md-card class="firstAuthorCard">
                             <md-layout md-flex="100"
                                 class="componentSeparator">
                                 <h2>Question Body</h2>
@@ -31,7 +31,7 @@
                         <md-card class="removePadding">
                             <md-tabs md-fixed
                                 :mdNavigation="false"
-                                class="md-transparent tabContainer">
+                                class="md-transparent tabContainer subTabs">
                                 <md-tab v-for="i in ['A', 'B', 'C', 'D']"
                                     :key="i"
                                     :id="'tab_' + i"
@@ -108,6 +108,22 @@ h3 {
     width: 100%;
     min-width: 100%;
     margin-top: 0px;
+}
+
+.firstAuthorCard {
+    margin-top: 40px;
+}
+
+.mainTab >>> nav {
+    position: fixed !important;
+    width: 85% !important;
+    background-color: white !important;
+}
+
+.subTabs >>> nav {
+    position: relative !important;
+    width: 100% !important;
+    background-color: transparent !important;
 }
 
 .removePadding {
