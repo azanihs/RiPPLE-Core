@@ -99,7 +99,7 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
     if not util.is_administrator(user):
         for i in range(0,len(leaderboard_users)):
             if leaderboard_users[i]["rank"] == user.id:
-                found = i+1
+                found = i
                 leaderboard_users[i]["id"] = user.id
             leaderboard_users[i]["rank"] = i+1
 
