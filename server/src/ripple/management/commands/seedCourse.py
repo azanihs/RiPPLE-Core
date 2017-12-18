@@ -42,9 +42,9 @@ def merge_url_parts(parts, url=""):
     return merge_url_parts(parts, urljoin(url, parts.pop(0)))
 
 
-def make_question_responses(user, distractors):
+def make_question_responses(user, correct, incorrect, ability):
     if chance(2):
-        user_choice = choice(distractors)
+        user_choice = choose_answer(correct, incorrect, ability)
         response = QuestionResponse(
             response=user_choice,
             user=user
@@ -61,6 +61,24 @@ def make_question_responses(user, distractors):
                 user=user
             )
             rating.save()
+
+
+def choose_answer(correct, incorrect, ability):
+    #Will be used with chance to get 33% probability of answering correctly
+    lowPercentage = 3
+    #Will be used with not chance to get 66% probability of answering correctly
+    mediumPercentage = 3
+    #Will be used with not chance to get 90% probability of answering correctly
+    highPercentage = 10
+    if (ability == "low" and chance(lowPercentage)):
+        user_choice = choice(correct)
+    elif (ability == "medium" and not chance(mediumPercentage)):
+        user_choice = choice(correct)
+    elif (ability == "high" and not chance(highPercentage)):
+        user_choice = choice(correct)
+    else:
+        user_choice = choice(incorrect)
+    return user_choice
 
 
 def get_topics(file):
@@ -255,11 +273,20 @@ class Command(BaseCommand):
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)
+            correct_distractors = []
+            incorrect_distractors = []
+            for item in distractors:
+                if (item.isCorrect):
+                    correct_distractors.append(item)
+                else:
+                    incorrect_distractors.append(item)
 
             print("\t-Answering and Rating Questions")
+            abilities = ["low", "medium", "high"]
             for user in course_users:
-                for i in range(0, 10):
-                    make_question_responses(user, distractors)
+                studentAbility = abilities[choice(range(3))]
+                for i in range(0, 100):
+                    make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
         def populate_availability(course_users, days, times):
             for i in range(len(course_users)):
@@ -286,7 +313,7 @@ class Command(BaseCommand):
                         availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
 
         courses = []
-        for i in range(0,len(course_names)):
+        for i in range(0,1):
             courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
@@ -300,26 +327,26 @@ class Command(BaseCommand):
             unique_topics = get_topics(courses[i]["courseFile"])
             populate_course(courses[i]["courseFile"], unique_topics, all_courses[i], users)
 
-        print("Populating Availabilities")
-        print("\t-Making Days")
-        make_days()
+        # print("Populating Availabilities")
+        # print("\t-Making Days")
+        # make_days()
 
-        print("\t-Making Times")
-        time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
-        time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
-        make_times(time_inputs)
+        # print("\t-Making Times")
+        # time_inputs = [datetime(2017, 11, 6, hour, 0).time() for hour in range(0, 24)]
+        # time_inputs.append(datetime(2017, 11, 7, 0, 0).time())
+        # make_times(time_inputs)
 
-        print("\t-Making Study Roles")
-        make_study_roles()
+        # print("\t-Making Study Roles")
+        # make_study_roles()
 
-        course_users = CourseUser.objects.all()
-        days = Day.objects.all()
-        times = Time.objects.all()
-        print("\t-Populating Availabilities")
-        populate_availability(course_users, days, times)
-        study_roles = StudyRole.objects.all()
-        print("\t-Populating Study Roles")
-        populate_available_roles(course_users, study_roles)
+        # course_users = CourseUser.objects.all()
+        # days = Day.objects.all()
+        # times = Time.objects.all()
+        # print("\t-Populating Availabilities")
+        # populate_availability(course_users, days, times)
+        # study_roles = StudyRole.objects.all()
+        # print("\t-Populating Study Roles")
+        # populate_available_roles(course_users, study_roles)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')
