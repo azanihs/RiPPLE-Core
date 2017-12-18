@@ -142,16 +142,12 @@ export interface IPeerConnection {
 export interface IUserSummary {
     name: string,
     image: string,
-    reputation: number,
 
     questionsAuthored: number,
     questionsAnswered: number,
-    questionsCommented: number,
-    questionsViewed: number,
+    questionsAnsweredCorrectly: number,
     questionsRated: number,
-
-    connectionsMade: number,
-    logins: number
+    achievementsEarned: number
 };
 
 export interface IBadge {

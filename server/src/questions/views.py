@@ -173,8 +173,7 @@ def distribution(request, question_id):
     return JsonResponse({"data": question_distribution})
 
 def leaderboard_default(request):
-    return leaderboard(request, "reputation", "DESC")
-
+    return leaderboard(request, "questionsAuthored", "DESC")
 
 def leaderboard(request, sort_field, sort_order):
     logged_in_user = UserService.logged_in_user(request)
@@ -182,7 +181,7 @@ def leaderboard(request, sort_field, sort_order):
     limit = -1 if "Instructor" in user_roles else 20
 
     if sort_order != "DESC" and sort_order != "ASC":
-        sort_order = "ASC"
+        sort_order = "DESC"
 
     leaderboard_scores = QuestionService.get_course_leaders(
         logged_in_user.course, sort_field, sort_order, limit)

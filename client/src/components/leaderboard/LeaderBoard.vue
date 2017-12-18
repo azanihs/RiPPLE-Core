@@ -13,10 +13,6 @@
                         <md-icon>account_box</md-icon>
                         <span>Name</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="reputation">
-                        <md-icon>star</md-icon>
-                        <span>Reputation</span>
-                    </md-table-head>
                     <md-table-head md-sort-by="questionsAuthored">
                         <md-icon>library_add</md-icon>
                         <span>Questions Contributed</span>
@@ -25,9 +21,17 @@
                         <md-icon>reply</md-icon>
                         <span>Questions Answered</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="questionsCommented">
-                        <md-icon>message</md-icon>
-                        <span>Comments</span>
+                    <md-table-head md-sort-by="questionsAnsweredCorrectly">
+                        <md-icon>check</md-icon>
+                        <span>Answered Correctly</span>
+                    </md-table-head>
+                    <md-table-head md-sort-by="questionsRated">
+                        <md-icon>star_rate</md-icon>
+                        <span>QuestionsRated</span>
+                    </md-table-head>
+                    <md-table-head md-sort-by="achievementsEarned">
+                        <md-icon>gamepad</md-icon>
+                        <span>achievementsEarned</span>
                     </md-table-head>
                 </md-table-row>
             </md-table-header>
@@ -40,10 +44,11 @@
                                   :alt="user.name"></md-image>
                     </md-table-cell>
                     <md-table-cell>{{ user.name }}</md-table-cell>
-                    <md-table-cell>{{ user.reputation }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAuthored }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAnswered }}</md-table-cell>
-                    <md-table-cell>{{ user.questionsCommented }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsAnsweredCorrectly }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsRated }}</md-table-cell>
+                    <md-table-cell>{{ user.achievementsEarned }}</md-table-cell>
                 </md-table-row>
             </md-table-body>
         </md-table>
@@ -93,7 +98,7 @@ export default class LeaderBoard extends Vue {
     @Lifecycle
     created() {
         UserService.getMostReputableUsers({
-            sortField: "reputation",
+            sortField: "questionsAuthored",
             sortOrder: "DESC"
         }).then(this.updateUsers);
     }
