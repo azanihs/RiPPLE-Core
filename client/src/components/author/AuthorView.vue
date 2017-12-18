@@ -111,13 +111,14 @@ h3 {
 }
 
 .firstAuthorCard {
-    margin-top: 40px;
+    margin-top: 7%;
 }
 
 .mainTab >>> nav {
     position: fixed !important;
     width: 85% !important;
     background-color: white !important;
+    top: 7%;
 }
 
 .subTabs >>> nav {

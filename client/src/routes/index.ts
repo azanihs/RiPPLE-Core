@@ -74,7 +74,7 @@ const routes = [{
     }, {
         path: "/question/create",
         name: "create",
-        component: AuthorView
+        component: AuthorWrapper
     }, {
         path: "/question/edit/:id",
         name: "edit",

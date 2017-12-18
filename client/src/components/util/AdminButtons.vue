@@ -1,5 +1,5 @@
 <template>
-    <md-layout class="buttonContainer">
+    <md-layout class="buttonContainer fixedButtons">
         <action-buttons>
             <md-button
                 v-if="showEdit"
@@ -16,6 +16,7 @@
                 <span>Save Question</span>
             </md-button>
             <md-button
+                v-if="questionExists"
                 class="md-warn"
                 slot="right"
                 @click="deleteQuestion">
@@ -35,6 +36,17 @@
     margin-bottom: 0.5;
     flex: unset;
 }
+
+.fixedButtons{
+    position: fixed;
+    background-color: white;
+    z-index: 100;
+}
+
+.fixedButtons >>> .right {
+    justify-content: center !important;
+}
+
 </style>
 
 <script lang="ts">
@@ -50,6 +62,10 @@ import ActionButtons from "./ActionButtons.vue";
 export default class AdminButtons extends Vue {
     @Prop showEdit = p<boolean>({
         required: true
+    });
+
+    @Prop questionExists = p<boolean>({
+        default: false
     });
 
     saveQuestion() {
