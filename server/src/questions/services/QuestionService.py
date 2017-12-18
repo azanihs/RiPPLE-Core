@@ -41,7 +41,7 @@ def question_response_distribution(question_id):
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
     return response_distribution
 
-def get_course_leaders(course, sort_field, sort_order, limit=25):
+def get_course_leaders(course, sort_field, sort_order, limit=25, user):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -81,6 +81,7 @@ def get_course_leaders(course, sort_field, sort_order, limit=25):
     achievement_counts = leaderboard_sort(UserAchievement, "user_id")
 
     leaderboard_users = [{
+        "id": u.id,
         "name": u.user.first_name,
         "image": u.user.image,
         "questionsAuthored": lookup_total("author_id", u.id, question_counts),
@@ -94,11 +95,24 @@ def get_course_leaders(course, sort_field, sort_order, limit=25):
         should_reverse = sort_order == "DESC"
         leaderboard_users = sorted(
             leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
-
     if limit == -1:
         return leaderboard_users
 
-    return leaderboard_users[0:limit]
+    leaderboard = leaderboard_users[0:limit]
+
+    if not is_administrator(user):
+        counter = 0
+        for i in range(0,len(leaderboard_users)):
+            if leaderboard_users[i]["id"] == user.id:
+                break
+            counter += 1
+    if counter >= limit:
+        leaderboard.append(leaderboard_users[i])
+
+    for l in leaderboard:
+        l.pop('id', None)
+
+    return leaderboard
 
 
 def get_course_topics(course):
