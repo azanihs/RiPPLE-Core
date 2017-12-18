@@ -148,6 +148,14 @@ def random_question_id(request):
 
     return JsonResponse({"data": question.id})
 
+def next_recommended_question(request):
+    logged_in_user = UserService.logged_in_user(request)
+    question = QuestionService.next_recommended_question(logged_in_user)
+    if question is None:
+        return JsonResponse({"error": "You are not enrolled in the course for this question"}, status=403)
+
+    return JsonResponse({"data": question.id})
+
 def id(request, id):
     logged_in_user = UserService.logged_in_user(request)
     question = QuestionService.get_question_by_id(logged_in_user, id)

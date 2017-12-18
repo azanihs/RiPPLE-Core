@@ -60,6 +60,10 @@ export default class QuestionService {
         return QuestionRepository.getRandomCourseQuestion();
     }
 
+    static getNextRecommendedQuestion() {
+        return QuestionRepository.getNextRecommendedQuestion();
+    }
+
     static getSearchCacheForCourse() {
         return UserRepository.getSearchCacheForCourse();
     }

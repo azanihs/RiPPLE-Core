@@ -58,6 +58,8 @@ class CourseUser(models.Model):
     course = models.ForeignKey(Course)
     roles = models.ManyToManyField(Role)
 
+    elo_rating = models.FloatField(default=1000)
+
     def toJSON(self):
         return {
             "user": self.user.toJSON(),

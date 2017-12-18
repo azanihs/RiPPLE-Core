@@ -90,6 +90,10 @@ export default class QuestionRepository {
         return apiFetch<number>(`/questions/random/`);
     }
 
+    static getNextRecommendedQuestion() {
+        return apiFetch<number>(`/questions/recommended/next`);
+    }
+
     static getReportReasons() {
         return apiFetch<IReasonList>("/questions/report/reasons/", {
             method: "POST",

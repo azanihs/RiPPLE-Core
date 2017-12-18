@@ -36,6 +36,8 @@ class Question(models.Model):
     topics = models.ManyToManyField(Topic)
     author = models.ForeignKey(CourseUser)
 
+    elo_difficulty = models.FloatField(default=1000)
+
     def __str__(self):
         return self.content[:20]
 
