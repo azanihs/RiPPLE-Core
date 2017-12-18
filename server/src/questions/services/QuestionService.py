@@ -41,7 +41,7 @@ def question_response_distribution(question_id):
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
     return response_distribution
 
-def get_course_leaders(course, sort_field, sort_order, limit=25, user):
+def get_course_leaders(course, sort_field, sort_order, user, limit=25):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -95,23 +95,20 @@ def get_course_leaders(course, sort_field, sort_order, limit=25, user):
         should_reverse = sort_order == "DESC"
         leaderboard_users = sorted(
             leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
+
+    if not util.is_administrator(user):
+        for i in range(0,len(leaderboard_users)):
+            print(i)
+            if leaderboard_users[i]["rank"] == user.id:
+                found = i+1
+            leaderboard_users[i]["rank"] = i+1
+
     if limit == -1:
         return leaderboard_users
 
     leaderboard = leaderboard_users[0:limit]
-
-    if not is_administrator(user):
-        counter = 0
-        for i in range(0,len(leaderboard_users)):
-            if leaderboard_users[i]["rank"] == user.id:
-                counter += 1
-                leaderboard_users[i]["rank"] = counter
-                break
-            counter += 1
-            leaderboard_users[i]["rank"] = counter
-
-    if counter >= limit:
-        leaderboard.append(leaderboard_users[i])
+    if found >= limit:
+        leaderboard.append(leaderboard_users[found])
 
     return leaderboard
 

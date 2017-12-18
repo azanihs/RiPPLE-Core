@@ -140,6 +140,7 @@ export interface IPeerConnection {
 };
 
 export interface IUserSummary {
+    rank: number,
     name: string,
     image: string,
 

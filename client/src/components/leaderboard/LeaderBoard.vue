@@ -6,6 +6,9 @@
             <md-table-header>
                 <md-table-row>
                     <md-table-head>
+                        <span>Rank</span>
+                    </md-table-head>
+                    <md-table-head>
                         <md-icon>camera_alt</md-icon>
                         <span>Avatar</span>
                     </md-table-head>
@@ -27,17 +30,18 @@
                     </md-table-head>
                     <md-table-head md-sort-by="questionsRated">
                         <md-icon>star_rate</md-icon>
-                        <span>QuestionsRated</span>
+                        <span>Questions Rated</span>
                     </md-table-head>
                     <md-table-head md-sort-by="achievementsEarned">
                         <md-icon>gamepad</md-icon>
-                        <span>achievementsEarned</span>
+                        <span>Achievements Earned</span>
                     </md-table-head>
                 </md-table-row>
             </md-table-header>
             <md-table-body>
                 <md-table-row v-for="user in users"
                               :key="user.id">
+                    <md-table-cell>{{ user.rank }}</md-table-cell>
                     <md-table-cell>
                         <md-image class="avatar"
                                   :md-src="user.image"
