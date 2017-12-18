@@ -301,7 +301,7 @@ class Command(BaseCommand):
             abilities = ["low", "medium", "high"]
             for user in course_users:
                 studentAbility = abilities[choice(range(3))]
-                for i in range(0, 100):
+                for i in range(0, 10):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
         def populate_availability(course_users, days, times):
