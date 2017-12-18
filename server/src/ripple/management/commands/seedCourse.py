@@ -299,8 +299,11 @@ class Command(BaseCommand):
 
             print("\t-Answering and Rating Questions")
             abilities = ["low", "medium", "high"]
+            index = 0
             for user in course_users:
                 studentAbility = abilities[choice(range(3))]
+                print("\t-Answering Course User:" + index + " Questions")
+                index += 1
                 for i in range(0, 100):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
