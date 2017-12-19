@@ -89,7 +89,8 @@ class Notification(models.Model):
             "id": self.id,
             "name": self.name,
             "description": self.description,
-            "icon": self.icon
+            "icon": self.icon,
+            "created": (self.created.replace(tzinfo=timezone.utc) - _epoch).total_seconds()
         }
 
 class Engagement(models.Model):

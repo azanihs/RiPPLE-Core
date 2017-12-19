@@ -12,39 +12,6 @@ const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures"
 
 const _n = (i: number) => Math.floor(Math.random() * i);
 
-const _icons = [
-    "error",
-    "supervisor_account",
-    "bar_chart",
-    "trending_up",
-    "hourglass_full"
-];
-
-const _notificationMessages = [
-    "Upcoming meeting",
-    "New achievement unlocked!",
-    "New peer recommendation",
-    "Personal goal met",
-    "Personal goals slipping",
-    "User meeting requested",
-    "User meeting accepted",
-    "New achievements made available",
-    "Achievement lost"
-];
-
-const getRandomTopic = () => {
-    const i = _n(4);
-    return ["Incoming Connection", "Achievement", "Personal Goal", "Upcoming Meeting"][i];
-};
-
-const notificationCount = Math.random() < 0.5 ? 50 : 0;
-const notifications = Array.from({ length: notificationCount }).map((_, i: number) => ({
-    id: i,
-    name: getRandomTopic(),
-    description: _notificationMessages[_n(_notificationMessages.length)],
-    icon: _icons[_n(4)]
-}));
-
 type IServerEdge = {
     0: ITopic,
     1: ITopic,
@@ -152,11 +119,7 @@ export default class UserRepository {
     }
 
     static getUserNotifications(): Promise<INotification[]> {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(notifications);
-            }, Math.random() * 1000);
-        });
+        return apiFetch<INotification[]>(`/users/notifications/all/`);
     }
 
     static getAllAvailableCategories(): Promise<string[]> {
