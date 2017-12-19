@@ -41,7 +41,7 @@ def question_response_distribution(question_id):
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
     return response_distribution
 
-def get_course_leaders(course, sort_field, sort_order, user, limit=25):
+def get_course_leaders(user, sort_field, sort_order, limit=25):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -49,6 +49,7 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
                 return dict_item.get("total", 0)
         return 0
 
+    course = user.course
     course_users = CourseUser.objects.filter(course=course).exclude(\
         id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role="Instructor")))
 
