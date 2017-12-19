@@ -133,7 +133,6 @@ def next_recommended_question(user):
         return get_random_question(user)
     res = list(res)[:5]
     q = random.choice(res)
-    print(q)
     return q
 
 def get_question_by_id(user, id):
@@ -175,7 +174,6 @@ def respond_to_question(distractor_id, user):
 def update_ELO(user, question, correct):
     user_rating = user.elo_rating
     question_rating = question.elo_difficulty
-    print(user_rating, question_rating)
     # Scalar for measuring change per calculation
     k_factor = 32
 
