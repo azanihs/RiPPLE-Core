@@ -91,6 +91,27 @@ def get_random_question(user):
     random_index = random.randint(0, count - 1)
     return course_questions.all()[random_index]
 
+def next_recommended_question(user):
+    course = user.course
+    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course))
+    unanswered_questions = course_questions.exclude(
+        id__in=(Distractor.objects.filter(
+            id__in=QuestionResponse.objects.filter(user=user).values("response")).values("question")))
+    unanswered_ids = [x[0] for x in unanswered_questions.values_list("id")]
+    if len(unanswered_ids) == 0:
+        return get_random_question(user)
+    user_rating = user.elo_rating
+    rawSQL = "SELECT *, abs(elo_difficulty-"+str(user_rating)+") AS rating_diff FROM questions_question WHERE id IN ("+\
+        ','.join(map(str,unanswered_ids)) + ") ORDER BY rating_diff ASC"
+    res = Question.objects.raw(rawSQL)
+
+    if len(list(res)) < 5:
+        return get_random_question(user)
+    res = list(res)[:5]
+    q = random.choice(res)
+    print(q)
+    return q
+
 def get_question_by_id(user, id):
     try:
         question = Question.objects.get(pk=id)
@@ -121,7 +142,40 @@ def respond_to_question(distractor_id, user):
     )
     response.save()
     update_competency(user, answered_option.question, response)
+
+    if QuestionResponse.objects.filter(
+            user=user, response__in=answered_option.question.distractor_set.all()).count() == 1:
+        update_ELO(user, answered_option.question, answered_option.isCorrect)
     return True
+
+def update_ELO(user, question, correct):
+    user_rating = user.elo_rating
+    question_rating = question.elo_difficulty
+    print(user_rating, question_rating)
+    # Scalar for measuring change per calculation
+    k_factor = 32
+
+    user_r = 10**(user_rating/400)
+    question_r = 10**(question_rating/400)
+
+    user_e = user_r / (user_r + question_r)
+    question_e = question_r / (user_r + question_r)
+
+    if correct:
+        user_s = 1
+        question_s = 0
+    else:
+        user_s = 0
+        question_s = 1
+
+    user_rating = user_rating + k_factor * (user_s - user_e)
+    question_rating = question_rating + k_factor * (question_s - question_e)
+
+    user.elo_rating = user_rating
+    user.save()
+
+    question.elo_difficulty = question_rating
+    question.save()
 
 def update_running_mean(value, count, new_weight):
     return (value * count + new_weight) / (count + 1)
