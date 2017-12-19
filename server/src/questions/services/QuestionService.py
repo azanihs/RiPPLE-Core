@@ -8,7 +8,7 @@ from django.db.models import Count, Min, Max
 from django.db import IntegrityError, transaction
 
 from ripple.util import util
-from users.models import CourseUser, Token, User
+from users.models import CourseUser, Token, User, Role
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
 from rippleAchievements.models import UserAchievement
@@ -49,7 +49,8 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
                 return dict_item.get("total", 0)
         return 0
 
-    course_users = CourseUser.objects.filter(course=course)
+    course_users = CourseUser.objects.filter(course=course).exclude(\
+        id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role="Instructor")))
 
     question_counts = leaderboard_sort(Question, "author_id")
 
@@ -97,13 +98,12 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
             leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
 
     found = 0
-    for i in leaderboard_users:
-    if not util.is_administrator(user):
-        for i in range(0,len(leaderboard_users)):
+    for i in range(0, len(leaderboard_users)):
+        if not util.is_administrator(user):
             if leaderboard_users[i]["rank"] == user.id:
                 found = i
                 leaderboard_users[i]["id"] = user.id
-            leaderboard_users[i]["rank"] = i+1
+        leaderboard_users[i]["rank"] = i+1
 
     if limit == -1:
         return leaderboard_users
