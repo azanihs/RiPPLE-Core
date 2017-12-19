@@ -1,5 +1,5 @@
 <template>
-    <md-layout class="buttonContainer">
+    <md-layout md-flex="100" class="buttonContainer">
         <md-layout>
             <md-button
                 @click="back()">

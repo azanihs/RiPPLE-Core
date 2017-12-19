@@ -80,6 +80,7 @@
 
 .userRow {
     font-weight: bold;
+    background-color: #efefef;
 }
 </style>
 

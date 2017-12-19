@@ -101,8 +101,7 @@
     border-top: 1px solid #ddd;
     padding: 1em;
     margin-top: 0px;
-    margin-bottom: 16px;
-
+    margin-bottom: 0px !important;
     display: flex;
     flex: 1;
     align-items: center;

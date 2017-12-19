@@ -91,7 +91,7 @@ export default class QuestionRepository {
     }
 
     static getNextRecommendedQuestion() {
-        return apiFetch<number>(`/questions/recommended/next`);
+        return apiFetch<number>(`/questions/recommended/next/`);
     }
 
     static getReportReasons() {

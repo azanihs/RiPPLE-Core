@@ -45,14 +45,16 @@
     position: fixed;
     background-color: white;
     z-index: 100;
-    width: 100%;
+    width: 83.75%;
+    left: 16.25%;
+    top: 0px;
 }
 
-.fixedButtons >>> .right {
+.fixedButtons .right {
     justify-content: center !important;
 }
 
-.mobileStyle >>> .right {
+.mobileStyle .right {
     justify-content: space-between !important;
 }
 
