@@ -1,6 +1,6 @@
 <template>
     <md-layout v-if="!id || question" class="flex-vertical">
-        <admin-buttons :showEdit="false" :questionExists="questionExists"></admin-buttons>
+        <admin-buttons :showEdit="false" :questionExists="questionPresent"></admin-buttons>
         <author-view ref="authView" :question="question" :id="this.id"></author-view>
     </md-layout>
     <page-loader v-else :condition="id && !question"></page-loader>
@@ -36,7 +36,7 @@ export default class AuthorWrapper extends Vue {
         required: false
     });
 
-    questionExists:boolean = false;
+    questionPresent:boolean = false;
 
     pQuestion: IQuestionBuilder | undefined = undefined;
 
@@ -49,7 +49,7 @@ export default class AuthorWrapper extends Vue {
                     }
                     this.pQuestion = this.questionToBuilder(question);
                 });
-            this.questionExists = true;
+            this.questionPresent = true;
         }
     }
 

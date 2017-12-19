@@ -69,13 +69,8 @@ a.topicChipLink:hover {
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
-import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 
-@Component({
-    components: {
-        ResponsiveWrapper
-    }
-})
+@Component
 export default class TopicChip extends Vue {
     @Prop linkTo = p<string>({
         required: false,

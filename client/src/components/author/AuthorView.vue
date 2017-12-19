@@ -1,84 +1,87 @@
 <template>
     <md-layout :class="bottomSpaceClass">
+        <md-layout md-hide-medium-and-up class="hidden" ref="onlyVisibleOnMobile"></md-layout>
         <md-layout md-flex="100">
             <md-tabs md-fixed
                 :mdNavigation="false"
-                class="md-transparent tabContainer mainTab"
+                class="md-transparent tabContainer"
+                :class="{'mainTab': !mobileMode}"
                 @change="tabSelected">
-                <md-tab md-label="Write Question">
-                    <md-layout md-flex="100">
-                        <md-card class="firstAuthorCard">
-                            <md-layout md-flex="100"
-                                class="componentSeparator">
-                                <h2>Question Body</h2>
-                                <TinyMCE id="questionEditor"
-                                    v-model="question.content"
-                                    :options="options"></TinyMCE>
-                            </md-layout>
-                            <md-layout md-flex="100">
-                                <h2>Topics</h2>
-                                <topic-chip v-for="topic in topics"
-                                    :key="topic.id"
-                                    :disabled="!topicIsUsed(topic)"
-                                    @click.native="toggleTopic(topic)">
-                                    {{topic.name}}
-                                </topic-chip>
-                            </md-layout>
-                        </md-card>
-                    </md-layout>
-                    <md-layout md-flex="100"
-                        class="cardSeparator">
-                        <md-card class="removePadding">
-                            <md-tabs md-fixed
-                                :mdNavigation="false"
-                                class="md-transparent tabContainer subTabs">
-                                <md-tab v-for="i in ['A', 'B', 'C', 'D']"
-                                    :key="i"
-                                    :id="'tab_' + i"
-                                    :md-label="'Response ' + i">
-                                    <TinyMCE :id="'editor_' + i"
-                                        v-model="question.responses[i]"
+                    <md-tab md-label="Write Question">
+                        <md-layout md-flex="100">
+                            <md-card class="firstAuthorCard">
+                                <md-layout md-flex="100"
+                                    class="componentSeparator">
+                                    <h2>Question Body</h2>
+                                    <TinyMCE id="questionEditor"
+                                        v-model="question.content"
                                         :options="options"></TinyMCE>
-                                </md-tab>
-                            </md-tabs>
-                        </md-card>
-                    </md-layout>
-                    <md-layout md-flex="100"
-                        class="cardSeparator">
-                        <md-card>
-                            <h3>Correct Answer</h3>
-                            <md-layout md-flex="100"
-                                class="flexAround">
-                                <md-radio v-for="i in ['A', 'B', 'C', 'D']"
-                                    :key="i"
-                                    v-model="question.correctIndex"
-                                    :md-value="i"
-                                    name="correctQuestionGroup">{{i}}</md-radio>
-                            </md-layout>
-                        </md-card>
-                    </md-layout>
-                    <md-layout md-flex="100"
-                        class="cardSeparator">
-                        <md-card>
-                            <md-layout md-flex="100"
-                                class="componentSeparator">
-                                <h2>Question Explanation</h2>
-                                <TinyMCE id="questionExplanation"
-                                    v-model="question.explanation"
-                                    :options="options"></TinyMCE>
-                            </md-layout>
-                        </md-card>
-                    </md-layout>
-                </md-tab>
-                <md-tab
-                    :md-label="prevLabel"
-                    :md-disabled="prevDisabled">
-                        <question v-if="questionPrev" :question="questionPrev"
-                            :preview="true"
-                            :showSpeedDial="false"
-                            :showNavBar="false"></question>
-                </md-tab>
-            </md-tabs>
+                                </md-layout>
+                                <md-layout md-flex="100">
+                                    <h2>Topics</h2>
+                                    <topic-chip v-for="topic in topics"
+                                        :key="topic.id"
+                                        :disabled="!topicIsUsed(topic)"
+                                        @click.native="toggleTopic(topic)">
+                                        {{topic.name}}
+                                    </topic-chip>
+                                </md-layout>
+                            </md-card>
+                        </md-layout>
+                        <md-layout md-flex="100"
+                            class="cardSeparator">
+                            <md-card class="removePadding">
+                                <md-tabs md-fixed
+                                    :mdNavigation="false"
+                                    class="md-transparent tabContainer subTabs"
+                                    :class = "{'subTabs': !mobileMode}">
+                                    <md-tab v-for="i in ['A', 'B', 'C', 'D']"
+                                        :key="i"
+                                        :id="'tab_' + i"
+                                        :md-label="'Response ' + i">
+                                        <TinyMCE :id="'editor_' + i"
+                                            v-model="question.responses[i]"
+                                            :options="options"></TinyMCE>
+                                    </md-tab>
+                                </md-tabs>
+                            </md-card>
+                        </md-layout>
+                        <md-layout md-flex="100"
+                            class="cardSeparator">
+                            <md-card>
+                                <h3>Correct Answer</h3>
+                                <md-layout md-flex="100"
+                                    class="flexAround">
+                                    <md-radio v-for="i in ['A', 'B', 'C', 'D']"
+                                        :key="i"
+                                        v-model="question.correctIndex"
+                                        :md-value="i"
+                                        name="correctQuestionGroup">{{i}}</md-radio>
+                                </md-layout>
+                            </md-card>
+                        </md-layout>
+                        <md-layout md-flex="100"
+                            class="cardSeparator">
+                            <md-card>
+                                <md-layout md-flex="100"
+                                    class="componentSeparator">
+                                    <h2>Question Explanation</h2>
+                                    <TinyMCE id="questionExplanation"
+                                        v-model="question.explanation"
+                                        :options="options"></TinyMCE>
+                                </md-layout>
+                            </md-card>
+                        </md-layout>
+                    </md-tab>
+                    <md-tab
+                        :md-label="prevLabel"
+                        :md-disabled="prevDisabled">
+                            <question v-if="questionPrev" :question="questionPrev"
+                                :preview="true"
+                                :showSpeedDial="false"
+                                :showNavBar="false"></question>
+                    </md-tab>
+                </md-tabs>
             <md-layout md-flex="100"
                 class="rightAlign">
                 <div class="uploadContainer md-fab-bottom-right floatingAction">
@@ -114,17 +117,21 @@ h3 {
     margin-top: 7%;
 }
 
+/* .mainTab:not(.mobileMode) >>> nav {
+
+} */
+
 .mainTab >>> nav {
-    position: fixed !important;
-    width: 85% !important;
+    position: fixed;
+    width: 85%;
     background-color: white !important;
     top: 7%;
 }
 
 .subTabs >>> nav {
-    position: relative !important;
-    width: 100% !important;
-    background-color: transparent !important;
+    position: relative;
+    width: 100%;
+    background-color: transparent;
 }
 
 .removePadding {
@@ -162,6 +169,13 @@ h3 {
 .bottomSpace {
     margin-bottom: 5em;
 }
+
+.hidden {
+        width: 0px;
+        height: 0px;
+        flex-grow: 0;
+        flex-basis: 0%;
+    }
 </style>
 
 
@@ -221,6 +235,8 @@ export default class AuthorView extends Vue {
     pDisabled = false;
 
     bottomSpaceClass: string = "bottomSpace"
+
+    mobileMode = false;
 
     get questionPrev():IQuestion | undefined {
         const error = AuthorService.validateQuestions(this.question);
@@ -297,6 +313,17 @@ export default class AuthorView extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
+    }
+
+    @Lifecycle
+    mounted() {
+        const visible = (this.$refs.onlyVisibleOnMobile as Vue);
+        const isVisible = visible.$el;
+        if (window.getComputedStyle(isVisible).display !== "none") {
+            this.mobileMode = true;
+        } else {
+            this.mobileMode = false;
+        }
     }
 
     get disabled() {
