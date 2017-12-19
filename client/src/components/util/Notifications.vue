@@ -11,13 +11,12 @@
                     <md-icon>{{notification.icon}}</md-icon>
                 </div>
 
-            <responsive-wrapper class="rightPanel">
-                <div>
+                <div class="rightPanel"
+                :class="{'mobileStyle': mobileMode}">
                     <h3>{{notification.name}}</h3>
                     <p>{{notification.description}}</p>
                     <span class="date">{{ notificationDate(notification) }}</span>
                 </div>
-             </responsive-wrapper>
 
             </md-card>
         </div>
@@ -106,22 +105,20 @@ p + p {
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { INotification } from "../../interfaces/models";
-import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 
 import UserService from "../../services/UserService";
+import ApplicationService from "../../services/ApplicationService";
 import Fetcher from "../../services/Fetcher";
 import { serverToLocal } from "../../util";
 
-@Component({
-    components: {
-        ResponsiveWrapper
-    }
-})
+@Component
 export default class Notifications extends Vue {
     @Prop
     showCount = p<number>({
         default: 10
     });
+
+    mobileMode:boolean = false;
 
     pNotifications: INotification[] = [];
     updateNotifications(newNotifications: INotification[]) {
@@ -140,6 +137,11 @@ export default class Notifications extends Vue {
     destroyed() {
         Fetcher.get(UserService.getUserNotifications)
             .off(this.updateNotifications);
+    }
+
+    @Lifecycle
+    mounted() {
+        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     notificationDate(notification: INotification) {

@@ -71,7 +71,7 @@ import ImageService from "../services/ImageService";
 
 import Fetcher from "../services/Fetcher";
 
-@Component()
+@Component
 export default class UserContainer extends Vue {
     @Prop user = p<IUser | undefined>({
         required: false

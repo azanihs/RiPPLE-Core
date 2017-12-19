@@ -53,7 +53,6 @@
                                 </md-select>
                             </md-input-container>
                             <h4>Topics to Visualise</h4>
-                            <responsive-wrapper>
                                 <md-layout md-flex="100">
                                     <topic-chip v-for="category in dataCategories"
                                         :key="category.id"
@@ -66,7 +65,6 @@
                                         </md-tooltip>
                                     </topic-chip>
                                 </md-layout>
-                            </responsive-wrapper>
                         </div>
                     </div>
                 </md-layout>
@@ -179,7 +177,6 @@ h3 {
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { ITopic, IEdge, ICompareSet } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
-import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Chart from "./Chart.vue";
 
@@ -191,8 +188,7 @@ interface IChartType {
 @Component({
     components: {
         Chart,
-        TopicChip,
-        ResponsiveWrapper
+        TopicChip
     }
 })
 export default class VariableDataVisualiser extends Vue {
