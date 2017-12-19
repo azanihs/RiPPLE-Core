@@ -6,9 +6,6 @@ export function getLinks(): ILink[] {
         href: "",
         icon: "widgets",
         submenu: [{
-            text: "Overview",
-            href: "/"
-        }, {
             text: "Engagement",
             href: "/profile/engagement"
         }, {

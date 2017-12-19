@@ -341,6 +341,13 @@ export default class Main extends Vue {
             const adminLinkIndex = _linkCopy.findIndex(x => x.text == "Admin");
             if (adminLinkIndex >= 0) {
                 _linkCopy.splice(adminLinkIndex, 1);
+                if (this.currentlyOpenMenu === undefined) {
+                    const questionLinkIndex = _linkCopy.findIndex(x => x.text == "Questions");
+                    if (questionLinkIndex == -1) {
+                        throw new Error("Missing question links.");
+                    }
+                    this.currentlyOpenMenu = _linkCopy[questionLinkIndex].submenu![0];
+                }
             }
         }
 

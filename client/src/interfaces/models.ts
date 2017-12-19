@@ -249,11 +249,8 @@ export interface IDayTime {
 export interface ILink {
     text: string,
     href: string
-    icon: string
-    submenu?: {
-        text: string,
-        href: string
-    }[]
+    icon?: string
+    submenu?: ILink[]
 };
 
 export interface IServerResponse<T> {
