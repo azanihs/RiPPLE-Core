@@ -3,7 +3,7 @@
         <md-card md-flex="100" class="column">
             <h2>Reported Questions for: {{ pCourseCode }}</h2>
             <md-list>
-                <md-list-item :disabled="true" class="md-expand-multiple" style="border-bottom:3px solid black">
+                <md-list-item :disabled="true" class="md-expand-multiple hide-arrow" style="border-bottom:3px solid black">
                     <span>
                         Question ID
                     </span>
@@ -113,6 +113,10 @@ span {
 }
 .md-list-item:hover{
     background-color: #fafafa
+}
+
+.hide-arrow >>> i {
+    opacity: 0;
 }
 
 </style>
