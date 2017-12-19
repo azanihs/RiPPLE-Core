@@ -55,7 +55,6 @@ export default class ConsentFormWrapper extends Vue {
         UserService.sendConsent(newConsent);
 
         addEventsToQueue([{
-            id: -6,
             name: "Consent Altered",
             description: "Response is now: " + (newConsent == true ? "Accepted" : "Declined"),
             icon: "cached"

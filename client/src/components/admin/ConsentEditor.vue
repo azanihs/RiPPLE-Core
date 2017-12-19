@@ -169,7 +169,6 @@ export default class ConsentEditor extends Vue {
 
         if (error !== "") {
             addEventsToQueue([{
-                id: -5,
                 name: "Invalid Consent Form",
                 description: error,
                 icon: "error"
@@ -180,7 +179,6 @@ export default class ConsentEditor extends Vue {
                 .then(preparedUpload => UserService.uploadContent(preparedUpload))
                 .catch(err => {
                     addEventsToQueue([{
-                        id: -6,
                         name: "Consent Form",
                         description: err,
                         icon: "error"
@@ -190,7 +188,6 @@ export default class ConsentEditor extends Vue {
                     this.disabled = false;
                     this.pOldConsentFormContent = this.consentForm!.content;
                     addEventsToQueue([{
-                        id: -6,
                         name: "Consent Form",
                         description: "Consent Form Saved",
                         icon: "done"

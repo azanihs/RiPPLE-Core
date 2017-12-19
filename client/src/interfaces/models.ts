@@ -171,6 +171,12 @@ export interface INotification {
     created?: number
 };
 
+export interface ISnackbarNotification{
+    name: string,
+    description: string,
+    icon: string
+}
+
 export interface IQuestionBuilder {
     content: string,
     explanation: string,
