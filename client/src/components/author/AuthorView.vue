@@ -76,7 +76,7 @@
                     <md-tab
                         :md-label="prevLabel"
                         :md-disabled="prevDisabled"
-                        :class = "{'previewTab': !mobileMode}">
+                        :class = "previewTabStyle">
                             <question v-if="questionPrev" :question="questionPrev"
                                 :preview="true"
                                 :showSpeedDial="false"
@@ -118,8 +118,16 @@ h3 {
     margin-top: 7%;
 }
 
-.previewTab {
+.previewTabStudent {
     top: 12%;
+}
+
+.previewTabAdmin {
+    top: 8%;
+}
+
+.mobilePreviewTab {
+    top: 3%;
 }
 
 .mainTab >>> nav {
@@ -421,6 +429,14 @@ export default class AuthorView extends Vue {
         } else {
             this.bottomSpaceClass = "bottomSpace";
         }
+    }
+
+    get previewTabStyle() {
+        return {
+            "previewTabStudent": !this.mobileMode && this.id < 0,
+            "previewTabAdmin": !this.mobileMode && this.id >= 0,
+            "mobilePreviewTab": this.mobileMode
+        };
     }
 
 }
