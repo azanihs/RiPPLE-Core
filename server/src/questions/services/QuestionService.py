@@ -55,10 +55,8 @@ def get_course_leaders(user, sort_field, sort_order, limit=25):
 
     question_counts = leaderboard_sort(Question, "author_id")
 
-    response_SQL = "SELECT 1 as id, qr.user_id, COUNT(DISTINCT d.question_id) as 'total' FROM "+\
-    "questions_questionresponse qr, questions_distractor d WHERE qr.response_id = d.id GROUP BY qr.user_id"
-    response_qry = QuestionResponse.objects.raw(response_SQL)
-    response_counts = [{"user_id": r.user_id, "total": r.total} for r in response_qry]
+    response_qry = course_users.annotate(total=Count("questionresponse__response__question", distinct=True))
+    response_counts = [{"user_id": r.id, "total": r.total} for r in response_qry]
 
     first_response_SQL = "SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr, "+\
         "questions_question q, questions_distractor d WHERE d.question_id = q.id AND qr.response_id=d.id AND "+\

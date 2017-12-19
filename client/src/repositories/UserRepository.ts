@@ -54,8 +54,8 @@ const makeUser = () => {
 };
 
 const _defaultSearch = () => ({
-    sortField: "",
-    sortDesc: false,
+    sortField: "recommended",
+    sortDesc: true,
     filterField: "All Questions",
     query: "",
     page: 0,

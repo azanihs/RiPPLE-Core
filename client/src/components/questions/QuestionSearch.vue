@@ -143,6 +143,9 @@ export default class QuestionSearch extends Vue {
                 name: "",
                 value: ""
             }, {
+                name: "Recommended",
+                value: "recommended"
+            }, {
                 name: "Difficulty",
                 value: "difficulty"
             }, {
