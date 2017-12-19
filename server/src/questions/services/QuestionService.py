@@ -57,12 +57,7 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
     response_SQL = "SELECT 1 as id, qr.user_id, COUNT(DISTINCT d.question_id) as 'total' FROM "+\
     "questions_questionresponse qr, questions_distractor d WHERE qr.response_id = d.id GROUP BY qr.user_id"
     response_qry = QuestionResponse.objects.raw(response_SQL)
-    response_counts = []
-    for r in response_qry:
-        response_counts.append({
-            "user_id": r.user_id,
-            "total": r.total
-        })
+    response_counts = [{"user_id": r.user_id, "total": r.total} for r in response_qry]
 
     first_response_SQL = "SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr, "+\
         "questions_question q, questions_distractor d WHERE d.question_id = q.id AND qr.response_id=d.id AND "+\
@@ -70,12 +65,7 @@ def get_course_leaders(course, sort_field, sort_order, user, limit=25):
         "questions_distractor d where d.question_id = q.id AND qr.response_id=d.id GROUP BY qr.user_id, "+\
         "q.id) GROUP BY qr.user_id"
     first_response_qry = QuestionResponse.objects.raw(first_response_SQL)
-    first_response_counts=[]
-    for r in first_response_qry:
-        first_response_counts.append({
-            "user_id": r.user_id,
-            "total": r.total
-        })
+    first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in response_qry]
 
     rating_counts = leaderboard_sort(QuestionRating, "user_id")
 
