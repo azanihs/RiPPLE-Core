@@ -1,7 +1,10 @@
 <template>
     <md-layout v-if="question">
         <md-layout class="question-navigation">
-            <admin-buttons v-if="canEdit"></admin-buttons>
+            <admin-buttons
+                v-if="canEdit"
+                :showEdit="true"
+                @editQuestion="editQuestion"></admin-buttons>
             <action-buttons v-else>
                 <md-button
                         slot="right"
@@ -69,6 +72,10 @@ export default class QuestionWrapper extends Vue {
 
     openDialog() {
         (<Question> this.$refs.questionComponent).openDialog();
+    }
+
+    editQuestion() {
+        this.$router.push({ path: `/question/edit/${this.id}` });
     }
 
     @Lifecycle
