@@ -1,6 +1,9 @@
 <template>
     <md-layout v-if="!id || question" class="flex-vertical">
-        <admin-buttons :showEdit="false" :questionExists="questionPresent"></admin-buttons>
+        <admin-buttons
+            :showEdit="false"
+            :questionExists="questionPresent"
+            @saveQuestion="saveQuestion"></admin-buttons>
         <author-view ref="authView" :question="question" :id="this.id"></author-view>
     </md-layout>
     <page-loader v-else :condition="id && !question"></page-loader>
@@ -87,6 +90,7 @@ export default class AuthorWrapper extends Vue {
     }
 
     saveQuestion() {
+        console.log("saving");
         let aView: AuthorView = <AuthorView> this.$refs.authView;
         aView.validateUpload();
     }
