@@ -185,8 +185,8 @@ export interface ICourseAvailability {
 };
 
 export interface IDayTime {
-    day: number,
-    time: number
+    day: IDay,
+    time: ITime
 };
 
 export interface ILink {

@@ -10,10 +10,10 @@
             </md-avatar>
             <div class="md-title">{{user.name}}</div>
             <div class="md-subhead">
-                <topic-chip v-for="prof in user.proficiencies"
-                            :key="prof"
+                <topic-chip v-for="role in roles"
+                            :key="role.topic.name"
                             linkTo="/view/peers">
-                    {{prof}}
+                    {{role.topic.name}}
                 </topic-chip>
             </div>
             <md-button class="type"> {{ user.recommendationType }}</md-button>
@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { IUser, IDayTime } from "../../interfaces/models";
+import { IUser, IRecommendation, IRecommendedRole, IDayTime } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -93,7 +93,7 @@ interface IMeetingHistory {
     }
 })
 export default class RecommendationCard extends Vue {
-    @Prop user = p<IUser>({
+    @Prop recommendation = p<IRecommendation>({
         required: true
     });
 
@@ -110,6 +110,12 @@ export default class RecommendationCard extends Vue {
             .on(this.updateMeetingHistory);
     }
 
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.getMeetingHistory)
+            .off(this.updateMeetingHistory);
+    }
+
     createMeetingDate(dayTime: IDayTime) {
         // Create a utc date with three days grace to the utc
         const local = new Date();
@@ -118,7 +124,7 @@ export default class RecommendationCard extends Vue {
         // Get the day of the week
 
         // Get the day offset
-        let dayOffset = dayTime.day % 7 - utc.getDay();
+        let dayOffset = dayTime.day.id % 7 - utc.getDay();
         if (dayOffset < 0) {
             dayOffset = dayOffset + 8;
         }
@@ -127,7 +133,7 @@ export default class RecommendationCard extends Vue {
         const utcTime = utc.getMilliseconds() + utc.getSeconds() * 1000 +
             utc.getMinutes() * 1000 * 60 + utc.getHours() * 1000 * 60 * 60;
 
-        const eventTime = dayTime.time * 60 * 60 * 1000;
+        const eventTime = dayTime.time.start.hour * 60 * 60 * 1000;
 
         const eventOffset = eventTime - utcTime;
 
@@ -141,9 +147,8 @@ export default class RecommendationCard extends Vue {
     }
 
     get meetingTime() {
+        const meetDate = this.createMeetingDate(this.recommendation.dayTime[0]);
         const dayToEnglish = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const meetDate = this.user.availableTime as Date;
-
         const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
         const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;
         return date + " " + time;
@@ -151,6 +156,14 @@ export default class RecommendationCard extends Vue {
 
     get meetingHistory() {
         return (a: { q: string }) => Promise.resolve(this.findItem(this.pMeetingHistory, a.q));
+    }
+
+    get user(): IUser {
+        return this.recommendation.recommendedCourseUser.user;
+    }
+
+    get roles(): IRecommendedRole[] {
+        return this.recommendation.recommendedRole;
     }
 }
 </script>

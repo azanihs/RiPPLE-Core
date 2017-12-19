@@ -77,7 +77,12 @@ h2 {}
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
-import { IAvailability, IDay, IDayTime, ITime } from "../../interfaces/models";
+import { IAvailability, IDay, ITime } from "../../interfaces/models";
+
+interface IConvertedDayTime {
+    day: number,
+    time: number
+}
 
 @Component()
 export default class AvailabilitySelector extends Vue {
@@ -201,7 +206,7 @@ export default class AvailabilitySelector extends Vue {
         }
     }
 
-    localToUTC(localDay?: number, localTime?: number): IDayTime {
+    localToUTC(localDay?: number, localTime?: number): IConvertedDayTime {
         if (localDay === undefined || localTime === undefined) {
             throw new Error("Missing localday or localtime");
         }
@@ -215,7 +220,7 @@ export default class AvailabilitySelector extends Vue {
             day++;
         }
 
-        const dayTime: IDayTime = {
+        const dayTime: IConvertedDayTime = {
             day: this.convertDay(day),
             time: this.convertTime(time)
         };

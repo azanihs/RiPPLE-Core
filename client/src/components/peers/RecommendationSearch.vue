@@ -42,9 +42,9 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
-                               v-for="(recommendation, i) in recommendations"
+                               v-for="(recommendation, i) in findRecommendations"
                                :key="i">
-                        <recommendation-card :user="recommendation">
+                        <recommendation-card :recommendation="recommendation">
                             Request
                         </recommendation-card>
                     </md-layout>
@@ -56,9 +56,9 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
-                               v-for="(recommendation, i) in requests"
+                               v-for="(recommendation, i) in reviewRecommendations"
                                :key="i">
-                        <recommendation-card :user="recommendation">
+                        <recommendation-card :recommendation="recommendation">
                             Request
                         </recommendation-card>
                     </md-layout>
@@ -195,6 +195,7 @@ export default class RecommendationSearch extends Vue {
 
     competencies = new Map();
     pFindRecommendations: IRecommendation[] = [];
+    pReviewRecommendations: IRecommendation[] = [];
 
     updateCompetencies(newCompetencies: ICompareSet) {
         this.competencies = newCompetencies.ownScores
@@ -210,12 +211,18 @@ export default class RecommendationSearch extends Vue {
         this.pFindRecommendations = recommendations;
     };
 
+    updateReviewRecommendations(recommendations: IRecommendation[]) {
+        this.pReviewRecommendations = recommendations;
+    };
+
     @Lifecycle
     created() {
         Fetcher.get(UserService.userCompetencies)
             .on(this.updateCompetencies);
         Fetcher.get(RecommendationService.findRecommendations)
             .on(this.updateFindRecommendations);
+        Fetcher.get(RecommendationService.reviewRecommendations)
+            .on(this.updateReviewRecommendations);
     }
 
     @Lifecycle
@@ -224,6 +231,8 @@ export default class RecommendationSearch extends Vue {
             .off(this.updateCompetencies);
         Fetcher.get(RecommendationService.findRecommendations)
             .off(this.updateFindRecommendations);
+        Fetcher.get(RecommendationService.reviewRecommendations)
+            .off(this.updateReviewRecommendations);
     }
 
     checkbox(topic: ITopic, studyRole: IStudyRole): boolean {
@@ -269,5 +278,14 @@ export default class RecommendationSearch extends Vue {
             width: `${weight}%`
         };
     }
+
+    get findRecommendations() {
+        return this.pFindRecommendations;
+    }
+
+    get reviewRecommendations() {
+        return this.pReviewRecommendations;
+    }
+
 }
 </script>
