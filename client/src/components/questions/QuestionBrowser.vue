@@ -39,8 +39,10 @@
             md-flex="100"
             :key="question.id"
             class="mobileQuestionPreview">
-            <question-preview class="mobileQuestionCard"
-                :data="question"></question-preview>
+            <router-link :to="'/question/id/' + question.id" class="questionLink">
+                <question-preview class="mobileQuestionCard"
+                    :data="question"></question-preview>
+            </router-link>
         </md-layout>
     </md-layout>
 </md-layout>
