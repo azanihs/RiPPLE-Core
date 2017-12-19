@@ -299,7 +299,7 @@ class Command(BaseCommand):
 
             print("\t-Answering and Rating Questions")
             abilities = ["low", "medium", "high"]
-            index = 0
+            index = 1
             for user in course_users:
                 studentAbility = abilities[choice(range(3))]
                 print("\t-Answering Course User:" + str(index) + " Questions")

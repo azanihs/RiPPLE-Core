@@ -75,7 +75,8 @@
                     </md-tab>
                     <md-tab
                         :md-label="prevLabel"
-                        :md-disabled="prevDisabled">
+                        :md-disabled="prevDisabled"
+                        :class = "{'previewTab': !mobileMode}">
                             <question v-if="questionPrev" :question="questionPrev"
                                 :preview="true"
                                 :showSpeedDial="false"
@@ -117,9 +118,9 @@ h3 {
     margin-top: 7%;
 }
 
-/* .mainTab:not(.mobileMode) >>> nav {
-
-} */
+.previewTab {
+    top: 12%;
+}
 
 .mainTab >>> nav {
     position: fixed;
@@ -132,6 +133,10 @@ h3 {
     position: relative;
     width: 100%;
     background-color: transparent;
+}
+
+.subTabs >>> .md-tabs-navigation-scroll-container {
+    width: 100%;
 }
 
 .removePadding {
