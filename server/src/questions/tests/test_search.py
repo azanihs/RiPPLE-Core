@@ -178,7 +178,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             q.save()
 
         test_search = SearchService.SearchService(course)
-        test_search.add_sort("difficulty", "DESC")
+        test_search.add_sort("difficulty", "DESC", author)
         sorted_questions = test_search.execute()
         # make sure next question has lower difficulty
         for i in range(0,sorted_questions.count() - 1):
@@ -193,7 +193,7 @@ class SearchServiceTestCase(BootstrapTestCase):
 
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
-        test_search.add_sort("difficulty", "ASC")
+        test_search.add_sort("difficulty", "ASC", author)
         sorted_questions = test_search.execute()
         #make sure next question has higher difficulty
         for i in range(0,sorted_questions.count() - 1):
@@ -215,7 +215,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             q.save()
 
         test_search = SearchService.SearchService(course)
-        test_search.add_sort("quality", "DESC")
+        test_search.add_sort("quality", "DESC", author)
         sorted_questions = test_search.execute()
         #make sure next question has lower quality
         for i in range(0,sorted_questions.count() - 1):
@@ -230,7 +230,7 @@ class SearchServiceTestCase(BootstrapTestCase):
 
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
-        test_search.add_sort("quality", "ASC")
+        test_search.add_sort("quality", "ASC", author)
         sorted_questions = test_search.execute()
         #make sure next question has higher quality
         for i in range(0,sorted_questions.count() - 1):
@@ -255,7 +255,7 @@ class SearchServiceTestCase(BootstrapTestCase):
             q.save()
 
         test_search = SearchService.SearchService(course)
-        test_search.add_sort("created_time", "DESC")
+        test_search.add_sort("created_time", "DESC", author)
         sorted_questions = test_search.execute()
         #make sure next question has lower created_time
         for i in range(0,sorted_questions.count() - 1):
@@ -272,7 +272,7 @@ class SearchServiceTestCase(BootstrapTestCase):
 
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
-        test_search.add_sort("created_time", "ASC")
+        test_search.add_sort("created_time", "ASC", author)
         sorted_questions = test_search.execute()
         #make sure next question has higher created_time
         for i in range(0,sorted_questions.count() - 1):
@@ -303,7 +303,7 @@ class SearchServiceTestCase(BootstrapTestCase):
         QuestionService.respond_to_question(9, author)
 
         test_search = SearchService.SearchService(course)
-        test_search.add_sort("responses", "DESC")
+        test_search.add_sort("responses", "DESC", author)
         sorted_questions = test_search.execute()
         for i in range(0, sorted_questions.count() - 1):
             responses = QuestionResponse.objects.filter(response__in = Distractor.objects.filter(
@@ -338,7 +338,7 @@ class SearchServiceTestCase(BootstrapTestCase):
 
         test_search = SearchService.SearchService(course)
         #The sorting order does not matter as anything that is not DESC will be considered ascending
-        test_search.add_sort("responses", "ASC")
+        test_search.add_sort("responses", "ASC", author)
         sorted_questions = test_search.execute()
         for i in range(0, sorted_questions.count() - 1):
             responses = QuestionResponse.objects.filter(response__in = Distractor.objects.filter(
