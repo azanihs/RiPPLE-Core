@@ -8,7 +8,6 @@ import ReportedQuestions from "../components/admin/ReportedQuestions.vue";
 import ErrorPermission from "../components/error/ErrorPermission.vue";
 
 import QuestionWrapper from "../components/questions/QuestionWrapper.vue";
-import Overview from "../components/profile/Overview.vue";
 import AchievementsView from "../components/profile/Achievements.vue";
 import CompetenciesView from "../components/profile/Competencies.vue";
 import ConnectionsView from "../components/profile/Connections.vue";
@@ -42,8 +41,7 @@ const routes = [{
         component: QuestionWrapper
     }, {
         path: "/",
-        name: "overview",
-        component: Overview
+        redirect: "/question/answer"
     }, {
         path: "/profile/engagement",
         name: "engagement",
