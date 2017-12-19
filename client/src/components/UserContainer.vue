@@ -159,7 +159,6 @@ export default class UserContainer extends Vue {
 
     showMessage(message: string, icon: string = "error") {
         addEventsToQueue([{
-            id: -2,
             name: "Image Upload",
             description: message,
             icon: icon

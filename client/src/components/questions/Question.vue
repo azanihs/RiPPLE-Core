@@ -261,7 +261,6 @@ export default class Question extends Vue {
         }
         if (this.reasonsUsed.length == 0) {
             addEventsToQueue([{
-                id: -4,
                 name: "Not enough reasons",
                 description: "You must provide at least one reason.",
                 icon: "error"
@@ -271,7 +270,6 @@ export default class Question extends Vue {
         QuestionService.reportQuestion(this.question.id, this.reasonsUsed)
             .then(_ => {
                 addEventsToQueue([{
-                    id: -4,
                     name: "Question Reported",
                     description: "Question Reported.",
                     icon: "done"

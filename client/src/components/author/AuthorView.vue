@@ -342,7 +342,6 @@ export default class AuthorView extends Vue {
 
         if (error !== "") {
             addEventsToQueue([{
-                id: -1,
                 name: "Invalid Question",
                 description: error,
                 icon: "error"
@@ -358,7 +357,6 @@ export default class AuthorView extends Vue {
                 .then(preparedUpload => AuthorService.uploadContent(preparedUpload, this.path))
                 .then(response => {
                     addEventsToQueue([{
-                        id: -8,
                         name: this.messageTitle,
                         description: this.message,
                         icon: "done"

@@ -1,6 +1,6 @@
 import "whatwg-fetch";
 import { IServerResponse } from "../interfaces/models";
-import { addEventsToQueue } from "../util";
+import { addEventsToQueue, notificationToSnackbar } from "../util";
 
 let token: undefined | string = undefined;
 
@@ -60,15 +60,16 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
         })
         .then(x => {
             if (x.notifications && x.notifications.length > 0) {
-                addEventsToQueue(x.notifications);
+                for (let n of x.notifications) {
+                    addEventsToQueue([notificationToSnackbar(n)]);
+                }
             }
 
             if (x.error) {
                 addEventsToQueue([{
-                    id: -10,
-                    icon: "error",
                     name: `Server Error`,
-                    description: `${x.error}`
+                    description: `${x.error}`,
+                    icon: "error"
                 }]);
                 return Promise.resolve({}) as Promise<T>;
             } else {
@@ -83,7 +84,6 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
                     if (errorObject.error) {
                         // TODO: Handle global things
                         addEventsToQueue([{
-                            id: performance.now(),
                             icon: "error",
                             name: `Server Error`,
                             description: `${errorObject.error}`

@@ -90,7 +90,6 @@ export default class AuthorWrapper extends Vue {
         QuestionService.deleteQuestion(this.id)
             .then(() => {
                 addEventsToQueue([{
-                    id: -7,
                     name: "Question Deleted",
                     description: "Successfully deleted question",
                     icon: "done"

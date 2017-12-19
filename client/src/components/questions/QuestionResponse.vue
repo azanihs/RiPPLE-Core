@@ -335,7 +335,6 @@ export default class QuestionResponse extends Vue {
                 })
                 .then(() => {
                     addEventsToQueue([{
-                        id: -3,
                         name: "Question Rated",
                         description: "Successfully rated question " + rateType,
                         icon: "done"
