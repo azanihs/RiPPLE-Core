@@ -24,6 +24,7 @@ import AuthorWrapper from "../components/author/AuthorWrapper.vue";
 
 import WIP from "../components/WIP.vue";
 import UserRepository from "../repositories/UserRepository";
+import { addEventsToQueue } from "../util";
 
 Vue.use(VueRouter);
 
@@ -74,7 +75,7 @@ const routes = [{
     }, {
         path: "/question/create",
         name: "create",
-        component: AuthorView
+        component: AuthorWrapper
     }, {
         path: "/question/edit/:id",
         name: "edit",
@@ -130,6 +131,12 @@ router.beforeEach((_to, _from, next) => {
         UserRepository.userHasConsentedForCourse()
             .then(hasConsented => {
                 if (!hasConsented) {
+                    addEventsToQueue([{
+                        id: -9,
+                        name: "Consent Form",
+                        description: "Please answer consent form before accesing the site",
+                        icon: "error"
+                    }]);
                     return next("/profile/consent");
                 }
                 next();

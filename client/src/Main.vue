@@ -14,7 +14,7 @@
             <md-button class="md-icon-button menuButton"
                 :class="menuButtonClass"
                 @click="toggleSideNav(undefined)">
-                <md-icon>{{menuIcon}}</md-icon>
+                <md-icon class="closeIcon">{{menuIcon}}</md-icon>
             </md-button>
         </md-layout>
         <md-layout ref="sidenavContainer"
@@ -22,12 +22,18 @@
             :class="pageSize"
             md-hide-xsmall
             md-hide-small>
+                <md-button v-if="mobileMode" class="md-icon-button closeButton"
+                    :class="menuButtonClass"
+                    @click="toggleSideNav(undefined)">
+                        <md-icon>{{closeIcon}}</md-icon>
+                </md-button>
                 <user-container
                     :user="user"
                     :course="course"
                     @changeUser="updateUser"
-                    @changeCourse="updateCourse"></user-container>
-            <ul>
+                    @changeCourse="updateCourse">
+                </user-container>
+            <ul class="sideNavList">
                 <li v-for="link in links"
                     :key="link.href">
                     <router-link :to="link.href"
@@ -80,11 +86,21 @@
     z-index: 2;
 }
 
+@media only screen and (max-device-height: 480px) and (orientation: landscape) {
+        .sideNavList {
+        overflow-y: scroll;
+        max-height: 60%;
+        border-top-style: solid;
+        border-top-color: #999;
+        border-top-width: 3px;
+    }
+}
+
 
 .slide-appear-active-class {
     opacity: 1;
     max-height: 36px;
-    transition: all 0.4s;
+    transition: all 0.3s;
 }
 
 .slide-appear-class {
@@ -112,6 +128,10 @@
     padding: 0px 20px !important;
 }
 
+.profileSubmenu.md-button:hover:not([disabled]):not(.md-raised) {
+    background-color: rgba(153, 153, 153, 0.5);
+}
+
 .menuContainer h2 {
     padding-right: 16px;
     color: #999;
@@ -125,6 +145,22 @@
     left: 0px;
     top: 0px;
     z-index: 2;
+}
+
+.closeButton {
+    color: #f2f2f2 !important;
+    right:0px !important;
+    left: initial;
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    z-index: 2;
+    margin: 2px 2px !important;
+}
+
+.closeButton > .md-icon {
+    margin: unset !important;
+    left:initial !important;
 }
 
 .offset {
@@ -265,6 +301,7 @@ export default class Main extends Vue {
     currentlyOpenMenu: ILink | undefined = undefined;
 
     menuIcon = "menu";
+    closeIcon = "close";
     sideMenuIsOpen = false;
     mobileMode = false;
     pageTitle = "";

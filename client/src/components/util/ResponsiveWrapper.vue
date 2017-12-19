@@ -19,6 +19,11 @@
         flex-basis: 0%;
     }
 
+    span {
+        width: 100%;
+    }
+
+
 </style>
 
 

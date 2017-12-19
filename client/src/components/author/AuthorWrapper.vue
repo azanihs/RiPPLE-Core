@@ -1,9 +1,9 @@
 <template>
-    <md-layout v-if="question" class="flex-vertical">
-        <admin-buttons :canEdit="false"></admin-buttons>
+    <md-layout v-if="!id || question" class="flex-vertical">
+        <admin-buttons :showEdit="false" :questionExists="questionPresent"></admin-buttons>
         <author-view ref="authView" :question="question" :id="this.id"></author-view>
     </md-layout>
-    <page-loader v-else :condition="!question"></page-loader>
+    <page-loader v-else :condition="id && !question"></page-loader>
 </template>
 
 <style scoped>
@@ -33,19 +33,24 @@ import { addEventsToQueue } from "../../util";
 
 export default class AuthorWrapper extends Vue {
     @Prop id = p<number>({
-        required: true
+        required: false
     });
+
+    questionPresent:boolean = false;
 
     pQuestion: IQuestionBuilder | undefined = undefined;
 
     updateQuestion() {
-        QuestionService.getQuestionById(this.id)
-            .then((question: IQuestion | undefined) => {
-                if (question && question.canEdit !== undefined && !question.canEdit) {
-                    this.$router.push(`/error/403`);
-                }
-                this.pQuestion = this.questionToBuilder(question);
-            });
+        if (this.id) {
+            QuestionService.getQuestionById(this.id)
+                .then((question: IQuestion | undefined) => {
+                    if (question && question.canEdit !== undefined && !question.canEdit) {
+                        this.$router.push(`/error/403`);
+                    }
+                    this.pQuestion = this.questionToBuilder(question);
+                });
+            this.questionPresent = true;
+        }
     }
 
     questionToBuilder(question: IQuestion | undefined) {
@@ -87,18 +92,20 @@ export default class AuthorWrapper extends Vue {
     }
 
     deleteQuestion() {
-        QuestionService.deleteQuestion(this.id)
-            .then(() => {
-                addEventsToQueue([{
-                    id: -7,
-                    name: "Question Deleted",
-                    description: "Successfully deleted question",
-                    icon: "done"
-                }]);
-            })
-            .then(() => {
-                this.$router.go(-1);
-            });
+        if (this.id) {
+            QuestionService.deleteQuestion(this.id)
+                .then(() => {
+                    addEventsToQueue([{
+                        id: -7,
+                        name: "Question Deleted",
+                        description: "Successfully deleted question",
+                        icon: "done"
+                    }]);
+                })
+                .then(() => {
+                    this.$router.go(-1);
+                });
+        }
     }
 
 }

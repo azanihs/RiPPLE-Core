@@ -51,7 +51,7 @@ export function getLinks(): ILink[] {
 
     const questionLink: ILink = {
         text: "Questions",
-        href: "/question/answer",
+        href: "",
         icon: "question_answer",
         submenu: [{
             text: "Answer",
