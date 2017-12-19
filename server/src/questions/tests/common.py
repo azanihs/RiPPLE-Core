@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import math
 from django.test import TestCase
 from questions.models import Course, Topic, Question, Distractor
-from users.models import User
+from users.models import User, CourseUser, Role
 
 class BootstrapTestCase(TestCase):
     def _bootstrap_courses(self, id):
@@ -90,3 +90,15 @@ class BootstrapTestCase(TestCase):
         user = User(id=id, first_name="u_firstname", last_name="u_lastname")
         user.save()
         return user
+
+    def _bootstrap_course_user(self, id, course, instructor):
+        user = self._bootstrap_user(id)
+        course = course
+        course_user = CourseUser(user=user, course=course)
+        course_user.save()
+        if instructor:
+            role = Role.objects.get_or_create(
+                role="Instructor"
+            )
+            course_user.roles.set(role)
+        return course_user

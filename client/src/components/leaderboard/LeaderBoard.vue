@@ -6,16 +6,15 @@
             <md-table-header>
                 <md-table-row>
                     <md-table-head>
+                        <span>Rank</span>
+                    </md-table-head>
+                    <md-table-head>
                         <md-icon>camera_alt</md-icon>
                         <span>Avatar</span>
                     </md-table-head>
                     <md-table-head md-sort-by="name">
                         <md-icon>account_box</md-icon>
                         <span>Name</span>
-                    </md-table-head>
-                    <md-table-head md-sort-by="reputation">
-                        <md-icon>star</md-icon>
-                        <span>Reputation</span>
                     </md-table-head>
                     <md-table-head md-sort-by="questionsAuthored">
                         <md-icon>library_add</md-icon>
@@ -25,25 +24,36 @@
                         <md-icon>reply</md-icon>
                         <span>Questions Answered</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="questionsCommented">
-                        <md-icon>message</md-icon>
-                        <span>Comments</span>
+                    <md-table-head md-sort-by="questionsAnsweredCorrectly">
+                        <md-icon>check</md-icon>
+                        <span>Answered Correctly</span>
+                    </md-table-head>
+                    <md-table-head md-sort-by="questionsRated">
+                        <md-icon>star_rate</md-icon>
+                        <span>Questions Rated</span>
+                    </md-table-head>
+                    <md-table-head md-sort-by="achievementsEarned">
+                        <md-icon>gamepad</md-icon>
+                        <span>Achievements Earned</span>
                     </md-table-head>
                 </md-table-row>
             </md-table-header>
             <md-table-body>
                 <md-table-row v-for="user in users"
-                              :key="user.id">
+                              :key="user.id"
+                              v-bind:class="{ userRow: user.id }">
+                    <md-table-cell>{{ user.rank }}</md-table-cell>
                     <md-table-cell>
                         <md-image class="avatar"
                                   :md-src="user.image"
                                   :alt="user.name"></md-image>
                     </md-table-cell>
                     <md-table-cell>{{ user.name }}</md-table-cell>
-                    <md-table-cell>{{ user.reputation }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAuthored }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAnswered }}</md-table-cell>
-                    <md-table-cell>{{ user.questionsCommented }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsAnsweredCorrectly }}</md-table-cell>
+                    <md-table-cell>{{ user.questionsRated }}</md-table-cell>
+                    <md-table-cell>{{ user.achievementsEarned }}</md-table-cell>
                 </md-table-row>
             </md-table-body>
         </md-table>
@@ -66,6 +76,10 @@
     height: 50px;
     border: 2px solid #ccc;
     box-shadow: 2px 2px 10px #888;
+}
+
+.userRow {
+    font-weight: bold;
 }
 </style>
 
@@ -93,7 +107,7 @@ export default class LeaderBoard extends Vue {
     @Lifecycle
     created() {
         UserService.getMostReputableUsers({
-            sortField: "reputation",
+            sortField: "questionsAuthored",
             sortOrder: "DESC"
         }).then(this.updateUsers);
     }

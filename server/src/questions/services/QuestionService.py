@@ -8,9 +8,10 @@ from django.db.models import Count, Min, Max
 from django.db import IntegrityError, transaction
 
 from ripple.util import util
-from users.models import CourseUser, Token, User
+from users.models import CourseUser, Token, User, Role
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
+from rippleAchievements.models import UserAchievement
 from questions.services import CompetencyService, AuthorService
 
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
@@ -40,7 +41,7 @@ def question_response_distribution(question_id):
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
     return response_distribution
 
-def get_course_leaders(course, sort_field, sort_order, limit=25):
+def get_course_leaders(user, sort_field, sort_order, limit=25):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -48,25 +49,38 @@ def get_course_leaders(course, sort_field, sort_order, limit=25):
                 return dict_item.get("total", 0)
         return 0
 
-    course_users = CourseUser.objects.filter(course=course)
-    # Cache database calls
+    course = user.course
+    course_users = CourseUser.objects.filter(course=course).exclude(\
+        id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role="Instructor")))
+
     question_counts = leaderboard_sort(Question, "author_id")
-    response_counts = leaderboard_sort(QuestionResponse, "user_id")
+
+    response_SQL = "SELECT 1 as id, qr.user_id, COUNT(DISTINCT d.question_id) as 'total' FROM "+\
+    "questions_questionresponse qr, questions_distractor d WHERE qr.response_id = d.id GROUP BY qr.user_id"
+    response_qry = QuestionResponse.objects.raw(response_SQL)
+    response_counts = [{"user_id": r.user_id, "total": r.total} for r in response_qry]
+
+    first_response_SQL = "SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr, "+\
+        "questions_question q, questions_distractor d WHERE d.question_id = q.id AND qr.response_id=d.id AND "+\
+        "d.isCorrect=1 AND qr.id IN (SELECT MIN(qr.ID) FROM questions_questionresponse qr, questions_question q, "+\
+        "questions_distractor d where d.question_id = q.id AND qr.response_id=d.id GROUP BY qr.user_id, "+\
+        "q.id) GROUP BY qr.user_id"
+    first_response_qry = QuestionResponse.objects.raw(first_response_SQL)
+    first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in response_qry]
+
     rating_counts = leaderboard_sort(QuestionRating, "user_id")
-    login_counts = leaderboard_sort(Token, "user_id")
+
+    achievement_counts = leaderboard_sort(UserAchievement, "user_id")
 
     leaderboard_users = [{
+        "rank": u.id,
         "name": u.user.first_name,
         "image": u.user.image,
-        "reputation": random.randint(0, 100),
         "questionsAuthored": lookup_total("author_id", u.id, question_counts),
         "questionsAnswered": lookup_total("user_id", u.id, response_counts),
-        "questionsCommented": random.randint(0, 100),
-        "questionsViewed": random.randint(0, 100),
+        "questionsAnsweredCorrectly": lookup_total("user_id", u.id, first_response_counts),
         "questionsRated": lookup_total("user_id", u.id, rating_counts),
-
-        "connectionsMade": random.randint(0, 100),
-        "logins": lookup_total("user_id", u.id, login_counts)
+        "achievementsEarned": lookup_total("user_id", u.id, achievement_counts)
     } for u in course_users]
 
     if len(leaderboard_users) > 0 and sort_field in leaderboard_users[0]:
@@ -74,9 +88,21 @@ def get_course_leaders(course, sort_field, sort_order, limit=25):
         leaderboard_users = sorted(
             leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
 
+    found = 0
+    for i in range(0, len(leaderboard_users)):
+        if not util.is_administrator(user):
+            if leaderboard_users[i]["rank"] == user.id:
+                found = i
+                leaderboard_users[i]["id"] = user.id
+        leaderboard_users[i]["rank"] = i+1
+
     if limit == -1:
         return leaderboard_users
-    return leaderboard_users[0:limit]
+
+    leaderboard = leaderboard_users[0:limit]
+    if found >= limit:
+        leaderboard.append(leaderboard_users[found])
+    return leaderboard
 
 
 def get_course_topics(course):
