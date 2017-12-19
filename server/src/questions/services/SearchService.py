@@ -10,12 +10,12 @@ class SearchService(object):
         #Some questions occur multiple times due to some having multiple tags
         #Make distinct
         self._query = Question.objects.filter(
-            author__in=CourseUser.objects.filter(course=course)).distinct()
+            author__in=CourseUser.objects.filter(course=course))
 
         # Default object order is by ID. Can possibly be overridden by search
         self._query = self._query.order_by("id")
 
-    def add_sort(self, sort_field, sort_order):
+    def add_sort(self, sort_field, sort_order, user):
         if sort_order == "DESC":
             sort_modifier = "-"
         else:
@@ -29,11 +29,13 @@ class SearchService(object):
             pass
             # Go somewhere else...
         elif sort_field == "responses":
-            self._query = self._query.annotate(responses=Subquery(
-                Distractor.objects.filter(question_id=OuterRef("pk"))
-                .annotate(c=Count("questionresponse")).values("c").annotate(
-                    s=Func(F("c"), function="LOWER")).values("c")))
+            self._query = self._query.annotate(responses=\
+                Count("distractor__questionresponse__user", distinct=True))
             self._query = self._query.order_by(sort_modifier + sort_field)
+        elif sort_field == "recommended":
+            user_rating = user.elo_rating
+            self._query = self._query.annotate(difficulty_diff=0-Func(user_rating - F("elo_difficulty"), function="ABS"))
+            self._query = self._query.order_by(sort_modifier + "difficulty_diff")
 
     def add_filter(self, filter_field, course_user):
         if filter_field == "unanswered":
@@ -66,4 +68,4 @@ class SearchService(object):
         self._query = self._query.filter(topics__in=topics)
 
     def execute(self):
-        return self._query
+        return self._query.distinct()
