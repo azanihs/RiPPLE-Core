@@ -61,13 +61,16 @@ def get_course_leaders(user, sort_field, sort_order, has_consented, limit=25):
     response_qry = course_users.annotate(total=Count("questionresponse__response__question", distinct=True))
     response_counts = [{"user_id": r.id, "total": r.total} for r in response_qry]
 
-    first_response_SQL = "SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr, "+\
-        "questions_question q, questions_distractor d WHERE d.question_id = q.id AND qr.response_id=d.id AND "+\
-        "d.isCorrect=1 AND qr.id IN (SELECT MIN(qr.ID) FROM questions_questionresponse qr, questions_question q, "+\
-        "questions_distractor d where d.question_id = q.id AND qr.response_id=d.id GROUP BY qr.user_id, "+\
-        "q.id) GROUP BY qr.user_id"
-    first_response_qry = QuestionResponse.objects.raw(first_response_SQL)
-    first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in response_qry]
+    first_response_SQL = '''SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr,
+        questions_question q, questions_distractor d, users_courseuser cu WHERE d.question_id = q.id AND
+        qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s AND d.isCorrect=1 AND qr.id IN (
+            SELECT MIN(qr.ID) FROM questions_questionresponse qr, questions_question q,
+            questions_distractor d, users_courseuser cu where d.question_id = q.id AND
+            qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s GROUP BY qr.user_id,
+            q.id)
+        GROUP BY qr.user_id'''
+    first_response_qry = QuestionResponse.objects.raw(first_response_SQL,[course.id, course.id])
+    first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in first_response_qry]
 
     rating_counts = leaderboard_sort(QuestionRating, "user_id")
 

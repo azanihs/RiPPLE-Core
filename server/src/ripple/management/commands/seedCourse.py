@@ -11,6 +11,7 @@ import imghdr
 import sys
 
 from questions.services import QuestionService
+from users.services import UserService
 
 from random import randint, randrange, sample, choice
 from datetime import datetime
@@ -46,13 +47,7 @@ def merge_url_parts(parts, url=""):
 def make_question_responses(user, correct, incorrect, ability):
     if chance(2):
         user_choice = choose_answer(correct, incorrect, ability)
-        response = QuestionResponse(
-            response=user_choice,
-            user=user
-        )
-        response.save()
-        QuestionService.update_competency(
-            user, user_choice.question, response)
+        response = QuestionService.respond_to_question(user_choice.id,user)
 
         if chance(2):
             rating = QuestionRating(
@@ -251,27 +246,6 @@ class Command(BaseCommand):
         def populate_course(file, topics, course, users):
             all_topics = [Topic.objects.create(
                 name=x, course=course) for x in topics]
-            print("\t-Creating Report Reasons")
-            reason_list = ["custom", "Inappropriate Content", "Incorrect Answer",  "Incorrect Tags"]
-            for r in reason_list:
-                reason = ReportReason (
-                    reason=r,
-                    course=course
-                )
-                reason.save()
-
-            print("\t-Adding Engagements")
-            engagements = ["Questions Answered", "Questions Authored", "Questions Rated",
-                    "Competent Topics", "Achievements Earned"]
-            e_models = ["questionresponse", "question", "questionrating", "competency",
-                    "userachievement"]
-            e_filter_name = ["isCorrect", "", "", "", ""]
-            e_key_user = ["user_id", "author_id", "user_id", "user_id", "user"]
-            for i in range(len(engagements)):
-                e = Engagement(name=engagements[i], course=course,
-                        model=e_models[i], filter_name=e_filter_name[i],
-                        key_user=e_key_user[i])
-                e.save()
 
             print("\t-Enrolling Users")
             course_users = []
@@ -279,13 +253,6 @@ class Command(BaseCommand):
                 if chance(2):
                     course_users.append(
                         CourseUser.objects.create(user=user, course=course))
-
-            print("\t-Adding Consent Form")
-            form = ConsentForm (
-                content="Testing consent form",
-                author=course_users[0]
-            )
-            form.save()
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)
@@ -338,9 +305,10 @@ class Command(BaseCommand):
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
                  for user_id in range(50)]
 
-        all_courses = [Course.objects.create(
-            available=True,
-            course_code=x["courseCode"], course_name=x["courseName"]) for x in courses]
+        all_courses = [UserService.insert_course_if_not_exists({
+            "course_code": x["courseCode"],
+            "course_name": x["courseName"]}, users[0]) for x in courses]
+
         for i in range(0,len(all_courses)):
             print("Populating Course: " + all_courses[i].course_code)
             unique_topics = get_topics(courses[i]["courseFile"])
