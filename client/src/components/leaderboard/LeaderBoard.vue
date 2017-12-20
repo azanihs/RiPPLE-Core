@@ -39,9 +39,9 @@
                 </md-table-row>
             </md-table-header>
             <md-table-body>
-                <md-table-row v-for="user in users"
+                <md-table-row v-for="user in pagedUsers"
                               :key="user.id"
-                              v-bind:class="{ userRow: user.id }">
+                              v-bind:class="{ userRow: user.id !== undefined }">
                     <md-table-cell>{{ user.rank }}</md-table-cell>
                     <md-table-cell>
                         <md-image class="avatar"
@@ -128,6 +128,22 @@ export default class LeaderBoard extends Vue {
 
     get users() {
         return this.pUsers;
+    }
+
+    get pagedUsers() {
+        if (this.users !== undefined) {
+            const users = this.users.slice(0 + this.itemsPerPage * (this.pageIndex - 1),
+                (this.itemsPerPage * this.pageIndex));
+
+            const ownUserIndex = users.findIndex(x => x.id !== undefined);
+            const ownUser = this.users.find(x => x.id !== undefined)!;
+            if (ownUserIndex === -1 && users[0] !== undefined && ownUser.rank < users[0].rank ) {
+                users.unshift(ownUser);
+            } else if (ownUserIndex === -1) {
+                return users.concat(ownUser);
+            }
+            return users;
+        }
     }
 }
 </script>
