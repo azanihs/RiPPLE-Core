@@ -85,9 +85,8 @@ export default class AdminButtons extends Vue {
     mobileMode:boolean = false;
 
     @Lifecycle
-    mounted() {
+    updated() {
         this.mobileMode = ApplicationService.getMobileMode();
-        console.log(this.mobileMode);
     }
 
     saveQuestion() {

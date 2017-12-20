@@ -301,8 +301,6 @@ export default class Main extends Vue {
     pMenuLinks: ILink[] = getLinks();
     currentlyOpenMenu: ILink | undefined = undefined;
 
-    // mixins:[mobileMixin]
-
     menuIcon = "menu";
     closeIcon = "close";
     sideMenuIsOpen = false;

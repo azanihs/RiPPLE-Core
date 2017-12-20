@@ -140,7 +140,7 @@ export default class Notifications extends Vue {
     }
 
     @Lifecycle
-    mounted() {
+    updated() {
         this.mobileMode = ApplicationService.getMobileMode();
     }
 

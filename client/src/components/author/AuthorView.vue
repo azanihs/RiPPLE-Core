@@ -253,7 +253,7 @@ export default class AuthorView extends Vue {
 
     bottomSpaceClass: string = "bottomSpace"
 
-    mobileMode: boolean = ApplicationService.getMobileMode();
+    mobileMode: boolean = false;
 
     get questionPrev():IQuestion | undefined {
         const error = AuthorService.validateQuestions(this.question);
@@ -332,6 +332,11 @@ export default class AuthorView extends Vue {
             .off(this.updateTopics);
     }
 
+    @Lifecycle
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
+    }
+
     get disabled() {
         return this.pDisabled;
     }
@@ -369,6 +374,10 @@ export default class AuthorView extends Vue {
     }
 
     get options() {
+        let imageIndex = tinyMCEPlugins.plugins.indexOf("image");
+        if (imageIndex >= 0 && this.mobileMode) {
+            tinyMCEPlugins.plugins.splice(imageIndex, 1);
+        }
         return {
             skin: false,
             image_caption: true,
@@ -376,10 +385,10 @@ export default class AuthorView extends Vue {
 
             plugins: tinyMCEPlugins.plugins,
             toolbar: tinyMCEPlugins.toolbar,
-            image_advtab: true,
-            file_browser_callback_types: "image",
-            file_picker_callback: ImageService.handleFileClick,
-            file_picker_types: "image"
+            image_advtab: this.mobileMode ? true: null,
+            file_browser_callback_types: this.mobileMode ? "image": null,
+            file_picker_callback: this.mobileMode ? ImageService.handleFileClick: null,
+            file_picker_types: this.mobileMode ? "image": null
         };
     }
 
