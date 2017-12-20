@@ -389,7 +389,7 @@ export default class Main extends Vue {
         if (this.currentlyOpenMenu !== undefined) {
             if (this.currentlyOpenMenu.href != "") {
                 this.pageTitle = this.currentlyOpenMenu.text;
-            } else if (this.currentlyOpenMenu.href == "") {
+            } else if (this.currentlyOpenMenu.href == "" && this.path !== undefined) {
                 this.pageTitle = this.path.charAt(0).toUpperCase() + this.path.slice(1);
             }
         }
