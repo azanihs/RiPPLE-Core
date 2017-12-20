@@ -100,5 +100,5 @@ class BootstrapTestCase(TestCase):
             (role, created) = Role.objects.get_or_create(
                 role="Instructor"
             )
-            course_user.roles.set(role)
+            course_user.roles.set([role])
         return course_user

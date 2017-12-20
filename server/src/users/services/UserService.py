@@ -173,31 +173,39 @@ def aggregate_competencies(user, compare_type):
 
     return _process_competencies(competencies)
 
-def insert_course_if_not_exists(course):
+def insert_course_if_not_exists(course, user):
     if course is None or course.get("course_name", None) is None \
             or course.get("course_code", None) is None:
         return {"error": "Invalid Course Provided"}
     (course, created) = Course.objects.get_or_create(course_code=course.get("course_code"), course_name=course.get("course_name"))
 
-    for r in settings.RUNTIME_CONFIGURATION["report_reason_list"]:
-        reason = ReportReason (
-                    reason=r,
-                    course=course
-                )
-        reason.save()
+    if created:
+        course_user = insert_course_user_if_not_exists(course, user)
 
-    engagements = settings.RUNTIME_CONFIGURATION["engagements"]
-    e_models = settings.RUNTIME_CONFIGURATION["engagement_models"]
-    e_filter_name = settings.RUNTIME_CONFIGURATION["engagement_filters"]
-    e_key_user = settings.RUNTIME_CONFIGURATION["engagement_key_users"]
+        for r in settings.RUNTIME_CONFIGURATION["report_reason_list"]:
+            reason = ReportReason (
+                        reason=r,
+                        course=course
+                    )
+            reason.save()
 
-    for i in range(len(engagements)):
-        e = Engagement(name=engagements[i], course=course,
-                model=e_models[i], filter_name=e_filter_name[i],
-                key_user=e_key_user[i])
-        e.save()
+        engagements = settings.RUNTIME_CONFIGURATION["engagements"]
+        e_models = settings.RUNTIME_CONFIGURATION["engagement_models"]
+        e_filter_name = settings.RUNTIME_CONFIGURATION["engagement_filters"]
+        e_key_user = settings.RUNTIME_CONFIGURATION["engagement_key_users"]
 
-    print(course)
+        for i in range(len(engagements)):
+            e = Engagement(name=engagements[i], course=course,
+                    model=e_models[i], filter_name=e_filter_name[i],
+                    key_user=e_key_user[i])
+            e.save()
+
+        form = ConsentForm (
+            content="Default consent form",
+            author=course_user
+        )
+        form.save()
+
     return course
 
 
