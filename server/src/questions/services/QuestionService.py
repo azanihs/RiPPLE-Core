@@ -8,11 +8,12 @@ from django.db.models import Count, Min, Max
 from django.db import IntegrityError, transaction
 
 from ripple.util import util
-from users.models import CourseUser, Token, User, Role
+from users.models import CourseUser, Token, User, Role, Consent, ConsentForm
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
 from rippleAchievements.models import UserAchievement
 from questions.services import CompetencyService, AuthorService
+from users.services import UserService
 
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
@@ -41,7 +42,7 @@ def question_response_distribution(question_id):
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
     return response_distribution
 
-def get_course_leaders(user, sort_field, sort_order, has_consented, limit=25):
+def get_course_leaders(user, sort_field, has_consented, sort_order, limit=25):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -51,10 +52,12 @@ def get_course_leaders(user, sort_field, sort_order, has_consented, limit=25):
 
     course = user.course
 
-    course_users = CourseUser.objects.filter(course=course).exclude(\
+    course_users = CourseUser.objects.filter(course=course)
+    consent_form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
+    course_users = course_users.exclude(\
         id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role="Instructor")))
     if has_consented:
-        course_users = course_users.filter(id__in=Consent.objects.filter(response=True))
+        course_users = course_users.filter(id__in=Consent.objects.filter(form=consent_form, response=True).values("user_id"))
 
     question_counts = leaderboard_sort(Question, "author_id")
 
@@ -70,7 +73,9 @@ def get_course_leaders(user, sort_field, sort_order, has_consented, limit=25):
             q.id)
         GROUP BY qr.user_id'''
     first_response_qry = QuestionResponse.objects.raw(first_response_SQL,[course.id, course.id])
+
     first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in first_response_qry]
+
 
     rating_counts = leaderboard_sort(QuestionRating, "user_id")
 

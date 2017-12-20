@@ -12,7 +12,7 @@ from ripple.util.util import save_image, mean, verify_content, is_administrator,
 
 from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating,\
     ReportReason
-from questions.services import CompetencyService
+from questions.services import CompetencyService, QuestionService
 from users.models import Course, CourseUser, User, Role, UserImage, Engagement, Consent, ConsentForm
 from rippleAchievements.models import UserAchievement
 from users.services.TokenService import token_to_user_course
@@ -397,5 +397,8 @@ def get_form(user):
 def get_consented_stats(user):
     if not util.is_administrator(user):
         return {"error": "User is not authorized"}
+
+    res = QuestionService.get_course_leaders(user, "rank", True, "DESC", -1)
+    return {"data": res}
 
 

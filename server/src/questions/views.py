@@ -192,7 +192,7 @@ def leaderboard(request, sort_field, sort_order):
         sort_order = "DESC"
 
     leaderboard_scores = QuestionService.get_course_leaders(logged_in_user,
-        sort_field, sort_order, limit)
+        sort_field, False, sort_order, limit)
     return JsonResponse({"data": leaderboard_scores})
 
 

@@ -29,7 +29,7 @@
             md-flex="100">
             <md-card>
                 <md-button @click="downloadCSVString" class="md-raised">Download Spreadsheet Results</md-button>
-                <md-button class="md-raised">Download Database Dump</md-button>
+                <md-button @click="testConsented" class="md-raised">Download Database Dump</md-button>
             </md-card>
         </md-layout>
         <md-dialog ref="course_create_modal"
@@ -274,6 +274,10 @@ export default class AdminView extends Vue {
 
         // Remove the anchor element from the DOM after it has been clicked
         document.body.removeChild(_a);
+    }
+
+    testConsented() {
+        UserService.getConsentedUserStats().then( x=>console.log(x));
     }
 }
 </script>
