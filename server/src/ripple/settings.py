@@ -180,5 +180,12 @@ ACHIEVEMENT_CLASSES = ['users.achievements.userAchievements']
 
 RUNTIME_CONFIGURATION = {
     "min_competency_threshold": -1,
-    "min_competency_value": 0.9
+    "min_competency_value": 0.9,
+    "report_reason_list": ["custom", "Inappropriate Content", "Incorrect Answer",  "Incorrect Tags"],
+    "engagements": ["Questions Answered", "Questions Authored", "Questions Rated",
+        "Competent Topics", "Achievements Earned"],
+    "engagement_models": ["questionresponse", "question", "questionrating", "competency",
+        "userachievement"],
+    "engagement_filters": ["isCorrect", "", "", "", ""],
+    "engagement_key_users": ["user_id", "author_id", "user_id", "user_id", "user"]
 }

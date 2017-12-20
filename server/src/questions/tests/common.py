@@ -97,7 +97,7 @@ class BootstrapTestCase(TestCase):
         course_user = CourseUser(user=user, course=course)
         course_user.save()
         if instructor:
-            role = Role.objects.get_or_create(
+            (role, created) = Role.objects.get_or_create(
                 role="Instructor"
             )
             course_user.roles.set(role)
