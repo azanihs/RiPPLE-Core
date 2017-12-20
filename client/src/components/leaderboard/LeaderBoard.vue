@@ -129,5 +129,21 @@ export default class LeaderBoard extends Vue {
     get users() {
         return this.pUsers;
     }
+
+    get pagedUsers() {
+        if (this.users !== undefined) {
+            const users = this.users.slice(0 + this.itemsPerPage * (this.pageIndex - 1),
+                (this.itemsPerPage * this.pageIndex));
+            const ownUserIndex = users.findIndex(x => x.id !== undefined);
+            const ownUser = this.users.find(x => x.id !== undefined)!;
+            if (ownUserIndex === -1 && users[0] !== undefined && ownUser.rank < users[0].rank ) {
+                users.unshift(ownUser);
+            } else if (ownUserIndex === -1 && ownUser !== undefined) {
+                const joinedUsers = users.concat(ownUser);
+                return joinedUsers;
+            }
+            return users;
+        }
+    }
 }
 </script>

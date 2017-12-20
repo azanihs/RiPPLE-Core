@@ -3,7 +3,7 @@
                class="header" v-if="search">
         <md-layout v-for="field in searchableFields"
                    :key="field.displayName"
-                   class="searchItem">
+                   :class="searchItemClass">
             <md-input-container v-if="field.type == 'multiselect'">
                 <label :for="field.name">{{field.name}}</label>
                 <md-select :name="field.name" multiple v-model="search[field.id]">
@@ -64,6 +64,12 @@
     margin-right: 20px;
 }
 
+.mobileSearchItem {
+    overflow: hidden;
+    margin-left: 0px;
+    margin-right: 15px;
+}
+
 h2 {
     color: #999;
 }
@@ -109,7 +115,7 @@ import { ITopic, ISearch } from "../../interfaces/models";
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
 import Fetcher from "../../services/Fetcher";
-
+import ApplicationService from "../../services/ApplicationService";
 import PageLoader from "../util/PageLoader.vue";
 
 @Component({
@@ -132,6 +138,8 @@ export default class QuestionSearch extends Vue {
     });
 
     pTopics: ITopic[] = [];
+
+    mobileMode: boolean = false;
 
     get searchableFields() {
         return [{
@@ -216,6 +224,11 @@ export default class QuestionSearch extends Vue {
             .off(this.updateCourseTopics);
     }
 
+    @Lifecycle
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
+    }
+
     sort() {
         if (this.search !== undefined) {
             this.search.sortDesc = !this.search.sortDesc;
@@ -266,6 +279,13 @@ export default class QuestionSearch extends Vue {
                 this.timeoutId = window.setTimeout((() => this.applyFilters()), 10);
             };
         }
+    }
+
+    get searchItemClass() {
+        return {
+            "searchItem": !this.mobileMode,
+            "mobileSearchItem": this.mobileMode
+        };
     }
 
 }
