@@ -447,25 +447,23 @@ export default class VariableDataVisualiser extends Vue {
     }
 
     zeroCompetency(topic: ITopic) {
-        if (this.pChartData == undefined || this.pChartData.data == undefined) {
+        if (this.chartType == "bar") {
+            if (this.pChartData == undefined || this.pChartData.data == undefined) {
             // const zero = { data: this.pChartData.data,
                 // class: "gray-out" };
+                return false;
+            }
+            const index = this.pChartData.data.labels.indexOf(topic.name);
+            const value = this.pChartData.data.datasets["0"].data[index];
+            if (value == 0) {
+                // const zero = { data: this.pChartData.data,
+                //     class: "gray-out" };
+                return true;
+            }
+            // Topic is not selected for render or competency is > 0
+            // Do not gray out
             return false;
         }
-
-        const index = this.pChartData.data.labels.indexOf(topic.name);
-        const value = this.pChartData.data.datasets["0"].data[index];
-        if (value == 0) {
-            // const zero = { data: this.pChartData.data,
-            //     class: "gray-out" };
-            return true;
-        }
-
-        // Topic is not selected for render or competency is > 0
-        // Do not gray out
-        return false;
     }
-
-
 }
 </script>
