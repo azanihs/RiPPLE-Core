@@ -298,7 +298,7 @@ class Command(BaseCommand):
                 studentAbility = abilities[choice(range(3))]
                 print("\t-Answering Course User:" + str(index) + " Questions")
                 index += 1
-                for i in range(0, 20):
+                for i in range(0, 100):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
         def populate_availability(course_users, days, times):
