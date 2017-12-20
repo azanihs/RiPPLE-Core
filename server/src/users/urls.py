@@ -17,5 +17,6 @@ urlpatterns = [
     url(r'^consent/$', views.consent, name='consent'),
     url(r'^submit_consent_form/$', views.submit_consent_form, name='submit_consent_form'),
     url(r'^consent_form/$', views.consent_form, name='consent_form'),
-    url(r'^has_consented/$', views.has_consented, name='has_consented')
+    url(r'^has_consented/$', views.has_consented, name='has_consented'),
+    url(r'consent/all/$', views.consented_stats, name="consented_stats")
 ]

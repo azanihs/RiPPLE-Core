@@ -369,3 +369,9 @@ def get_form(user):
     form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
 
     return form
+
+def get_consented_stats(user):
+    if not util.is_administrator(user):
+        return {"error": "User is not authorized"}
+
+

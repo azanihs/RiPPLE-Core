@@ -151,6 +151,10 @@ export default class UserService {
         return UserRepository.getUserLeaderboard(sortField, sortOrder);
     }
 
+    static getConsentedUserStats() {
+        return UserRepository.getConsentedUserStats();
+    }
+
     static getUserNotifications() {
         return UserRepository.getUserNotifications();
     }
