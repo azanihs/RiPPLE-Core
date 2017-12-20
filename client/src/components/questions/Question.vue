@@ -1,6 +1,6 @@
 <template>
     <md-layout :class="bottomSpaceClass">
-        <md-layout md-flex="100">
+        <md-layout md-flex="100" class="adminQuestionStyle">
             <md-layout md-flex="100"
                        class="questionContainer componentSeparator">
                 <md-card>

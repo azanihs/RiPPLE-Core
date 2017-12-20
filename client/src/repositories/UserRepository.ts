@@ -132,7 +132,7 @@ export default class UserRepository {
 
     static getAllAvailableEngagementTypes(): Promise<IEngagementType[]> {
         return apiFetch<IEngagementType[]>(`/users/engagement/`)
-            .then(topics => topics.map(x => TopicRepository.topicPointer(x)));
+            .then(topics => topics.map(x => TopicRepository.engagementPointer(x)));
     }
 
     static getUserLeaderboard(sortField: string, sortOrder: "DESC" | "ASC"): Promise<IUserSummary[]> {
