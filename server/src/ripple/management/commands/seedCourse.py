@@ -46,13 +46,7 @@ def merge_url_parts(parts, url=""):
 def make_question_responses(user, correct, incorrect, ability):
     if chance(2):
         user_choice = choose_answer(correct, incorrect, ability)
-        response = QuestionResponse(
-            response=user_choice,
-            user=user
-        )
-        response.save()
-        QuestionService.update_competency(
-            user, user_choice.question, response)
+        response = QuestionService.respond_to_question(user_choice.id,user)
 
         if chance(2):
             rating = QuestionRating(
@@ -304,7 +298,7 @@ class Command(BaseCommand):
                 studentAbility = abilities[choice(range(3))]
                 print("\t-Answering Course User:" + str(index) + " Questions")
                 index += 1
-                for i in range(0, 100):
+                for i in range(0, 20):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
         def populate_availability(course_users, days, times):
