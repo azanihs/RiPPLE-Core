@@ -1,7 +1,9 @@
 <template>
     <md-layout md-flex="100">
-        <md-card class="fullWidth">
-            <md-layout md-flex="100">
+        <md-card class="fullWidth"
+            :class = "{'overflowMobile': mobileMode}">
+            <md-layout md-flex="100"
+                :class = "{'mobileStyle': mobileMode}">
                 <md-layout md-flex="75"
                     class="leftPanel">
                     <h2 class="chartHeader">Your Current Results vs. {{compare}}</h2>
@@ -53,7 +55,6 @@
                                 </md-select>
                             </md-input-container>
                             <h4>Topics to Visualise</h4>
-                            <responsive-wrapper>
                                 <md-layout md-flex="100">
                                     <topic-chip v-for="category in dataCategories"
                                         :key="category.id"
@@ -66,7 +67,6 @@
                                         </md-tooltip>
                                     </topic-chip>
                                 </md-layout>
-                            </responsive-wrapper>
                         </div>
                     </div>
                 </md-layout>
@@ -173,15 +173,28 @@ h3 {
 .visualisationMenu > h3 {
     margin-top: 0px;
 }
+
+.mobileStyle {
+    min-width: 600px;
+}
+
+.mobileStyle > .settingsContainer {
+    min-width: 100%;
+}
+
+.overflowMobile {
+    overflow: auto;
+}
+
 </style>
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
 import { ITopic, IEdge, ICompareSet } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
-import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Chart from "./Chart.vue";
+import ApplicationService from "../../services/ApplicationService";
 
 interface IChartType {
     name: string,
@@ -191,8 +204,7 @@ interface IChartType {
 @Component({
     components: {
         Chart,
-        TopicChip,
-        ResponsiveWrapper
+        TopicChip
     }
 })
 export default class VariableDataVisualiser extends Vue {
@@ -240,6 +252,8 @@ export default class VariableDataVisualiser extends Vue {
     zeroCompetencyClass: boolean = false;
 
     pCompareAgainst: string = "peers";
+
+    mobileMode: boolean = false;
 
     get chart() {
         return this.pChartType || this.chartType;
@@ -399,6 +413,11 @@ export default class VariableDataVisualiser extends Vue {
         Fetcher.get(this.pDataGeneratorFunction as any,
             { compareTo: this.compare, exclude: this.pExcludeTopics })
             .off(this.updateChartData);
+    }
+
+    @Lifecycle
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     getColour(c: number) {

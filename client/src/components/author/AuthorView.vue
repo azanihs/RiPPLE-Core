@@ -1,6 +1,5 @@
 <template>
     <md-layout :class="bottomSpaceClass">
-        <md-layout md-hide-medium-and-up class="hidden" ref="onlyVisibleOnMobile"></md-layout>
         <md-layout md-flex="100">
             <md-tabs md-fixed
                 :mdNavigation="false"
@@ -34,7 +33,7 @@
                                 <md-tabs md-fixed
                                     :mdNavigation="false"
                                     class="md-transparent tabContainer subTabs"
-                                    :class = "{'subTabs': !mobileMode}">
+                                    :class = "subTabStyle">
                                     <md-tab v-for="i in ['A', 'B', 'C', 'D']"
                                         :key="i"
                                         :id="'tab_' + i"
@@ -147,6 +146,10 @@ h3 {
     width: 100%;
 }
 
+.mobileSubTabs >>> button{
+    font-size: 0.9em;
+}
+
 .removePadding {
     padding: 0px !important;
 }
@@ -205,6 +208,7 @@ import tinyMCEPlugins from "./plugins";
 import TinyMCE from "../util/TinyMCE.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Question from "../questions/Question.vue";
+import ApplicationService from "../../services/ApplicationService";
 
 @Component({
     components: {
@@ -249,7 +253,7 @@ export default class AuthorView extends Vue {
 
     bottomSpaceClass: string = "bottomSpace"
 
-    mobileMode = false;
+    mobileMode: boolean = false;
 
     get questionPrev():IQuestion | undefined {
         const error = AuthorService.validateQuestions(this.question);
@@ -329,14 +333,8 @@ export default class AuthorView extends Vue {
     }
 
     @Lifecycle
-    mounted() {
-        const visible = (this.$refs.onlyVisibleOnMobile as Vue);
-        const isVisible = visible.$el;
-        if (window.getComputedStyle(isVisible).display !== "none") {
-            this.mobileMode = true;
-        } else {
-            this.mobileMode = false;
-        }
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     get disabled() {
@@ -376,6 +374,10 @@ export default class AuthorView extends Vue {
     }
 
     get options() {
+        let imageIndex = tinyMCEPlugins.plugins.indexOf("image");
+        if (imageIndex >= 0 && this.mobileMode) {
+            tinyMCEPlugins.plugins.splice(imageIndex, 1);
+        }
         return {
             skin: false,
             image_caption: true,
@@ -383,10 +385,10 @@ export default class AuthorView extends Vue {
 
             plugins: tinyMCEPlugins.plugins,
             toolbar: tinyMCEPlugins.toolbar,
-            image_advtab: true,
-            file_browser_callback_types: "image",
-            file_picker_callback: ImageService.handleFileClick,
-            file_picker_types: "image"
+            image_advtab: this.mobileMode ? true: null,
+            file_browser_callback_types: this.mobileMode ? "image": null,
+            file_picker_callback: this.mobileMode ? ImageService.handleFileClick: null,
+            file_picker_types: this.mobileMode ? "image": null
         };
     }
 
@@ -436,6 +438,13 @@ export default class AuthorView extends Vue {
             "previewTabStudent": !this.mobileMode && this.id < 0,
             "previewTabAdmin": !this.mobileMode && this.id >= 0,
             "mobilePreviewTab": this.mobileMode
+        };
+    }
+
+    get subTabStyle() {
+        return {
+            "subTabs": !this.mobileMode,
+            "mobileSubTabs": this.mobileMode
         };
     }
 

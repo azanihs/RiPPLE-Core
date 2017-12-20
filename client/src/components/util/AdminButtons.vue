@@ -1,32 +1,31 @@
 <template>
     <md-layout class="buttonContainer">
-        <responsive-wrapper>
-            <div class="fixedButtons">
-            <action-buttons>
-                <md-button
-                    v-if="showEdit"
-                    class="primary-colour"
-                    slot="centreRight"
-                    @click="editQuestion">
-                    <span>Edit Question</span>
-                </md-button>
-                <md-button
-                    v-else
-                    class="primary-colour"
-                    slot="centreRight"
-                    @click="saveQuestion">
-                    <span>Save Question</span>
-                </md-button>
-                <md-button
-                    v-if="questionExists"
-                    class="md-warn"
-                    slot="right"
-                    @click="deleteQuestion">
-                    <span>Delete Question</span>
-                </md-button>
-            </action-buttons>
-            </div>
-        </responsive-wrapper>
+        <div class="fixedButtons"
+        :class = "{'mobileStyle': mobileMode}">
+        <action-buttons>
+            <md-button
+                v-if="showEdit"
+                class="primary-colour"
+                slot="centreRight"
+                @click="editQuestion">
+                <span>Edit Question</span>
+            </md-button>
+            <md-button
+                v-else
+                class="primary-colour"
+                slot="centreRight"
+                @click="saveQuestion">
+                <span>Save Question</span>
+            </md-button>
+            <md-button
+                v-if="questionExists"
+                class="md-warn"
+                slot="right"
+                @click="deleteQuestion">
+                <span>Delete Question</span>
+            </md-button>
+        </action-buttons>
+        </div>
     </md-layout>
 </template>
 
@@ -58,7 +57,7 @@
     justify-content: space-between !important;
 }
 
-.mobileStyle > .fixedButtons {
+.mobileStyle.fixedButtons {
     position: relative !important;
     background-color: transparent !important;
 }
@@ -66,14 +65,13 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, p } from "av-ts";
+import { Vue, Lifecycle, Component, Prop, p } from "av-ts";
 import ActionButtons from "./ActionButtons.vue";
-import ResponsiveWrapper from "../util/ResponsiveWrapper.vue";
+import ApplicationService from "../../services/ApplicationService";
 
 @Component({
     components: {
-        ActionButtons,
-        ResponsiveWrapper
+        ActionButtons
     }
 })
 
@@ -85,6 +83,13 @@ export default class AdminButtons extends Vue {
     @Prop questionExists = p<boolean>({
         default: false
     });
+
+    mobileMode:boolean = false;
+
+    @Lifecycle
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
+    }
 
     saveQuestion() {
         this.$emit("saveQuestion");
