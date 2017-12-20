@@ -15,7 +15,8 @@
                 </md-button>
             </action-buttons>
         </md-layout>
-        <question :question="question" ref="questionComponent"></question>
+        <question :question="question" ref="questionComponent"
+            :class = "{'adminQuestion': canEdit}"></question>
     </md-layout>
     <page-loader v-else :condition="!question"></page-loader>
 </template>
@@ -26,6 +27,11 @@
     min-width: 100%;
     flex-direction: column;
 }
+
+.adminQuestion >>> .adminQuestionStyle {
+    margin-top: 75px;
+}
+
 </style>
 
 <script lang="ts">
