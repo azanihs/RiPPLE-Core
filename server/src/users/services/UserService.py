@@ -10,8 +10,9 @@ from django.db import IntegrityError, transaction
 from datetime import datetime
 from ripple.util.util import save_image, mean, verify_content, is_administrator, extract_image_from_html, generate_static_path
 
-from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating
-from questions.services import CompetencyService
+from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating,\
+    ReportReason
+from questions.services import CompetencyService, QuestionService
 from users.models import Course, CourseUser, User, Role, UserImage, Engagement, Consent, ConsentForm
 from rippleAchievements.models import UserAchievement
 from users.services.TokenService import token_to_user_course
@@ -172,14 +173,40 @@ def aggregate_competencies(user, compare_type):
 
     return _process_competencies(competencies)
 
-def insert_course_if_not_exists(course):
+def insert_course_if_not_exists(course, user):
     if course is None or course.get("course_name", None) is None \
             or course.get("course_code", None) is None:
         return {"error": "Invalid Course Provided"}
-    try:
-        return Course.objects.get(course_code=course.get("course_code"))
-    except Course.DoesNotExist:
-        return Course.objects.create(course_code=course.get("course_code"), course_name=course.get("course_name"))
+    (course, created) = Course.objects.get_or_create(course_code=course.get("course_code"), course_name=course.get("course_name"))
+
+    if created:
+        course_user = insert_course_user_if_not_exists(course, user)
+
+        for r in settings.RUNTIME_CONFIGURATION["report_reason_list"]:
+            reason = ReportReason (
+                        reason=r,
+                        course=course
+                    )
+            reason.save()
+
+        engagements = settings.RUNTIME_CONFIGURATION["engagements"]
+        e_models = settings.RUNTIME_CONFIGURATION["engagement_models"]
+        e_filter_name = settings.RUNTIME_CONFIGURATION["engagement_filters"]
+        e_key_user = settings.RUNTIME_CONFIGURATION["engagement_key_users"]
+
+        for i in range(len(engagements)):
+            e = Engagement(name=engagements[i], course=course,
+                    model=e_models[i], filter_name=e_filter_name[i],
+                    key_user=e_key_user[i])
+            e.save()
+
+        form = ConsentForm (
+            content="Default consent form",
+            author=course_user
+        )
+        form.save()
+
+    return course
 
 
 def insert_user_if_not_exists(user):
@@ -198,10 +225,7 @@ def insert_course_user_if_not_exists(course, user):
         return {"error": "Invalid Course Provided"}
     if user is None or not isinstance(user, User):
         return {"error": "Invalid User Provided"}
-    try:
-        return CourseUser.objects.get(course=course, user=user)
-    except CourseUser.DoesNotExist:
-        return CourseUser.objects.create(course=course, user=user)
+    return CourseUser.objects.get_or_create(course=course, user=user)[0]
 
 
 def update_user_roles(course_user, role):
@@ -369,3 +393,26 @@ def get_form(user):
     form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
 
     return form
+
+def get_all_stats(user):
+    if not util.is_administrator(user):
+        return {"error": "User is not authorized"}
+
+    leaderboard = QuestionService.create_leaderboard(user, False, ["lastName", "firstName"], "ASC")
+    for person in leaderboard:
+        person.pop("rank", None)
+    return {"data": leaderboard}
+
+
+def get_consented_stats(user):
+    if not util.is_administrator(user):
+        return {"error": "User is not authorized"}
+
+    leaderboard = QuestionService.create_leaderboard(user, True, ["lastName", "firstName"], "ASC")
+    for person in leaderboard:
+        person.pop("firstName", None)
+        person.pop("lastName", None)
+        person.pop("image", None)
+    return {"data": leaderboard}
+
+

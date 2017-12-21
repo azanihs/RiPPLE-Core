@@ -83,6 +83,14 @@ export default class UserRepository {
         }
     }
 
+    static getUserStats(): Promise<IUserSummary[]> {
+        return apiFetch<IUserSummary[]>(`/users/stats/all`);
+    }
+
+    static getConsentedUserStats(): Promise<IUserSummary[]> {
+        return apiFetch<IUserSummary[]>(`/users/stats/consented`);
+    }
+
     static getLoggedInUser(): Promise<ICourseUser> {
         return apiFetch<ICourseUser>(`/users/me/`);
     }

@@ -17,8 +17,8 @@ def index(request):
         }
         return JsonResponse(user_response)
     else:
-        course = request_to_course(lti_params)
         user = request_to_user(lti_params)
+        course = request_to_course(lti_params, user)
         course_user = create_course_user(course, user, lti_params)
         # Get token
         token = generate_token(user, course.course_code)

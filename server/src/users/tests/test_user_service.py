@@ -332,21 +332,22 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_insert_course_if_not_exists(self):
-        self.assertEqual(UserService.insert_course_if_not_exists(None),
+        user = self._bootstrap_user()
+        self.assertEqual(UserService.insert_course_if_not_exists(None, user),
                 {"error": "Invalid Course Provided"})
 
-        self.assertEqual(UserService.insert_course_if_not_exists({"invalid": "course"}),
+        self.assertEqual(UserService.insert_course_if_not_exists({"invalid": "course"}, user),
                 {"error": "Invalid Course Provided"})
 
         self.assertEqual(UserService.insert_course_if_not_exists(
-                {"course_code": "test1", "course_name": "test1"}
+                {"course_code": "test1", "course_name": "test1"}, user
         ), Course.objects.filter(course_code="test1")[0])
 
         c = Course(course_code="test2", course_name="test2")
         c.save()
 
         self.assertEqual(UserService.insert_course_if_not_exists(
-                {"course_code": "test2", "course_name": "test2"}
+                {"course_code": "test2", "course_name": "test2"}, user
         ), c)
 
     def test_insert_user_if_not_exists(self):
