@@ -81,7 +81,8 @@ export default class QuestionWrapper extends Vue {
     }
 
     editQuestion() {
-        this.$router.push({ path: `/question/edit/${this.id}` });
+        let routeTo = "answer";
+        this.$router.push({ path: `/question/edit/${routeTo}/${this.id}` });
     }
 
     @Lifecycle

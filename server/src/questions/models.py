@@ -56,7 +56,8 @@ class Question(models.Model):
             "topics": [x.toJSON() for x in self.topics.all()],
             "responses": [],
             "responseCount": responses,
-            "distractors": [x.toJSON() for x in self.distractor_set.all()]
+            "distractors": [x.toJSON() for x in self.distractor_set.all()],
+            "createdAt": (self.created_time.replace(tzinfo=timezone.utc) - _epoch).total_seconds()
         }
 
 class DeletedQuestion(models.Model):
@@ -77,9 +78,6 @@ class DeletedQuestion(models.Model):
         return self.content[:20]
 
     def toJSON(self):
-        responses = QuestionResponse.objects.filter(response_id__in=self.distractor_set.all())\
-            .values('user_id').distinct().count()
-
         return {
             "id": self.id,
             "content": self.content,
@@ -89,9 +87,10 @@ class DeletedQuestion(models.Model):
             "difficultyCount": self.difficultyCount,
             "qualityCount": self.qualityCount,
             "topics": [x.toJSON() for x in self.topics.all()],
-            "responses": [],
-            "responseCount": responses,
-            "distractors": [x.toJSON() for x in self.distractor_set.all()]
+            "responses": 0,
+            "responseCount": 0,
+            "distractors": [x.toJSON() for x in self.deleteddistractor_set.all()],
+            "createdAt": (self.created_time.replace(tzinfo=timezone.utc) - _epoch).total_seconds()
         }
 
 
@@ -113,6 +112,23 @@ class Distractor(models.Model):
             "isCorrect": self.isCorrect
         }
 
+class DeletedDistractor(models.Model):
+    content = models.TextField()
+    response = models.CharField(max_length=1)
+    isCorrect = models.BooleanField()
+
+    question = models.ForeignKey(DeletedQuestion)
+
+    def __str__(self):
+        return self.content[:20]
+
+    def toJSON(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "response": self.response,
+            "isCorrect": self.isCorrect
+        }
 
 class QuestionResponse(models.Model):
     response = models.ForeignKey(Distractor, on_delete=None)

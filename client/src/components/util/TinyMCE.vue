@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
+import { Vue, Component, Prop, p, Watch, Lifecycle } from "av-ts";
 
 @Component
 export default class TinyMCE extends Vue {
@@ -17,6 +17,15 @@ export default class TinyMCE extends Vue {
     @Prop value = p<string | undefined>({
         required: false
     });
+
+    @Prop version = p<number>({
+        default: 0
+    });
+
+    @Watch("version")
+    watchVersion(_n: number, _o: number) {
+        tinymce.get(this.id).setContent(this.value);
+    }
 
     @Lifecycle
     mounted() {

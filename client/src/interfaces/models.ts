@@ -29,7 +29,8 @@ export interface IQuestion {
     solution: IDistractor,
     distractors: IDistractor[],
     responseCount: number,
-    canEdit?: boolean
+    canEdit?: boolean,
+    createdAt?: number
 };
 
 export interface IDistractor {
@@ -187,7 +188,8 @@ export interface IQuestionBuilder {
         D: string
     },
     correctIndex: string,
-    topics: ITopic[]
+    topics: ITopic[],
+    createdAt?: string
 };
 
 export interface IAuthorResponse {

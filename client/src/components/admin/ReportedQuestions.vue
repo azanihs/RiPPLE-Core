@@ -249,7 +249,8 @@ export default class ReportedQuestions extends Vue {
     }
 
     editQuestion(id: number) {
-        this.$router.push({ path: `/question/edit/${id}` });
+        let src = this.$route.name;
+        this.$router.push({ path: `/question/edit/${src}/${id}` });
     }
 
     @Lifecycle

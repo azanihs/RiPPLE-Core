@@ -2,9 +2,27 @@
     <md-layout v-if="!id || question" class="flex-vertical">
         <admin-buttons
             :showEdit="false"
-            :questionExists="questionPresent"
-            @saveQuestion="saveQuestion"></admin-buttons>
-        <author-view ref="authView" :question="question" :id="this.id"></author-view>
+            :id="id"
+            :prevQuestions="prevQuestions"
+            @saveQuestion="saveQuestion"
+            @deleteQuestion="openDialog"
+            @version="version"></admin-buttons>
+        <author-view ref="authView"
+            :version="pVersion"
+            :question="question"
+            :id="this.id"></author-view>
+        <md-dialog ref="delete_modal">
+            <md-dialog-title>Delete Question</md-dialog-title>
+            <md-dialog-content>
+                <p>Are you sure you want to delete?</p>
+            </md-dialog-content>
+            <md-dialog-actions>
+                <md-button
+                    @click="closeDialog()">Cancel</md-button>
+                    <md-button class="md-warn"
+                    @click="deleteQuestion()">Delete</md-button>
+            </md-dialog-actions>
+        </md-dialog>
     </md-layout>
     <page-loader v-else :condition="id && !question"></page-loader>
 </template>
@@ -25,6 +43,9 @@ import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
 import AdminButtons from "../util/AdminButtons.vue";
 import { addEventsToQueue } from "../../util";
+import { serverToLocal } from "../../util";
+
+const _MODAL_NAME = "delete_modal";
 
 @Component({
     components: {
@@ -39,9 +60,12 @@ export default class AuthorWrapper extends Vue {
         required: false
     });
 
-    questionPresent:boolean = false;
+    @Prop returnTo = p<string>({});
 
     pQuestion: IQuestionBuilder | undefined = undefined;
+    pCurrent: IQuestionBuilder | undefined = undefined;
+    prevQuestions: IQuestionBuilder[] = [];
+    pVersion: number = 0;
 
     updateQuestion() {
         if (this.id) {
@@ -50,9 +74,17 @@ export default class AuthorWrapper extends Vue {
                     if (question && question.canEdit !== undefined && !question.canEdit) {
                         this.$router.push(`/error/403`);
                     }
-                    this.pQuestion = this.questionToBuilder(question);
+                    this.pQuestion = this.questionToBuilder(question!);
+                    this.pCurrent = this.questionToBuilder(question!);
                 });
-            this.questionPresent = true;
+
+            QuestionService.getPreviousQuestions(this.id)
+                .then((questionList: IQuestion[]) => {
+                    this.prevQuestions = [];
+                    questionList.forEach( question => {
+                        this.prevQuestions.push(this.questionToBuilder(question)!);
+                    });
+                });
         }
     }
 
@@ -70,7 +102,8 @@ export default class AuthorWrapper extends Vue {
                 D: question.distractors[3].content
             },
             correctIndex: "A",
-            topics: question.topics
+            topics: question.topics,
+            createdAt: serverToLocal(question.createdAt!)
         };
         question.distractors.forEach(d => {
             if (d.isCorrect) {
@@ -81,7 +114,11 @@ export default class AuthorWrapper extends Vue {
     }
 
     get question() {
-        return this.pQuestion;
+        return this.pQuestion!;
+    }
+
+    set question(newQuestion: IQuestionBuilder) {
+        this.pQuestion = newQuestion;
     }
 
     @Lifecycle
@@ -90,7 +127,6 @@ export default class AuthorWrapper extends Vue {
     }
 
     saveQuestion() {
-        console.log("saving");
         let aView: AuthorView = <AuthorView> this.$refs.authView;
         aView.validateUpload();
     }
@@ -106,8 +142,29 @@ export default class AuthorWrapper extends Vue {
                     }]);
                 })
                 .then(() => {
-                    this.$router.go(-1);
+                    this.closeDialog();
+                    this.$router.push({ "name": this.returnTo });
                 });
+        }
+    }
+
+    openDialog() {
+        const modal = this.$refs[_MODAL_NAME] as any;
+        if (modal) {
+            requestAnimationFrame(() => modal.open());
+        }
+    };
+
+    closeDialog() {
+        (this.$refs[_MODAL_NAME] as any).close();
+    }
+
+    version(version: number) {
+        this.pVersion = version;
+        if (version == 0) {
+            this.question = this.pCurrent!;
+        } else {
+            this.question = this.prevQuestions[version-1];
         }
     }
 

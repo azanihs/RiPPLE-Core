@@ -14,6 +14,7 @@
                                     <h2>Question Body</h2>
                                     <TinyMCE id="questionEditor"
                                         v-model="question.content"
+                                        :version="version"
                                         :options="options"></TinyMCE>
                                 </md-layout>
                                 <md-layout md-flex="100">
@@ -40,6 +41,7 @@
                                         :md-label="'Response ' + i">
                                         <TinyMCE :id="'editor_' + i"
                                             v-model="question.responses[i]"
+                                            :version="version"
                                             :options="options"></TinyMCE>
                                     </md-tab>
                                 </md-tabs>
@@ -67,6 +69,7 @@
                                     <h2>Question Explanation</h2>
                                     <TinyMCE id="questionExplanation"
                                         v-model="question.explanation"
+                                        :version="version"
                                         :options="options"></TinyMCE>
                                 </md-layout>
                             </md-card>
@@ -236,6 +239,10 @@ export default class AuthorView extends Vue {
     });
     @Prop id = p<number>({
         default: -1
+    });
+
+    @Prop version = p<number>({
+        default: 0
     });
 
     uploadDone = false;

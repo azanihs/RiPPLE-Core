@@ -73,6 +73,10 @@ def delete(request, qid):
     user = UserService.logged_in_user(request)
     return JsonResponse(QuestionService.delete_question(user, qid))
 
+def previous(request, qid):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(QuestionService.previous_versions(user, qid))
+
 def respond(request):
     if request.method != 'POST':
         return JsonResponse({

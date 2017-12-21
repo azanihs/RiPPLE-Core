@@ -75,7 +75,7 @@ const routes = [{
         name: "create",
         component: AuthorWrapper
     }, {
-        path: "/question/edit/:id",
+        path: "/question/edit/:returnTo/:id",
         name: "edit",
         component: AuthorWrapper,
         props: true

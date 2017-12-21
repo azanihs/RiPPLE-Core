@@ -3,6 +3,22 @@
         <div class="fixedButtons"
         :class = "{'mobileStyle': mobileMode}">
         <action-buttons>
+            <md-input-container v-if="prevQuestions" class="prev-versions"
+                slot="centreLeft" style="min-width:200px">
+                <label for="prevQuestions">Version:</label>
+                <md-select
+                    name="prevQuestions"
+                    id="prevQuestions"
+                    v-model="version"
+                    md-change="versionChanged()">
+                    <md-option :value="0">
+                        Version: Current
+                    </md-option>
+                    <md-option v-for="i in prevQuestions.length" :key="i" :value="i">
+                        Version {{ prevQuestions.length - i + 1 }}: {{ prevQuestions[i-1]["createdAt"] }}
+                    </md-option>
+                </md-select>
+            </md-input-container>
             <md-button
                 v-if="showEdit"
                 class="primary-colour"
@@ -18,7 +34,7 @@
                 <span>Save Question</span>
             </md-button>
             <md-button
-                v-if="questionExists"
+                v-if="id"
                 class="md-warn"
                 slot="right"
                 @click="deleteQuestion">
@@ -64,12 +80,20 @@
     left: 0px;
 }
 
+.prev-versions {
+    flex-grow: 1;
+    flex: unset;
+    width: unset;
+    margin: 0px;
+}
+
 </style>
 
 <script lang="ts">
-import { Vue, Lifecycle, Component, Prop, p } from "av-ts";
+import { Vue, Lifecycle, Watch, Component, Prop, p } from "av-ts";
 import ActionButtons from "./ActionButtons.vue";
 import ApplicationService from "../../services/ApplicationService";
+import { IQuestionBuilder } from "../../interfaces/models";
 
 @Component({
     components: {
@@ -82,16 +106,24 @@ export default class AdminButtons extends Vue {
         required: true
     });
 
-    @Prop questionExists = p<boolean>({
-        default: false
-    });
+    @Prop id = p<number>({});
+
+    @Prop prevQuestions = p<IQuestionBuilder[]>({});
+
+    pVersion: number = 0;
 
     mobileMode:boolean = false;
+
+    get version() {
+        return this.pVersion;
+    }
+    set version(newVersion: number) {
+        this.pVersion = newVersion;
+    }
 
     @Lifecycle
     mounted() {
         this.mobileMode = ApplicationService.getMobileMode();
-        console.log(this.mobileMode);
     }
 
     saveQuestion() {
@@ -104,6 +136,11 @@ export default class AdminButtons extends Vue {
 
     editQuestion() {
         this.$emit("editQuestion");
+    }
+
+    @Watch("version")
+    versionWatch(_newValue: number, _oldValue: number) {
+        this.$emit("version", this.version);
     }
 }
 </script>
