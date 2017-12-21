@@ -8,11 +8,12 @@ from django.db.models import Count, Min, Max
 from django.db import IntegrityError, transaction
 
 from ripple.util import util
-from users.models import CourseUser, Token, User, Role
+from users.models import CourseUser, Token, User, Role, Consent, ConsentForm
 from questions.models import Question, Topic, Distractor, QuestionRating, QuestionResponse,\
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
 from rippleAchievements.models import UserAchievement
 from questions.services import CompetencyService, AuthorService
+from users.services import UserService
 
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
@@ -41,7 +42,30 @@ def question_response_distribution(question_id):
             response_distribution[i.id] = (distractor_response_count / total_responses) * 100
     return response_distribution
 
-def get_course_leaders(user, sort_field, sort_order, limit=25):
+def get_course_leaders(user, has_consented, sort_field, sort_order, limit=25):
+    if not type(sort_field) == list:
+        sort_field = [sort_field]
+    leaderboard_users = create_leaderboard(user, has_consented, sort_field, sort_order)
+
+    found_user = [x for x in leaderboard_users if x["id"] == user.id]
+    if found_user:
+        found_user = found_user[0]
+
+    for l_user in leaderboard_users:
+        if found_user is not l_user:
+            l_user.pop("lastName", None)
+            l_user.pop("id", None)
+
+    if limit == -1:
+        return leaderboard_users
+
+    leaderboard = leaderboard_users[0:limit]
+    if not util.is_administrator(user) and found_user not in leaderboard:
+        leaderboard.append(found_user)
+
+    return leaderboard
+
+def create_leaderboard(user, has_consented, sort_field, sort_order):
     def lookup_total(fieldName, user_id, data):
         for dict_item in data:
             entry = dict_item.get(fieldName, None)
@@ -50,60 +74,46 @@ def get_course_leaders(user, sort_field, sort_order, limit=25):
         return 0
 
     course = user.course
-    course_users = CourseUser.objects.filter(course=course).exclude(\
+
+    course_users = CourseUser.objects.filter(course=course)
+    consent_form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
+    course_users = course_users.exclude(\
         id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role="Instructor")))
+    if has_consented:
+        course_users = course_users.filter(id__in=Consent.objects.filter(
+            form=consent_form, response=True).values("user_id"))
 
-    question_counts = leaderboard_sort(Question, "author_id")
-
-    response_qry = course_users.annotate(total=Count("questionresponse__response__question", distinct=True))
-    response_counts = [{"user_id": r.id, "total": r.total} for r in response_qry]
-
-    first_response_SQL = '''SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr,
-        questions_question q, questions_distractor d, users_courseuser cu WHERE d.question_id = q.id AND
-        qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s AND d.isCorrect=1 AND qr.id IN (
-            SELECT MIN(qr.ID) FROM questions_questionresponse qr, questions_question q,
-            questions_distractor d, users_courseuser cu where d.question_id = q.id AND
-            qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s GROUP BY qr.user_id,
-            q.id)
-        GROUP BY qr.user_id'''
-    first_response_qry = QuestionResponse.objects.raw(first_response_SQL,[course.id, course.id])
-    first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in first_response_qry]
-
-    rating_counts = leaderboard_sort(QuestionRating, "user_id")
-
-    achievement_counts = leaderboard_sort(UserAchievement, "user_id")
+    leaderboard_results = _leaderboard_results(course, course_users)
 
     leaderboard_users = [{
-        "rank": u.id,
-        "name": u.user.first_name,
+        "id": u.id,
+        "firstName": u.user.first_name,
+        "lastName": u.user.last_name,
         "image": u.user.image,
-        "questionsAuthored": lookup_total("author_id", u.id, question_counts),
-        "questionsAnswered": lookup_total("user_id", u.id, response_counts),
-        "questionsAnsweredCorrectly": lookup_total("user_id", u.id, first_response_counts),
-        "questionsRated": lookup_total("user_id", u.id, rating_counts),
-        "achievementsEarned": lookup_total("user_id", u.id, achievement_counts)
+        "questionsAuthored": lookup_total(
+            "author_id", u.id, leaderboard_results["question_counts"]),
+        "questionsAnswered": lookup_total(
+            "user_id", u.id, leaderboard_results["response_counts"]),
+        "questionsAnsweredCorrectly": lookup_total(
+            "user_id", u.id, leaderboard_results["first_response_counts"]),
+        "questionsRated": lookup_total(
+            "user_id", u.id, leaderboard_results["rating_counts"]),
+        "achievementsEarned": lookup_total(
+            "user_id", u.id, leaderboard_results["achievement_counts"])
     } for u in course_users]
 
-    if len(leaderboard_users) > 0 and sort_field in leaderboard_users[0]:
+    sort_fields_exist = set(sort_field).issubset(set(leaderboard_users[0].keys()))
+
+    if len(leaderboard_users) > 0 and sort_fields_exist:
         should_reverse = sort_order == "DESC"
+        sort_key = lambda k: tuple(k[i] for i in sort_field)
         leaderboard_users = sorted(
-            leaderboard_users, key=lambda k: k[sort_field], reverse=should_reverse)
+            leaderboard_users, key=sort_key, reverse=should_reverse)
 
-    found = 0
-    for i in range(0, len(leaderboard_users)):
-        if not util.is_administrator(user):
-            if leaderboard_users[i]["rank"] == user.id:
-                found = i
-                leaderboard_users[i]["id"] = user.id
-        leaderboard_users[i]["rank"] = i+1
+    for i, person in enumerate(leaderboard_users):
+        person["rank"] = i+1
 
-    if limit == -1:
-        return leaderboard_users
-
-    leaderboard = leaderboard_users[0:limit]
-    if found >= limit:
-        leaderboard.append(leaderboard_users[found])
-    return leaderboard
+    return leaderboard_users
 
 
 def get_course_topics(course):
@@ -487,3 +497,32 @@ def make_deleted_question(question):
     )
     d_question.save()
     return d_question
+
+def _leaderboard_results(course, course_users):
+    question_counts = leaderboard_sort(Question, "author_id")
+
+    response_qry = course_users.annotate(total=Count("questionresponse__response__question", distinct=True))
+    response_counts = [{"user_id": r.id, "total": r.total} for r in response_qry]
+
+    first_response_SQL = '''SELECT 1 as id, qr.user_id, COUNT(*) as 'total' FROM questions_questionresponse qr,
+        questions_question q, questions_distractor d, users_courseuser cu WHERE d.question_id = q.id AND
+        qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s AND d.isCorrect=1 AND qr.id IN (
+            SELECT MIN(qr.ID) FROM questions_questionresponse qr, questions_question q,
+            questions_distractor d, users_courseuser cu where d.question_id = q.id AND
+            qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s GROUP BY qr.user_id,
+            q.id)
+        GROUP BY qr.user_id'''
+    first_response_qry = QuestionResponse.objects.raw(first_response_SQL,[course.id, course.id])
+    first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in first_response_qry]
+
+    rating_counts = leaderboard_sort(QuestionRating, "user_id")
+
+    achievement_counts = leaderboard_sort(UserAchievement, "user_id")
+
+    return {
+        "question_counts": question_counts,
+        "response_counts": response_counts,
+        "first_response_counts": first_response_counts,
+        "rating_counts": rating_counts,
+        "achievement_counts": achievement_counts
+    }

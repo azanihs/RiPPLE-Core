@@ -12,7 +12,7 @@ from ripple.util.util import save_image, mean, verify_content, is_administrator,
 
 from questions.models import Topic, Competency, Distractor, QuestionResponse, Question, QuestionRating,\
     ReportReason
-from questions.services import CompetencyService
+from questions.services import CompetencyService, QuestionService
 from users.models import Course, CourseUser, User, Role, UserImage, Engagement, Consent, ConsentForm
 from rippleAchievements.models import UserAchievement
 from users.services.TokenService import token_to_user_course
@@ -393,3 +393,26 @@ def get_form(user):
     form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
 
     return form
+
+def get_all_stats(user):
+    if not util.is_administrator(user):
+        return {"error": "User is not authorized"}
+
+    leaderboard = QuestionService.create_leaderboard(user, False, ["lastName", "firstName"], "ASC")
+    for person in leaderboard:
+        person.pop("rank", None)
+    return {"data": leaderboard}
+
+
+def get_consented_stats(user):
+    if not util.is_administrator(user):
+        return {"error": "User is not authorized"}
+
+    leaderboard = QuestionService.create_leaderboard(user, True, ["lastName", "firstName"], "ASC")
+    for person in leaderboard:
+        person.pop("firstName", None)
+        person.pop("lastName", None)
+        person.pop("image", None)
+    return {"data": leaderboard}
+
+

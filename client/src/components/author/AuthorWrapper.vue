@@ -90,7 +90,6 @@ export default class AuthorWrapper extends Vue {
     }
 
     saveQuestion() {
-        console.log("saving");
         let aView: AuthorView = <AuthorView> this.$refs.authView;
         aView.validateUpload();
     }

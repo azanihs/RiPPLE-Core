@@ -154,3 +154,10 @@ def has_consented(request):
     user = UserService.logged_in_user(request)
     return JsonResponse(UserService.has_consented_course(user))
 
+def all_stats(request):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(UserService.get_all_stats(user))
+
+def consented_stats(request):
+    user = UserService.logged_in_user(request)
+    return JsonResponse(UserService.get_consented_stats(user))

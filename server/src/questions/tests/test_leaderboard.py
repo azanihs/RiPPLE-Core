@@ -21,7 +21,7 @@ class LeaderboardTest(BootstrapTestCase):
         for i in [1,2,3,4,5]:
             self._boostrap_leaderboard_users(course, i, i == 1)
 
-        leaderboard = QuestionService.get_course_leaders(course_user, "questionsAuthored", "")
+        leaderboard = QuestionService.get_course_leaders(course_user, False, "questionsAuthored", "")
         self.assertEqual(len(leaderboard), 5)
 
     def test_leaderboard_sort_direction(self):
@@ -31,13 +31,13 @@ class LeaderboardTest(BootstrapTestCase):
         for i in [1,2,3,4,5]:
             self._boostrap_leaderboard_users(course, i, i == 1)
 
-        leaderboard = QuestionService.get_course_leaders(course_user, "questionsAuthored", "DESC")
+        leaderboard = QuestionService.get_course_leaders(course_user, False, "questionsAuthored", "DESC")
         self.assertEqual(len(leaderboard), 5)
         self.assertEqual(leaderboard[0]["questionsAuthored"], 5)
         self.assertEqual(leaderboard[1]["questionsAuthored"], 0)
 
         # Sort in other direction
-        leaderboard = QuestionService.get_course_leaders(course_user, "questionsAuthored", "ASC")
+        leaderboard = QuestionService.get_course_leaders(course_user, False, "questionsAuthored", "ASC")
         self.assertEqual(len(leaderboard), 5)
         self.assertEqual(leaderboard[0]["questionsAuthored"], 0)
         self.assertEqual(leaderboard[-1]["questionsAuthored"], 5)
@@ -53,10 +53,10 @@ class LeaderboardTest(BootstrapTestCase):
                 id = i + count*5
                 self._boostrap_leaderboard_users(course, id, id == count)
 
-        leaderboard = QuestionService.get_course_leaders(course_user, "questionsAuthored", "")
+        leaderboard = QuestionService.get_course_leaders(course_user, False, "questionsAuthored", "")
         self.assertEqual(len(leaderboard), 5)
 
-        leaderboard = QuestionService.get_course_leaders(course_user_2, "questionsAuthored", "")
+        leaderboard = QuestionService.get_course_leaders(course_user_2, False, "questionsAuthored", "")
         self.assertEqual(len(leaderboard), 10)
 
     def test_leaderboard_fetch_many(self):
@@ -67,7 +67,7 @@ class LeaderboardTest(BootstrapTestCase):
         for i in range(0, 100):
             self._boostrap_leaderboard_users(course, i, i == 1)
 
-        leaderboard = QuestionService.get_course_leaders(course_user, "questionsAuthored", "DESC")
+        leaderboard = QuestionService.get_course_leaders(course_user, False, "questionsAuthored", "DESC")
         self.assertEqual(len(leaderboard), 25)
 
     def test_leaderboard_fetch_many_instructor(self):
@@ -77,5 +77,5 @@ class LeaderboardTest(BootstrapTestCase):
         self._bootstrap_topics(course)
         for i in range(0, 100):
             self._boostrap_leaderboard_users(course, i, i == 1)
-        leaderboard = QuestionService.get_course_leaders(course_user, "questionsAuthored", "DESC", limit=-1)
+        leaderboard = QuestionService.get_course_leaders(course_user, False, "questionsAuthored", "DESC", limit=-1)
         self.assertEqual(len(leaderboard), 100)
