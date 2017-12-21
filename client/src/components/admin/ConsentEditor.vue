@@ -49,7 +49,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Lifecycle, Mixin as mixin } from "av-ts";
 import { ICourseUser, IConsentForm } from "../../interfaces/models";
 
 import { getDefaultConsentForm } from "../../util";
@@ -63,6 +63,7 @@ import { addEventsToQueue } from "../../util";
 
 import TinyMCE from "../util/TinyMCE.vue";
 import ConsentForm from "../profile/ConsentForm.vue";
+import responsiveMixin from "../../responsiveMixin";
 
 @Component({
     components: {
@@ -70,7 +71,7 @@ import ConsentForm from "../profile/ConsentForm.vue";
         ConsentForm
     }
 })
-export default class ConsentEditor extends Vue {
+export default class ConsentEditor extends mixin(responsiveMixin, Vue) {
     pCourseCode = "";
 
     pCourseUser: ICourseUser | undefined = undefined;
@@ -149,19 +150,33 @@ export default class ConsentEditor extends Vue {
     }
 
     get options() {
-        return {
+        let imageIndex = tinyMCEPlugins.plugins.indexOf("image");
+        if (imageIndex >= 0 && this.mobileMode) {
+            tinyMCEPlugins.plugins.splice(imageIndex, 1);
+        } else if (imageIndex === -1 && !this.mobileMode) {
+            tinyMCEPlugins.plugins.push("image");
+        }
+
+        const baseSettings = {
             skin: false,
             image_caption: true,
             media_live_embeds: true,
-
             plugins: tinyMCEPlugins.plugins,
             toolbar: tinyMCEPlugins.toolbar,
+            height: 480
+        };
+
+        const imageSettings = {
             image_advtab: true,
             file_browser_callback_types: "image",
             file_picker_callback: ImageService.handleFileClick,
-            file_picker_types: "image",
-            height: 480
+            file_picker_types: "image"
         };
+
+        if (!this.mobileMode) {
+            return Object.assign(baseSettings, imageSettings);
+        }
+        return baseSettings;
     }
 
     validateUpload() {

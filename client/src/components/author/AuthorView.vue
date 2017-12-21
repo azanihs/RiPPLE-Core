@@ -370,19 +370,29 @@ export default class AuthorView extends mixin(responsiveMixin, Vue) {
         let imageIndex = tinyMCEPlugins.plugins.indexOf("image");
         if (imageIndex >= 0 && this.mobileMode) {
             tinyMCEPlugins.plugins.splice(imageIndex, 1);
+        } else if (imageIndex === -1 && !this.mobileMode) {
+            tinyMCEPlugins.plugins.push("image");
         }
-        return {
+
+        const baseSettings = {
             skin: false,
             image_caption: true,
             media_live_embeds: true,
-
             plugins: tinyMCEPlugins.plugins,
-            toolbar: tinyMCEPlugins.toolbar,
-            image_advtab: this.mobileMode ? true: null,
-            file_browser_callback_types: this.mobileMode ? "image": null,
-            file_picker_callback: this.mobileMode ? ImageService.handleFileClick: null,
-            file_picker_types: this.mobileMode ? "image": null
+            toolbar: tinyMCEPlugins.toolbar
         };
+
+        const imageSettings = {
+            image_advtab: true,
+            file_browser_callback_types: "image",
+            file_picker_callback: ImageService.handleFileClick,
+            file_picker_types: "image"
+        };
+
+        if (!this.mobileMode) {
+            return Object.assign(baseSettings, imageSettings);
+        }
+        return baseSettings;
     }
 
     navigateToAnswer() {

@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
+import { Vue, Component, Prop, p, Lifecycle, Watch } from "av-ts";
 
 @Component
 export default class TinyMCE extends Vue {
@@ -18,9 +18,13 @@ export default class TinyMCE extends Vue {
         required: false
     });
 
-    @Lifecycle
-    mounted() {
-        //Initial configuration
+    @Watch("options")
+    optionsChanged(_oldOptions: any, _newOptions: any) {
+        tinymce.execCommand("mceRemoveEditor", false, this.id);
+        this.createEditor();
+    }
+
+    createEditor() {
         let options: any = {};
         let config = (editor: any) => {
             editor.on("NodeChange Change KeyUp", (_e: any) => {
@@ -55,6 +59,11 @@ export default class TinyMCE extends Vue {
 
         options.setup = (editor: any) => s1(editor);
         this.$nextTick(() => tinymce.init(options));
+    }
+
+    @Lifecycle
+    mounted() {
+        this.createEditor();
     }
 
     @Lifecycle
