@@ -77,7 +77,6 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             } else {
                 return err.json().then((errorObject: any) => {
                     if (errorObject.error) {
-                        // TODO: Handle global things
                         addEventsToQueue([{
                             icon: "error",
                             name: `Server Error`,
