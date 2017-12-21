@@ -36,6 +36,7 @@
         </md-layout>
         <md-speed-dial v-if="showSpeedDial"
                        md-open="hover"
+                       md-direction="left"
                        class="md-fab-bottom-right floatingAction">
             <md-button class="md-fab md-primary"
                        @click="nextQuestion"
@@ -43,22 +44,22 @@
                 <md-icon md-icon-morph>arrow_forward</md-icon>
                 <md-icon v-if="!userIsFinishedWithQuestion">replay</md-icon>
                 <md-tooltip v-if="!userIsFinishedWithQuestion"
-                            md-direction="left">Skip Question</md-tooltip>
+                            md-direction="top">Skip Question</md-tooltip>
 
                 <md-icon v-if="userIsFinishedWithQuestion">arrow_forward</md-icon>
                 <md-tooltip v-if="userIsFinishedWithQuestion"
-                            md-direction="left">Next Question</md-tooltip>
+                            md-direction="top">Next Question</md-tooltip>
             </md-button>
 
             <md-button class="md-fab md-primary md-mini md-clean"
                        @click="closeQuestion">
                 <md-icon>keyboard_return</md-icon>
-                <md-tooltip md-direction="left">Return</md-tooltip>
+                <md-tooltip md-direction="top">Return</md-tooltip>
             </md-button>
             <md-button class="md-fab md-primary md-mini md-clean"
                             @click="openDialog">
                 <md-icon>error_outline</md-icon>
-                <md-tooltip md-direction="left">Report Question</md-tooltip>
+                <md-tooltip md-direction="top">Report Question</md-tooltip>
             </md-button>
         </md-speed-dial>
         <md-dialog ref="report_question_modal"
