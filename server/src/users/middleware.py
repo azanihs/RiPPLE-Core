@@ -18,7 +18,8 @@ class TokenValidator(object):
         def pre(x):
             return request.path == x
 
-        using_lti_login = pre('/lti') or pre('/lti/')
+        # If entering at the root, don't require auth header
+        using_lti_login = pre('') or pre('/')
         if using_lti_login:
             return self.get_response(request)
 
