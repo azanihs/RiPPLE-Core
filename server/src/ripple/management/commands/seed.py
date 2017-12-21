@@ -8,14 +8,17 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--host")
+        parser.add_argument("--dataset", required=True)
 
     def handle(self, *args, **options):
         host = options.get("host", None)
+        json_path = options.get("dataset", None)
+
         if host is None:
             host = "//localhost:8000"
 
         course_seeder = CourseSeedCommand(self)
-        base_path = os.path.abspath("../../migration/JSONFiles/")
+        base_path = os.path.abspath(json_path)
         course_codes = []
         course_names = []
         file_names = []
