@@ -281,7 +281,7 @@ export default class AdminView extends Vue {
         _a.download = this.pCourseCode + "_ripple_export_" + Date.now() + ".csv";
         _a.style.opacity = "0";
 
-        // Add the anchor tag to the DOM and programmically click it
+        // Add the anchor tag to the DOM and programmatically click it
         document.body.appendChild(_a);
         _a.dispatchEvent(new MouseEvent("click", {
             bubbles: false
