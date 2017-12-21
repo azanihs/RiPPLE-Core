@@ -230,13 +230,14 @@ export default class AdminView extends Vue {
             },
             topics: this.topics
         })
-            .then(x => {
+        .then((x: any | ICourseUser) => {
+            if (x.error !== undefined) {
+                this.networkError = x.error;
+            } else {
                 this.updateCourseUser(x);
                 this.closeDialog();
-            })
-            .catch(err => {
-                this.networkError = err;
-            });
+            }
+        });
     };
 
     downloadCSVString() {
