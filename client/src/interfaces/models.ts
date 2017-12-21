@@ -140,16 +140,17 @@ export interface IPeerConnection {
 };
 
 export interface IUserSummary {
-    rank: number,
-    name: string,
-    image: string,
+    id?: number
+    firstName?: string,
+    lastName?: string,
+    image?: string,
 
+    rank: number,
     questionsAuthored: number,
     questionsAnswered: number,
     questionsAnsweredCorrectly: number,
     questionsRated: number,
-    achievementsEarned: number,
-    id?: number
+    achievementsEarned: number
 };
 
 export interface IBadge {

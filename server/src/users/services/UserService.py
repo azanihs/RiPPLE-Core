@@ -394,11 +394,25 @@ def get_form(user):
 
     return form
 
+def get_all_stats(user):
+    if not util.is_administrator(user):
+        return {"error": "User is not authorized"}
+
+    leaderboard = QuestionService.create_leaderboard(user, False, ["lastName", "firstName"], "ASC")
+    for person in leaderboard:
+        person.pop("rank", None)
+    return {"data": leaderboard}
+
+
 def get_consented_stats(user):
     if not util.is_administrator(user):
         return {"error": "User is not authorized"}
 
-    res = QuestionService.get_course_leaders(user, "rank", True, "DESC", -1)
-    return {"data": res}
+    leaderboard = QuestionService.create_leaderboard(user, True, ["lastName", "firstName"], "ASC")
+    for person in leaderboard:
+        person.pop("firstName", None)
+        person.pop("lastName", None)
+        person.pop("image", None)
+    return {"data": leaderboard}
 
 

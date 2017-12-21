@@ -48,7 +48,7 @@
                                   :md-src="user.image"
                                   :alt="user.name"></md-image>
                     </md-table-cell>
-                    <md-table-cell>{{ user.name }}</md-table-cell>
+                    <md-table-cell>{{ user.firstName }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAuthored }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAnswered }}</md-table-cell>
                     <md-table-cell>{{ user.questionsAnsweredCorrectly }}</md-table-cell>

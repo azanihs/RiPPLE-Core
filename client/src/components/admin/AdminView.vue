@@ -22,14 +22,13 @@
             </md-card>
         </md-layout>
         <leader-board class="componentSeparator"
-            @userData="generateCSVString"
             v-if="courseIsAvailable"></leader-board>
         <md-layout v-if="courseIsAvailable"
             class="componentSeparator"
             md-flex="100">
             <md-card>
-                <md-button @click="downloadCSVString" class="md-raised">Download Spreadsheet Results</md-button>
-                <md-button @click="testConsented" class="md-raised">Download Database Dump</md-button>
+                <md-button @click="downloadCSVString" class="md-raised">Download Full Spreadsheet Results</md-button>
+                <md-button @click="downloadConsentedCSV" class="md-raised">Download Consented Spreadsheet Results</md-button>
             </md-card>
         </md-layout>
         <md-dialog ref="course_create_modal"
@@ -240,25 +239,41 @@ export default class AdminView extends Vue {
             });
     };
 
-    generateCSVString(userData: IUserSummary[]) {
+    downloadCSVString() {
+        UserService.getUserStats().then( results =>
+        this.downloadCSV(this.makeCSVString(results,
+            ["id", "firstName", "lastName", "questionsAuthored", "questionsAnswered",
+                "questionsAnsweredCorrectly", "achievementsEarned", "questionsRated"])!));
+    }
+
+    downloadConsentedCSV() {
+        UserService.getConsentedUserStats().then(results =>
+        this.downloadCSV(this.makeCSVString(results,
+            ["rank", "questionsAuthored", "questionsAnswered",
+                "questionsAnsweredCorrectly", "achievementsEarned", "questionsRated"])!));
+    }
+
+    makeCSVString(userData: IUserSummary[], fields: string[]) {
         if (userData.length == 0) {
             return;
         }
 
         const unparseData = {
-            fields: Object.keys(userData[0]),
+            fields: fields,
             data: userData
         };
-        this.pCsvString = Papa.unparse(unparseData, {
+        return Papa.unparse(unparseData, {
             quotes: true,
             delimiter: ",",
             newline: "\r\n"
         });
     }
 
-    downloadCSVString(_e: MouseEvent) {
+    downloadCSV(csvString: string) {
+        // update CSV string headings
+        csvString = this.updateHeadings(csvString);
         // Encode the CSV string as a URI
-        const uri = encodeURI("data:text/csv;charset=utf-8," + this.pCsvString);
+        const uri = encodeURI("data:text/csv;charset=utf-8," + csvString);
         // Create a mock anchor element and point it at the CSV URI
         const _a = document.createElement("a");
         _a.target = "_blank";
@@ -276,8 +291,25 @@ export default class AdminView extends Vue {
         document.body.removeChild(_a);
     }
 
-    testConsented() {
-        UserService.getConsentedUserStats().then( x=>console.log(x));
+    updateHeadings(csvString:string) {
+        let headings = [["id", "ID"],
+            ["firstName", "First Name"],
+            ["lastName", "Last Name"],
+            ["rank", "Rank"],
+            ["questionsAuthored", "Questions Authored"],
+            ["questionsAnswered", "Questions Answered"],
+            ["questionsAnsweredCorrectly", "Questions Answered Correctly"],
+            ["achievementsEarned", "Achievements Earned"],
+            ["questionsRated", "Questions Rated"]];
+
+        let splitString = csvString.split(/\r\n|\r|\n/);
+        let headerString = splitString[0];
+        for (let i of headings) {
+            headerString = headerString.replace(i[0], i[1]);
+        }
+        splitString[0] = headerString;
+        csvString = splitString.join("\r\n");
+        return csvString;
     }
 }
 </script>
