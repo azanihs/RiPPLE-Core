@@ -13,7 +13,6 @@ from questions.models import Question, Topic, Distractor, QuestionRating, Questi
     Competency, QuestionScore, ReportQuestion, ReportReason, ReportQuestionList, DeletedQuestion
 from rippleAchievements.models import UserAchievement
 from questions.services import CompetencyService, AuthorService
-from users.services import UserService
 
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
