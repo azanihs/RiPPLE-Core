@@ -53,9 +53,9 @@ class UserTestCase(BootstrapTestCase):
 
         #Image update successful
         res = UserService.update_user_image(user, host, good_encode)
-        self.assertEqual(res, {"name":user.first_name + " " + user.last_name,
+        self.assertEqual(res, {"data": {"name":user.first_name + " " + user.last_name,
                 "image": user.image
-            })
+            }})
 
         image = UserImage.objects.filter(user=user)[0].image
         encode = str(b"data:image/jpeg;base64,"+base64.b64encode(image.read()))

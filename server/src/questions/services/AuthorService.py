@@ -27,34 +27,31 @@ def add_question(question_request, host, user, question_obj=None):
     elif len(explanation_content) == 0:
         return {"state": "Error", "error": "Explanation content is blank"}
 
-    # Cleans question and explanation content before saving as Question
-    if question_obj is None:
-        question_obj = Question(
-        content="",
-        explanation="",
-        difficulty=0,
-        quality=0,
-        difficultyCount=0,
-        qualityCount=0,
-        author=user
-        )
     try:
         with transaction.atomic():
+            # Cleans question and explanation content before saving as Question
+            if question_obj is None:
+                question_obj = Question.objects.create(
+                content="",
+                explanation="",
+                difficulty=0,
+                quality=0,
+                difficultyCount=0,
+                qualityCount=0,
+                author=user
+            )
+
+            question_obj.content = cleanContent(question_content)
             # Question Images
             images = question.get("payloads", None)
             if images:
                 util.extract_image_from_html(str(question_obj.id), question_obj, images, "q", host)
-            else:
-                question_obj.content = cleanContent(question_content)
-                question_obj.save()
 
+            question_obj.explanation = cleanContent(explanation_content)
             # Explanation Images
             images = explanation.get("payloads", None)
             if images:
                 util.extract_image_from_html(str(question_obj.id), question_obj, images, "e", host)
-            else:
-                question_obj.explanation = cleanContent(explanation_content)
-                question_obj.save()
 
             # Topics
             topicList = []
@@ -72,19 +69,19 @@ def add_question(question_request, host, user, question_obj=None):
                 if(len(distractor_content) == 0):
                     return {"state": "Error", "error": "Distractor content is blank"}
                 #cleans distractor content before saving
-                distractor = Distractor(
+                distractor = Distractor.objects.create(
                     content="",
                     isCorrect=responses[i].get("isCorrect", None),
                     response=i,
                     question=question_obj
                 )
+                distractor.content = cleanContent(distractor_content)
+
                 # Distractor Images
                 images = responses[i].get("payloads", None)
                 if images:
                     util.extract_image_from_html(str(distractor.id), distractor, images, "d", host)
-                else:
-                    distractor.content = cleanContent(distractor_content)
-                    distractor.save()
+
     except IntegrityError as e:
         return {"state": "Error", "error": str(e)}
     except Exception as e:

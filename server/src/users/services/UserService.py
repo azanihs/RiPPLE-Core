@@ -37,7 +37,7 @@ def update_user_image(user, server_root, new_image):
 
     user.image = util.merge_url_parts([server_root, profile_image.image.name])
     user.save()
-    return user.toJSON()
+    return {"data": user.toJSON() }
 
 
 def logged_in_user(request):

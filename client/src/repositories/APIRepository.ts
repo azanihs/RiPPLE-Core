@@ -66,12 +66,7 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             }
 
             if (x.error) {
-                addEventsToQueue([{
-                    name: `Server Error`,
-                    description: `${x.error}`,
-                    icon: "error"
-                }]);
-                return Promise.resolve({}) as Promise<T>;
+                throw x.error;
             } else {
                 return Promise.resolve(x.data);
             }
