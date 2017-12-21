@@ -45,21 +45,16 @@
 </style>
 
 <script lang="ts">
-    import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
-    import ApplicationService from "../../services/ApplicationService";
+    import { Vue, Component, Prop, p, Mixin as mixin } from "av-ts";
+    import responsiveMixin from "../../responsiveMixin";
 
     @Component
-    export default class PageLoader extends Vue {
+    export default class PageLoader extends mixin(responsiveMixin, Vue) {
         @Prop condition = p<boolean>({
             required: true
         });
 
         mobileMode: boolean = false;
-
-        @Lifecycle
-        created() {
-            this.mobileMode = ApplicationService.getMobileMode();
-        }
 
     }
 </script>

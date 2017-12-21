@@ -131,7 +131,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Lifecycle, Mixin as mixin } from "av-ts";
 import { IQuestion, ITopic } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
@@ -143,7 +143,7 @@ import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
 import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 
 
 @Component({
@@ -155,7 +155,7 @@ import ApplicationService from "../../services/ApplicationService";
         Question
     }
 })
-export default class QuestionBrowser extends Vue {
+export default class QuestionBrowser extends mixin(responsiveMixin, Vue) {
 
     pTopics: ITopic[] = [];
 
@@ -165,8 +165,6 @@ export default class QuestionBrowser extends Vue {
 
     searchedQuestions: IQuestion[] = [];
     topicsToUse: ITopic[] = [];
-
-    mobileMode: boolean = false;
 
     updateTopics(topics: ITopic[]) {
         this.pTopics = topics;
@@ -182,11 +180,6 @@ export default class QuestionBrowser extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
-    }
-
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     get topics() {

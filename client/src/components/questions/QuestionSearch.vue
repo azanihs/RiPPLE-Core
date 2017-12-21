@@ -110,13 +110,13 @@ input {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p, Mixin as mixin } from "av-ts";
 import { ITopic, ISearch } from "../../interfaces/models";
 
 import QuestionService from "../../services/QuestionService";
 import TopicService from "../../services/TopicService";
 import Fetcher from "../../services/Fetcher";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 import PageLoader from "../util/PageLoader.vue";
 
 @Component({
@@ -124,7 +124,7 @@ import PageLoader from "../util/PageLoader.vue";
         PageLoader
     }
 })
-export default class QuestionSearch extends Vue {
+export default class QuestionSearch extends mixin(responsiveMixin, Vue) {
 
     timeoutId: number | undefined = undefined;
     nextSearchRequest: Function| undefined = undefined;
@@ -139,8 +139,6 @@ export default class QuestionSearch extends Vue {
     });
 
     pTopics: ITopic[] = [];
-
-    mobileMode: boolean = false;
 
     get searchableFields() {
         return [{
@@ -223,11 +221,6 @@ export default class QuestionSearch extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateCourseTopics);
-    }
-
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     sort() {

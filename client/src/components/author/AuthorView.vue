@@ -196,7 +196,7 @@ h3 {
 
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p, Mixin as mixin } from "av-ts";
 import { ITopic, IQuestionBuilder, IQuestion, IDistractor } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
@@ -208,7 +208,7 @@ import tinyMCEPlugins from "./plugins";
 import TinyMCE from "../util/TinyMCE.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Question from "../questions/Question.vue";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 
 @Component({
     components: {
@@ -217,7 +217,7 @@ import ApplicationService from "../../services/ApplicationService";
         TopicChip
     }
 })
-export default class AuthorView extends Vue {
+export default class AuthorView extends mixin(responsiveMixin, Vue) {
 
     pTopics: ITopic[] = [];
     @Prop question = p<IQuestionBuilder>({
@@ -252,8 +252,6 @@ export default class AuthorView extends Vue {
     pDisabled = false;
 
     bottomSpaceClass: string = "bottomSpace"
-
-    mobileMode: boolean = false;
 
     get questionPrev():IQuestion | undefined {
         const error = AuthorService.validateQuestions(this.question);
@@ -330,11 +328,6 @@ export default class AuthorView extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
-    }
-
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     get disabled() {

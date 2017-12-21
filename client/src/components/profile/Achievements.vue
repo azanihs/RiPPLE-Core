@@ -27,11 +27,11 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle } from "av-ts";
+import { Vue, Component, Mixin as mixin } from "av-ts";
 
 import CollectedBadges from "../util/CollectedBadges.vue";
 import OverviewDescription from "../util/OverviewDescription.vue";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 
 @Component({
     components:{
@@ -39,13 +39,7 @@ import ApplicationService from "../../services/ApplicationService";
         CollectedBadges
     }
 })
-export default class AchievementView extends Vue {
+export default class AchievementView extends mixin(responsiveMixin, Vue) {
 
-    mobileMode: boolean = false;
-
-    @Lifecycle
-    mounted() {
-        this.mobileMode = ApplicationService.getMobileMode();
-    }
 }
 </script>

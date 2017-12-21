@@ -67,9 +67,9 @@
 </style>
 
 <script lang="ts">
-import { Vue, Lifecycle, Component, Prop, p } from "av-ts";
+import { Vue, Component, Prop, p, Mixin as mixin } from "av-ts";
 import ActionButtons from "./ActionButtons.vue";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 
 @Component({
     components: {
@@ -77,7 +77,7 @@ import ApplicationService from "../../services/ApplicationService";
     }
 })
 
-export default class AdminButtons extends Vue {
+export default class AdminButtons extends mixin(responsiveMixin, Vue) {
     @Prop showEdit = p<boolean>({
         required: true
     });
@@ -85,14 +85,6 @@ export default class AdminButtons extends Vue {
     @Prop questionExists = p<boolean>({
         default: false
     });
-
-    mobileMode:boolean = false;
-
-    @Lifecycle
-    mounted() {
-        this.mobileMode = ApplicationService.getMobileMode();
-        console.log(this.mobileMode);
-    }
 
     saveQuestion() {
         this.$emit("saveQuestion");
