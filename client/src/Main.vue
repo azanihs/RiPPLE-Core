@@ -8,7 +8,7 @@
             md-hide-medium-and-up></md-layout>
         <md-layout md-hide-medium-and-up
             class="menuContainer">
-            <h2>{{ pageTitle }}</h2>
+            <h2 class= "pageTitle">{{ pageTitle }}</h2>
         </md-layout>
         <md-layout md-hide-medium-and-up>
             <md-button class="md-icon-button menuButton"
@@ -72,6 +72,7 @@
 </template>
 
 <style scoped>
+
 .menuContainer {
     position: fixed;
     left: 0px;
@@ -94,6 +95,10 @@
         border-top-color: #999;
         border-top-width: 3px;
     }
+}
+
+.pageTitle {
+    opacity: 0;
 }
 
 .slide-appear-active-class {

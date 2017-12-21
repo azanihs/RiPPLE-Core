@@ -60,6 +60,8 @@
 .mobileStyle.fixedButtons {
     position: relative !important;
     background-color: transparent !important;
+    width: 100% !important;
+    left: 0px;
 }
 
 </style>
@@ -87,8 +89,9 @@ export default class AdminButtons extends Vue {
     mobileMode:boolean = false;
 
     @Lifecycle
-    updated() {
+    mounted() {
         this.mobileMode = ApplicationService.getMobileMode();
+        console.log(this.mobileMode);
     }
 
     saveQuestion() {

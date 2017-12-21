@@ -64,7 +64,7 @@
     }
 
     .snackWrapper.closed {
-        bottom: -70px;
+        bottom: -75px;
     }
 
 </style>
