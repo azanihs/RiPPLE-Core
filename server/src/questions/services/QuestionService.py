@@ -51,16 +51,16 @@ def get_course_leaders(user, has_consented, sort_field, sort_order, limit=25):
     if found_user:
         found_user = found_user[0]
 
-    for user in leaderboard_users:
-        if found_user is not user:
-            user.pop("lastName", None)
-            user.pop("id", None)
+    for l_user in leaderboard_users:
+        if found_user is not l_user:
+            l_user.pop("lastName", None)
+            l_user.pop("id", None)
 
     if limit == -1:
         return leaderboard_users
 
     leaderboard = leaderboard_users[0:limit]
-    if found_user not in leaderboard:
+    if not util.is_administrator(user) and found_user not in leaderboard:
         leaderboard.append(found_user)
 
     return leaderboard
