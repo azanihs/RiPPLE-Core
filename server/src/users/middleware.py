@@ -14,10 +14,9 @@ class TokenValidator(object):
 
     def __call__(self, request):
         token = request.META.get("HTTP_AUTHORIZATION", None)
-        prefix = settings.FORCE_SCRIPT_NAME
 
         def pre(x):
-            return request.path == (prefix + x)
+            return request.path == x
 
         using_lti_login = pre('/lti') or pre('/lti/')
         if using_lti_login:
@@ -69,10 +68,9 @@ class AchievementChecker(object):
         # On client request
         ###################
         token = request.META.get("HTTP_AUTHORIZATION", None)
-        prefix = settings.FORCE_SCRIPT_NAME
 
         def pre(x):
-            return request.path == (prefix + x) or request.path == (prefix + x + "/")
+            return request.path == x or request.path == (x + "/")
 
         req = None
         # Identify which view the request is associated with if ach attached.

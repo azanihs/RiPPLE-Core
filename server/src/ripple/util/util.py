@@ -24,7 +24,6 @@ def generate_static_path(host):
 
     return merge_url_parts([
         _format("//" + host),
-        _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
 

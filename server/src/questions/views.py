@@ -17,7 +17,6 @@ def get_root_path(request):
 
     return merge_url_parts([
         _format("//" + request.get_host()),
-        _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
 

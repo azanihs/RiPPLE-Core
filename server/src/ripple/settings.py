@@ -30,8 +30,6 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CONN_MAX_AGE = None
 
-# the nginx reverse proxy path (eg. "/api/")
-FORCE_SCRIPT_NAME = os.environ.get("PROXY_LOCATION")
 ALLOW_UNAUTHENTICATED = (DEBUG is True)
 
 # Setup support for proxy headers
