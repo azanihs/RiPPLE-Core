@@ -49,6 +49,7 @@
     width: 100%;
     flex-wrap: nowrap;
     position: relative;
+    min-width: 800px;
 }
 
 .searchItem:first-of-type {

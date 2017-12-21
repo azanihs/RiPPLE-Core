@@ -1,9 +1,10 @@
 <template>
     <div class="profileContainer">
-        <div class="imageContainer" @click="openImagePicker">
+        <div class="imageContainer" @click="openImagePicker"
+        :class = "{'mobileStyle': mobileMode}">
             <img :src="personalAvatar" />
-            <md-icon v-if="personalAvatar == undefined" class="md-size-4x">add_a_photo</md-icon>
-            <md-icon v-else class="md-size-2x">edit</md-icon>
+            <md-icon v-if="personalAvatar == undefined && !mobileMode" class="md-size-4x">add_a_photo</md-icon>
+            <md-icon v-else-if = "!mobileMode" class="md-size-2x">edit</md-icon>
         </div>
         <h5>{{userFullName}}</h5>
         <select v-model="currentCourse">
@@ -30,6 +31,10 @@
     margin: auto;
     position: relative;
     cursor: pointer;
+}
+
+.mobileStyle {
+    cursor: default !important;
 }
 
 .imageContainer img {
@@ -68,10 +73,11 @@ import { ICourseUser, IUser, ICourse } from "../interfaces/models";
 import { addEventsToQueue } from "../util";
 import UserService from "../services/UserService";
 import ImageService from "../services/ImageService";
+import ApplicationService from "./../services/ApplicationService";
 
 import Fetcher from "../services/Fetcher";
 
-@Component()
+@Component
 export default class UserContainer extends Vue {
     @Prop user = p<IUser | undefined>({
         required: false
@@ -82,6 +88,8 @@ export default class UserContainer extends Vue {
 
     pCourse: ICourse | undefined = undefined;
     pCourses: ICourse[] = [];
+
+    mobileMode: boolean = false;
 
     set currentCourse(newCourse: ICourse | undefined) {
         this.pCourse = newCourse;
@@ -147,14 +155,16 @@ export default class UserContainer extends Vue {
     }
 
     openImagePicker() {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.addEventListener("change", (e: Event) => this.handleImageChange(input)(e));
+        if (!this.mobileMode) {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.addEventListener("change", (e: Event) => this.handleImageChange(input)(e));
 
-        document.body.appendChild(input);
-        input.dispatchEvent(new MouseEvent("click", {
-            bubbles: false
-        }));
+            document.body.appendChild(input);
+            input.dispatchEvent(new MouseEvent("click", {
+                bubbles: false
+            }));
+        }
     }
 
     showMessage(message: string, icon: string = "error") {
@@ -175,6 +185,11 @@ export default class UserContainer extends Vue {
     destroyed() {
         Fetcher.get(UserService.getUserCourses)
             .off(this.updateCourses);
+    }
+
+    @Lifecycle
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
     }
 }
 </script>

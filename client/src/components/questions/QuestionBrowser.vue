@@ -6,6 +6,8 @@
             :dataCategories="topics"
             :compareList="generateCompetencies">
         </variable-data-visualiser>
+        <div class = "searchMenuContainer"
+            :class = "{'mobileStyle': mobileMode}">
         <question-search :page="page"
             :pageSize="pageSize"
             @searched="changeDisplay">
@@ -15,10 +17,12 @@
                     md-label="Questions per page"
                     :md-size="pageSize"
                     :md-page="page"
-                    @pagination="nextPage">
+                    @pagination="nextPage"
+                    :class = "{'mobileStylePagination': mobileMode}">
                 </md-table-pagination>
             </div>
         </question-search>
+        </div>
     </md-layout>
     <md-layout md-hide-xsmall
         md-hide-small
@@ -111,6 +115,19 @@
 .questionContainer {
     margin-bottom: 2em;
 }
+
+.searchMenuContainer {
+    width: 100%;
+    overflow: auto;
+}
+
+.mobileStyle > header {
+    min-width: 800px !important;
+}
+.mobileStylePagination >>> .md-select.md-theme-default {
+    margin: 0 16px;
+}
+
 </style>
 
 <script lang="ts">
@@ -126,6 +143,7 @@ import QuestionSearch from "./QuestionSearch.vue";
 import QuestionPreview from "./QuestionPreview.vue";
 import Question from "./Question.vue";
 import VariableDataVisualiser from "../charts/VariableDataVisualiser.vue";
+import ApplicationService from "../../services/ApplicationService";
 
 
 @Component({
@@ -148,6 +166,8 @@ export default class QuestionBrowser extends Vue {
     searchedQuestions: IQuestion[] = [];
     topicsToUse: ITopic[] = [];
 
+    mobileMode: boolean = false;
+
     updateTopics(topics: ITopic[]) {
         this.pTopics = topics;
     };
@@ -162,6 +182,11 @@ export default class QuestionBrowser extends Vue {
     destroyed() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .off(this.updateTopics);
+    }
+
+    @Lifecycle
+    updated() {
+        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     get topics() {

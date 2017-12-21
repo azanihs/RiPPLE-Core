@@ -39,9 +39,9 @@
                 </md-table-row>
             </md-table-header>
             <md-table-body>
-                <md-table-row v-for="user in users"
+                <md-table-row v-for="user in pagedUsers"
                               :key="user.id"
-                              v-bind:class="{ userRow: user.id }">
+                              v-bind:class="{ userRow: user.id !== undefined }">
                     <md-table-cell>{{ user.rank }}</md-table-cell>
                     <md-table-cell>
                         <md-image class="avatar"

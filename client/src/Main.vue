@@ -96,7 +96,6 @@
     }
 }
 
-
 .slide-appear-active-class {
     opacity: 1;
     max-height: 36px;
@@ -107,7 +106,6 @@
     opacity: 0;
     max-height: 0px;
 }
-
 
 .dimOverlay {
     position:fixed;
@@ -282,6 +280,9 @@ import UserContainer from "./components/UserContainer.vue";
 import PageLoader from "./components/util/PageLoader.vue";
 import GlobalNotification from "./GlobalNotification.vue";
 
+import ApplicationService from "./services/ApplicationService";
+
+
 @Component({
     components: {
         GlobalNotification,
@@ -382,9 +383,11 @@ export default class Main extends Vue {
         const isVisible = visible.$el;
         if (window.getComputedStyle(isVisible).display !== "none") {
             this.mobileMode = true;
+            ApplicationService.setMobileMode(true);
             container.style.transform = null;
         } else {
             this.mobileMode = false;
+            ApplicationService.setMobileMode(false);
             container.style.transform = "translate3d(0,0,0)";
         }
     }
@@ -393,7 +396,7 @@ export default class Main extends Vue {
         if (this.currentlyOpenMenu !== undefined) {
             if (this.currentlyOpenMenu.href != "") {
                 this.pageTitle = this.currentlyOpenMenu.text;
-            } else if (this.currentlyOpenMenu.href == "") {
+            } else if (this.currentlyOpenMenu.href == "" && this.path !== undefined) {
                 this.pageTitle = this.path.charAt(0).toUpperCase() + this.path.slice(1);
             }
         }
