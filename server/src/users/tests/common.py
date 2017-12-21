@@ -11,14 +11,14 @@ from users.models import User, Role, Course, CourseUser
 
 class BootstrapTestCase(TestCase):
     def _bootstrap_courses(self, id):
-        return Course.objects.create(course_code="test_course_" + str(id), 
+        return Course.objects.create(course_code="test_course_" + str(id),
             course_name="course_name_" + str(id),
             start=datetime.fromtimestamp(int(100), timezone.utc),
             end=datetime.fromtimestamp(int(100), timezone.utc),
             available=True)
 
-    def _bootstrap_user(self):
-        user = User(user_id="u_id", first_name="u_firstname", last_name="u_lastname")
+    def _bootstrap_user(self, id):
+        user = User(user_id="u_id" + str(id), first_name="u_firstname", last_name="u_lastname")
         user.save()
         return user
 
@@ -27,9 +27,9 @@ class BootstrapTestCase(TestCase):
         role.save()
         return role
 
-    def _bootstrap_course_user(self):
+    def _bootstrap_course_user(self, id):
         course = self._bootstrap_courses(1)
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(id)
         cu = CourseUser(course=course, user=user)
         cu.save()
         return cu

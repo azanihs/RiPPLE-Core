@@ -87,7 +87,7 @@ class BootstrapTestCase(TestCase):
             ).save()
 
     def _bootstrap_user(self, id):
-        user = User(id=id, first_name="u_firstname", last_name="u_lastname")
+        user = User(user_id="uid" + str(id), first_name="u_firstname", last_name="u_lastname")
         user.save()
         return user
 

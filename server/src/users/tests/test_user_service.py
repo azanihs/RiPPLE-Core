@@ -31,7 +31,7 @@ def mock_request_factory(request_dict):
 
 class UserTestCase(BootstrapTestCase):
     def test_update_user_image(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         host = "//localhost:8000"
         with open("./users/tests/elephantJPG.png", "rb") as image_file:
             bad_encode = base64.b64encode(image_file.read())
@@ -63,7 +63,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_logged_in_user(self):
-        user = self._bootstrap_course_user()
+        user = self._bootstrap_course_user(1)
 
         # Request not none
         self.assertEqual(UserService.logged_in_user(None),
@@ -88,7 +88,7 @@ class UserTestCase(BootstrapTestCase):
 
     def test_user_courses(self):
         courses = [self._bootstrap_courses(x) for x in range(5)]
-        users = [self._bootstrap_user() for x in range(5)]
+        users = [self._bootstrap_user(x) for x in range(5)]
         course_map = [
             [courses[0]],
             [courses[0], courses[1]],
@@ -118,7 +118,7 @@ class UserTestCase(BootstrapTestCase):
 
     def test_update_course(self):
         course = self._bootstrap_courses(1)
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         course_user = self._user_in_course(user, course)
 
         # None inputs
@@ -263,7 +263,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_process_competencies(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         course = self._bootstrap_courses(1)
         course_user = self._user_in_course(user, course)
         topics = self._bootstrap_topics(course)
@@ -293,7 +293,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_user_competencies(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         course = self._bootstrap_courses(1)
         course_user = self._user_in_course(user, course)
         topics = self._bootstrap_topics(course)
@@ -311,7 +311,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_aggregate_competencies(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         course = self._bootstrap_courses(1)
         course_user = self._user_in_course(user, course)
         topics = self._bootstrap_topics(course)
@@ -332,7 +332,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_insert_course_if_not_exists(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         self.assertEqual(UserService.insert_course_if_not_exists(None, user),
                 {"error": "Invalid Course Provided"})
 
@@ -373,7 +373,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_insert_course_user_if_not_exists(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         course = self._bootstrap_courses(1)
         course2 = self._bootstrap_courses(2)
 
@@ -400,7 +400,7 @@ class UserTestCase(BootstrapTestCase):
 
 
     def test_update_user_roles(self):
-        user = self._bootstrap_user()
+        user = self._bootstrap_user(1)
         course = self._bootstrap_courses(1)
         cu = CourseUser(course=course, user=user)
         cu.save()

@@ -27,7 +27,7 @@ class TopicsTest(BootstrapTestCase):
         courses = [self._bootstrap_courses(1), self._bootstrap_courses(2)]
         for _c, course in enumerate(courses):
             self._bootstrap_topics(course)
-            user = self._bootstrap_user(_c)
+            user = self._bootstrap_user(_c + 1)
             author = CourseUser.objects.create(user=user, course=course)
             self._bootstrap_questions(author)
 
