@@ -50,7 +50,7 @@ def request_to_user(lti_params):
     user_context = {
         "user_id": lti_params.get("user_id"),
         "first_name": lti_params.get("lis_person_name_given"),
-        "last_name": lti_params.get("lis_person_name_given")
+        "last_name": lti_params.get("lis_person_name_family")
     }
 
     return insert_user_if_not_exists(user_context)
