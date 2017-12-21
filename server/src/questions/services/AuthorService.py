@@ -32,7 +32,7 @@ def add_question(question_request, host, user, question_obj=None):
             # Cleans question and explanation content before saving as Question
             if question_obj is None:
                 question_obj = Question.objects.create(
-                content="",
+                content=cleanContent(question_content),
                 explanation="",
                 difficulty=0,
                 quality=0,
@@ -40,8 +40,6 @@ def add_question(question_request, host, user, question_obj=None):
                 qualityCount=0,
                 author=user
             )
-
-            question_obj.content = cleanContent(question_content)
             # Question Images
             images = question.get("payloads", None)
             if images:
@@ -58,6 +56,7 @@ def add_question(question_request, host, user, question_obj=None):
             for i in topics:
                 topicList.append(i.get("id", None))
             question_obj.topics = topicList
+            question_obj.save()
 
             # Distractors
             _response_choices = ["A", "B", "C", "D"]
@@ -70,12 +69,11 @@ def add_question(question_request, host, user, question_obj=None):
                     return {"state": "Error", "error": "Distractor content is blank"}
                 #cleans distractor content before saving
                 distractor = Distractor.objects.create(
-                    content="",
+                    content=cleanContent(distractor_content),
                     isCorrect=responses[i].get("isCorrect", None),
                     response=i,
                     question=question_obj
                 )
-                distractor.content = cleanContent(distractor_content)
 
                 # Distractor Images
                 images = responses[i].get("payloads", None)
