@@ -3,12 +3,12 @@
         <md-layout md-flex="100">
             <md-tabs md-fixed
                 :mdNavigation="false"
-                class="md-transparent tabContainer"
+                class="md-transparent tabContainer tabContent"
                 :class="{'mainTab': !mobileMode}"
                 @change="tabSelected">
                     <md-tab md-label="Write Question">
                         <md-layout md-flex="100">
-                            <md-card class="firstAuthorCard">
+                            <md-card >
                                 <md-layout md-flex="100"
                                     class="componentSeparator">
                                     <h2>Question Body</h2>
@@ -113,21 +113,10 @@ h3 {
     margin-top: 0px;
 }
 
-.firstAuthorCard {
+.tabContent {
     margin-top: 7%;
 }
 
-.previewTabStudent {
-    top: 12%;
-}
-
-.previewTabAdmin {
-    top: 8%;
-}
-
-.mobilePreviewTab {
-    top: 3%;
-}
 
 .mainTab >>> nav {
     position: fixed;
@@ -140,6 +129,7 @@ h3 {
     position: relative;
     width: 100%;
     background-color: transparent;
+    top: 0;
 }
 
 .subTabs >>> .md-tabs-navigation-scroll-container {
@@ -186,12 +176,6 @@ h3 {
     margin-bottom: 5em;
 }
 
-.hidden {
-        width: 0px;
-        height: 0px;
-        flex-grow: 0;
-        flex-basis: 0%;
-    }
 </style>
 
 
@@ -251,7 +235,7 @@ export default class AuthorView extends mixin(responsiveMixin, Vue) {
     prevTooltip: string | undefined = "Please fill out all question fields to see preview.";
     pDisabled = false;
 
-    bottomSpaceClass: string = "bottomSpace"
+    bottomSpaceClass: string = "bottomSpace";
 
     get questionPrev():IQuestion | undefined {
         const error = AuthorService.validateQuestions(this.question);
