@@ -36,13 +36,13 @@ def validate_lti_request(uri, method, request_payload):
         return {"error": e.message}
 
 
-def request_to_course(lti_params):
+def request_to_course(lti_params, user):
     course_context = {
         "course_code": lti_params.get("context_id"),
         "course_name": lti_params.get("context_label")
     }
 
-    return insert_course_if_not_exists(course_context)
+    return insert_course_if_not_exists(course_context, user)
 
 
 def request_to_user(lti_params):
