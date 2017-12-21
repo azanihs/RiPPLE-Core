@@ -228,6 +228,12 @@ def insert_course_user_if_not_exists(course, user):
     return CourseUser.objects.get_or_create(course=course, user=user)[0]
 
 
+def delete_user_roles(course_user):
+    if course_user is None or not isinstance(course_user, CourseUser):
+        return {"error": "Invalid CourseUser Provided"}
+
+    course_user.roles.clear()
+
 def update_user_roles(course_user, role):
     if course_user is None or not isinstance(course_user, CourseUser):
         return {"error": "Invalid CourseUser Provided"}

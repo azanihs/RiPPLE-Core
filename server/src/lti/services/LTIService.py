@@ -5,7 +5,7 @@ from django.conf import settings
 
 from .endpoint import SignatureEndpoint
 from ..exceptions import OAuthException, LTIException
-from users.services.UserService import insert_course_if_not_exists, insert_user_if_not_exists, insert_course_user_if_not_exists, update_user_roles
+from users.services.UserService import insert_course_if_not_exists, insert_user_if_not_exists, insert_course_user_if_not_exists, update_user_roles, delete_user_roles
 
 ROLE_HANDLES = [
     "Instructor",
@@ -80,6 +80,7 @@ def create_course_user(course, user, lti_params):
 
     course_user = insert_course_user_if_not_exists(course, user)
 
+    delete_user_roles(course_user)
     for i in user_roles:
         update_user_roles(course_user, i)
 

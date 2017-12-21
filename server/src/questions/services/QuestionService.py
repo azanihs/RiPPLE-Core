@@ -102,7 +102,12 @@ def create_leaderboard(user, has_consented, sort_field, sort_order):
             "user_id", u.id, leaderboard_results["achievement_counts"])
     } for u in course_users]
 
-    sort_fields_exist = set(sort_field).issubset(set(leaderboard_users[0].keys()))
+    if not leaderboard_users:
+        return []
+
+    leaderboard_keys = set(leaderboard_users[0].keys())
+
+    sort_fields_exist = set(sort_field).issubset(leaderboard_keys)
 
     if len(leaderboard_users) > 0 and sort_fields_exist:
         should_reverse = sort_order == "DESC"

@@ -7,7 +7,7 @@ from django.db import models
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 class Course(models.Model):
-    course_code = models.CharField(max_length=30)
+    course_code = models.CharField(max_length=30, unique=True)
     course_name = models.CharField(max_length=30)
     available = models.BooleanField(default=False)
 
@@ -28,7 +28,7 @@ class Course(models.Model):
 
 
 class User(models.Model):
-    user_id = models.CharField(max_length=30)
+    user_id = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     image = models.CharField(max_length=255)
@@ -66,6 +66,9 @@ class CourseUser(models.Model):
             "course": self.course.toJSON(),
             "roles": [str(x) for x in self.roles.all()]
         }
+
+    class Meta:
+        unique_together = ('user', 'course')
 
 
 class Token(models.Model):
