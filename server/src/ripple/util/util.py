@@ -24,7 +24,6 @@ def generate_static_path(host):
 
     return merge_url_parts([
         _format("//" + host),
-        _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
 
@@ -94,6 +93,7 @@ def verify_content(content):
 
 def extract_image_from_html(image_id, obj, images, image_type, host):
     # type q=question, d=distractor, e=explanation, c=ConsentFormImage
+
     urls = []
     database_image_types = {
         "c": ConsentImage,
@@ -127,7 +127,6 @@ def extract_image_from_html(image_id, obj, images, image_type, host):
 
 def update_image_sources(urls, content, host):
     soup = BeautifulSoup(content, "html.parser")
-
     # Only get substitutable images
     images = soup.find_all("img", src=lambda img_src: img_src.startswith("#:"))
     for i, file_location in enumerate(urls):

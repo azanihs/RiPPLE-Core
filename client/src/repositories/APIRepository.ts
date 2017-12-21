@@ -66,12 +66,7 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             }
 
             if (x.error) {
-                addEventsToQueue([{
-                    name: `Server Error`,
-                    description: `${x.error}`,
-                    icon: "error"
-                }]);
-                return Promise.resolve({}) as Promise<T>;
+                throw x.error;
             } else {
                 return Promise.resolve(x.data);
             }
@@ -82,7 +77,6 @@ export const apiFetch = <T>(url: string, opts?: RequestInit): Promise<T> => {
             } else {
                 return err.json().then((errorObject: any) => {
                     if (errorObject.error) {
-                        // TODO: Handle global things
                         addEventsToQueue([{
                             icon: "error",
                             name: `Server Error`,

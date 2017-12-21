@@ -81,9 +81,7 @@ def image_update(request):
 
     root_path = util.generate_static_path(request.get_host())
 
-    return JsonResponse({
-        "data":UserService.update_user_image(course_user.user, root_path, new_image)
-    })
+    return JsonResponse(UserService.update_user_image(course_user.user, root_path, new_image))
 
 
 def get_all_user_achievements(request):

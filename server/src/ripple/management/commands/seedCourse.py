@@ -86,7 +86,6 @@ def get_topics(file):
 def parse_questions(file, course_users, all_topics, host):
     host = merge_url_parts([
         _format(host),
-        _format(settings.FORCE_SCRIPT_NAME),
         _format("static")
     ])
     distractors = []
