@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
 
-from ripple.util.util import is_number, merge_url_parts
+from ripple.util.util import is_number, merge_url_parts, is_administrator
 from users.services import UserService
 from questions.services import QuestionService, SearchService, AuthorService
 
@@ -189,7 +189,7 @@ def leaderboard_default(request):
 def leaderboard(request, sort_field, sort_order):
     logged_in_user = UserService.logged_in_user(request)
     user_roles = (str(x) for x in logged_in_user.roles.all())
-    limit = -1 if "Instructor" in user_roles else 20
+    limit = -1 if is_administrator(logged_in_user) else 20
 
     if sort_order != "DESC" and sort_order != "ASC":
         sort_order = "DESC"

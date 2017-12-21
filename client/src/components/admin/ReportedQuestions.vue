@@ -127,7 +127,7 @@ import { Vue, Component, Lifecycle } from "av-ts";
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import QuestionService from "../../services/QuestionService";
-import { serverToLocal } from "../../util";
+import { serverToLocal, isAdmin } from "../../util";
 
 import { ICourseUser, IReport, IReportAggregate, IServerReportFull,
     IServerReport, IServerReportAggregate } from "../../interfaces/models";
@@ -207,7 +207,7 @@ export default class ReportedQuestions extends Vue {
     };
 
     updateCourseUser(courseUser: ICourseUser) {
-        if (courseUser.roles.indexOf("Instructor") == -1) {
+        if (!isAdmin(courseUser.roles)) {
             this.$router.push("error/403");
         }
         this.pCourseCode = courseUser.course.courseCode;

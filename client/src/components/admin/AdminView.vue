@@ -88,7 +88,7 @@ import { IUserSummary, IUser, ICourse, ICourseUser, ITopic } from "../../interfa
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
-import { serverToLocal, localToUTC } from "../../util";
+import { serverToLocal, localToUTC, isAdmin } from "../../util";
 
 import LeaderBoard from "../leaderboard/LeaderBoard.vue";
 import TopicChip from "../util/TopicChip.vue";
@@ -120,7 +120,7 @@ export default class AdminView extends Vue {
     networkError: string = "";
 
     updateCourseUser(courseUser: ICourseUser) {
-        if (courseUser.roles.indexOf("Instructor") == -1) {
+        if (!isAdmin(courseUser.roles)) {
             this.$router.push("error/403");
         }
 

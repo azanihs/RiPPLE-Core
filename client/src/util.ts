@@ -15,6 +15,16 @@ const _bus = new Vue();
 
 export const NEW_QUEUE_ITEM = "NEW_QUEUE_ITEM";
 
+export function isAdmin(roles: string[]) {
+    const adminRoles = ["Instructor", "TeachingAssistant"];
+    for (let i of adminRoles) {
+        if (roles.indexOf(i) >= 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 export function addEventsToQueue(items: ISnackbarNotification[]) {
     items.forEach(x => {
         _bus.$emit(NEW_QUEUE_ITEM, x);

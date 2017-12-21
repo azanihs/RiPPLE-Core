@@ -75,10 +75,12 @@ def merge_url_parts(parts, url=""):
     return merge_url_parts(parts, urljoin(url, parts.pop(0)))
 
 def is_administrator(course_user):
-    if "Instructor" in (x.role for x in course_user.roles.all()):
-        return True
-    else:
-        return False
+    user_roles = [x.role for x in course_user.roles.all()]
+    _admin_roles = ["Instructor", "TeachingAssistant"]
+    for role in _admin_roles:
+        if role in user_roles:
+            return True
+    return False
 
 def verify_content(content):
     if len(content) == 0:

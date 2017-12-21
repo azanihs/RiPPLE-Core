@@ -52,7 +52,7 @@
 import { Vue, Component, Lifecycle } from "av-ts";
 import { ICourseUser, IConsentForm } from "../../interfaces/models";
 
-import { getDefaultConsentForm } from "../../util";
+import { getDefaultConsentForm, isAdmin } from "../../util";
 
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
@@ -84,7 +84,7 @@ export default class ConsentEditor extends Vue {
     pDisabled = false;
 
     updateCourseUser(user: ICourseUser) {
-        if (user.roles.indexOf("Instructor") == -1) {
+        if (!isAdmin(user.roles)) {
             this.$router.push("../error/403");
         }
 

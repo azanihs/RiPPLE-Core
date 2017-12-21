@@ -9,6 +9,7 @@ from users.services.UserService import insert_course_if_not_exists, insert_user_
 
 ROLE_HANDLES = [
     "Instructor",
+    "TeachingAssistant",
     "Administrator",
     "Mentor",
     "Staff",

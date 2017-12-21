@@ -275,6 +275,7 @@ label {
 import { Vue, Component, Prop, p, Lifecycle } from "av-ts";
 import { ILink, IUser, ICourse, ICourseUser } from "./interfaces/models";
 import { getLinks } from "./routes/links";
+import { isAdmin } from "./util";
 
 // Special case where main.vue needs to refresh application
 import UserRepository from "./repositories/UserRepository";
@@ -332,7 +333,7 @@ export default class Main extends Vue {
 
         const _linkCopy = this.pMenuLinks.slice();
         // Fix links
-        if (this.course !== undefined && this.courseRoles.indexOf("Instructor") >= 0) {
+        if (this.course !== undefined && isAdmin(courseUser.roles)) {
             const profileLinkIndex = _linkCopy.findIndex(x => x.text == "Profile");
             if (profileLinkIndex >= 0) {
                 _linkCopy.splice(profileLinkIndex, 1);

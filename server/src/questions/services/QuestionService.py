@@ -78,7 +78,7 @@ def create_leaderboard(user, has_consented, sort_field, sort_order):
     course_users = CourseUser.objects.filter(course=course)
     consent_form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
     course_users = course_users.exclude(\
-        id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role="Instructor")))
+        id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role__in=["Instructor", "TeachingAssistant"])))
     if has_consented:
         course_users = course_users.filter(id__in=Consent.objects.filter(
             form=consent_form, response=True).values("user_id"))
