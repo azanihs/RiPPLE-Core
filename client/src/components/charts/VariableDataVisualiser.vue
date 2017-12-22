@@ -229,7 +229,7 @@ export default class VariableDataVisualiser extends Vue {
             name: "Radar Chart",
             value: "radar"
         }, {
-            name: "ITopic Dependency Chart",
+            name: "Topic Dependency Chart",
             value: "topicDependency"
         }]
     });
