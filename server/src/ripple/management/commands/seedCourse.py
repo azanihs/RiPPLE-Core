@@ -251,7 +251,7 @@ class Command(BaseCommand):
             for user in users:
                 if chance(2):
                     course_users.append(
-                        CourseUser.objects.create(user=user, course=course))
+                        CourseUser.objects.get_or_create(user=user, course=course)[0])
 
             print("\t-Making Questions")
             distractors = parse_questions(file, course_users, all_topics, host)
@@ -266,12 +266,13 @@ class Command(BaseCommand):
             print("\t-Answering and Rating Questions")
             abilities = ["low", "medium", "high"]
             index = 1
-            for user in course_users:
+            '''for user in course_users:
                 studentAbility = abilities[choice(range(3))]
                 print("\t-Answering Course User:" + str(index) + " Questions")
                 index += 1
                 for i in range(0, 100):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
+            '''
 
         def populate_availability(course_users, days, times):
             for i in range(len(course_users)):
@@ -281,7 +282,6 @@ class Command(BaseCommand):
                     random_time = Time.objects.get(pk=randint(1, len(times)))
                     # Add availability
                     availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
-                    availability.save()
 
         def populate_available_roles(course_users, study_roles):
             for course_user in course_users:

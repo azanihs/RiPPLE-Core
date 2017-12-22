@@ -146,8 +146,8 @@ export default class UserContainer extends Vue {
                         this.showMessage("Profile image changed", "done");
                         document.body.removeChild(input);
                     })
-                    .catch(err => {
-                        this.showMessage(err);
+                    .catch(_err => {
+                        // this.showMessage(err);
                         document.body.removeChild(input);
                     });
             }

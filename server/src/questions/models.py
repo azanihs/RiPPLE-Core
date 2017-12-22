@@ -22,7 +22,6 @@ class Topic(models.Model):
             "name": self.name,
         }
 
-
 class Question(models.Model):
     content = models.TextField()
     explanation = models.TextField()
@@ -184,6 +183,9 @@ class DistractorImage(models.Model):
 class ReportReason(models.Model):
     reason = models.TextField()
     course = models.ForeignKey(Course)
+
+    class Meta:
+        unique_together = ('reason', 'course')
 
 class ReportQuestion(models.Model):
     created_at = models.DateTimeField(auto_now=True)

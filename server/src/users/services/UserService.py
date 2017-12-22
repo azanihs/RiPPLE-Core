@@ -25,7 +25,7 @@ def update_user_image(user, server_root, new_image):
         return {
             "error": "No image provided"
         }
-    saved_image = save_image(new_image, str(user.id))
+    saved_image = save_image(new_image, str(user.user_id))
     if saved_image is None:
         return {
             "error": "Image is not of valid type"
@@ -130,7 +130,7 @@ def update_course(course_user, new_data):
         if exists_by_id(new_topics, i.id) is False:
             i.delete()
 
-    return course_user.toJSON()
+    return { "data": course_user.toJSON() }
 
 def _process_competencies(competencies):
     if competencies is None:

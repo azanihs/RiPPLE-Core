@@ -3,14 +3,14 @@
         <md-layout md-flex="100">
             <md-card>
                 <h2>Administration Page for: {{ pCourseCode }}</h2>
-                <md-input-container>
+                <!-- <md-input-container>
                     <label>Teaching Start: {{ this.teachingStart }}</label>
                     <date-picker v-model="teachingStart"></date-picker>
                 </md-input-container>
                 <md-input-container>
                     <label>Teaching End: {{ this.teachingEnd }}</label>
                     <date-picker v-model="teachingEnd"></date-picker>
-                </md-input-container>
+                </md-input-container> -->
                 <md-chips v-model="editableTopics"
                     @change="topicsEdited"
                     md-input-placeholder="Course Topics">
@@ -46,14 +46,14 @@
                         <label>Course Code</label>
                         <md-input v-model="courseCode"></md-input>
                     </md-input-container>
-                    <md-input-container>
+                    <!-- <md-input-container>
                         <label>Teaching Start: {{this.teachingStart}}</label>
                         <date-picker v-model="teachingStart"></date-picker>
                     </md-input-container>
                     <md-input-container>
                         <label>Teaching End: {{this.teachingEnd}}</label>
                         <date-picker v-model="teachingEnd"></date-picker>
-                    </md-input-container>
+                    </md-input-container> -->
                     <md-chips v-model="editableTopics"
                         @change="topicsEdited"
                         md-input-placeholder="Course Topics">
@@ -111,8 +111,8 @@ export default class AdminView extends Vue {
     pTopics: ITopic[] = [];
     pCourseCode = "";
 
-    teachingStart: string | undefined = undefined;
-    teachingEnd: string | undefined = undefined;
+    teachingStart: string | undefined = "0";
+    teachingEnd: string | undefined = "0";
 
     pUser: IUser | undefined = undefined;
     pCourse: ICourse| undefined = undefined;

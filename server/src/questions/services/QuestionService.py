@@ -540,7 +540,7 @@ def _leaderboard_results(course, course_users):
             qr.response_id=d.id AND q.author_id=cu.id AND cu.course_id=%s GROUP BY qr.user_id,
             q.id)
         GROUP BY qr.user_id'''
-    first_response_qry = QuestionResponse.objects.raw(first_response_SQL,[course.id, course.id])
+    first_response_qry = QuestionResponse.objects.raw(first_response_SQL,[course.course_code, course.course_code])
     first_response_counts=[{"user_id": r.user_id, "total": r.total} for r in first_response_qry]
 
     rating_counts = leaderboard_sort(QuestionRating, "user_id")

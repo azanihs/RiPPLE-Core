@@ -42,7 +42,7 @@ def update(request):
 
     post_request = loads(request.body.decode("utf-8"))
     user = UserService.logged_in_user(request)
-    return JsonResponse({"data": UserService.update_course(user, post_request)})
+    return JsonResponse(UserService.update_course(user, post_request))
 
 
 def login(request, course_code):

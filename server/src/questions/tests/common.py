@@ -42,7 +42,7 @@ class BootstrapTestCase(TestCase):
         ]
 
         #Modifier created to handle multiple users creating questions
-        id_modifier = 5 * (author.user.id - 1) + 1
+        id_modifier = 5 * (int(author.user.user_id) - 1) + 1
 
         for i in range(0, 5):
             q = Question(
@@ -87,7 +87,7 @@ class BootstrapTestCase(TestCase):
             ).save()
 
     def _bootstrap_user(self, id):
-        user = User(user_id="uid" + str(id), first_name="u_firstname", last_name="u_lastname")
+        user = User(user_id=str(id), first_name="u_firstname", last_name="u_lastname")
         user.save()
         return user
 

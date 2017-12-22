@@ -7,7 +7,7 @@ from django.db import models
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 class Course(models.Model):
-    course_code = models.CharField(max_length=30, unique=True)
+    course_code = models.CharField(max_length=30, primary_key=True)
     course_name = models.CharField(max_length=30)
     available = models.BooleanField(default=False)
 
@@ -28,7 +28,7 @@ class Course(models.Model):
 
 
 class User(models.Model):
-    user_id = models.CharField(max_length=30, unique=True)
+    user_id = models.CharField(max_length=30, primary_key=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     image = models.CharField(max_length=255)
@@ -47,7 +47,7 @@ class UserImage(models.Model):
     user = models.ForeignKey(User, on_delete=None)
 
 class Role(models.Model):
-    role = models.CharField(max_length=32)
+    role = models.CharField(max_length=32, primary_key=True)
 
     def __str__(self):
         return str(self.role)
@@ -109,6 +109,7 @@ class Engagement(models.Model):
             "id": self.id,
             "name": self.name
         }
+
 class ConsentForm(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

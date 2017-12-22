@@ -96,21 +96,22 @@ class UserTestCase(BootstrapTestCase):
             [courses[3]],
             [courses[3], courses[4]]
         ]
+
         course_users = []
-        for i in range(5):
+        for i, user in enumerate(users):
+            course_users.append([])
             for c in course_map[i]:
-                course_users.append(self._user_in_course(users[i], c))
+                course_users[i].append(self._user_in_course(user, c))
+
 
         # No User
         self.assertEqual({"error": "CourseUser must be provided"} ,
                 UserService.user_courses(None))
 
-
         # Valid
-        for c_u in course_users:
-            u_id = c_u.user.id-1
-            u_c = UserService.user_courses(c_u)
-            c_list = [x.toJSON() for x in course_map[u_id]]
+        for i in range(5):
+            u_c = UserService.user_courses(course_users[i][0])
+            c_list = [x.toJSON() for x in course_map[i]]
 
             self.assertEqual(u_c, c_list)
 

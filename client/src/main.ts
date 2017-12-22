@@ -56,5 +56,8 @@ new Promise(resolve => {
             el: "#main",
             router: Router
         });
+    })
+    .catch(unhandled => {
+        console.log(unhandled);
     });
 
