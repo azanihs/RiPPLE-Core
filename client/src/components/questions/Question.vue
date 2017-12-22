@@ -246,9 +246,17 @@ export default class Question extends Vue {
     nextQuestion() {
         QuestionService.getNextRecommendedQuestion()
             .then(questionId => {
-                this.$router.push({
-                    path: `/question/id/${questionId}`
-                });
+                if (questionId == this.question.id) {
+                    addEventsToQueue([{
+                        name: "Server Question Response",
+                        description: "You may have no more recommended questions",
+                        icon: "error"
+                    }]);
+                } else {
+                    this.$router.push({
+                        path: `/question/id/${questionId}`
+                    });
+                }
             });
     }
 

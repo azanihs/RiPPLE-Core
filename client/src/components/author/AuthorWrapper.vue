@@ -66,7 +66,7 @@ export default class AuthorWrapper extends Vue {
     @Prop returnTo = p<string>({});
 
     returnToPrevious() {
-        this.$router.push({ name: this.returnTo });
+        this.$router.push({ name: this.returnTo || "/question/answer/" });
     }
 
     pQuestion: IQuestionBuilder | undefined = undefined;
