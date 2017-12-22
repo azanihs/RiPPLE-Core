@@ -203,16 +203,6 @@ class UserTestCase(BootstrapTestCase):
                 {"error": "Given end timestamp is not valid: invalid end"})
 
         # Invalid topics
-        # Invalid ID
-        self.assertEqual(UserService.update_course(course_user, {
-                    "topics": [{"id": "abc", "name": "def"}],
-                    "course": {
-                        "courseCode": "test_course_1",
-                        "start": 100,
-                        "end": 100
-                    }}),
-                {"error": "Invalid Topic ID"})
-
 
         #VALID TESTS
         self.assertEqual(UserService.update_course(course_user, {

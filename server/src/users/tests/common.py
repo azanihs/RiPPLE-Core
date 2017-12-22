@@ -40,8 +40,12 @@ class BootstrapTestCase(TestCase):
         return cu
 
     def _bootstrap_topics(self, course):
-        return [Topic.objects.create(name=x, course=course)
-         for x in ["t1", "t2", "t3", "t4", "t5", "t6"]]
+        topics = []
+        for x in ["t1", "t2", "t3", "t4", "t5", "t6"]:
+            topic = Topic.objects.create(name=x)
+            topic.course.add(course)
+            topics.append(topic)
+        return topics
 
     def _bootstrap_competencies(self, user, topics):
         c = Competency(

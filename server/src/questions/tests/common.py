@@ -12,8 +12,12 @@ class BootstrapTestCase(TestCase):
 
 
     def _bootstrap_topics(self, course):
-        return [Topic.objects.create(name=x, course=course)
-         for x in ["t1", "t2", "t3", "t4", "t5", "t6"]]
+        topics = []
+        for x in ["t1", "t2", "t3", "t4", "t5", "t6"]:
+            topic = Topic.objects.create(name=x)
+            topic.course.add(course)
+            topics.append(topic)
+        return topics
 
     def _bootstrap_question_request(self):
         topic = Topic.objects.all().first()
