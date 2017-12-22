@@ -2,7 +2,7 @@
     <md-layout md-flex="100" class="buttonContainer">
         <md-layout>
             <md-button
-                @click="back()">
+                @click="back">
                 <md-icon>keyboard_return</md-icon>
                 <span>Return</span>
             </md-button>

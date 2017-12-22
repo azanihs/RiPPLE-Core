@@ -3,6 +3,7 @@
         <admin-buttons
             :showEdit="false"
             :id="id"
+            @back="returnToPrevious"
             :prevQuestions="prevQuestions"
             @saveQuestion="saveQuestion"
             @deleteQuestion="openDialog"
@@ -63,6 +64,10 @@ export default class AuthorWrapper extends Vue {
     });
 
     @Prop returnTo = p<string>({});
+
+    returnToPrevious() {
+        this.$router.push({ name: this.returnTo });
+    }
 
     pQuestion: IQuestionBuilder | undefined = undefined;
     pCurrent: IQuestionBuilder | undefined = undefined;

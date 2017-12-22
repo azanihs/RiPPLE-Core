@@ -4,6 +4,7 @@
             <admin-buttons
                 v-if="canEdit"
                 :showEdit="true"
+                @back="returnToBrowse"
                 @editQuestion="editQuestion"></admin-buttons>
             <action-buttons v-else @back="returnToBrowse">
                 <md-button

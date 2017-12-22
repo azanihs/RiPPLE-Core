@@ -246,13 +246,9 @@ export default class Question extends Vue {
     nextQuestion() {
         QuestionService.getNextRecommendedQuestion()
             .then(questionId => {
-                if (questionId == this.question.id) {
-                    this.nextQuestion();
-                } else {
-                    this.$router.push({
-                        path: `/question/id/${questionId}`
-                    });
-                }
+                this.$router.push({
+                    path: `/question/id/${questionId}`
+                });
             });
     }
 
