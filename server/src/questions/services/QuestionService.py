@@ -74,14 +74,15 @@ def create_leaderboard(user, has_consented, sort_field, sort_order):
         return 0
 
     course = user.course
-
     course_users = CourseUser.objects.filter(course=course)
     consent_form = ConsentForm.objects.filter(author__in=course_users).order_by("-created_at").first()
     course_users = course_users.exclude(\
         id__in = CourseUser.objects.filter(roles__in=Role.objects.filter(role__in=["Instructor", "TeachingAssistant"])))
     if has_consented:
-        course_users = course_users.filter(id__in=Consent.objects.filter(
-            form=consent_form, response=True).values("user_id"))
+        recent_consent_ids = Consent.objects.filter(form=consent_form).values("user_id").annotate(last=Max('id'))
+        consented_users = Consent.objects.filter(id__in=recent_consent_ids.values("last"), response=True)
+
+        course_users = course_users.filter(id__in=consented_users.values("user_id"))
 
     leaderboard_results = _leaderboard_results(course, course_users)
 

@@ -10,7 +10,6 @@ class BootstrapTestCase(TestCase):
     def _bootstrap_courses(self, id):
         return Course.objects.create(course_code="test_course_" + str(id), course_name="course_name_" + str(id))
 
-
     def _bootstrap_topics(self, course):
         topics = []
         for x in ["t1", "t2", "t3", "t4", "t5", "t6"]:

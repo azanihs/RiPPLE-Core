@@ -243,8 +243,12 @@ class Command(BaseCommand):
         host = options["host"]
 
         def populate_course(file, topics, course, users):
-            all_topics = [Topic.objects.create(
-                name=x, course=course) for x in topics]
+            all_topics = []
+            for x in topics:
+                topic = Topic.objects.create(name=x)
+                topic.course.add(topic)
+                all_topics.append(topic)
+
 
             print("\t-Enrolling Users")
             course_users = []

@@ -88,7 +88,7 @@ import { IUserSummary, IUser, ICourse, ICourseUser, ITopic } from "../../interfa
 import Fetcher from "../../services/Fetcher";
 import UserService from "../../services/UserService";
 import TopicService from "../../services/TopicService";
-import { serverToLocal, localToUTC, isAdmin } from "../../util";
+import { serverToLocal, localToUTC, isAdmin, addEventsToQueue } from "../../util";
 
 import LeaderBoard from "../leaderboard/LeaderBoard.vue";
 import TopicChip from "../util/TopicChip.vue";
@@ -270,8 +270,16 @@ export default class AdminView extends Vue {
         });
     }
 
-    downloadCSV(csvString: string) {
+    downloadCSV(csvString: undefined | string) {
         // update CSV string headings
+        if (!csvString) {
+            return addEventsToQueue([{
+                name: "No Consent Data",
+                description: "There are no consented users for your course",
+                icon: "error"
+            }]);
+        }
+
         csvString = this.updateHeadings(csvString);
         // Encode the CSV string as a URI
         const uri = encodeURI("data:text/csv;charset=utf-8," + csvString);
@@ -304,6 +312,7 @@ export default class AdminView extends Vue {
             ["questionsRated", "Questions Rated"]];
 
         let splitString = csvString.split(/\r\n|\r|\n/);
+
         let headerString = splitString[0];
         for (let i of headings) {
             headerString = headerString.replace(i[0], i[1]);
