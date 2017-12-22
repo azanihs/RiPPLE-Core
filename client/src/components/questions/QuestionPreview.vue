@@ -31,11 +31,6 @@
                     <span>{{ data.quality }}</span>
                     <md-tooltip md-direction="top">Question Quality</md-tooltip>
                 </div>
-                <div>
-                    <md-icon>person_pin</md-icon>
-                    <span>{{ Math.floor(Math.random() * 10) }}</span>
-                    <md-tooltip md-direction="top">Question Suitability</md-tooltip>
-                </div>
             </md-layout>
         </div>
     </md-card>

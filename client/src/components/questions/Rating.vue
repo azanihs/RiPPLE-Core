@@ -90,7 +90,7 @@ export default class Rating extends Vue {
 
         const icons = this.$refs["icons"] as Array<Vue>;
         this.selectedIndex = icons.findIndex((x: Vue) => x.$el == target);
-        this.$emit("input", this.selectedIndex);
+        this.$emit("input", this.selectedIndex + 1);
     }
 
     previewRating(e: MouseEvent) {
