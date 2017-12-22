@@ -8,7 +8,7 @@
                 @change="tabSelected">
                     <md-tab md-label="Write Question">
                         <md-layout md-flex="100">
-                            <md-card >
+                            <md-card>
                                 <md-layout md-flex="100"
                                     class="componentSeparator">
                                     <h2>Question Body</h2>
@@ -32,19 +32,25 @@
                             class="cardSeparator">
                             <md-card class="removePadding">
                                 <md-tabs md-fixed
+                                    @change="changeResponseTab"
                                     :mdNavigation="false"
                                     class="md-transparent tabContainer subTabs"
                                     :class = "subTabStyle">
                                     <md-tab v-for="i in ['A', 'B', 'C', 'D']"
+                                        class="removeBottomPadding"
                                         :key="i"
                                         :id="'tab_' + i"
                                         :md-label="'Response ' + i">
-                                        <TinyMCE :id="'editor_' + i"
-                                            v-model="question.responses[i]"
-                                            :version="version"
-                                            :options="options"></TinyMCE>
                                     </md-tab>
                                 </md-tabs>
+
+                                <TinyMCE v-for="(i, index) in ['A', 'B', 'C', 'D']"
+                                        :key="i"
+                                        v-if="selectedTab == index"
+                                        :id="'editor_' + i"
+                                        v-model="question.responses[i]"
+                                        :version="version"
+                                        :options="options"></TinyMCE>
                             </md-card>
                         </md-layout>
                         <md-layout md-flex="100"
@@ -109,6 +115,10 @@
 </template>
 
 <style scoped>
+.removeBottomPadding {
+    padding: 5px !important;
+}
+
 h2,
 h3 {
     width: 100%;
@@ -421,7 +431,13 @@ export default class AuthorView extends mixin(responsiveMixin, Vue) {
         }
     }
 
+    selectedTab = 0;
+    changeResponseTab(newTab: number) {
+        this.selectedTab = newTab;
+    }
+
     tabSelected(index: number) {
+        this.selectedTab = index;
         if (index==1) {
             this.bottomSpaceClass="";
         } else {

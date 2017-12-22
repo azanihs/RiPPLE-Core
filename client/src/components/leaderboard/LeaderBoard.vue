@@ -12,7 +12,7 @@
                         <md-icon>camera_alt</md-icon>
                         <span>Avatar</span>
                     </md-table-head>
-                    <md-table-head md-sort-by="name">
+                    <md-table-head>
                         <md-icon>account_box</md-icon>
                         <span>Name</span>
                     </md-table-head>

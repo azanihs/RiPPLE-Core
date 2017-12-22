@@ -99,36 +99,25 @@ def update_course(course_user, new_data):
         course.available = available
 
     course.save()
-    original_topics = course.topic_set.all()
     new_topics = []
     # Insert topics
     for topic in topics:
         topic_id = topic.get("id", None)
         topic_name = topic.get("name", None)
-        if topic_id is None:
-            new_topics.append(Topic.objects.create(
-                name=topic_name, course=course))
-        elif topic_id is not None:
-            if not str(topic_id).isdigit():
-                return {"error": "Invalid Topic ID"}
-            try:
-                existing_topic = Topic.objects.get(pk=topic_id)
-                existing_topic.name = topic_name
-                existing_topic.course = course
-                existing_topic.save()
-                new_topics.append(existing_topic)
-            except Topic.DoesNotExist:
-                pass
+        existing_topic = None
+        try:
+            existing_topic = Topic.objects.get(name=topic_name)
+        except Topic.DoesNotExist:
+            pass
 
-    def exists_by_id(topic_list, id):
-        for t in topic_list:
-            if t.id == id:
-                return True
-        return False
-    # Trim out old topics
-    for i in original_topics:
-        if exists_by_id(new_topics, i.id) is False:
-            i.delete()
+        if not existing_topic:
+            new_topic = Topic.objects.create(name=topic_name)
+            new_topic.course.add(course)
+            new_topics.append(new_topic)
+        else:
+            new_topics.append(existing_topic)
+    course.topic_set.clear()
+    course.topic_set.set(new_topics)
 
     return { "data": course_user.toJSON() }
 

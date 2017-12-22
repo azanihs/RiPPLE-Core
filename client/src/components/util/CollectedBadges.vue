@@ -62,6 +62,11 @@ export default class CollectedBadges extends Vue {
     created() {
         Fetcher.get(BadgeService.getAllUserBadges)
             .on(this.updateAvailableBadges);
+        BadgeService.getAllUserBadges()
+            .then(x => {
+                Fetcher.get(BadgeService.getAllUserBadges)
+                    .update(x);
+            });
     }
 
     @Lifecycle

@@ -11,7 +11,7 @@ _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 class Topic(models.Model):
     name = models.CharField(max_length=128)
 
-    course = models.ForeignKey(Course)
+    course = models.ManyToManyField(Course)
 
     def __str__(self):
         return self.name
@@ -52,7 +52,7 @@ class Question(models.Model):
             "quality": self.quality,
             "difficultyCount": self.difficultyCount,
             "qualityCount": self.qualityCount,
-            "topics": [x.toJSON() for x in self.topics.all()],
+            "topics": [x.toJSON() for x in self.topics.all().filter(id__in=self.author.course.topic_set.all())],
             "responses": [],
             "responseCount": responses,
             "distractors": [x.toJSON() for x in self.distractor_set.all()],

@@ -127,7 +127,8 @@ def get_course_topics(course):
 
 def get_random_question(user):
     course = user.course
-    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course))
+    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course),
+        topics__in=get_course_topics(course)).distinct()
 
     count = course_questions.aggregate(count=Count('id'))['count']
     random_index = random.randint(0, count - 1)
@@ -135,10 +136,11 @@ def get_random_question(user):
 
 def next_recommended_question(user):
     course = user.course
-    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course))
+    course_questions = Question.objects.filter(author__in=CourseUser.objects.filter(course=course)).filter(topics__in=get_course_topics(course)).distinct()
     unanswered_questions = course_questions.exclude(
         id__in=(Distractor.objects.filter(
             id__in=QuestionResponse.objects.filter(user=user).values("response")).values("question")))
+
     unanswered_ids = [x[0] for x in unanswered_questions.values_list("id")]
     if len(unanswered_ids) == 0:
         return get_random_question(user)

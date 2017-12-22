@@ -177,7 +177,7 @@ ACHIEVEMENT_CLASSES = ['users.achievements.userAchievements']
 
 
 RUNTIME_CONFIGURATION = {
-    "min_competency_threshold": -1,
+    "min_competency_threshold": 3,
     "min_competency_value": 0.9,
     "report_reason_list": ["custom", "Inappropriate Content", "Incorrect Answer",  "Incorrect Tags"],
     "engagements": ["Questions Answered", "Questions Authored", "Questions Rated",
