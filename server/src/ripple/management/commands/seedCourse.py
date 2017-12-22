@@ -246,9 +246,8 @@ class Command(BaseCommand):
             all_topics = []
             for x in topics:
                 topic = Topic.objects.create(name=x)
-                topic.course.add(topic)
+                topic.course.add(course)
                 all_topics.append(topic)
-
 
             print("\t-Enrolling Users")
             course_users = []
