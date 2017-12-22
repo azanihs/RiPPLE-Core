@@ -27,19 +27,22 @@ def add_question(question_request, host, user, question_obj=None):
     elif len(explanation_content) == 0:
         return {"state": "Error", "error": "Explanation content is blank"}
 
+
     try:
         with transaction.atomic():
             # Cleans question and explanation content before saving as Question
             if question_obj is None:
                 question_obj = Question.objects.create(
-                content=cleanContent(question_content),
-                explanation="",
-                difficulty=0,
-                quality=0,
-                difficultyCount=0,
-                qualityCount=0,
-                author=user
-            )
+                    content="",
+                    explanation="",
+                    difficulty=0,
+                    quality=0,
+                    difficultyCount=0,
+                    qualityCount=0,
+                    author=user
+                )
+
+            question_obj.content = cleanContent(question_content)
             # Question Images
             images = question.get("payloads", None)
             if images:

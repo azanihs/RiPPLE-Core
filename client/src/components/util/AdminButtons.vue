@@ -2,7 +2,7 @@
     <md-layout class="buttonContainer">
         <div class="fixedButtons"
         :class = "{'mobileStyle': mobileMode}">
-        <action-buttons>
+        <action-buttons @back="back">
             <md-input-container v-if="prevQuestions" class="prev-versions"
                 slot="centreLeft" style="min-width:200px">
                 <label for="prevQuestions">Version:</label>
@@ -10,7 +10,7 @@
                     name="prevQuestions"
                     id="prevQuestions"
                     v-model="version"
-                    md-change="versionChanged()">
+                    @change="versionChange">
                     <md-option :value="0">
                         Version: Current
                     </md-option>
@@ -90,10 +90,10 @@
 </style>
 
 <script lang="ts">
-import { Vue, Lifecycle, Watch, Component, Prop, p } from "av-ts";
+import { Vue, Component, Prop, p, Mixin as mixin } from "av-ts";
 import ActionButtons from "./ActionButtons.vue";
-import ApplicationService from "../../services/ApplicationService";
 import { IQuestionBuilder } from "../../interfaces/models";
+import responsiveMixin from "../../responsiveMixin";
 
 @Component({
     components: {
@@ -101,7 +101,7 @@ import { IQuestionBuilder } from "../../interfaces/models";
     }
 })
 
-export default class AdminButtons extends Vue {
+export default class AdminButtons extends mixin(responsiveMixin, Vue) {
     @Prop showEdit = p<boolean>({
         required: true
     });
@@ -110,20 +110,10 @@ export default class AdminButtons extends Vue {
 
     @Prop prevQuestions = p<IQuestionBuilder[]>({});
 
-    pVersion: number = 0;
+    version: number = 0;
 
-    mobileMode:boolean = false;
-
-    get version() {
-        return this.pVersion;
-    }
-    set version(newVersion: number) {
-        this.pVersion = newVersion;
-    }
-
-    @Lifecycle
-    mounted() {
-        this.mobileMode = ApplicationService.getMobileMode();
+    back() {
+        this.$emit("back");
     }
 
     saveQuestion() {
@@ -138,8 +128,7 @@ export default class AdminButtons extends Vue {
         this.$emit("editQuestion");
     }
 
-    @Watch("version")
-    versionWatch(_newValue: number, _oldValue: number) {
+    versionChange() {
         this.$emit("version", this.version);
     }
 }

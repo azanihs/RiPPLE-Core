@@ -11,10 +11,10 @@ export function getLinks(): ILink[] {
         }, {
             text: "Competencies",
             href: "/profile/competencies"
-        }, {
+        }, /*{
             text: "Connections",
             href: "/profile/connections"
-        }, {
+        }, */{
             text: "Achievements",
             href: "/profile/achievements"
         }, {
@@ -58,11 +58,11 @@ export function getLinks(): ILink[] {
             href: "/question/create"
         }]
     };
-    const connectLink: ILink = {
+    /*const connectLink: ILink = {
         text: "Connect",
         href: "/view/peers",
         icon: "group"
-    };
+    };*/
 
-    return [adminLink, profileLink, questionLink, connectLink, leaderLink];
+    return [adminLink, profileLink, questionLink, leaderLink];
 }

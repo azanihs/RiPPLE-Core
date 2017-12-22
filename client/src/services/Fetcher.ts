@@ -66,6 +66,11 @@ export default class Fetcher<T extends any> {
         this.params = { ...params }; // copy object
     }
 
+    update(_newValue: any) {
+        (cache as any).set(this.identifier, undefined);
+        this.run();
+    }
+
     run() {
         const hasRequestedBefore = cache.get(this.identifier);
         if (hasRequestedBefore !== undefined && (hasRequestedBefore.timestamp + 10000) > Date.now()) {

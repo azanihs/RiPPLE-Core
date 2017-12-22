@@ -5,7 +5,7 @@
                 v-if="canEdit"
                 :showEdit="true"
                 @editQuestion="editQuestion"></admin-buttons>
-            <action-buttons v-else>
+            <action-buttons v-else @back="returnToBrowse">
                 <md-button
                         slot="right"
                         class="md-warn"
@@ -83,6 +83,10 @@ export default class QuestionWrapper extends Vue {
     editQuestion() {
         let routeTo = "answer";
         this.$router.push({ path: `/question/edit/${routeTo}/${this.id}` });
+    }
+
+    returnToBrowse() {
+        this.$router.push("/question/answer/");
     }
 
     @Lifecycle

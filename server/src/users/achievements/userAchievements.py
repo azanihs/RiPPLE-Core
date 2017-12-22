@@ -39,7 +39,7 @@ class AbstractAchievementClass(ABC):
     @abstractproperty
     def name(self):
         pass
-    
+
     @abstractproperty
     def key(self):
         pass
@@ -59,11 +59,11 @@ class AbstractAchievementClass(ABC):
     @abstractproperty
     def condition(self):
         pass
-    
+
     @abstractproperty
     def icon(self):
         pass
-        
+
     @abstractproperty
     def tasks(self):
         pass
@@ -73,7 +73,7 @@ class AbstractAchievementClass(ABC):
         pass
 
     def toJSON(self):
-        return {"key": self.key, "name": self.name, "key": self.key, "description": self.description, 
+        return {"key": self.key, "name": self.name, "key": self.key, "description": self.description,
             "category": self.category, "condition": self.condition, "icon":self.icon, "bonus": self.bonus}
 
     def get_result(self, count, progress):
@@ -221,7 +221,7 @@ class AdvancedCompetencyAchievement(AbstractAchievementClass):
         return self.get_result(count, progress)
 
 
-class BeginnerConnectionAchievement(AbstractAchievementClass):
+"""class BeginnerConnectionAchievement(AbstractAchievementClass):
     name = "Beginner Connection"
     key = "beginner_connect"
     description = "Awarded for making 3 connections"
@@ -268,3 +268,4 @@ class AdvancedConnectionAchievement(AbstractAchievementClass):
         count = user.pk/2
         progress = min(100, count/float(self.condition)*100)
         return self.get_result(count, progress)
+"""

@@ -38,6 +38,8 @@
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
 import QuestionService from "../../services/QuestionService";
+import Fetcher from "../../services/Fetcher";
+
 import PageLoader from "../util/PageLoader.vue";
 import { IQuestionBuilder, IQuestion } from "../../interfaces/models";
 import AuthorView from "./AuthorView.vue";
@@ -140,6 +142,11 @@ export default class AuthorWrapper extends Vue {
                         description: "Successfully deleted question",
                         icon: "done"
                     }]);
+                    QuestionService.getReportAggregates()
+                        .then(x => {
+                            Fetcher.get(QuestionService.getReportAggregates)
+                                .update(x);
+                        });
                 })
                 .then(() => {
                     this.closeDialog();

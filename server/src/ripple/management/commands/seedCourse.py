@@ -266,13 +266,12 @@ class Command(BaseCommand):
             print("\t-Answering and Rating Questions")
             abilities = ["low", "medium", "high"]
             index = 1
-            '''for user in course_users:
+            for user in course_users:
                 studentAbility = abilities[choice(range(3))]
                 print("\t-Answering Course User:" + str(index) + " Questions")
                 index += 1
                 for i in range(0, 100):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
-            '''
 
         def populate_availability(course_users, days, times):
             for i in range(len(course_users)):

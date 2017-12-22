@@ -3,12 +3,12 @@
         <md-layout md-flex="100">
             <md-tabs md-fixed
                 :mdNavigation="false"
-                class="md-transparent tabContainer"
+                class="md-transparent tabContainer tabContent"
                 :class="{'mainTab': !mobileMode}"
                 @change="tabSelected">
                     <md-tab md-label="Write Question">
                         <md-layout md-flex="100">
-                            <md-card class="firstAuthorCard">
+                            <md-card >
                                 <md-layout md-flex="100"
                                     class="componentSeparator">
                                     <h2>Question Body</h2>
@@ -116,21 +116,10 @@ h3 {
     margin-top: 0px;
 }
 
-.firstAuthorCard {
+.tabContent {
     margin-top: 7%;
 }
 
-.previewTabStudent {
-    top: 12%;
-}
-
-.previewTabAdmin {
-    top: 8%;
-}
-
-.mobilePreviewTab {
-    top: 3%;
-}
 
 .mainTab >>> nav {
     position: fixed;
@@ -143,6 +132,7 @@ h3 {
     position: relative;
     width: 100%;
     background-color: transparent;
+    top: 0;
 }
 
 .subTabs >>> .md-tabs-navigation-scroll-container {
@@ -189,17 +179,11 @@ h3 {
     margin-bottom: 5em;
 }
 
-.hidden {
-        width: 0px;
-        height: 0px;
-        flex-grow: 0;
-        flex-basis: 0%;
-    }
 </style>
 
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p, Mixin as mixin } from "av-ts";
 import { ITopic, IQuestionBuilder, IQuestion, IDistractor } from "../../interfaces/models";
 import { addEventsToQueue } from "../../util";
 import TopicService from "../../services/TopicService";
@@ -211,7 +195,7 @@ import tinyMCEPlugins from "./plugins";
 import TinyMCE from "../util/TinyMCE.vue";
 import TopicChip from "../util/TopicChip.vue";
 import Question from "../questions/Question.vue";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 
 @Component({
     components: {
@@ -220,7 +204,7 @@ import ApplicationService from "../../services/ApplicationService";
         TopicChip
     }
 })
-export default class AuthorView extends Vue {
+export default class AuthorView extends mixin(responsiveMixin, Vue) {
 
     pTopics: ITopic[] = [];
     @Prop question = p<IQuestionBuilder>({
@@ -258,9 +242,7 @@ export default class AuthorView extends Vue {
     prevTooltip: string | undefined = "Please fill out all question fields to see preview.";
     pDisabled = false;
 
-    bottomSpaceClass: string = "bottomSpace"
-
-    mobileMode: boolean = false;
+    bottomSpaceClass: string = "bottomSpace";
 
     get questionPrev():IQuestion | undefined {
         const error = AuthorService.validateQuestions(this.question);
@@ -339,11 +321,6 @@ export default class AuthorView extends Vue {
             .off(this.updateTopics);
     }
 
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
-    }
-
     get disabled() {
         return this.pDisabled;
     }
@@ -384,19 +361,29 @@ export default class AuthorView extends Vue {
         let imageIndex = tinyMCEPlugins.plugins.indexOf("image");
         if (imageIndex >= 0 && this.mobileMode) {
             tinyMCEPlugins.plugins.splice(imageIndex, 1);
+        } else if (imageIndex === -1 && !this.mobileMode) {
+            tinyMCEPlugins.plugins.push("image");
         }
-        return {
+
+        const baseSettings = {
             skin: false,
             image_caption: true,
             media_live_embeds: true,
-
             plugins: tinyMCEPlugins.plugins,
-            toolbar: tinyMCEPlugins.toolbar,
-            image_advtab: this.mobileMode ? true: null,
-            file_browser_callback_types: this.mobileMode ? "image": null,
-            file_picker_callback: this.mobileMode ? ImageService.handleFileClick: null,
-            file_picker_types: this.mobileMode ? "image": null
+            toolbar: tinyMCEPlugins.toolbar
         };
+
+        const imageSettings = {
+            image_advtab: true,
+            file_browser_callback_types: "image",
+            file_picker_callback: ImageService.handleFileClick,
+            file_picker_types: "image"
+        };
+
+        if (!this.mobileMode) {
+            return Object.assign(baseSettings, imageSettings);
+        }
+        return baseSettings;
     }
 
     navigateToAnswer() {
@@ -420,7 +407,9 @@ export default class AuthorView extends Vue {
                 this.message = "Successfully updated question";
             }
             AuthorService.prepareUpload(this.question)
-                .then(preparedUpload => AuthorService.uploadContent(preparedUpload, this.path))
+                .then(preparedUpload => {
+                    return AuthorService.uploadContent(preparedUpload, this.path);
+                })
                 .then(response => {
                     addEventsToQueue([{
                         name: this.messageTitle,

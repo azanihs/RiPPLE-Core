@@ -43,14 +43,8 @@
                                 <md-select name="visualisationCompare"
                                     id="visualisationCompare"
                                     v-model="compare">
-                                    <md-option value="personalGoals">
-                                        Personal Goals
-                                    </md-option>
                                     <md-option value="peers">
                                         Peers
-                                    </md-option>
-                                    <md-option value="previousOfferings">
-                                        Previous Offerings
                                     </md-option>
                                 </md-select>
                             </md-input-container>
@@ -189,12 +183,12 @@ h3 {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Watch, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Watch, Prop, p, Mixin as mixin } from "av-ts";
 import { ITopic, IEdge, ICompareSet } from "../../interfaces/models";
 import Fetcher from "../../services/Fetcher";
 import TopicChip from "../util/TopicChip.vue";
 import Chart from "./Chart.vue";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 
 interface IChartType {
     name: string,
@@ -207,7 +201,7 @@ interface IChartType {
         TopicChip
     }
 })
-export default class VariableDataVisualiser extends Vue {
+export default class VariableDataVisualiser extends mixin(responsiveMixin, Vue) {
     @Prop
     dataCategories = p<ITopic[]>({
         required: true
@@ -252,8 +246,6 @@ export default class VariableDataVisualiser extends Vue {
     zeroCompetencyClass: boolean = false;
 
     pCompareAgainst: string = "peers";
-
-    mobileMode: boolean = false;
 
     get chart() {
         return this.pChartType || this.chartType;
@@ -413,11 +405,6 @@ export default class VariableDataVisualiser extends Vue {
         Fetcher.get(this.pDataGeneratorFunction as any,
             { compareTo: this.compare, exclude: this.pExcludeTopics })
             .off(this.updateChartData);
-    }
-
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     getColour(c: number) {

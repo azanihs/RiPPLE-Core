@@ -177,7 +177,13 @@ def insert_course_if_not_exists(course, user):
     if course is None or course.get("course_name", None) is None \
             or course.get("course_code", None) is None:
         return {"error": "Invalid Course Provided"}
-    (course, created) = Course.objects.get_or_create(course_code=course.get("course_code"), course_name=course.get("course_name"))
+
+    try:
+        course = Course.objects.get(course_code=course.get("course_code"))
+        created = False
+    except Course.DoesNotExist:
+        course = Course.objects.create(course_code=course.get("course_code"), course_name=course.get("course_name"))
+        created = True
 
     if created:
         course_user = insert_course_user_if_not_exists(course, user)

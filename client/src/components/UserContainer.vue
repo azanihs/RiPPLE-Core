@@ -68,17 +68,16 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p, Mixin as mixin } from "av-ts";
 import { ICourseUser, IUser, ICourse } from "../interfaces/models";
 import { addEventsToQueue } from "../util";
 import UserService from "../services/UserService";
 import ImageService from "../services/ImageService";
-import ApplicationService from "./../services/ApplicationService";
-
+import responsiveMixin from "./../responsiveMixin";
 import Fetcher from "../services/Fetcher";
 
 @Component
-export default class UserContainer extends Vue {
+export default class UserContainer extends mixin(responsiveMixin, Vue) {
     @Prop user = p<IUser | undefined>({
         required: false
     });
@@ -88,8 +87,6 @@ export default class UserContainer extends Vue {
 
     pCourse: ICourse | undefined = undefined;
     pCourses: ICourse[] = [];
-
-    mobileMode: boolean = false;
 
     set currentCourse(newCourse: ICourse | undefined) {
         this.pCourse = newCourse;
@@ -185,11 +182,6 @@ export default class UserContainer extends Vue {
     destroyed() {
         Fetcher.get(UserService.getUserCourses)
             .off(this.updateCourses);
-    }
-
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
     }
 }
 </script>

@@ -222,17 +222,19 @@ class UserTestCase(BootstrapTestCase):
                         "start": 100,
                         "end": 100
                     }}),
-                {"course": {
-                    "available": True,
-                    "courseCode": "test_course_1",
-                    "courseName": "course_name_1",
-                    "end": 100,
-                    "start": 100
-                },
-                "roles": ["Instructor"],
-                "user": {
-                    "image": "",
-                    "name": "u_firstname u_lastname"
+                {"data":  {
+                    "course": {
+                        "available": True,
+                        "courseCode": "test_course_1",
+                        "courseName": "course_name_1",
+                        "end": 100,
+                        "start": 100
+                    },
+                    "roles": ["Instructor"],
+                    "user": {
+                        "image": "",
+                        "name": "u_firstname u_lastname"
+                    }
                 }})
 
 
@@ -249,7 +251,7 @@ class UserTestCase(BootstrapTestCase):
                         "start": 100,
                         "end": 100
                     }}),
-                {"course": {
+                {"data": {"course": {
                     "available": True,
                     "courseCode": "test_course_1",
                     "courseName": "course_name_1",
@@ -260,7 +262,7 @@ class UserTestCase(BootstrapTestCase):
                 "user": {
                     "image": "",
                     "name": "u_firstname u_lastname"
-                }})
+                }}})
 
 
     def test_process_competencies(self):

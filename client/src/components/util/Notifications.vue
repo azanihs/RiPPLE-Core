@@ -103,22 +103,20 @@ p + p {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
+import { Vue, Component, Lifecycle, Prop, p, Mixin as mixin } from "av-ts";
 import { INotification } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
-import ApplicationService from "../../services/ApplicationService";
+import responsiveMixin from "../../responsiveMixin";
 import Fetcher from "../../services/Fetcher";
 import { serverToLocal } from "../../util";
 
 @Component
-export default class Notifications extends Vue {
+export default class Notifications extends mixin(responsiveMixin, Vue) {
     @Prop
     showCount = p<number>({
         default: 10
     });
-
-    mobileMode:boolean = false;
 
     pNotifications: INotification[] = [];
     updateNotifications(newNotifications: INotification[]) {
@@ -137,11 +135,6 @@ export default class Notifications extends Vue {
     destroyed() {
         Fetcher.get(UserService.getUserNotifications)
             .off(this.updateNotifications);
-    }
-
-    @Lifecycle
-    updated() {
-        this.mobileMode = ApplicationService.getMobileMode();
     }
 
     notificationDate(notification: INotification) {

@@ -44,7 +44,7 @@ export default class QuestionService {
         return QuestionRepository.getReportReasons();
     }
 
-    static getReportedQuestions( { sortField, sortOrder }: { sortField:string, sortOrder: "ASC" | "DESC" }) {
+    static getReportedQuestions( { sortField, sortOrder }: { sortField: string, sortOrder: "ASC" | "DESC" }) {
         return QuestionRepository.getReportedQuestions(sortField, sortOrder);
     }
 

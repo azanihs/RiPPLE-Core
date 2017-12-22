@@ -27,9 +27,13 @@ export default class TinyMCE extends Vue {
         tinymce.get(this.id).setContent(this.value);
     }
 
-    @Lifecycle
-    mounted() {
-        //Initial configuration
+    @Watch("options")
+    optionsChanged(_oldOptions: any, _newOptions: any) {
+        tinymce.execCommand("mceRemoveEditor", false, this.id);
+        this.createEditor();
+    }
+
+    createEditor() {
         let options: any = {};
         let config = (editor: any) => {
             editor.on("NodeChange Change KeyUp", (_e: any) => {
@@ -64,6 +68,11 @@ export default class TinyMCE extends Vue {
 
         options.setup = (editor: any) => s1(editor);
         this.$nextTick(() => tinymce.init(options));
+    }
+
+    @Lifecycle
+    mounted() {
+        this.createEditor();
     }
 
     @Lifecycle
