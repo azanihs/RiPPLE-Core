@@ -183,7 +183,7 @@ export default class PeerView extends Vue {
 
     get days() {
         if (this.pDays.length > 0) {
-            const days = this.pDays.slice(0, 5);
+            const days = this.pDays;
             return days;
         } else {
             return this.pDays;
@@ -192,7 +192,7 @@ export default class PeerView extends Vue {
 
     get times() {
         if (this.pTimes) {
-            const times = this.pTimes.slice(8, 21);
+            const times = this.pTimes.slice(8, 23);
             return times;
         } else {
             return this.pTimes;
