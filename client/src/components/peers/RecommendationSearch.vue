@@ -2,6 +2,15 @@
     <md-layout md-flex="100">
         <md-layout md-flex="100"
                    class="componentSeparator">
+            <div class="spaceBetween">
+              <h2>
+                Select your roles to match with people who have complementing roles
+              </h2>
+              <md-switch v-model="showRoles"
+                         class="md-primary switch"
+                         id="roleSwitch"
+                         name="roleSwitch">Show Student Roles</md-switch>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
@@ -106,6 +115,12 @@
 </style>
 
 <style scoped>
+.spaceBetween {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+}
+
 .tab {
     padding-left: 2px !important;
     padding-right: 2px !important;
@@ -191,6 +206,15 @@ export default class RecommendationSearch extends Vue {
             return new Map<string, Map<string, boolean>>();
         }
     });
+
+    pShowRoles = true;
+
+    get showRoles() {
+        return this.pShowRoles;
+    }
+    set showRoles(newVal) {
+        this.pShowRoles = newVal;
+    }
 
     competencies = new Map();
 
