@@ -1,4 +1,5 @@
-import { IAvailability, ICourseAvailability, IDay, ITime, IAvailableRole, IStudyRole } from "../interfaces/models";
+import { IAvailability, ICourseAvailability, IDay, ITime, IAvailableRole,
+    IStudyRole, ICourseRoleCount } from "../interfaces/models";
 import { apiFetch, apiPost } from "./APIRepository";
 
 export default class AvailabilityRepository {
@@ -29,6 +30,10 @@ export default class AvailabilityRepository {
 
     static getUserAvailableRoles(): Promise<IAvailableRole[]> {
         return apiFetch<IAvailableRole[]>("/recommendations/roles/");
+    }
+
+    static getCourseRoleCount(): Promise<ICourseRoleCount> {
+        return apiFetch<ICourseRoleCount>("/recommendations/roles/course/");
     }
 
     static updateUserRoles(topic: number, studyRole: number): Promise<IAvailableRole> {

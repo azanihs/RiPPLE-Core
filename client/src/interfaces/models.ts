@@ -55,18 +55,18 @@ export interface IServerReportAggregate {
     questionID: number,
     totalReports: number,
     lastReport: number
-}
+};
 
 export interface IServerReport {
     author: string,
     createdAt: number,
     reasons: IServerReason[]
-}
+};
 
 export interface IServerReason {
     reasonText: string,
     reportReason: string
-}
+};
 
 export interface IServerReportFull {
     reports: (IServerReportAggregate | IServerReport)[][]
@@ -260,31 +260,31 @@ export interface IServerResponse<T> {
     error: string,
     notifications: INotification[]
     data: T
-}
+};
 
 export interface StudyRole {
     id: number,
     role: string,
     description: string
-}
+};
 
 export interface IAvailableRole {
     courseUser: ICourseUser,
     topic: ITopic,
     studyRole: IStudyRole
-}
+};
 
 export interface IStudyRole {
     id: number,
     role: string,
     description: string
-}
+};
 
 export interface IAvailableRole {
     courseUser: ICourseUser,
     topic: ITopic,
     studyRole: IStudyRole
-}
+};
 
 export interface ISearch {
     sortField: string,
@@ -293,4 +293,21 @@ export interface ISearch {
     query: string,
     page: number,
     filterTopics: number[]
+};
+
+export interface IRoleCount {
+    topic: number,
+    studyRole: number,
+    entries: number
+};
+
+export interface ICourseRoleCount {
+    counts: [IRoleCount],
+    max: number
+};
+
+export interface ICourseRoleWeights {
+  [topic: number]: {
+    [studyRole: number]: number
+  }
 };

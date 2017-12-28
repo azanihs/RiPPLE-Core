@@ -1,5 +1,8 @@
 from ..models import Day, Time, Availability, StudyRole, AvailableRole
+from questions.models import Topic
+
 from django.db.models import Count
+from django.core.exceptions import ObjectDoesNotExist
 
 def get_user_availability(course_user):
     return Availability.objects.filter(course_user=course_user)
