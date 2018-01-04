@@ -16,10 +16,12 @@ import NotificationsView from "../components/profile/Notifications.vue";
 import ConsentFormWrapper from "../components/profile/ConsentFormWrapper.vue";
 import FriendView from "../components/friends/FriendView.vue";
 import QuestionBrowser from "../components/questions/QuestionBrowser.vue";
-import PeerView from "../components/peers/PeerView.vue";
 import LeaderBoard from "../components/leaderboard/LeaderBoard.vue";
 import AuthorView from "../components/author/AuthorView.vue";
 import AuthorWrapper from "../components/author/AuthorWrapper.vue";
+
+import PeerView from "../components/peers/PeerView.vue";
+import Meetings from "../components/peers/Meetings.vue";
 
 import WIP from "../components/WIP.vue";
 import UserRepository from "../repositories/UserRepository";
@@ -87,6 +89,10 @@ const routes = [{
         path: "/view/peers",
         name: "peers",
         component: PeerView
+    }, {
+        path: "/view/peers/meetings",
+        name: "meetings",
+        component: Meetings
     }, {
         path: "/view/leaderboard",
         name: "leaderboard",

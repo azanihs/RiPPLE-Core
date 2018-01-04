@@ -245,8 +245,8 @@ export interface ICourseAvailability {
 };
 
 export interface IDayTime {
-    day: number,
-    time: number
+    day: IDay,
+    time: ITime
 };
 
 export interface ILink {
@@ -294,3 +294,21 @@ export interface ISearch {
     page: number,
     filterTopics: number[]
 };
+
+export interface IEvent {
+    dayTime: IDayTime,
+    user: IUser,
+    topics: ITopic[],
+    location: string
+};
+
+export interface IDate {
+    year: number,
+    month: number,
+    date: number,
+    hour: number,
+    minute: number,
+    second: number,
+    millisecond: number,
+    day: number
+}

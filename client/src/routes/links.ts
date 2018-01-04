@@ -58,11 +58,15 @@ export function getLinks(): ILink[] {
             href: "/question/create"
         }]
     };
-    /*const connectLink: ILink = {
+    const connectLink: ILink = {
         text: "Connect",
         href: "/view/peers",
-        icon: "group"
-    };*/
+        icon: "group",
+        submenu: [{
+            text: "Meetings",
+            href: "/view/peers/meetings"
+        }]
+    };
 
-    return [adminLink, profileLink, questionLink, leaderLink];
+    return [adminLink, profileLink, connectLink, questionLink, leaderLink];
 }
