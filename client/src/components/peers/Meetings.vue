@@ -3,7 +3,7 @@
         <md-card class="fullWidth">
             <md-layout md-flex="100">
                 <md-card class="componentSeparator">
-                    <timeline :eventLookup="eventLookup"></timeline>
+                    <timeline :eventLookup="eventLookup" :sortedDates="sortedDates"></timeline>
                 </md-card>
             </md-layout>
             <md-layout md-flex="100">
@@ -170,6 +170,17 @@ export default class Meetings extends Vue {
 
     get eventLookup() {
         return this.pEventLookup;
+    }
+
+    get sortedDates() {
+        let dates: string[] = Object.keys(this.pEventLookup);
+        let sortedDates: Date[] = [];
+        if (dates.length > 0) {
+            dates.map(date => sortedDates.push(new Date(date)));
+            sortedDates.sort((a, b) => a.getTime() - b.getTime());
+        }
+
+        return sortedDates;
     }
 }
 </script>

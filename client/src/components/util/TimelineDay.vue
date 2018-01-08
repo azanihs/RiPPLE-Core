@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <h3>Wednesday, January 3</h3>
-        <timeline-event v-for="event in events" :key="event" user="user"></timeline-event>
-    </div>
+    <md-layout md-flex="100">
+        <h3>{{day}}</h3>
+        <timeline-event v-for="(event, i) in events" :key="i" user="user"></timeline-event>
+    </md-layout>
 </template>
 
 <style scoped>
@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
-import { IEvent } from "../../interfaces/models";
+import { ILocalisedEvent } from "../../interfaces/models";
 
 import TimelineEvent from "./TimelineEvent.vue";
 
@@ -27,8 +27,24 @@ export default class TimelineDay extends Vue {
     });
 
     @Prop
-    events = p<IEvent[]>({
+    events = p<ILocalisedEvent[]>({
         required: true
     });
+
+    pDays: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday"];
+
+    pMonths: string[] = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+
+    get day() {
+        if (this.date) {
+            const weekDay: string = this.pDays[this.date.getDay()];
+            const header: string = `${weekDay}, ${this.pMonths[this.date.getMonth()]} ${this.date.getDate()}`;
+            return header;
+        } else {
+            return "";
+        }
+    }
 }
 </script>

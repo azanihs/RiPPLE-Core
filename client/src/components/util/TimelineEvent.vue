@@ -41,19 +41,23 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
-import { IEvent } from "../../interfaces/models";
+import { ILocalisedEvent } from "../../interfaces/models";
 
 @Component({
     components: {
     }
 })
 export default class TimelineEvent extends Vue {
-    @Prop event = p<IEvent>({
+    @Prop event = p<ILocalisedEvent>({
         required: true
     });
 
     get time() {
-        return this.event.dayTime.time.start.time;
+        if (this.event) {
+            return new Date(this.event.date).toLocaleTimeString();
+        } else {
+            return "";
+        }
     }
 
     get user() {

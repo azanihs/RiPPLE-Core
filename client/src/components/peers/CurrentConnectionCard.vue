@@ -5,9 +5,7 @@
             <div class="md-title">"John Smith"</div>
         </md-card-header>
         <md-card-content class="fullWidth flex">
-            <md-input-container class="autoComplete">
-                <label>Something</label>
-            </md-input-container>
+            <label>Something</label>
         </md-card-content>
         <md-card-actions>
             <md-button>End Connection</md-button>

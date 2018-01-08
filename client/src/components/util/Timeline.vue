@@ -1,6 +1,10 @@
 <template>
     <md-layout md-flex="100">
-        <timeline-day></timeline-day>
+        <timeline-day v-for="date in sortedDates"
+            :key="date.toLocaleDateString()"
+            :date="date"
+            :events="eventLookup[date.toLocaleDateString()]"
+        ></timeline-day>
     </md-layout>
 </template>
 
@@ -20,6 +24,10 @@ import TimelineDay from "./TimelineDay.vue";
 })
 export default class Timeline extends Vue {
     @Prop eventLookup = p<IEventLookup>({
+        required: true
+    });
+
+    @Prop sortedDates = p<Date[]>({
         required: true
     });
 }
