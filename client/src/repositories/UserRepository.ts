@@ -10,7 +10,7 @@ const types = ["Provide Mentorship", "Seek Mentorship", "Find Study Partner"];
 
 const _topics = ["Arrays", "Loops", "Recursion", "Algorithms", "Data Structures", "Variables"];
 
-const _n = (i: number) => Math.floor(Math.random() * i);
+export const _n = (i: number) => Math.floor(Math.random() * i);
 
 type IServerEdge = {
     0: ITopic,
@@ -19,7 +19,7 @@ type IServerEdge = {
     3: number
 };
 
-const makeUser = () => {
+export const makeUser = () => {
     const getType = (i: number) => {
         return types[i] as "Provide Mentorship" | "Seek Mentorship" | "Find Study Partner";
     };

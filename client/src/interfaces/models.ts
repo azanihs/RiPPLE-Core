@@ -302,6 +302,13 @@ export interface IEvent {
     location: string
 };
 
+export interface ILocalisedEvent {
+    date: string,
+    user: IUser,
+    topics: ITopic[],
+    location: string
+};
+
 export interface IDate {
     year: number,
     month: number,
@@ -311,4 +318,8 @@ export interface IDate {
     second: number,
     millisecond: number,
     day: number
-}
+};
+
+export interface IEventLookup {
+    [id: string]: ILocalisedEvent[]
+};
