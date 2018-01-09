@@ -59,12 +59,15 @@ export function getLinks(): ILink[] {
         }]
     };
     const connectLink: ILink = {
-        text: "Connect",
-        href: "/view/peers",
+        text: "Connections",
+        href: "",
         icon: "group",
         submenu: [{
-            text: "Meetings",
-            href: "/view/peers/meetings"
+            text: "Connect",
+            href: "/view/peers"
+        }, {
+            text: "Schedule",
+            href: "/view/peers/schedule"
         }]
     };
 

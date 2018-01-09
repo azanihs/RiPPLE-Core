@@ -58,7 +58,7 @@ import Timeline from "../util/Timeline.vue";
         Timeline
     }
 })
-export default class Meetings extends Vue {
+export default class Schedule extends Vue {
 
     pCurrentConnections: IUser[] = [];
     pEventLookup: IEventLookup = {};
