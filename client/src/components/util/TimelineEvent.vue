@@ -52,9 +52,22 @@ export default class TimelineEvent extends Vue {
         required: true
     });
 
+    formatAMPM(date: Date): string {
+        // From: https://stackoverflow.com/questions/8888491/how-do-you-display-javascript-datetime-in-12-hour-am-pm-format
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        const ampm = hours >= 12 ? "pm" : "am";
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        const displayMins = minutes < 10 ? "0" + minutes : minutes.toString();
+        const strTime = hours + ":" + displayMins + " " + ampm;
+        return strTime;
+    }
+
+
     get time() {
         if (this.event) {
-            return new Date(this.event.date).toLocaleTimeString();
+            return this.formatAMPM(new Date(this.event.date));
         } else {
             return "";
         }
