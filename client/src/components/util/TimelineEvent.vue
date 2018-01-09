@@ -4,7 +4,7 @@
             <h4>{{time}}</h4>
         </div>
         <div class="badgeDescription">
-            <h4>{{user}}</h4>
+            <h4>{{user.name}}</h4>
             <md-avatar>
                 <img :src="user.image"
                      :alt="user.name">

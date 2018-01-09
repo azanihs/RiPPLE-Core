@@ -82,6 +82,7 @@ export default class Meetings extends Vue {
             this.addlocalisedEvent(eventLookup, localisedEvent);
         });
 
+        this.sortEvents(eventLookup);
         return eventLookup;
     }
 
@@ -136,7 +137,7 @@ export default class Meetings extends Vue {
         return localisedEventDate;
     }
 
-    addlocalisedEvent( eventLookup: IEventLookup, localisedEvent: ILocalisedEvent) {
+    addlocalisedEvent(eventLookup: IEventLookup, localisedEvent: ILocalisedEvent) {
         let date = new Date(localisedEvent.date).toDateString();
         if (eventLookup) {
             if (eventLookup[date] === undefined) {
@@ -152,6 +153,14 @@ export default class Meetings extends Vue {
         }
     }
 
+    sortEvents(eventLookup: IEventLookup) {
+        Object.keys(eventLookup).map(key => {
+            let event = eventLookup[key];
+            event.sort((a: ILocalisedEvent, b: ILocalisedEvent) => {
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
+            });
+        });
+    }
 
     @Lifecycle
     created() {
