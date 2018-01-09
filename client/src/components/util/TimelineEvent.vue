@@ -9,7 +9,7 @@
                 <img :src="user.image"
                      :alt="user.name">
             </md-avatar>
-            <p>Location</p>
+            <p>{{location}}</p>
         </div>
     </div>
 </template>
@@ -64,7 +64,6 @@ export default class TimelineEvent extends Vue {
         return strTime;
     }
 
-
     get time() {
         if (this.event) {
             return this.formatAMPM(new Date(this.event.date));
@@ -74,11 +73,11 @@ export default class TimelineEvent extends Vue {
     }
 
     get user() {
-        if (this.event) {
-            return this.event.user;
-        } else {
-            return "";
-        }
+        return this.event ? this.event.user : "";
+    }
+
+    get location() {
+        return this.event ? this.event.location : "";
     }
 }
 </script>
