@@ -46,14 +46,14 @@ def request_to_course(lti_params, user):
     return insert_course_if_not_exists(course_context, user)
 
 
-def request_to_user(lti_params):
+def request_to_user(lti_params, root_path):
     user_context = {
         "user_id": lti_params.get("user_id"),
         "first_name": lti_params.get("lis_person_name_given"),
         "last_name": lti_params.get("lis_person_name_family")
     }
 
-    return insert_user_if_not_exists(user_context)
+    return insert_user_if_not_exists(user_context, root_path)
 
 
 def create_course_user(course, user, lti_params):
