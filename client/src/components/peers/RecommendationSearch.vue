@@ -1,5 +1,6 @@
 <template>
     <md-layout md-flex="100">
+        <h2>Find Connections</h2>
         <md-layout md-flex="100"
                    class="componentSeparator">
             <table class="table">
@@ -33,40 +34,21 @@
                 </tbody>
             </table>
         </md-layout>
-        <md-tabs md-fixed
-                :mdNavigation="false"
-                class="connect-tabs">
-            <md-tab md-label="Find"
-                    class="tab">
-                <md-layout md-flex="100"
-                           md-gutter="16">
-                    <md-layout md-flex="33"
-                               md-gutter
-                               class="componentSeparator"
-                               v-for="(recommendation, i) in recommendations"
-                               :key="i">
-                        <recommendation-card :user="recommendation">
-                            Request
-                        </recommendation-card>
-                    </md-layout>
+        <md-layout md-flex="100">
+            <h3>Suggested Connections</h3>
+            <md-layout md-flex="100"
+                       md-gutter="16">
+                <md-layout md-flex="33"
+                           md-gutter
+                           class="componentSeparator"
+                           v-for="(recommendation, i) in recommendations"
+                           :key="i">
+                    <recommendation-card :user="recommendation">
+                        Request
+                    </recommendation-card>
                 </md-layout>
-            </md-tab>
-            <md-tab md-label="Review"
-                    class="tab">
-                <md-layout md-flex="100"
-                           md-gutter="16">
-                    <md-layout md-flex="33"
-                               md-gutter
-                               class="componentSeparator"
-                               v-for="(recommendation, i) in requests"
-                               :key="i">
-                        <recommendation-card :user="recommendation">
-                            Request
-                        </recommendation-card>
-                    </md-layout>
-                </md-layout>
-            </md-tab>
-        </md-tabs>
+            </md-layout>
+        </md-layout>
     </md-layout>
 </template>
 
@@ -171,11 +153,6 @@ export default class RecommendationSearch extends Vue {
 
     @Prop
     recommendations = p<IUserSummary[]>({
-        required: true
-    });
-
-    @Prop
-    requests = p<IUserSummary[]>({
         required: true
     });
 

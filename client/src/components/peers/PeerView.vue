@@ -14,7 +14,6 @@
             <md-card>
                 <recommendation-search @change="changeRoles"
                                        :recommendations="recommendations"
-                                       :requests="requests"
                                        :studyRoles="studyRoles"
                                        :topics="topics"
                                        :userRoles="userRoles"></recommendation-search>
@@ -56,7 +55,6 @@ export default class PeerView extends Vue {
 
     searchTypes = ["Provide Mentorship", "Seek Mentorship", "Find Study Partners"];
     pTopics: ITopic[] = [];
-    pRequests: IUser[] = [];
     pRecommendations: IUser[] = [];
     pCourseAvailability: ICourseAvailability[] = [];
     pUserAvailability: IAvailability[] = [];
@@ -72,9 +70,6 @@ export default class PeerView extends Vue {
     };
     updateConnections(newConnections: IUser[]) {
         this.pRecommendations = newConnections;
-    };
-    updateRequests(newRequests: IUser[]) {
-        this.pRequests = newRequests;
     };
     updateCourseAvailability(availability: ICourseAvailability[]) {
         this.pCourseAvailability = availability;
@@ -133,8 +128,6 @@ export default class PeerView extends Vue {
             .on(this.updateTopics);
         UserService.getRecommendedConnections({ count: 7 })
             .then(this.updateConnections);
-        UserService.getOutstandingRequests({ count: 3 })
-            .then(this.updateRequests);
 
         Fetcher.get(AvailabilityService.getUserAvailability)
             .on(this.updateUserAvailability);
@@ -176,9 +169,6 @@ export default class PeerView extends Vue {
 
     get recommendations() {
         return this.pRecommendations;
-    }
-    get requests() {
-        return this.pRequests;
     }
 
     get days() {
