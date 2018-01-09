@@ -9,10 +9,14 @@
                 </md-avatar>
             </md-avatar>
             <div class="md-title">{{user.name}}</div>
+            <div class="md-subhead">
+                <topic-chip v-for="prof in user.proficiencies"
+                            :key="prof"
+                            linkTo="/view/peers">
+                    {{prof}}
+                </topic-chip>
+            </div>
         </md-card-header>
-        <md-card-content class="fullWidth flex">
-            <label>Topic Chips</label>
-        </md-card-content>
         <md-card-actions>
             <md-button>End Connection</md-button>
         </md-card-actions>
@@ -41,9 +45,11 @@
 import { Vue, Component, Prop, p } from "av-ts";
 import { IUser } from "../../interfaces/models";
 
+import TopicChip from "../util/TopicChip.vue";
+
 @Component({
     components: {
-
+        TopicChip
     }
 })
 export default class CurrentConnectionCard extends Vue {
