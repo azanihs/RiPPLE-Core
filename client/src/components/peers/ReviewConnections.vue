@@ -7,6 +7,7 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
+                               class="componentSeparator"
                                v-for="(recommendation, i) in requests"
                                :key="i">
                         <recommendation-card :user="recommendation">
@@ -120,7 +121,7 @@ export default class ReviewConnections extends Vue {
 
     @Lifecycle
     created() {
-        UserService.getOutstandingRequests({ count: 3 })
+        UserService.getOutstandingRequests({ count: 7 })
             .then(this.updateRequests);
     }
 
