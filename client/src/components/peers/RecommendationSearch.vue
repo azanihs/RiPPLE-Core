@@ -42,6 +42,7 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
+                               class="componentSeparator"
                                v-for="(recommendation, i) in recommendations"
                                :key="i">
                         <recommendation-card :user="recommendation">
@@ -56,6 +57,7 @@
                            md-gutter="16">
                     <md-layout md-flex="33"
                                md-gutter
+                               class="componentSeparator"
                                v-for="(recommendation, i) in requests"
                                :key="i">
                         <recommendation-card :user="recommendation">

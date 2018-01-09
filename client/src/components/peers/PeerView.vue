@@ -131,7 +131,7 @@ export default class PeerView extends Vue {
     created() {
         Fetcher.get(TopicService.getAllAvailableTopics)
             .on(this.updateTopics);
-        UserService.getRecommendedConnections({ count: 3 })
+        UserService.getRecommendedConnections({ count: 7 })
             .then(this.updateConnections);
         UserService.getOutstandingRequests({ count: 3 })
             .then(this.updateRequests);
