@@ -66,6 +66,9 @@ export function getLinks(): ILink[] {
             text: "Connect",
             href: "/view/peers"
         }, {
+            text: "Review",
+            href: "/view/peers/review"
+        }, {
             text: "Schedule",
             href: "/view/peers/schedule"
         }]

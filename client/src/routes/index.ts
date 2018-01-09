@@ -21,6 +21,7 @@ import AuthorView from "../components/author/AuthorView.vue";
 import AuthorWrapper from "../components/author/AuthorWrapper.vue";
 
 import PeerView from "../components/peers/PeerView.vue";
+import ReviewConnections from "../components/peers/ReviewConnections.vue";
 import Schedule from "../components/peers/Schedule.vue";
 
 import WIP from "../components/WIP.vue";
@@ -89,6 +90,10 @@ const routes = [{
         path: "/view/peers",
         name: "peers",
         component: PeerView
+    }, {
+        path: "/view/peers/review",
+        name: "review",
+        component: ReviewConnections
     }, {
         path: "/view/peers/schedule",
         name: "schedule",
