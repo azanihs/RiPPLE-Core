@@ -6,7 +6,7 @@
                  v-for="(connection, i) in connections"
                  :key="i">
           <current-connection-card :user="connection">
-              Request
+              Current Connection
           </current-connection-card>
       </md-layout>
   </md-layout>

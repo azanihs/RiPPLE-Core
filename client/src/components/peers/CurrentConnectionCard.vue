@@ -2,10 +2,10 @@
     <md-card md-with-hover
              class="recommendationsCard">
         <md-card-header class="fullWidth">
-            <div class="md-title">"John Smith"</div>
+            <div class="md-title">{{user.name}}</div>
         </md-card-header>
         <md-card-content class="fullWidth flex">
-            <label>Something</label>
+            <label>Topic Chips</label>
         </md-card-content>
         <md-card-actions>
             <md-button>End Connection</md-button>
