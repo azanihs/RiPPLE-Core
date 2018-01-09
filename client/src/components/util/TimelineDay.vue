@@ -1,7 +1,7 @@
 <template>
     <md-layout md-flex="100">
         <h3>{{day}}</h3>
-        <timeline-event v-for="(event, i) in events" :key="i" user="user"></timeline-event>
+        <timeline-event v-for="(event, i) in events" :key="i" :event="event"></timeline-event>
     </md-layout>
 </template>
 

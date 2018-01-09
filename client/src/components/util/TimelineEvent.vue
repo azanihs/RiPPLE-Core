@@ -61,7 +61,11 @@ export default class TimelineEvent extends Vue {
     }
 
     get user() {
-        return this.event.user;
+        if (this.event) {
+            return this.event.user;
+        } else {
+            return "";
+        }
     }
 }
 </script>

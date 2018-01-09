@@ -128,7 +128,7 @@ export default class Meetings extends Vue {
 
     localiseEvent(date: Date, event: IEvent) {
         const localisedEventDate: ILocalisedEvent = {
-            date: date.toLocaleString(),
+            date: date.toString(),
             user: event.user,
             topics: event.topics,
             location: event.location
@@ -137,7 +137,7 @@ export default class Meetings extends Vue {
     }
 
     addlocalisedEvent( eventLookup: IEventLookup, localisedEvent: ILocalisedEvent) {
-        let date = new Date(localisedEvent.date).toLocaleDateString();
+        let date = new Date(localisedEvent.date).toDateString();
         if (eventLookup) {
             if (eventLookup[date] === undefined) {
                 eventLookup[date] = [localisedEvent];

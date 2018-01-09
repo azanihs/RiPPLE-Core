@@ -1,9 +1,9 @@
 <template>
     <md-layout md-flex="100">
         <timeline-day v-for="date in sortedDates"
-            :key="date.toLocaleDateString()"
+            :key="date.toDateString()"
             :date="date"
-            :events="eventLookup[date.toLocaleDateString()]"
+            :events="eventLookup[date.toDateString()]"
         ></timeline-day>
     </md-layout>
 </template>
