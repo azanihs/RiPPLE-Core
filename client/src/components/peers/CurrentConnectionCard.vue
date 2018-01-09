@@ -2,6 +2,12 @@
     <md-card md-with-hover
              class="recommendationsCard">
         <md-card-header class="fullWidth">
+            <md-avatar>
+                <md-avatar>
+                    <img :src="user.image"
+                         :alt="user.name">
+                </md-avatar>
+            </md-avatar>
             <div class="md-title">{{user.name}}</div>
         </md-card-header>
         <md-card-content class="fullWidth flex">
