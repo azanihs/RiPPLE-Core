@@ -3,12 +3,13 @@
         <md-card class="fullWidth">
             <md-layout md-flex="100">
                 <md-card class="componentSeparator">
+                    <h2>Upcoming Meetings</h2>
                     <timeline :eventLookup="eventLookup" :sortedDates="sortedDates"></timeline>
                 </md-card>
             </md-layout>
             <md-layout md-flex="100">
                 <md-card>
-                    <h3>Current Connections</h3>
+                    <h2>Current Connections</h2>
                     <current-connection-search :connections="connections">
                     </current-connection-search>
                 </md-card>
