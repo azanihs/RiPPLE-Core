@@ -1,40 +1,42 @@
 <template>
-    <md-layout md-flex="100">
-        <md-layout md-flex="100"
-                   class="componentSeparator">
-            <md-card md-with-hover
-                     class="recommendationsCard">
-                <md-card-header class="fullWidth">
+    <md-layout md-flex="100"
+               class="componentSeparator">
+        <md-card md-with-hover>
+            <md-layout md-flex="10">
+                <h3>{{ time }}</h3>
+            </md-layout>
+            <md-layout md-flex="25">
+                <md-avatar>
                     <md-avatar>
-                        <md-avatar>
-                            <img :src="user.image"
-                                 :alt="user.name">
-                        </md-avatar>
+                        <img :src="user.image"
+                             :alt="user.name">
                     </md-avatar>
-                    <div class="md-title">{{user.name}}</div>
-                    <div class="md-subhead">
-                        <topic-chip v-for="prof in user.proficiencies"
-                                    :key="prof"
-                                    linkTo="/view/peers">
-                            {{prof}}
-                        </topic-chip>
-                    </div>
-                    <md-button class="type"> {{ user.recommendationType }}</md-button>
-                    <md-button class="date"> {{ meetingTime }}</md-button>
-                </md-card-header>
-                <md-card-content class="fullWidth flex">
+                </md-avatar>
+                <md-layout md-flex="100" class="centerContainer">
+                    <div class="center">{{ user.name }}</div>
+                </md-layout>
+            </md-layout>
+            <md-layout md-flex="25">
+                <div class="md-subhead">
+                    <topic-chip v-for="prof in user.proficiencies"
+                                :key="prof"
+                                linkTo="/view/peers">
+                        {{prof}}
+                    </topic-chip>
+                </div>
+            </md-layout>
+            <md-layout md-flex="20">
+                <md-layout md-flex="100">
                     <label>Meeting Location</label>
+                </md-layout>
+                <md-layout md-flex="100">
                     <label>{{ location }}</label>
-                </md-card-content>
-
-                <md-card-actions>
-                    <md-button>Ignore</md-button>
-                    <md-button>
-                        <slot></slot>
-                    </md-button>
-                </md-card-actions>
-            </md-card>
-        </md-layout>
+                </md-layout>
+            </md-layout>
+            <md-layout md-flex="20" class="centerContainer">
+                <md-button class="center">Cancel</md-button>
+            </md-layout>
+        </md-card>
     </md-layout>
 </template>
 
@@ -70,6 +72,21 @@
 
 .autoComplete {
     margin-bottom: 0px;
+}
+
+.centerContainer {
+    position: relative;
+}
+
+.center {
+    position:absolute;
+    left:50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+}
+
+.eventUserName {
+    text-align: center;
 }
 </style>
 
