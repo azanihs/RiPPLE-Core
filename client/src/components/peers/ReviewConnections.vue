@@ -10,9 +10,9 @@
                                class="componentSeparator"
                                v-for="(recommendation, i) in requests"
                                :key="i">
-                        <recommendation-card :user="recommendation">
+                        <recommendation-review-card :user="recommendation">
                             Request
-                        </recommendation-card>
+                        </recommendation-review-card>
                     </md-layout>
                 </md-layout>
             </md-layout>
@@ -104,11 +104,11 @@ import { Vue, Component, Lifecycle } from "av-ts";
 import UserService from "../../services/UserService";
 import { IUser } from "../../interfaces/models";
 
-import RecommendationCard from "./RecommendationCard.vue";
+import RecommendationReviewCard from "./RecommendationReviewCard.vue";
 
 @Component({
     components: {
-        RecommendationCard
+        RecommendationReviewCard
     }
 })
 export default class ReviewConnections extends Vue {
