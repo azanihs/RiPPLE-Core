@@ -1,50 +1,87 @@
 <template>
-    <div class="badgeContainer">
-        <div class="badgeProgress">
-            <h4>{{time}}</h4>
-        </div>
-        <div class="badgeDescription">
-            <h4>{{user.name}}</h4>
-            <md-avatar>
-                <img :src="user.image"
-                     :alt="user.name">
-            </md-avatar>
-            <p>{{location}}</p>
-        </div>
-    </div>
+    <md-layout md-flex="100">
+        <md-layout md-flex="100"
+                   class="componentSeparator">
+            <md-card md-with-hover
+                     class="recommendationsCard">
+                <md-card-header class="fullWidth">
+                    <md-avatar>
+                        <md-avatar>
+                            <img :src="user.image"
+                                 :alt="user.name">
+                        </md-avatar>
+                    </md-avatar>
+                    <div class="md-title">{{user.name}}</div>
+                    <div class="md-subhead">
+                        <topic-chip v-for="prof in user.proficiencies"
+                                    :key="prof"
+                                    linkTo="/view/peers">
+                            {{prof}}
+                        </topic-chip>
+                    </div>
+                    <md-button class="type"> {{ user.recommendationType }}</md-button>
+                    <md-button class="date"> {{ meetingTime }}</md-button>
+                </md-card-header>
+                <md-card-content class="fullWidth flex">
+                    <label>Meeting Location</label>
+                    <label>{{ location }}</label>
+                </md-card-content>
+
+                <md-card-actions>
+                    <md-button>Ignore</md-button>
+                    <md-button>
+                        <slot></slot>
+                    </md-button>
+                </md-card-actions>
+            </md-card>
+        </md-layout>
+    </md-layout>
 </template>
 
 <style scoped>
-.badgeContainer {
-    display: flex;
+.md-subhead {
+    opacity: 1 !important;
+}
+
+.fullWidth {
     width: 100%;
-    align-items: center;
-    background-color: #fafafa;
-    margin-bottom: 16px;
 }
 
-.badgeDescription {
-    padding-left: 8px;
-}
-
-.badgeProgress {
-    position: relative;
-    height: 100%;
-    background-color: #eee;
-    align-items: center;
+.flex {
     display: flex;
-    padding: 0px 1.25em;
-    border-right: 1px solid #e1e1e1;
+    flex: 1;
+    min-width: 100%;
+    padding-bottom: 0px;
 }
 
+.type {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+}
+
+.date {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 10px;
+}
+
+.autoComplete {
+    margin-bottom: 0px;
+}
 </style>
 
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
 import { ILocalisedEvent } from "../../interfaces/models";
 
+import TopicChip from "../util/TopicChip.vue";
+
 @Component({
     components: {
+        TopicChip
     }
 })
 export default class TimelineEvent extends Vue {
