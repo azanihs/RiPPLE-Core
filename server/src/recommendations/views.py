@@ -6,7 +6,7 @@ from users.models import CourseUser
 from django.http import JsonResponse, HttpResponse
 
 from users.services import UserService
-from recommendations.services import AvailabilityService
+from recommendations.services import AvailabilityService, RoleService
 
 def user_availability(request):
     logged_in_user = UserService.logged_in_user(request)
@@ -74,3 +74,9 @@ def update_role(request):
         return JsonResponse({"error": "Invalid topic/studyRole/availableRole combination"}, status=422)
     else:
         return JsonResponse(updated_role.toJSON())
+
+def role_availability(request):
+    logged_in_user = UserService.logged_in_user(request)
+    course_role_count = RoleService.course_popularity_weightings(logged_in_user.course)
+
+    return JsonResponse({"data": course_role_count})

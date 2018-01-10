@@ -30,6 +30,10 @@ export default class AvailabilityService {
         return AvailabilityRepository.getUserAvailableRoles();
     }
 
+    static getCourseRoleCount() {
+        return AvailabilityRepository.getCourseRoleCount();
+    }
+
     static updateUserRoles(topic: number, studyRole: number) {
         return AvailabilityRepository.updateUserRoles(topic, studyRole);
     }

@@ -3,6 +3,15 @@
         <h2>Find Connections</h2>
         <md-layout md-flex="100"
                    class="componentSeparator">
+            <div class="spaceBetween">
+              <h2>
+                Select your roles to match with people who have complementing roles
+              </h2>
+              <md-switch v-model="showRoles"
+                         class="md-primary switch"
+                         id="roleSwitch"
+                         name="roleSwitch">Show Student Roles</md-switch>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
@@ -22,7 +31,8 @@
                         </td>
                         <td v-for="role in studyRoles"
                             :key="role.id"
-                            class="centerAlign">
+                            class="centerAlign"
+                            :style="getCellShade(topic, role)">
                             <md-checkbox class="centerCheckbox"
                                          :disabled="checkboxIsDisabled(role.description, topic)"
                                          :value="checkbox(topic, role)"
@@ -90,6 +100,12 @@
 </style>
 
 <style scoped>
+.spaceBetween {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+}
+
 .tab {
     padding-left: 2px !important;
     padding-right: 2px !important;
@@ -134,7 +150,9 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { ITopic, IUserSummary, IEdge, IStudyRole, ICompareSet } from "../../interfaces/models";
+import { ITopic, IUserSummary, IEdge, IStudyRole, ICompareSet, IRoleCount,
+    ICourseRoleCount, ICourseRoleWeights } from "../../interfaces/models";
+import AvailabilityService from "../../services/AvailabilityService";
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
@@ -171,7 +189,16 @@ export default class RecommendationSearch extends Vue {
         }
     });
 
+    pShowRoles = true;
     competencies = new Map();
+    pRoleWeights: ICourseRoleWeights = {};
+
+    get showRoles() {
+        return this.pShowRoles;
+    }
+    set showRoles(newVal) {
+        this.pShowRoles = newVal;
+    }
 
     updateCompetencies(newCompetencies: ICompareSet) {
         this.competencies = newCompetencies.ownScores
@@ -183,10 +210,36 @@ export default class RecommendationSearch extends Vue {
             }, new Map());
     };
 
+    updateRoleWeights(newRoleCount: ICourseRoleCount) {
+        const roleCounts: [IRoleCount] = newRoleCount.counts;
+        const max: number = newRoleCount.max;
+        let roleWeightLookup: ICourseRoleWeights = {};
+        roleCounts.map(roleCount => {
+            const { topic, studyRole, entries } = roleCount;
+            if (roleWeightLookup[topic] === undefined) {
+                // Create the
+                roleWeightLookup[topic] = { [studyRole]: entries / max };
+            } else {
+                roleWeightLookup[topic][studyRole] = entries / max;
+            }
+        });
+        this.pRoleWeights = roleWeightLookup;
+    }
+
     @Lifecycle
     created() {
         Fetcher.get(UserService.userCompetencies)
             .on(this.updateCompetencies);
+        Fetcher.get(AvailabilityService.getCourseRoleCount)
+            .on(this.updateRoleWeights);
+    }
+
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(UserService.userCompetencies)
+            .off(this.updateCompetencies);
+        Fetcher.get(AvailabilityService.getCourseRoleCount)
+            .off(this.updateRoleWeights);
     }
 
     checkbox(topic: ITopic, studyRole: IStudyRole): boolean {
@@ -231,6 +284,22 @@ export default class RecommendationSearch extends Vue {
             borderColor: `${this.getColour(weight)}1)`,
             width: `${weight}%`
         };
+    }
+
+    getCellShade(topic:ITopic, studyRole:IStudyRole) {
+        if (this.pShowRoles) {
+            let weight = 0;
+            if (this.pRoleWeights[topic.id] !== undefined) {
+                if (this.pRoleWeights[topic.id][studyRole.id] !== undefined) {
+                    weight = this.pRoleWeights[topic.id][studyRole.id];
+                }
+            }
+
+            // Perferably have a lookup table generated on mount
+            return {
+                background: `rgba(34, 85, 102, ${weight})`
+            };
+        }
     }
 }
 </script>
