@@ -20,11 +20,12 @@ personalised content and learning support at scale. RiPPLE employs exemplary tec
 
 The RiPPLE platform has been released as an open-source package1 under the Apache 2.0 license and is freely available for usage in non-commercial settings. RiPPLE can be integrated into many popular learning management systems including Blackboard, Moodle and Canvas using the Learning Tools Interoperability (LTI) standard. It is designed to be scalable, allowing the system to be easily adopted by many courses across different faculties in many universities. It is also designed to be sustainable, requiring very low maintenance from the teaching team.
 
-For information on the RiPPLE Client see https://github.com/hkhosrav/RiPPLE-Core/wiki/RiPPLE-Client
+For more information on RiPPLE please see https://arxiv.org/pdf/1712.03077.pdf
 
-For information on the RiPPLE Server see https://github.com/hkhosrav/RiPPLE-Core/wiki/RiPPLE-Server
+For information on the implementation of the RiPPLE Client see https://github.com/hkhosrav/RiPPLE-Core/wiki/RiPPLE-Client
+
+For information on the implementation of the RiPPLE Server see https://github.com/hkhosrav/RiPPLE-Core/wiki/RiPPLE-Server
 
 To cite the RiPPLE platform, please use the following citation:
-
 Khosravi, H., 2017. Recommendation in Personalised Peer-Learning Environments. arXiv preprint arXiv:1712.03077
 
