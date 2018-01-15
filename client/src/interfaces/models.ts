@@ -340,3 +340,14 @@ export interface ICourseRoleWeights {
     [studyRole: number]: number
   }
 };
+
+export interface IRecommendedRole {
+  topic: ITopic,
+  studyRole: IStudyRole
+};
+
+export interface IRecommendation {
+  recommendedCourseUser: ICourseUser,
+  recommendedRole: IRecommendedRole[],
+  dayTime: IDayTime[]
+};

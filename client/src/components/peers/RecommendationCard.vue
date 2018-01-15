@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { IUser } from "../../interfaces/models";
+import { IUser, IDayTime, IRecommendation } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
@@ -93,7 +93,7 @@ interface IMeetingHistory {
     }
 })
 export default class RecommendationCard extends Vue {
-    @Prop user = p<IUser>({
+    @Prop recommendation = p<IRecommendation>({
         required: true
     });
 
@@ -110,13 +110,34 @@ export default class RecommendationCard extends Vue {
             .on(this.updateMeetingHistory);
     }
 
+    createMeetingDate(dayTime: IDayTime) {
+        // Create a utc date with three days grace to the utc
+        const local = new Date();
+        const offset = local.getTimezoneOffset() * 60 * 1000;
+        const utc = new Date(local.getTime() + 3 * 24 * 60 * 60 * 1000);
+        // Get the day offset
+        let dayOffset = dayTime.day.id % 7 - utc.getDay();
+        if (dayOffset < 0) {
+            dayOffset = dayOffset + 8;
+        }
+
+        // Set the time
+        const utcTime = utc.getMilliseconds() + utc.getSeconds() * 1000 +
+            utc.getMinutes() * 1000 * 60 + utc.getHours() * 1000 * 60 * 60;
+        const eventTime = dayTime.time.start.hour * 60 * 60 * 1000;
+        const eventOffset = eventTime - utcTime;
+        const meetingTime = new Date(utc.getTime() + offset + dayOffset * 24 * 60 * 60 * 1000 + eventOffset);
+
+        return meetingTime;
+    }
+
     findItem(toSearch: IMeetingHistory[], query: string) {
         return toSearch.filter(x => x.name.toLowerCase().indexOf(query.toLowerCase()) >= 0);
     }
 
     get meetingTime() {
         const dayToEnglish = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const meetDate = this.user.availableTime as Date;
+        const meetDate = this.createMeetingDate(this.recommendation.dayTime[0]);
 
         const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
         const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;
@@ -125,6 +146,10 @@ export default class RecommendationCard extends Vue {
 
     get meetingHistory() {
         return (a: { q: string }) => Promise.resolve(this.findItem(this.pMeetingHistory, a.q));
+    }
+
+    get user(): IUser {
+        return this.recommendation.recommendedCourseUser.user;
     }
 }
 </script>

@@ -4,13 +4,13 @@
         <md-layout md-flex="100"
                    class="componentSeparator">
             <div class="spaceBetween">
-              <h2>
-                Select your roles to match with people who have complementing roles
-              </h2>
-              <md-switch v-model="showRoles"
-                         class="md-primary switch"
-                         id="roleSwitch"
-                         name="roleSwitch">Show Student Roles</md-switch>
+                <h2>
+                  Select your roles to match with people who have complementing roles
+                </h2>
+                <md-switch v-model="showRoles"
+                           class="md-primary switch"
+                           id="roleSwitch"
+                           name="roleSwitch">Show Student Roles</md-switch>
             </div>
             <table class="table">
                 <thead>
@@ -53,7 +53,7 @@
                            class="componentSeparator"
                            v-for="(recommendation, i) in recommendations"
                            :key="i">
-                    <recommendation-card :user="recommendation">
+                    <recommendation-card :recommendation="recommendation">
                         Request
                     </recommendation-card>
                 </md-layout>
@@ -150,10 +150,11 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 
-import { ITopic, IUserSummary, IEdge, IStudyRole, ICompareSet, IRoleCount,
-    ICourseRoleCount, ICourseRoleWeights } from "../../interfaces/models";
+import { ITopic, IEdge, IStudyRole, ICompareSet, IRoleCount,
+    ICourseRoleCount, ICourseRoleWeights, IRecommendation } from "../../interfaces/models";
 import AvailabilityService from "../../services/AvailabilityService";
 import UserService from "../../services/UserService";
+import RecommendationService from "../../services/RecommendationService";
 import Fetcher from "../../services/Fetcher";
 
 import RecommendationCard from "./RecommendationCard.vue";
@@ -166,11 +167,6 @@ import RecommendationCard from "./RecommendationCard.vue";
 export default class RecommendationSearch extends Vue {
     @Prop
     topics = p<ITopic[]>({
-        required: true
-    });
-
-    @Prop
-    recommendations = p<IUserSummary[]>({
         required: true
     });
 
@@ -192,12 +188,17 @@ export default class RecommendationSearch extends Vue {
     pShowRoles = true;
     competencies = new Map();
     pRoleWeights: ICourseRoleWeights = {};
+    pFindRecommendations: IRecommendation[] = [];
 
     get showRoles() {
         return this.pShowRoles;
     }
     set showRoles(newVal) {
         this.pShowRoles = newVal;
+    }
+
+    get recommendations() {
+        return this.pFindRecommendations;
     }
 
     updateCompetencies(newCompetencies: ICompareSet) {
@@ -224,7 +225,11 @@ export default class RecommendationSearch extends Vue {
             }
         });
         this.pRoleWeights = roleWeightLookup;
-    }
+    };
+
+    updateFindRecommendations(recommendations: IRecommendation[]) {
+        this.pFindRecommendations = recommendations;
+    };
 
     @Lifecycle
     created() {
@@ -232,6 +237,8 @@ export default class RecommendationSearch extends Vue {
             .on(this.updateCompetencies);
         Fetcher.get(AvailabilityService.getCourseRoleCount)
             .on(this.updateRoleWeights);
+        Fetcher.get(RecommendationService.findRecommendations)
+            .on(this.updateFindRecommendations);
     }
 
     @Lifecycle
@@ -240,6 +247,8 @@ export default class RecommendationSearch extends Vue {
             .off(this.updateCompetencies);
         Fetcher.get(AvailabilityService.getCourseRoleCount)
             .off(this.updateRoleWeights);
+        Fetcher.get(RecommendationService.findRecommendations)
+            .off(this.updateFindRecommendations);
     }
 
     checkbox(topic: ITopic, studyRole: IStudyRole): boolean {
@@ -275,7 +284,7 @@ export default class RecommendationSearch extends Vue {
         } else if (c >= 85) {
             return "rgba(34, 85, 102, ";
         }
-    };
+    }
 
     getCellWeight(topic: ITopic) {
         const weight = this.competencies.get(topic);
