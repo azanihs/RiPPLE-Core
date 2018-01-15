@@ -27,5 +27,11 @@ For information on the implementation of the RiPPLE Client see https://github.co
 For information on the implementation of the RiPPLE Server see https://github.com/hkhosrav/RiPPLE-Core/wiki/RiPPLE-Server
 
 To cite the RiPPLE platform, please use the following citation:
-Khosravi, H., 2017. Recommendation in Personalised Peer-Learning Environments. arXiv preprint arXiv:1712.03077
-
+```
+@article{khosravi2017recommendation,
+title={Recommendation in Personalised Peer-Learning Environments},
+author={Khosravi, Hassan},
+journal={arXiv preprint arXiv:1712.03077},
+year={2017}
+}
+```
