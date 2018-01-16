@@ -21,6 +21,7 @@ import AuthorView from "../components/author/AuthorView.vue";
 import AuthorWrapper from "../components/author/AuthorWrapper.vue";
 
 import PeerView from "../components/peers/PeerView.vue";
+import PendingConnections from "../components/peers/PendingConnections.vue";
 import ReviewConnections from "../components/peers/ReviewConnections.vue";
 import Schedule from "../components/peers/Schedule.vue";
 
@@ -90,6 +91,10 @@ const routes = [{
         path: "/view/peers",
         name: "peers",
         component: PeerView
+    }, {
+        path: "/view/peers/pending",
+        name: "pending",
+        component: PendingConnections
     }, {
         path: "/view/peers/review",
         name: "review",

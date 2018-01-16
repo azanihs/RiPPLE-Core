@@ -24,8 +24,7 @@
         </md-card-content>
 
         <md-card-actions>
-            <md-button>Ignore</md-button>
-            <md-button>Accept</md-button>
+            <md-button>Cancel</md-button>
         </md-card-actions>
     </md-card>
 </template>
@@ -84,7 +83,7 @@ interface IMeetingHistory {
         TopicChip
     }
 })
-export default class RecommendationReviewCard extends Vue {
+export default class RecommendationPendingCard extends Vue {
     @Prop user = p<IUser>({
         required: true
     });
