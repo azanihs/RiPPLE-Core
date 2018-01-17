@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
 from users.models import Course, User, CourseUser, Engagement, ConsentForm
-from recommendations.models import Day, Time, Availability, StudyRole, Request, PeerRecommendation, RoleRecommendation, TimeRecommendation, Connection
+from recommendations.models import Day, Time, Availability, StudyRole, Request, PeerRecommendation, RoleRecommendation, TimeRecommendation, Recommendation
 from base64 import b64decode
 import imghdr
 import sys
@@ -348,7 +348,7 @@ class Command(BaseCommand):
                 return time_recommendation
             return None
 
-        def populate_connections(course_users):
+        def populate_recommendations(course_users):
             # Get two compatible course_users
             for course_user in course_users:
                 user = course_user.user
@@ -383,7 +383,7 @@ class Command(BaseCommand):
                     if (time_recommendation is None):
                         continue
 
-                    connection = Connection.objects.create(
+                    recommendation = Recommendation.objects.create(
                         peer_recommendation=peer_recommendation,
                         role_recommendation=role_recommendation,
                         time_recommendation=time_recommendation,
@@ -391,7 +391,7 @@ class Command(BaseCommand):
                         recommended_user_status="pending",
                         location=""
                     )
-                    connection.save()
+                    recommendation.save()
 
         courses = []
         for i in range(0,len(course_names)):
@@ -429,8 +429,8 @@ class Command(BaseCommand):
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
         populate_available_roles(course_users, study_roles)
-        print("\t-Populating Connections")
-        populate_connections(course_users)
+        print("\t-Populating Recommendations")
+        populate_recommendations(course_users)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')

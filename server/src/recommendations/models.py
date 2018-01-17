@@ -103,7 +103,7 @@ class TimeRecommendation(models.Model):
             "recommendedUserAvailability": self.recommended_user_availability.toJSON()
         }
 
-class Connection(models.Model):
+class Recommendation(models.Model):
     peer_recommendation = models.ForeignKey(PeerRecommendation)
     role_recommendation = models.ForeignKey(RoleRecommendation)
     time_recommendation = models.ForeignKey(TimeRecommendation)
