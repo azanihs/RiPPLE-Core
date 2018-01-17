@@ -262,18 +262,6 @@ export interface IServerResponse<T> {
     data: T
 };
 
-export interface StudyRole {
-    id: number,
-    role: string,
-    description: string
-};
-
-export interface IAvailableRole {
-    courseUser: ICourseUser,
-    topic: ITopic,
-    studyRole: IStudyRole
-};
-
 export interface IStudyRole {
     id: number,
     role: string,

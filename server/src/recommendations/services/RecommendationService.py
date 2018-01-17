@@ -19,9 +19,9 @@ def get_user_find_recommendations(course_user):
             for connection in connections:
                 # Get the topic and study role of the reccommendedCourseUser
                 recommended_role = {}
-                user_role = connection.role_recommendation.user_role
-                recommended_role['topic'] = user_role.topic.toJSON()
-                recommended_role['studyRole'] = user_role.study_role.toJSON()
+                user_request = connection.role_recommendation.user_request
+                recommended_role['topic'] = user_request.topic.toJSON()
+                recommended_role['studyRole'] = user_request.study_role.toJSON()
                 recommendation['recommendedRole'].append(recommended_role)
 
                 availability = connection.time_recommendation.recommended_user_availability
@@ -57,9 +57,9 @@ def get_user_review_recommendations(course_user):
             for connection in connections:
                 # Get the topic and study role of the reccommendedCourseUser
                 recommended_role = {}
-                recomended_user_role = connection.role_recommendation.recomended_user_role
+                recomended_user_request = connection.role_recommendation.recomended_user_request
                 recommended_role['topic'] = recommended_role.topic.toJSON()
-                recommended_role['studyRole'] = recomended_user_role.study_role.toJSON()
+                recommended_role['studyRole'] = recomended_user_request.study_role.toJSON()
                 recommendation['recommendedRole'].append(recommended_role)
 
                 availability = connection.time_recommendation.user_availability

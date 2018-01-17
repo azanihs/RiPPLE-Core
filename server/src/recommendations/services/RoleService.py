@@ -2,13 +2,13 @@ from django.db.models import Count, Max
 
 from users.models import CourseUser, User
 from questions.models import Topic
-from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
+from recommendations.models import Day, Time, Availability, StudyRole, Request
 
-# from ..models import Day, Time, Availability, StudyRole, AvailableRole
+# from ..models import Day, Time, Availability, StudyRole, Request
 
 def course_popularity_weightings(course):
 
-    role_popularity = AvailableRole.objects.values('topic', 'study_role').annotate(entries=Count('id'))
+    role_popularity = Request.objects.values('topic', 'study_role').annotate(entries=Count('id'))
     max_entries = role_popularity.aggregate(Max('entries'))['entries__max']
 
     role_counts = []

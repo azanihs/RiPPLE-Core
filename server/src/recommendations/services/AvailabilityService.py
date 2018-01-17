@@ -1,4 +1,4 @@
-from ..models import Day, Time, Availability, StudyRole, AvailableRole
+from ..models import Day, Time, Availability, StudyRole, Request
 from questions.models import Topic
 
 from django.db.models import Count
@@ -39,12 +39,12 @@ def get_study_roles():
     return StudyRole.objects.all()
 
 def get_user_available_roles(course_user):
-    return AvailableRole.objects.filter(course_user=course_user)
+    return Request.objects.filter(course_user=course_user)
 
 def update_role(course_user, topic_id, study_role_id):
     # Check if availaibility exists
     try:
-        available_role = AvailableRole.objects.get(course_user=course_user, topic=topic_id, study_role=study_role_id)
+        available_role = Request.objects.get(course_user=course_user, topic=topic_id, study_role=study_role_id)
         exists = True
     except ObjectDoesNotExist:
         exists = False
@@ -62,6 +62,6 @@ def update_role(course_user, topic_id, study_role_id):
             study_role = StudyRole.objects.get(pk=study_role_id)
         except ObjectDoesNotExist:
             return None
-        available_role = AvailableRole(course_user=course_user, topic=topic, study_role=study_role)
+        available_role = Request(course_user=course_user, topic=topic, study_role=study_role)
         available_role.save()
         return available_role

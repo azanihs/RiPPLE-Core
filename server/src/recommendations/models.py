@@ -57,7 +57,7 @@ class StudyRole(models.Model):
             "description": self.description
         }
 
-class AvailableRole(models.Model):
+class Request(models.Model):
     course_user = models.ForeignKey(CourseUser)
     topic = models.ForeignKey(Topic)
     study_role = models.ForeignKey(StudyRole)
@@ -81,14 +81,14 @@ class PeerRecommendation(models.Model):
 
 class RoleRecommendation(models.Model):
     peer_recommendation = models.ForeignKey(PeerRecommendation)
-    user_role = models.ForeignKey(AvailableRole, related_name="user_role")
-    recomended_user_role = models.ForeignKey(AvailableRole, related_name="recommended_user_role")
+    user_request = models.ForeignKey(Request, related_name="user_request")
+    recomended_user_request = models.ForeignKey(Request, related_name="recommended_user_request")
 
     def toJSON(self):
         return {
             "peerRecommendation": self.peer_recommendation.toJSON(),
-            "userRole": self.user_role.toJSON(),
-            "recomendedUserRole": self.recomended_user_role.toJSON()
+            "userRequest": self.user_request.toJSON(),
+            "recomendedUserRequest": self.recomended_user_request.toJSON()
         }
 
 class TimeRecommendation(models.Model):

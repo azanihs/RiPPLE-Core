@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
 from users.models import Course, User, CourseUser, Engagement, ConsentForm
-from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole, PeerRecommendation, RoleRecommendation, TimeRecommendation, Connection
+from recommendations.models import Day, Time, Availability, StudyRole, Request, PeerRecommendation, RoleRecommendation, TimeRecommendation, Connection
 from base64 import b64decode
 import imghdr
 import sys
@@ -293,35 +293,35 @@ class Command(BaseCommand):
                     role_id = randint(0, 1)
                     if role_id > 0:
                         study_role = study_roles[1]
-                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+                        request = Request.objects.create(course_user=course_user, topic=topic, study_role=study_role)
 
                     role_id = randint(0, 1)
                     if role_id:
                         study_role = study_roles[2]
-                        availableRole = AvailableRole.objects.create(course_user=course_user, topic=topic, study_role=study_role)
+                        request = Request.objects.create(course_user=course_user, topic=topic, study_role=study_role)
 
         def create_role_recommendation(peer_recommendation, user, recommended_user):
-            recommended_roles = AvailableRole.objects.filter(course_user=recommended_user)
-            if len(recommended_roles) > 0:
-                recommended_role = recommended_roles[0]
+            recommended_requests = Request.objects.filter(course_user=recommended_user)
+            if len(recommended_requests) > 0:
+                recommended_request = recommended_requests[0]
 
-                topic = recommended_role.topic
+                topic = recommended_request.topic
                 role = None
-                if recommended_role.study_role.role == "mentor":
+                if recommended_request.study_role.role == "mentor":
                     role = StudyRole.objects.filter(role="mentee")[0]
-                elif recommended_role.study_role.role == "mentee":
+                elif recommended_request.study_role.role == "mentee":
                     role = StudyRole.objects.filter(role="mentor")[0]
-                elif recommended_role.study_role.role == "partner":
+                elif recommended_request.study_role.role == "partner":
                     role = StudyRole.objects.filter(role="partner")[0]
 
                 if role:
-                    available_role = AvailableRole.objects.create(course_user=user, topic=topic, study_role=role)
-                    available_role.save()
+                    request = Request.objects.create(course_user=user, topic=topic, study_role=role)
+                    request.save()
 
                     role_recommendation = RoleRecommendation.objects.create(
                         peer_recommendation=peer_recommendation,
-                        user_role=available_role,
-                        recomended_user_role=recommended_role
+                        user_request=request,
+                        recomended_user_request=recommended_request
                     )
 
                     role_recommendation.save()
