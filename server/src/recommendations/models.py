@@ -69,54 +69,36 @@ class Request(models.Model):
             "studyRole": self.study_role.toJSON()
         }
 
-class PeerRecommendation(models.Model):
+class Recommendation(models.Model):
     course_user = models.ForeignKey(CourseUser, related_name="course_user")
-    recommended_course_user = models.ForeignKey(CourseUser, related_name="recommended_course_user")
+    suggested_course_user = models.ForeignKey(CourseUser, related_name="suggested_course_user")
+    day = models.ForeignKey(Day)
+    time = models.ForeignKey(Time)
+    user_status = models.CharField(max_length=20)
+    suggeested_user_status = models.CharField(max_length=20)
+    location = models.CharField(max_length=100)
+    score = models.FloatField()
 
     def toJSON(self):
         return {
             "courseUser": self.course_user.toJSON(),
-            "recommendedCourseUser": self.recommended_course_user.toJSON()
-        }
-
-class RoleRecommendation(models.Model):
-    peer_recommendation = models.ForeignKey(PeerRecommendation)
-    user_request = models.ForeignKey(Request, related_name="user_request")
-    recomended_user_request = models.ForeignKey(Request, related_name="recommended_user_request")
-
-    def toJSON(self):
-        return {
-            "peerRecommendation": self.peer_recommendation.toJSON(),
-            "userRequest": self.user_request.toJSON(),
-            "recomendedUserRequest": self.recomended_user_request.toJSON()
-        }
-
-class TimeRecommendation(models.Model):
-    peer_recommendation = models.ForeignKey(PeerRecommendation)
-    user_availability = models.ForeignKey(Availability, related_name="user_availability")
-    recommended_user_availability = models.ForeignKey(Availability, related_name="recommended_user_availability")
-
-    def toJSON(self):
-        return {
-            "peerRecommendation": self.peer_recommendation.toJSON(),
-            "userAvailability": self.user_availability.toJSON(),
-            "recommendedUserAvailability": self.recommended_user_availability.toJSON()
-        }
-
-class Recommendation(models.Model):
-    peer_recommendation = models.ForeignKey(PeerRecommendation)
-    role_recommendation = models.ForeignKey(RoleRecommendation)
-    time_recommendation = models.ForeignKey(TimeRecommendation)
-    user_status = models.CharField(max_length=20)
-    recommended_user_status = models.CharField(max_length=20)
-    location = models.CharField(max_length=100)
-
-    def toJSON(self):
-        return {
-            "peerRecommendation": self.peer_recommendation.toJSON(),
-            "roleRecommendation": self.role_recommendation.toJSON(),
-            "timeRecommendation": self.time_recommendation.toJSON(),
+            "suggestedCourseUser": self.suggested_course_user.toJSON(),
+            "day": self.day.toJSON(),
+            "time": self.time.toJSON(),
             "userStatus": self.user_status.toJSON(),
-            "recommendedUserStatus": self.recommended_user_status.toJSON(),
-            "location": self.location.toJSON()
+            "suggestedUserStatus": self.suggeested_user_status.toJSON(),
+            "location": self.location.toJSON(),
+            "score": self.score.toJSON()
+        }
+
+class RecommendedTopicRole(models.Model):
+    recommendation = models.ForeignKey(Recommendation)
+    study_role = models.ForeignKey(StudyRole)
+    topic = models.ForeignKey(Topic)
+
+    def toJSON(self):
+        return {
+            "recommendation": self.recommendation.toJSON(),
+            "studyRole": self.study_role.toJSON(),
+            "topic": self.topic.toJSON(),
         }

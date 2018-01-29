@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
 from users.models import Course, User, CourseUser, Engagement, ConsentForm
-from recommendations.models import Day, Time, Availability, StudyRole, Request, PeerRecommendation, RoleRecommendation, TimeRecommendation, Recommendation
+from recommendations.models import Day, Time, Availability, StudyRole, Request
 from base64 import b64decode
 import imghdr
 import sys
@@ -299,7 +299,7 @@ class Command(BaseCommand):
                     if role_id:
                         study_role = study_roles[2]
                         request = Request.objects.create(course_user=course_user, topic=topic, study_role=study_role)
-
+        """
         def create_role_recommendation(peer_recommendation, user, recommended_user):
             recommended_requests = Request.objects.filter(course_user=recommended_user)
             if len(recommended_requests) > 0:
@@ -348,6 +348,7 @@ class Command(BaseCommand):
                 return time_recommendation
             return None
 
+
         def populate_recommendations(course_users):
             # Get two compatible course_users
             for course_user in course_users:
@@ -392,6 +393,7 @@ class Command(BaseCommand):
                         location=""
                     )
                     recommendation.save()
+        """
 
         courses = []
         for i in range(0,len(course_names)):
@@ -429,8 +431,10 @@ class Command(BaseCommand):
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
         populate_available_roles(course_users, study_roles)
+        """
         print("\t-Populating Recommendations")
         populate_recommendations(course_users)
+        """
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')

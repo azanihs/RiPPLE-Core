@@ -81,12 +81,12 @@ def role_availability(request):
 
     return JsonResponse({"data": course_role_count})
 
-def get_user_find_recommendations(request):
+def get_user_recommendations(request):
     logged_in_user = UserService.logged_in_user(request)
-    recommendations = RecommendationService.get_user_find_recommendations(logged_in_user)
+    recommendations = RecommendationService.get_user_recommendations(logged_in_user)
     return JsonResponse({"data": recommendations})
 
 def get_user_review_recommendations(request):
     logged_in_user = UserService.logged_in_user(request)
-    recommendations = RecommendationService.get_user_review_recommendations(logged_in_user)
+    recommendations = RecommendationService.get_user_recommendations(logged_in_user, review=True)
     return JsonResponse({"data": recommendations})
