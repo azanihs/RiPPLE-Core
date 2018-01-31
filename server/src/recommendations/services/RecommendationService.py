@@ -14,16 +14,16 @@ def get_user_recommendations(course_user, review=False):
             if not review else rec_top_role.recommendation.course_user
 
         user_recommendation = {
-            'courseUser': course_user.toJSON(),
-            'recommendedRole': {
+            'recommendedCourseUser': course_user.toJSON(),
+            'recommendedRole': [{
                 'topic': rec_top_role.topic.toJSON(),
-                'studyRole': rec_top_role.study_roletoJSON()
-            },
-            'daytime': {
-                    'day': availability.day.toJSON(),
-                    'time': availability.time.toJSON()
-            }
+                'studyRole': rec_top_role.study_role.toJSON()
+            }],
+            'dayTime': [{
+                    'day': rec_top_role.recommendation.day.toJSON(),
+                    'time': rec_top_role.recommendation.time.toJSON()
+            }]
         }
 
         user_recommendations.append(user_recommendation)
-        return recommendations
+    return user_recommendations
