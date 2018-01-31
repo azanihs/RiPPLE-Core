@@ -45,6 +45,9 @@
             </table>
         </md-layout>
         <md-layout md-flex="100">
+            <md-button class="md-raised">Create Connections</md-button>
+        </md-layout>
+        <md-layout md-flex="100">
             <h3>Suggested Connections</h3>
             <md-layout md-flex="100"
                        md-gutter="16">
