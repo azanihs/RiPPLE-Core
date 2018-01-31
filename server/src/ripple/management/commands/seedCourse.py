@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
 from users.models import Course, User, CourseUser, Engagement, ConsentForm
-from recommendations.models import Day, Time, Availability, StudyRole, Request
+from recommendations.models import Day, Time, Availability, StudyRole, Request, Recommendation, RecommendedTopicRole
 from base64 import b64decode
 import imghdr
 import sys
@@ -276,17 +276,24 @@ class Command(BaseCommand):
                 for i in range(0, 100):
                     make_question_responses(user, correct_distractors, incorrect_distractors, studentAbility)
 
-        def populate_availability(course_users, days, times):
+        def get_randomised_day_time():
+            days = Day.objects.all()
+            times = Time.objects.all()
+            random_day = Day.objects.get(pk=randint(1, len(days)))
+            random_time = Time.objects.get(pk=randint(1, len(times)))
+
+            return random_day, random_time
+
+        def populate_availability(course_users):
             for i in range(len(course_users)):
                 course_user = course_users[i]
                 for j in range(randint(3, 10)):
-                    random_day = Day.objects.get(pk=randint(1, len(days)))
-                    random_time = Time.objects.get(pk=randint(1, len(times)))
+                    random_day, random_time = get_randomised_day_time()
                     # Add availability
                     availability = Availability.objects.create(course_user=course_user, day=random_day, time=random_time)
                     availability.save()
 
-        def populate_available_roles(course_users, study_roles):
+        def populate_request_roles(course_users, study_roles):
             for course_user in course_users:
                 topics = Topic.objects.filter(course=course_user.course)
                 for topic in topics:
@@ -299,101 +306,72 @@ class Command(BaseCommand):
                     if role_id:
                         study_role = study_roles[2]
                         request = Request.objects.create(course_user=course_user, topic=topic, study_role=study_role)
-        """
-        def create_role_recommendation(peer_recommendation, user, recommended_user):
-            recommended_requests = Request.objects.filter(course_user=recommended_user)
-            if len(recommended_requests) > 0:
-                recommended_request = recommended_requests[0]
 
-                topic = recommended_request.topic
-                role = None
-                if recommended_request.study_role.role == "mentor":
-                    role = StudyRole.objects.filter(role="mentee")[0]
-                elif recommended_request.study_role.role == "mentee":
-                    role = StudyRole.objects.filter(role="mentor")[0]
-                elif recommended_request.study_role.role == "partner":
-                    role = StudyRole.objects.filter(role="partner")[0]
+        def populate_recommendations(course):
 
-                if role:
-                    request = Request.objects.create(course_user=user, topic=topic, study_role=role)
-                    request.save()
+            def get_randomised_study_roles():
+                study_roles = StudyRole.objects.all()
+                if len(study_roles) == 0:
+                    return None, None
 
-                    role_recommendation = RoleRecommendation.objects.create(
-                        peer_recommendation=peer_recommendation,
-                        user_request=request,
-                        recomended_user_request=recommended_request
+                user_study_role = study_roles[randint(0, len(study_roles) - 1)]
+                suggested_role_filter = "invalid"
+                if user_study_role.role == "mentor":
+                    suggested_role = "mentee"
+                elif user_study_role == "mentee":
+                    suggested_role = "mentor"
+                else:
+                    suggested_role = "partner"
+
+                suggested_user_study_roles = StudyRole.objects.filter(role=suggested_role)
+                if len(suggested_user_study_roles) == 0:
+                    return None, None
+
+                suggested_user_study_role = suggested_user_study_roles[0]
+
+                return user_study_role, suggested_user_study_role
+
+            def create_recommended_topic_role(course_user, recommendation, study_role, topic):
+                    RecommendedTopicRole.objects.create(
+                        recommendation=recommendation,
+                        study_role=study_role,
+                        topic=topic
                     )
 
-                    role_recommendation.save()
-                    return role_recommendation
-            return None
+            # 1. Get the course_users for a topic
+            course_users = CourseUser.objects.filter(course=course)
+            topics = Topic.objects.filter(course=course)
 
-        def create_time_recommendation(peer_recommendation, user, recommended_user):
-            recommended_availabilities = Availability.objects.filter(course_user=recommended_user)
-            if len(recommended_availabilities):
-                recommended_availability = recommended_availabilities[0]
-                availability = Availability.objects.create(
-                    course_user=user,
-                    day=recommended_availability.day,
-                    time=recommended_availability.time
+            user_status = "pending"
+
+            for i in range(len(course_users)):
+                course_user = course_users[i]
+                suggested_course_user = course_users[i + 1] if i + 1 < len(course_users) else course_users[0]
+
+                topic = topics[randint(0, len(topics) - 1)]
+
+                # Choose a random studyRole
+                user_study_role, suggested_user_study_role = get_randomised_study_roles()
+                if user_study_role is None or suggested_user_study_role is None:
+                    return
+
+                # Create a common day and time
+                day, time = get_randomised_day_time()
+
+                recommendation, created = Recommendation.objects.get_or_create(
+                    course_user=course_user,
+                    suggested_course_user=suggested_course_user,
+                    day=day,
+                    time=time,
+                    user_status=user_status,
+                    suggested_user_status=user_status,
+                    location="",
+                    score=0
                 )
-                availability.save()
 
-                time_recommendation = TimeRecommendation.objects.create(
-                    peer_recommendation=peer_recommendation,
-                    user_availability=availability,
-                    recommended_user_availability=recommended_availability
-                )
-                time_recommendation.save()
-                return time_recommendation
-            return None
-
-
-        def populate_recommendations(course_users):
-            # Get two compatible course_users
-            for course_user in course_users:
-                user = course_user.user
-                course = course_user.course
-                compatable_course_users = CourseUser.objects.filter(course=course).exclude(user=user)
-                if len(compatable_course_users) > 0:
-                    compatable_course_user = compatable_course_users[0]
-
-                    peer_recommendation_check = PeerRecommendation.objects.filter(
-                        course_user=course_user,
-                        recommended_course_user=compatable_course_users
-                    )
-
-                    if len(peer_recommendation_check) > 0:
-                        continue
-
-                    # Create a peer recommendation
-                    peer_recommendation = PeerRecommendation.objects.create(
-                        course_user=course_user,
-                        recommended_course_user= compatable_course_user)
-                    peer_recommendation.save()
-
-                    role_recommendation = create_role_recommendation(
-                        peer_recommendation, course_user, compatable_course_user)
-
-                    if (role_recommendation is None):
-                        continue
-
-                    time_recommendation = create_time_recommendation(
-                        peer_recommendation, course_user, compatable_course_user)
-
-                    if (time_recommendation is None):
-                        continue
-
-                    recommendation = Recommendation.objects.create(
-                        peer_recommendation=peer_recommendation,
-                        role_recommendation=role_recommendation,
-                        time_recommendation=time_recommendation,
-                        user_status="pending",
-                        recommended_user_status="pending",
-                        location=""
-                    )
-                    recommendation.save()
-        """
+                #create the RecommededTopicRole rows for each user
+                create_recommended_topic_role(course_user, recommendation, user_study_role, topic)
+                create_recommended_topic_role(suggested_course_user, recommendation, suggested_user_study_role, topic)
 
         courses = []
         for i in range(0,len(course_names)):
@@ -427,14 +405,16 @@ class Command(BaseCommand):
         days = Day.objects.all()
         times = Time.objects.all()
         print("\t-Populating Availabilities")
-        populate_availability(course_users, days, times)
+        populate_availability(course_users)
         study_roles = StudyRole.objects.all()
         print("\t-Populating Study Roles")
-        populate_available_roles(course_users, study_roles)
-        """
+        populate_request_roles(course_users, study_roles)
         print("\t-Populating Recommendations")
-        populate_recommendations(course_users)
-        """
+        courses = Course.objects.all()
+
+        for i in range(2):
+            course = courses[i]
+            populate_recommendations(course)
 
 def save_image_course_seeder(encoded_image, image_id):
     image_format, base64_payload = encoded_image.split(';base64,')

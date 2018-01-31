@@ -75,7 +75,7 @@ class Recommendation(models.Model):
     day = models.ForeignKey(Day)
     time = models.ForeignKey(Time)
     user_status = models.CharField(max_length=20)
-    suggeested_user_status = models.CharField(max_length=20)
+    suggested_user_status = models.CharField(max_length=20)
     location = models.CharField(max_length=100)
     score = models.FloatField()
 
