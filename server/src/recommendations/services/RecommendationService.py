@@ -29,11 +29,12 @@ def get_user_recommendations(course_user, review=False):
     return user_recommendations
 
 def get_event_utc(day, hour):
+    minimum_days_grace = 2
     current_utc = datetime.utcnow()
     current_weekday = current_utc.weekday()
     # Based off: https://stackoverflow.com/questions/6558535/find-the-date-for-the-first-monday-after-a-given-a-date
     days_ahead = day - current_utc.weekday()
-    if days_ahead <= 3: # Too close to set event
+    if days_ahead <= minimum_days_grace: # Too close to set event
         days_ahead += 7
     event_utc = current_utc + timedelta(days_ahead)
     # Set the time
