@@ -7,6 +7,10 @@ export default class RecommendationService {
         return RecommendationRepository.findRecommendations();
     }
 
+    static pendingRecommendations(): Promise<IRecommendation[]> {
+        return RecommendationRepository.pendingRecommendations();
+    }
+
     static reviewRecommendations(): Promise<IRecommendation[]> {
         return RecommendationRepository.reviewRecommendations();
     }

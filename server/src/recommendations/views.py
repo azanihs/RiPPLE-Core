@@ -86,6 +86,11 @@ def get_user_recommendations(request):
     recommendations = RecommendationService.get_user_recommendations(logged_in_user)
     return JsonResponse({"data": recommendations})
 
+def get_pending_recommendations(request):
+    logged_in_user = UserService.logged_in_user(request)
+    recommendations = RecommendationService.get_pending_recommendations(logged_in_user)
+    return JsonResponse({"data": recommendations})
+
 def get_user_review_recommendations(request):
     logged_in_user = UserService.logged_in_user(request)
     recommendations = RecommendationService.get_user_recommendations(logged_in_user, review=True)

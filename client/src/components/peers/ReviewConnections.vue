@@ -104,7 +104,6 @@ import { Vue, Component, Lifecycle } from "av-ts";
 import { IRecommendation } from "../../interfaces/models";
 import RecommendationService from "../../services/RecommendationService";
 import Fetcher from "../../services/Fetcher";
-
 import RecommendationReviewCard from "./RecommendationReviewCard.vue";
 
 @Component({

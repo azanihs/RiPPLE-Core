@@ -8,9 +8,9 @@
                     <md-layout md-flex="33"
                                md-gutter
                                class="componentSeparator"
-                               v-for="(recommendation, i) in requests"
+                               v-for="(recommendation, i) in recommendations"
                                :key="i">
-                        <recommendation-pending-card :user="recommendation">
+                        <recommendation-pending-card :recommendation="recommendation">
                             Pending
                         </recommendation-pending-card>
                     </md-layout>
@@ -101,9 +101,9 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import UserService from "../../services/UserService";
-import { IUser } from "../../interfaces/models";
-
+import { IRecommendation } from "../../interfaces/models";
+import RecommendationService from "../../services/RecommendationService";
+import Fetcher from "../../services/Fetcher";
 import RecommendationPendingCard from "./RecommendationPendingCard.vue";
 
 @Component({
@@ -113,21 +113,27 @@ import RecommendationPendingCard from "./RecommendationPendingCard.vue";
 })
 export default class PendingConnections extends Vue {
 
-    pRequests: IUser[] = [];
+    pPendingRecommendations: IRecommendation[] = [];
 
-    updateRequests(newRequests: IUser[]) {
-        this.pRequests = newRequests;
+    updatePendingRecommendations(recommendations: IRecommendation[]) {
+        this.pPendingRecommendations = recommendations;
     };
+
 
     @Lifecycle
     created() {
-        UserService.getOutstandingRequests({ count: 7 })
-            .then(this.updateRequests);
+        Fetcher.get(RecommendationService.pendingRecommendations)
+          .on(this.updatePendingRecommendations);
     }
 
-    get requests() {
-        return this.pRequests;
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(RecommendationService.pendingRecommendations)
+            .off(this.updatePendingRecommendations);
     }
 
+    get recommendations() {
+        return this.pPendingRecommendations;
+    }
 }
 </script>

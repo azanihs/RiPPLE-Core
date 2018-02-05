@@ -66,12 +66,11 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
-import { IUser } from "../../interfaces/models";
-
+import { IUser, IRecommendation } from "../../interfaces/models";
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
-
 import TopicChip from "../util/TopicChip.vue";
+import { serverToLocal } from "../../util";
 
 interface IMeetingHistory {
     name: string,
@@ -84,7 +83,7 @@ interface IMeetingHistory {
     }
 })
 export default class RecommendationPendingCard extends Vue {
-    @Prop user = p<IUser>({
+    @Prop recommendation = p<IRecommendation>({
         required: true
     });
 
@@ -106,16 +105,15 @@ export default class RecommendationPendingCard extends Vue {
     }
 
     get meetingTime() {
-        const dayToEnglish = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const meetDate = this.user.availableTime as Date;
-
-        const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
-        const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;
-        return date + " " + time;
+        return serverToLocal(this.recommendation.eventTime);
     }
 
     get meetingHistory() {
         return (a: { q: string }) => Promise.resolve(this.findItem(this.pMeetingHistory, a.q));
+    }
+
+    get user(): IUser {
+        return this.recommendation.recommendedCourseUser.user;
     }
 }
 </script>

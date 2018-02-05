@@ -68,10 +68,8 @@
 <script lang="ts">
 import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { IUser, IRecommendation } from "../../interfaces/models";
-
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
-
 import TopicChip from "../util/TopicChip.vue";
 import { serverToLocal } from "../../util";
 
