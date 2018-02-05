@@ -8,9 +8,9 @@
                     <md-layout md-flex="33"
                                md-gutter
                                class="componentSeparator"
-                               v-for="(recommendation, i) in requests"
+                               v-for="(recommendation, i) in recommendations"
                                :key="i">
-                        <recommendation-review-card :user="recommendation">
+                        <recommendation-review-card :recommendation="recommendation">
                             Request
                         </recommendation-review-card>
                     </md-layout>
@@ -101,8 +101,9 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import UserService from "../../services/UserService";
-import { IUser } from "../../interfaces/models";
+import { IRecommendation } from "../../interfaces/models";
+import RecommendationService from "../../services/RecommendationService";
+import Fetcher from "../../services/Fetcher";
 
 import RecommendationReviewCard from "./RecommendationReviewCard.vue";
 
@@ -113,21 +114,26 @@ import RecommendationReviewCard from "./RecommendationReviewCard.vue";
 })
 export default class ReviewConnections extends Vue {
 
-    pRequests: IUser[] = [];
+    pReviewRecommendations: IRecommendation[] = [];
 
-    updateRequests(newRequests: IUser[]) {
-        this.pRequests = newRequests;
+    updateReviewRecommendations(recommendations: IRecommendation[]) {
+        this.pReviewRecommendations = recommendations;
     };
 
     @Lifecycle
     created() {
-        UserService.getOutstandingRequests({ count: 7 })
-            .then(this.updateRequests);
+        Fetcher.get(RecommendationService.reviewRecommendations)
+            .on(this.updateReviewRecommendations);
     }
 
-    get requests() {
-        return this.pRequests;
+    @Lifecycle
+    destroyed() {
+        Fetcher.get(RecommendationService.reviewRecommendations)
+            .off(this.updateReviewRecommendations);
     }
 
+    get recommendations() {
+        return this.pReviewRecommendations;
+    }
 }
 </script>
