@@ -81,6 +81,7 @@ import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
+import { serverToLocal } from "../../util";
 
 interface IMeetingHistory {
     name: string,
@@ -136,12 +137,7 @@ export default class RecommendationCard extends Vue {
     }
 
     get meetingTime() {
-        const dayToEnglish = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        const meetDate = this.createMeetingDate(this.recommendation.dayTime[0]);
-
-        const date = `${dayToEnglish[meetDate.getDay()]} ${meetDate.getDate()}/${meetDate.getMonth()}`;
-        const time = `${meetDate.getHours()}:${meetDate.getMinutes()}`;
-        return date + " " + time;
+        return serverToLocal(this.recommendation.eventTime);
     }
 
     get meetingHistory() {

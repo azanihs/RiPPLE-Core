@@ -13,6 +13,8 @@ import sys
 from questions.services import QuestionService
 from users.services import UserService
 
+from recommendations.services import RecommendationService
+
 from random import randint, randrange, sample, choice
 from datetime import datetime
 from faker import Factory
@@ -358,11 +360,14 @@ class Command(BaseCommand):
                 # Create a common day and time
                 day, time = get_randomised_day_time()
 
+                # TODO: Add the day and time to both users
+
+                event_time = RecommendationService.get_event_utc(day.id - 1, time.start.hour)
+
                 recommendation, created = Recommendation.objects.get_or_create(
                     course_user=course_user,
                     suggested_course_user=suggested_course_user,
-                    day=day,
-                    time=time,
+                    event_time=event_time,
                     user_status=user_status,
                     suggested_user_status=user_status,
                     location="",

@@ -3,6 +3,11 @@ from __future__ import unicode_literals
 from django.db import models
 from users.models import CourseUser
 from questions.models import Topic
+from datetime import datetime
+import pytz as timezone
+
+_epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
+
 
 class Day(models.Model):
     day = models.CharField(max_length=10, unique=True)
@@ -72,19 +77,20 @@ class Request(models.Model):
 class Recommendation(models.Model):
     course_user = models.ForeignKey(CourseUser, related_name="course_user")
     suggested_course_user = models.ForeignKey(CourseUser, related_name="suggested_course_user")
-    day = models.ForeignKey(Day)
-    time = models.ForeignKey(Time)
+    event_time = models.DateTimeField()
     user_status = models.CharField(max_length=20)
     suggested_user_status = models.CharField(max_length=20)
     location = models.CharField(max_length=100)
     score = models.FloatField()
 
+    def eventTimeToJSON(self):
+        return (self.event_time.replace(tzinfo=timezone.utc) - _epoch).total_seconds()
+
     def toJSON(self):
         return {
             "courseUser": self.course_user.toJSON(),
             "suggestedCourseUser": self.suggested_course_user.toJSON(),
-            "day": self.day.toJSON(),
-            "time": self.time.toJSON(),
+            "eventTime": self.eventTimeToJSON(),
             "userStatus": self.user_status.toJSON(),
             "suggestedUserStatus": self.suggeested_user_status.toJSON(),
             "location": self.location.toJSON(),
