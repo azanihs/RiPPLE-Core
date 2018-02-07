@@ -95,3 +95,30 @@ def get_user_review_recommendations(request):
     logged_in_user = UserService.logged_in_user(request)
     recommendations = RecommendationService.get_user_recommendations(logged_in_user, review=True)
     return JsonResponse({"data": recommendations})
+
+def update_recommendation(request, status_field=None):
+    # Check if the request is valid
+    if request.method != "POST":
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    # Check if status is valid
+    if status_field == "user" or status_field == "suggested_user":
+        # Update the suggested_user_status
+        post_request = loads(request.body.decode("utf-8"))
+        rec_id = post_request.get("id", None)
+        status = post_request.get("status", None)
+        location = post_request.get("location", None)
+        return RecommendationService.update_recommendation(status_field, rec_id, status, location)
+    else:
+        # Error
+        return JsonResponse({
+            "error": "status field not specified"
+        }, status=405)
+
+def update_recommendation_user_status(request):
+    return update_recommendation(request, status_field="user")
+
+def update_recommendation_suggested_user_status(request):
+    return update_recommendation(request, status_field="suggested_user")

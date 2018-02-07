@@ -1,5 +1,5 @@
 import { IRecommendation } from "../interfaces/models";
-import { apiFetch } from "./APIRepository";
+import { apiFetch, apiPost } from "./APIRepository";
 
 export default class RecommendationRepository {
 
@@ -13,5 +13,10 @@ export default class RecommendationRepository {
 
     static reviewRecommendations(): Promise<IRecommendation[]> {
         return apiFetch<IRecommendation[]>("/recommendations/recommendations/review/all/");
+    }
+
+    static updateUserStatus(id: number, status: string, location: string | undefined) {
+        let data = location ? { id, status, location } : { id, status };
+        return apiPost(`/recommendations/recommendations/find/update/`, data);
     }
 }

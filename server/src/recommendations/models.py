@@ -91,10 +91,10 @@ class Recommendation(models.Model):
             "courseUser": self.course_user.toJSON(),
             "suggestedCourseUser": self.suggested_course_user.toJSON(),
             "eventTime": self.eventTimeToJSON(),
-            "userStatus": self.user_status.toJSON(),
-            "suggestedUserStatus": self.suggeested_user_status.toJSON(),
-            "location": self.location.toJSON(),
-            "score": self.score.toJSON()
+            "userStatus": self.user_status,
+            "suggestedUserStatus": self.suggested_user_status,
+            "location": self.location,
+            "score": self.score
         }
 
 class RecommendedTopicRole(models.Model):

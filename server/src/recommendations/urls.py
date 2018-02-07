@@ -15,5 +15,7 @@ urlpatterns = [
 
     url(r'^recommendations/find/all/$', views.get_user_recommendations),
     url(r'^recommendations/pending/all/$', views.get_pending_recommendations),
-    url(r'^recommendations/review/all/$', views.get_user_review_recommendations)
+    url(r'^recommendations/review/all/$', views.get_user_review_recommendations),
+
+    url(r'^recommendations/find/update/$', views.update_recommendation_user_status)
 ]

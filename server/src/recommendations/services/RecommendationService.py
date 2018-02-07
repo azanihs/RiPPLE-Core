@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import pytz
 
+from django.http import JsonResponse, HttpResponse
+
 from ..models import  Recommendation, RecommendedTopicRole
 
 def get_user_recommendations(course_user, review=False):
@@ -14,6 +16,7 @@ def get_user_recommendations(course_user, review=False):
         course_user = rec_top_role.recommendation.suggested_course_user \
             if not review else rec_top_role.recommendation.course_user
         user_recommendation = {
+            'id': rec_top_role.recommendation.id,
             'recommendedCourseUser': course_user.toJSON(),
             'recommendedRole': [{
                 'topic': rec_top_role.topic.toJSON(),
@@ -58,3 +61,51 @@ def get_event_utc(day, hour):
     # Set the time
     event_utc = event_utc.replace(hour=hour, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
     return event_utc
+
+def update_recommendation(status_field, rec_id, status, location=None):
+    if status_field == "user":
+        return update_recommendation_user_status(rec_id, status, location)
+    elif status_field == "suggested_user":
+        update_recommendation_suggested_user_status(rec_id, status)
+    else:
+        return JsonResponse({"state": "Error", "error": "Invalid user status"})
+
+def update_recommendation_user_status(rec_id, status, location=None):
+    try:
+        recommendation = Recommendation.objects.get(id=rec_id)
+    except Recommendation.DoesNotExist:
+        return JsonResponse({"state": "Error", "error": "Recommendation does not exist"})
+
+    if status == "accepted":
+        if location is not None:
+            recommendation.user_status=status
+            recommendation.location=location
+            recommendation.save()
+        else:
+            return JsonResponse({"state": "Error", "error": "Accepted recommendation does not have location"})
+
+    elif status == "rejected":
+        recommendation.user_status=status
+        recommendation.save()
+
+    else:
+        return JsonResponse({"state": "Error", "error": "Invalid user status"})
+
+    return JsonResponse({"state": "Recommendation Updated", "recommendation": Recommendation.objects.get(id=rec_id).toJSON()})
+
+def update_recommendation_suggested_user_status(rec_id, status):
+    try:
+        recommendation = Recommendation.objects.get(id=rec_id)
+    except Recommendation.DoesNotExist:
+        return JsonResponse({"state": "Error", "error": "Recommendation does not exist"})
+
+    if status == "accepted":
+        recommendation.suggested_user_status=status
+        recommendation.save()
+    elif status == "rejected":
+        recommendation.user_status=status
+        recommendation.save()
+    else:
+        return JsonResponse({"state": "Error", "error": "Invalid user status"})
+
+    return JsonResponse({"state": "Recommendation Updated", "recommendation": Recommendation.objects.get(id=rec_id).toJSON()})

@@ -335,6 +335,7 @@ export interface IRecommendedRole {
 };
 
 export interface IRecommendation {
+  id: number,
   recommendedCourseUser: ICourseUser,
   recommendedRole: IRecommendedRole[],
   eventTime: number

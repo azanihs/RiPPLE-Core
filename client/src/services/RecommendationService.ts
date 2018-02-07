@@ -14,4 +14,8 @@ export default class RecommendationService {
     static reviewRecommendations(): Promise<IRecommendation[]> {
         return RecommendationRepository.reviewRecommendations();
     }
+
+    static updateUserStatus(id: number, status: string, location: string | undefined) {
+        return RecommendationRepository.updateUserStatus(id, status, location);
+    }
 }

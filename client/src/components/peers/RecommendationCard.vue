@@ -30,8 +30,8 @@
         </md-card-content>
 
         <md-card-actions>
-            <md-button>Ignore</md-button>
-            <md-button>
+            <md-button @click="ignoreRecommendation">Ignore</md-button>
+            <md-button @click="acceptRecommendation">
                 <slot></slot>
             </md-button>
         </md-card-actions>
@@ -78,6 +78,7 @@ import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { IUser, IRecommendation } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
+import RecommendationService from "../../services/RecommendationService";
 import Fetcher from "../../services/Fetcher";
 
 import TopicChip from "../util/TopicChip.vue";
@@ -113,6 +114,23 @@ export default class RecommendationCard extends Vue {
 
     findItem(toSearch: IMeetingHistory[], query: string) {
         return toSearch.filter(x => x.name.toLowerCase().indexOf(query.toLowerCase()) >= 0);
+    }
+
+    ignoreRecommendation() {
+        RecommendationService.updateUserStatus(
+          this.recommendation.id,
+          "rejected",
+          undefined);
+    }
+
+    acceptRecommendation() {
+        let location = this.meetingLocation.trim();
+        if (location != "") {
+            RecommendationService.updateUserStatus(
+              this.recommendation.id,
+              "accepted",
+              location);
+        }
     }
 
     get meetingTime() {
