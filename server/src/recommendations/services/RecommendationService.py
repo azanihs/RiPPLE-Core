@@ -9,7 +9,7 @@ def get_user_recommendations(course_user, review=False):
     user_recommendations = []
     # 1. Get all the RecommendedTopicRoles where each recommendation has ${course_user} as recommendation.course_user
     recommendations = Recommendation.objects.filter(course_user=course_user) \
-        if not review else Recommendation.objects.filter(suggested_course_user=course_user)
+        if not review else Recommendation.objects.filter(suggested_course_user=course_user, user_status="accepted")
     recommended_topic_roles = RecommendedTopicRole.objects.filter(recommendation__in=recommendations)
     # 2. For each rec_top_role in recommended_topic_roles
     for rec_top_role in recommended_topic_roles:

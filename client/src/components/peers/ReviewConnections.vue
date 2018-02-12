@@ -10,8 +10,9 @@
                                class="componentSeparator"
                                v-for="(recommendation, i) in recommendations"
                                :key="i">
-                        <recommendation-review-card :recommendation="recommendation">
-                            Request
+                        <recommendation-review-card @change="updateRecommendation"
+                                                    :recommendation="recommendation">
+                            Review
                         </recommendation-review-card>
                     </md-layout>
                 </md-layout>
@@ -129,6 +130,10 @@ export default class ReviewConnections extends Vue {
     destroyed() {
         Fetcher.get(RecommendationService.reviewRecommendations)
             .off(this.updateReviewRecommendations);
+    }
+
+    updateRecommendation(id: number, status: string) {
+        RecommendationService.updateReviewStatus(id, status);
     }
 
     get recommendations() {

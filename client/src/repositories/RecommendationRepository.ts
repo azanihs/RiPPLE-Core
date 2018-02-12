@@ -19,4 +19,9 @@ export default class RecommendationRepository {
         let data = location ? { id, status, location } : { id, status };
         return apiPost(`/recommendations/recommendations/find/update/`, data);
     }
+
+    static updateReviewStatus(id: number, status: string) {
+        let data = { id, status };
+        return apiPost(`/recommendations/recommendations/review/update/`, data);
+    }
 }

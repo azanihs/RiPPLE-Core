@@ -56,7 +56,8 @@
                            class="componentSeparator"
                            v-for="(recommendation, i) in recommendations"
                            :key="i">
-                    <recommendation-card :recommendation="recommendation">
+                    <recommendation-card @change="updateRecommendation"
+                                         :recommendation="recommendation">
                         Request
                     </recommendation-card>
                 </md-layout>
@@ -312,6 +313,10 @@ export default class RecommendationSearch extends Vue {
                 background: `rgba(34, 85, 102, ${weight})`
             };
         }
+    }
+
+    updateRecommendation(id: number, status: string, location: string | undefined) {
+        RecommendationService.updateUserStatus(id, status, location);
     }
 }
 </script>

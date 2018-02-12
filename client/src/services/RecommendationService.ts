@@ -18,4 +18,8 @@ export default class RecommendationService {
     static updateUserStatus(id: number, status: string, location: string | undefined) {
         return RecommendationRepository.updateUserStatus(id, status, location);
     }
+
+    static updateReviewStatus(id: number, status: string) {
+        return RecommendationRepository.updateReviewStatus(id, status);
+    }
 }

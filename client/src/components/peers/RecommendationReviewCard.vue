@@ -24,8 +24,8 @@
         </md-card-content>
 
         <md-card-actions>
-            <md-button>Ignore</md-button>
-            <md-button>Accept</md-button>
+            <md-button @click="ignoreRecommendation">Ignore</md-button>
+            <md-button @click="acceptRecommendation">Accept</md-button>
         </md-card-actions>
     </md-card>
 </template>
@@ -103,6 +103,14 @@ export default class RecommendationReviewCard extends Vue {
 
     findItem(toSearch: IMeetingHistory[], query: string) {
         return toSearch.filter(x => x.name.toLowerCase().indexOf(query.toLowerCase()) >= 0);
+    }
+
+    ignoreRecommendation() {
+        this.$emit("change", this.recommendation.id, "rejected");
+    }
+
+    acceptRecommendation() {
+        this.$emit("change", this.recommendation.id, "accepted");
     }
 
     get meetingTime() {

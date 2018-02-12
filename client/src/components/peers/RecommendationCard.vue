@@ -78,9 +78,7 @@ import { Vue, Component, Lifecycle, Prop, p } from "av-ts";
 import { IUser, IRecommendation } from "../../interfaces/models";
 
 import UserService from "../../services/UserService";
-import RecommendationService from "../../services/RecommendationService";
 import Fetcher from "../../services/Fetcher";
-
 import TopicChip from "../util/TopicChip.vue";
 import { serverToLocal } from "../../util";
 
@@ -117,19 +115,13 @@ export default class RecommendationCard extends Vue {
     }
 
     ignoreRecommendation() {
-        RecommendationService.updateUserStatus(
-          this.recommendation.id,
-          "rejected",
-          undefined);
+        this.$emit("change", this.recommendation.id, "rejected", undefined);
     }
 
     acceptRecommendation() {
         let location = this.meetingLocation.trim();
         if (location != "") {
-            RecommendationService.updateUserStatus(
-              this.recommendation.id,
-              "accepted",
-              location);
+            this.$emit("change", this.recommendation.id, "accepted", location);
         }
     }
 
