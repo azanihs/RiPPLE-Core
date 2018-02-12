@@ -199,7 +199,6 @@ def insert_course_if_not_exists(course, user):
             content=util.get_default_consent_form(),
             author=course_user
         )
-        print(form.content)
         form.save()
 
     return course
