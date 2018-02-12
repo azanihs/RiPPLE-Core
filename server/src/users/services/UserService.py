@@ -196,9 +196,10 @@ def insert_course_if_not_exists(course, user):
             e.save()
 
         form = ConsentForm (
-            content="Default consent form",
+            content=util.get_default_consent_form(),
             author=course_user
         )
+        print(form.content)
         form.save()
 
     return course

@@ -1,12 +1,6 @@
 <template>
     <md-layout md-flex="100" md-gutter>
         <consent-form class="hoistAboveOverlay" v-if="consentForm" @change="updateUserConsent" :consentForm="consentForm" :courseCode="courseCode" :response="response"></consent-form>
-        <md-layout md-class="hoistAboveOverlay" flex="100" md-gutter v-else>
-            <md-card>
-                Your course instructor has not set up a consent form for your course.
-                You will be unable to use this tool until the consent form is set up.
-            </md-card>
-        </md-layout>
         <div v-if="response === undefined" class="overlay"></div>
     </md-layout>
 </template>
