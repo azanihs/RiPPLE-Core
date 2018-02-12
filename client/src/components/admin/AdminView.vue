@@ -16,7 +16,7 @@
                     md-input-placeholder="Course Topics">
                 </md-chips>
                 <md-button class="md-fab md-primary"
-                    @click="openDialog()">
+                    @click="saveCourseInformation()">
                     <md-icon>save</md-icon>
                 </md-button>
             </md-card>
@@ -34,19 +34,16 @@
         <md-dialog ref="course_create_modal"
             :md-click-outside-to-close="false"
             :md-esc-to-close="false">
-            <md-dialog-title>Create new course</md-dialog-title>
-            <md-dialog-content>
-                <p v-if="courseIsAvailable">Your course: {{courseCode}} does not appear to exist.</p>
-                <p v-else>Updating course: {{courseCode}}</p>
-            </md-dialog-content>
+            <md-dialog-title v-if="courseIsAvailable">Edit Course Topics for {{courseCode}}</md-dialog-title>
+            <md-dialog-title v-else>Create new course: {{courseCode}}</md-dialog-title>
             <md-dialog-content>
                 <span>{{networkError}}</span>
                 <form>
-                    <md-input-container>
+                    <!--<md-input-container>
                         <label>Course Code</label>
-                        <md-input v-model="courseCode"></md-input>
+                        <md-input v-model="courseCode" disabled></md-input>
                     </md-input-container>
-                    <!-- <md-input-container>
+                    <md-input-container>
                         <label>Teaching Start: {{this.teachingStart}}</label>
                         <date-picker v-model="teachingStart"></date-picker>
                     </md-input-container>
@@ -234,6 +231,11 @@ export default class AdminView extends Vue {
             if (x.error !== undefined) {
                 this.networkError = x.error;
             } else {
+                addEventsToQueue([{
+                    name: "Data Updated",
+                    description: "Course Topics Updated",
+                    icon: "check"
+                }]);
                 this.updateCourseUser(x);
                 this.closeDialog();
             }
