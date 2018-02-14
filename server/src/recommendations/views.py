@@ -127,3 +127,14 @@ def get_week_events(request):
     logged_in_user = UserService.logged_in_user(request)
     events = EventService.get_week_events(logged_in_user)
     return JsonResponse({"data": events})
+
+def update_event_status(request):
+    # Check if the request is valid
+    if request.method != "POST":
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+
+    logged_in_user = UserService.logged_in_user(request)
+    rec_id = post_request.get("id", None)
+    status = post_request.get("status", None)

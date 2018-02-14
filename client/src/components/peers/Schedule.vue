@@ -4,7 +4,11 @@
             <md-layout md-flex="100">
                 <md-card class="componentSeparator">
                     <h2>Upcoming Meetings</h2>
-                    <timeline :eventLookup="eventLookup" :sortedDates="sortedDates"></timeline>
+                    <timeline
+                        :eventLookup="eventLookup"
+                        :sortedDates="sortedDates"
+                        @change="cancelEvent">
+                    </timeline>
                 </md-card>
             </md-layout>
             <md-layout md-flex="100">
@@ -169,6 +173,11 @@ export default class Schedule extends Vue {
     @Lifecycle
     destroyed() {
         Fetcher.get(EventService.getWeekEvents).off(this.updateEvents);
+    }
+
+    cancelEvent(id: number) {
+        console.log("cancelEvent() called, id = " + id);
+        EventService.cancelEvent(id);
     }
 
     get connections() {

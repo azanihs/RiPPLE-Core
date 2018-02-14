@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import pytz as timezone
 
 from ..models import Recommendation, RecommendedTopicRole
+from . import RecommendationService
 
 def get_week_events(course_user):
 
@@ -36,3 +37,8 @@ def get_week_events(course_user):
         events.append(event)
 
     return events
+
+def update_event_status(course_user, rec_id, status):
+    rec = Recommendation.objects.get(id=rec_id)
+    status_field = "user" if rec.course_user == course_user else "suggested_user"
+    return RecommendationService.update_recommendation(status_field, rec_id, status)

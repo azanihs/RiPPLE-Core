@@ -40,7 +40,8 @@ def get_pending_recommendations(course_user):
         course_user=course_user,
         user_status=user_status,
         suggested_user_status=suggested_user_status)
-    recommended_topic_roles = RecommendedTopicRole.objects.filter(recommendation__in=recommendations)
+    recommended_topic_roles = RecommendedTopicRole.objects.filter(recommendation__in=recommendations,
+        course_user__in=recommendations.values("suggested_course_user"))
     for rec_top_role in recommended_topic_roles:
         course_user = rec_top_role.recommendation.suggested_course_user
         user_recommendation = {
