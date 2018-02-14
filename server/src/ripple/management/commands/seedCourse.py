@@ -336,6 +336,7 @@ class Command(BaseCommand):
             def create_recommended_topic_role(course_user, recommendation, study_role, topic):
                     RecommendedTopicRole.objects.create(
                         recommendation=recommendation,
+                        course_user=course_user,
                         study_role=study_role,
                         topic=topic
                     )

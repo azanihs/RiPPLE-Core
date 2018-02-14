@@ -72,13 +72,10 @@ export default class Schedule extends Vue {
     };
 
     createEventLookup(events: IEvent[]): IEventLookup {
-        const nowUTC = this.nowUTC();
         let eventLookup: IEventLookup = {};
 
         events.map((event: IEvent) => {
-            const days = Math.abs(event.dayTime.day.id % 7 - nowUTC.day);
-            const nowDate: Date = new Date();
-            const eventDate: Date = this.localisedEventDate(nowDate, days, event.dayTime.time);
+            const eventDate: Date = new Date(event.time);
             const localisedEvent = this.localiseEvent(eventDate, event);
             this.addlocalisedEvent(eventLookup, localisedEvent);
         });

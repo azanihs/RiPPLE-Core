@@ -18,5 +18,7 @@ urlpatterns = [
     url(r'^recommendations/review/all/$', views.get_user_review_recommendations),
 
     url(r'^recommendations/find/update/$', views.update_recommendation_user_status),
-    url(r'^recommendations/review/update/$', views.update_recommendation_suggested_user_status)
+    url(r'^recommendations/review/update/$', views.update_recommendation_suggested_user_status),
+
+    url(r'^recommendations/events/week/$', views.get_week_events)
 ]

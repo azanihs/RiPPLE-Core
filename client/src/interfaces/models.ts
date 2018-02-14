@@ -284,7 +284,7 @@ export interface ISearch {
 };
 
 export interface IEvent {
-    dayTime: IDayTime,
+    time: number,
     user: IUser,
     topics: ITopic[],
     location: string

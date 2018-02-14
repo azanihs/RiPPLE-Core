@@ -3,14 +3,19 @@ import pytz
 
 from django.http import JsonResponse, HttpResponse
 
-from ..models import  Recommendation, RecommendedTopicRole
+from ..models import Recommendation, RecommendedTopicRole
 
 def get_user_recommendations(course_user, review=False):
     user_recommendations = []
     # 1. Get all the RecommendedTopicRoles where each recommendation has ${course_user} as recommendation.course_user
-    recommendations = Recommendation.objects.filter(course_user=course_user) \
-        if not review else Recommendation.objects.filter(suggested_course_user=course_user, user_status="accepted")
-    recommended_topic_roles = RecommendedTopicRole.objects.filter(recommendation__in=recommendations)
+    recommendations = Recommendation.objects.filter(course_user=course_user, user_status="pending", suggested_user_status="pending") \
+        if not review else Recommendation.objects.filter(suggested_course_user=course_user, user_status="accepted", suggested_user_status="pending")
+
+    recommended_topic_roles = RecommendedTopicRole.objects.filter(recommendation__in=recommendations,
+        course_user__in=recommendations.values("suggested_course_user")) \
+        if not review else RecommendedTopicRole.objects.filter(recommendation__in=recommendations,
+        course_user__in=recommendations.values("course_user"))
+
     # 2. For each rec_top_role in recommended_topic_roles
     for rec_top_role in recommended_topic_roles:
         course_user = rec_top_role.recommendation.suggested_course_user \
@@ -66,7 +71,7 @@ def update_recommendation(status_field, rec_id, status, location=None):
     if status_field == "user":
         return update_recommendation_user_status(rec_id, status, location)
     elif status_field == "suggested_user":
-        update_recommendation_suggested_user_status(rec_id, status)
+        return update_recommendation_suggested_user_status(rec_id, status)
     else:
         return JsonResponse({"state": "Error", "error": "Invalid user status"})
 

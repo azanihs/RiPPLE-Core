@@ -99,12 +99,14 @@ class Recommendation(models.Model):
 
 class RecommendedTopicRole(models.Model):
     recommendation = models.ForeignKey(Recommendation)
+    course_user = models.ForeignKey(CourseUser)
     study_role = models.ForeignKey(StudyRole)
     topic = models.ForeignKey(Topic)
 
     def toJSON(self):
         return {
             "recommendation": self.recommendation.toJSON(),
+            "courseUser": self.course_user.toJSON(),
             "studyRole": self.study_role.toJSON(),
             "topic": self.topic.toJSON(),
         }

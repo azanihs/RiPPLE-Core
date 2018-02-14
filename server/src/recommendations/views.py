@@ -6,7 +6,7 @@ from users.models import CourseUser
 from django.http import JsonResponse, HttpResponse
 
 from users.services import UserService
-from recommendations.services import AvailabilityService, RecommendationService, RoleService
+from recommendations.services import AvailabilityService, EventService, RecommendationService, RoleService
 
 def user_availability(request):
     logged_in_user = UserService.logged_in_user(request)
@@ -122,3 +122,8 @@ def update_recommendation_user_status(request):
 
 def update_recommendation_suggested_user_status(request):
     return update_recommendation(request, status_field="suggested_user")
+
+def get_week_events(request):
+    logged_in_user = UserService.logged_in_user(request)
+    events = EventService.get_week_events(logged_in_user)
+    return JsonResponse({"data": events})
