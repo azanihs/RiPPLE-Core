@@ -51,16 +51,18 @@ a.topicChipLink:hover {
 }
 
 .selected.md-chip.topicChip:hover {
-    background-color: #fff;
-    color: #222;
+    background-color: #266073;
+    color: #f2f2f2;
 }
 
 .disabled.md-chip.topicChip {
+    background-color: #fff;
     color: #333;
 }
+
 .disabled.md-chip.topicChip:hover {
-    background-color: #fff;
-    color: #222;
+    background-color: #DCDCDC;
+    color: #333;
 }
 
 
