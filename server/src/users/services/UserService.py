@@ -204,7 +204,7 @@ def insert_course_if_not_exists(course, user):
     return course
 
 
-def insert_user_if_not_exists(user):
+def insert_user_if_not_exists(user, root_path):
     if user is None or user.get("user_id", None) is None:
         return {"error": "Invalid User Provided"}
     try:
@@ -212,7 +212,9 @@ def insert_user_if_not_exists(user):
     except User.DoesNotExist:
         if user.get("first_name", None) is None or user.get("last_name", None) is None:
             return {"error": "Invalid User Provided"}
-        return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image="")
+
+        default_image_path = root_path + settings.RUNTIME_CONFIGURATION["default_user_image"]
+        return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image=default_image_path)
 
 
 def insert_course_user_if_not_exists(course, user):

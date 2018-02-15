@@ -2,7 +2,8 @@
 src/rippledb
 src/*.db
 src/*.db-journal
-src/media/
+src/media/*
+!src/media/default_images
 htmlcov
 .coverage
 

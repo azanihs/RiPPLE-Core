@@ -17,6 +17,17 @@ except ImportError:
     from urllib.parse import urljoin
 
 
+
+def get_root_path(request):
+    def _format(x):
+        if len(x) == 0: return x
+        return (x + "/") if x[-1] != "/" else x
+
+    return merge_url_parts([
+        _format("//" + request.get_host()),
+        _format("static")
+    ])
+
 def generate_static_path(host):
     def _format(x):
         if len(x) == 0: return x
@@ -132,7 +143,6 @@ def update_image_sources(urls, content, host):
     # Only get substitutable images
     images = soup.find_all("img", src=lambda img_src: img_src.startswith("#:"))
     for i, file_location in enumerate(urls):
-        images[i]['src'] = "//" + host + file_location
         images[i]['src'] = merge_url_parts([host, file_location])
 
     immediate_children = soup.findChildren(recursive=False)

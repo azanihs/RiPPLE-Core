@@ -344,16 +344,16 @@ class UserTestCase(BootstrapTestCase):
         ), c)
 
     def test_insert_user_if_not_exists(self):
-        self.assertEqual(UserService.insert_user_if_not_exists(None),
+        self.assertEqual(UserService.insert_user_if_not_exists(None, "http://localhost:8000/"),
                 {"error": "Invalid User Provided"})
 
-        self.assertEqual(UserService.insert_user_if_not_exists({"invalid": "user"}),
+        self.assertEqual(UserService.insert_user_if_not_exists({"invalid": "user"}, "http://localhost:8000/"),
                 {"error": "Invalid User Provided"})
 
-        self.assertEqual(UserService.insert_user_if_not_exists({"user_id": "u1"}),
+        self.assertEqual(UserService.insert_user_if_not_exists({"user_id": "u1"}, "http://localhost:8000/"),
                 {"error": "Invalid User Provided"})
 
-        self.assertEqual(UserService.insert_user_if_not_exists({"user_id": "test1", "first_name":"first_name", "last_name":"last_name", "image":""}), User.objects.filter(user_id="test1")[0])
+        self.assertEqual(UserService.insert_user_if_not_exists({"user_id": "test1", "first_name":"first_name", "last_name":"last_name", "image":""}, "http://localhost:8000/"), User.objects.filter(user_id="test1")[0])
 
         u = User(user_id="test2", first_name="first_name", last_name="last_name",
                 image="")
@@ -361,7 +361,7 @@ class UserTestCase(BootstrapTestCase):
 
         self.assertEqual(UserService.insert_user_if_not_exists(
                 {"user_id": "test2", "first_name":"first_name", "last_name":"last_name",
-                "image": ""}
+                "image": ""}, "http://localhost:8000/"
         ), u)
 
 
