@@ -42,13 +42,8 @@
                        @click="nextQuestion"
                        md-fab-trigger>
                 <md-icon md-icon-morph>arrow_forward</md-icon>
-                <md-icon v-if="!userIsFinishedWithQuestion">replay</md-icon>
-                <md-tooltip v-if="!userIsFinishedWithQuestion"
-                            md-direction="top">Skip Question</md-tooltip>
-
-                <md-icon v-if="userIsFinishedWithQuestion">arrow_forward</md-icon>
-                <md-tooltip v-if="userIsFinishedWithQuestion"
-                            md-direction="top">Next Question</md-tooltip>
+                    <md-icon>arrow_forward</md-icon>
+                    <md-tooltip md-direction="top">Next Question</md-tooltip>
             </md-button>
 
             <md-button class="md-fab md-primary md-mini md-clean"
