@@ -56,7 +56,7 @@ const makeUser = () => {
 const _defaultSearch = () => ({
     sortField: "recommended",
     sortDesc: true,
-    filterField: "All Questions",
+    filterField: "unanswered",
     query: "",
     page: 0,
     filterTopics: []
