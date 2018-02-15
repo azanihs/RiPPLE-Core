@@ -106,12 +106,12 @@ def update_course(course_user, new_data):
         topic_name = topic.get("name", None)
         existing_topic = None
         try:
-            existing_topic = Topic.objects.get(name=topic_name)
+            existing_topic = Topic.objects.get(name=topic_name, id__in=course.topic_set.all())
         except Topic.DoesNotExist:
             pass
 
         if not existing_topic:
-            new_topic = Topic.objects.create(name=topic_name)
+            (new_topic, created) = Topic.objects.get_or_create(name=topic_name)
             new_topic.course.add(course)
             new_topics.append(new_topic)
         else:
