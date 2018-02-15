@@ -204,7 +204,6 @@ export default class QuestionSearch extends mixin(responsiveMixin, Vue) {
         QuestionService.getSearchCacheForCourse()
             .then(x => {
                 this.search = x;
-                console.log(this.search);
             });
     }
 
