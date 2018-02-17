@@ -11,13 +11,6 @@
                     </timeline>
                 </md-card>
             </md-layout>
-            <md-layout md-flex="100">
-                <md-card>
-                    <h2>Current Connections</h2>
-                    <current-connection-search :connections="connections">
-                    </current-connection-search>
-                </md-card>
-            </md-layout>
         </md-card>
     </md-layout>
 </template>
@@ -51,13 +44,11 @@ import EventService from "../../services/EventService";
 import UserService from "../../services/UserService";
 import Fetcher from "../../services/Fetcher";
 
-import CurrentConnectionSearch from "./CurrentConnectionSearch.vue";
 import OverviewDescription from "../util/OverviewDescription.vue";
 import Timeline from "../util/Timeline.vue";
 
 @Component({
     components: {
-        CurrentConnectionSearch,
         OverviewDescription,
         Timeline
     }
@@ -131,6 +122,7 @@ export default class Schedule extends Vue {
 
     localiseEvent(date: Date, event: IEvent) {
         const localisedEventDate: ILocalisedEvent = {
+            id: event.id,
             date: date.toString(),
             user: event.user,
             topics: event.topics,
@@ -176,8 +168,9 @@ export default class Schedule extends Vue {
     }
 
     cancelEvent(id: number) {
-        console.log("cancelEvent() called, id = " + id);
-        EventService.cancelEvent(id);
+        EventService.cancelEvent(id)
+            .then(_ => EventService.getWeekEvents())
+            .then(x => this.updateEvents(x));
     }
 
     get connections() {

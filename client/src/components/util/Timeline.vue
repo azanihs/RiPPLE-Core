@@ -4,6 +4,7 @@
             :key="date.toDateString()"
             :date="date"
             :events="eventLookup[date.toDateString()]"
+            @change="change"
         ></timeline-day>
     </md-layout>
 </template>
@@ -30,5 +31,9 @@ export default class Timeline extends Vue {
     @Prop sortedDates = p<Date[]>({
         required: true
     });
+
+    change(id: number) {
+        this.$emit("change", id);
+    }
 }
 </script>

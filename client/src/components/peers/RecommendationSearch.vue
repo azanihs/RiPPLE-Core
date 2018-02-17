@@ -316,7 +316,9 @@ export default class RecommendationSearch extends Vue {
     }
 
     updateRecommendation(id: number, status: string, location: string | undefined) {
-        RecommendationService.updateUserStatus(id, status, location);
+        RecommendationService.updateUserStatus(id, status, location)
+            .then(_ => RecommendationService.findRecommendations())
+            .then(x => this.updateFindRecommendations(x));
     }
 }
 </script>

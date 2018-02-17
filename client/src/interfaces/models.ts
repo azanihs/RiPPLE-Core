@@ -284,6 +284,7 @@ export interface ISearch {
 };
 
 export interface IEvent {
+    id: number,
     time: number,
     user: IUser,
     topics: ITopic[],
@@ -291,6 +292,7 @@ export interface IEvent {
 };
 
 export interface ILocalisedEvent {
+    id: number,
     date: string,
     user: IUser,
     topics: ITopic[],

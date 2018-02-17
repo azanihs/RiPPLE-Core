@@ -34,7 +34,7 @@
                 </md-layout>
             </md-layout>
             <md-layout md-flex="20" class="centerContainer">
-                <md-button class="center">Cancel</md-button>
+                <md-button class="center" @click="cancelEvent">Cancel</md-button>
             </md-layout>
         </md-card>
     </md-layout>
@@ -116,6 +116,10 @@ export default class TimelineEvent extends Vue {
         const displayMins = minutes < 10 ? "0" + minutes : minutes.toString();
         const strTime = hours + ":" + displayMins + " " + ampm;
         return strTime;
+    }
+
+    cancelEvent() {
+        this.$emit("change", this.event.id);
     }
 
     get time() {

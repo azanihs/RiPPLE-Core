@@ -22,10 +22,6 @@
         <md-card-content class="fullWidth flex">
             <label>Meeting Location:</br>Library</label>
         </md-card-content>
-
-        <md-card-actions>
-            <md-button>Cancel</md-button>
-        </md-card-actions>
     </md-card>
 </template>
 

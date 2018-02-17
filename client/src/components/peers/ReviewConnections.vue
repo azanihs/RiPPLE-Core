@@ -133,7 +133,9 @@ export default class ReviewConnections extends Vue {
     }
 
     updateRecommendation(id: number, status: string) {
-        RecommendationService.updateReviewStatus(id, status);
+        RecommendationService.updateReviewStatus(id, status)
+        .then(_ => RecommendationService.reviewRecommendations())
+        .then(x => this.updateReviewRecommendations(x));
     }
 
     get recommendations() {

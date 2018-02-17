@@ -5,7 +5,6 @@ from ..models import Recommendation, RecommendedTopicRole
 from . import RecommendationService
 
 def get_week_events(course_user):
-
     events = []
 
     earliest_time = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -21,15 +20,17 @@ def get_week_events(course_user):
 
     for recommendation in recommendations:
         rec_top_rols = RecommendedTopicRole.objects.filter(
-            recommendation=recommendation)
+            recommendation=recommendation,
+            course_user=recommendation.suggested_course_user)
 
         topics = []
         for rec_top_rol in rec_top_rols:
             topics.append(rec_top_rol.topic.toJSON())
 
         event = {
-            "time": recommendation.time,
-            "user": recommendation.suggested_user.user,
+            "id": recommendation.id,
+            "time": recommendation.event_time,
+            "user": course_user.user.toJSON(),
             "topics": topics,
             "location": recommendation.location
         }
@@ -41,4 +42,4 @@ def get_week_events(course_user):
 def update_event_status(course_user, rec_id, status):
     rec = Recommendation.objects.get(id=rec_id)
     status_field = "user" if rec.course_user == course_user else "suggested_user"
-    return RecommendationService.update_recommendation(status_field, rec_id, status)
+    return RecommendationService.update_recommendation(status_field=status_field, rec_id=rec_id, status=status)

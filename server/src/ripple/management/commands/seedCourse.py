@@ -341,17 +341,7 @@ class Command(BaseCommand):
                         topic=topic
                     )
 
-            # 1. Get the course_users for a topic
-            course_users = CourseUser.objects.filter(course=course)
-            topics = Topic.objects.filter(course=course)
-
-            user_status = "pending"
-
-            for i in range(len(course_users)):
-                course_user = course_users[i]
-                suggested_course_user = course_users[i + 1] if i + 1 < len(course_users) else course_users[0]
-
-                topic = topics[randint(0, len(topics) - 1)]
+            def create_recommendation(course_user, suggested_course_user, user_status, suggested_user_status, topic, location=""):
 
                 # Choose a random studyRole
                 user_study_role, suggested_user_study_role = get_randomised_study_roles()
@@ -370,14 +360,83 @@ class Command(BaseCommand):
                     suggested_course_user=suggested_course_user,
                     event_time=event_time,
                     user_status=user_status,
-                    suggested_user_status=user_status,
-                    location="",
+                    suggested_user_status=suggested_user_status,
+                    location=location,
                     score=0
                 )
 
                 #create the RecommededTopicRole rows for each user
                 create_recommended_topic_role(course_user, recommendation, user_study_role, topic)
                 create_recommended_topic_role(suggested_course_user, recommendation, suggested_user_study_role, topic)
+
+            # 1. Get the course_users for a topic
+            course_users = CourseUser.objects.filter(course=course)
+            topics = Topic.objects.filter(course=course)
+
+            locations = ["Library", "Study Hall", "Computer Lab"]
+
+            for i in range(len(course_users)):
+                course_user = course_users[i]
+                initial_suggested_course_user = course_users[(i + 1) % len(course_users)]
+
+                user_status = "pending"
+                suggested_user_status = "pending"
+                topic = topics[randint(0, len(topics) - 1)]
+                location = ""
+
+                create_recommendation(
+                    course_user=course_user,
+                    suggested_course_user=initial_suggested_course_user,
+                    user_status=user_status,
+                    suggested_user_status=suggested_user_status,
+                    topic=topic,
+                    location=location)
+
+                if (len(course_users) >= 3):
+                    pending_suggested_course_user = course_users[(i + 2) % len(course_users)]
+                    user_status = "accepted"
+                    suggested_user_status = "pending"
+                    topic = topics[randint(0, len(topics) - 1)]
+                    location = locations[randint(0, len(locations) - 1)]
+
+                    create_recommendation(
+                        course_user=course_user,
+                        suggested_course_user=pending_suggested_course_user,
+                        user_status=user_status,
+                        suggested_user_status=suggested_user_status,
+                        topic=topic,
+                        location=location)
+
+                if (len(course_users) >= 4):
+                    scheduled_suggested_course_user = course_users[(i + 3) % len(course_users)]
+                    user_status = "accepted"
+                    suggested_user_status = "accepted"
+                    topic = topics[randint(0, len(topics) - 1)]
+                    location = locations[randint(0, len(locations) - 1)]
+
+                    create_recommendation(
+                        course_user=course_user,
+                        suggested_course_user=scheduled_suggested_course_user,
+                        user_status=user_status,
+                        suggested_user_status=suggested_user_status,
+                        topic=topic,
+                        location=location)
+
+                if (len(course_users) >= 5):
+                    scheduled_suggested_course_user = course_users[(i + 3) % len(course_users)]
+                    user_status = "accepted"
+                    suggested_user_status = "accepted"
+                    topic = topics[randint(0, len(topics) - 1)]
+                    location = locations[randint(0, len(locations) - 1)]
+
+                    create_recommendation(
+                        course_user=course_user,
+                        suggested_course_user=scheduled_suggested_course_user,
+                        user_status=user_status,
+                        suggested_user_status=suggested_user_status,
+                        topic=topic,
+                        location=location)
+
 
         courses = []
         for i in range(0,len(course_names)):
@@ -418,7 +477,7 @@ class Command(BaseCommand):
         print("\t-Populating Recommendations")
         courses = Course.objects.all()
 
-        for i in range(2):
+        for i in range(len(courses)):
             course = courses[i]
             populate_recommendations(course)
 

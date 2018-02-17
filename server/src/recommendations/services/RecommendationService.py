@@ -90,7 +90,7 @@ def update_recommendation_user_status(rec_id, status, location=None):
         else:
             return JsonResponse({"state": "Error", "error": "Accepted recommendation does not have location"})
 
-    elif status == "rejected":
+    elif status == "rejected" or status == "cancelled":
         recommendation.user_status=status
         recommendation.save()
 
@@ -108,7 +108,7 @@ def update_recommendation_suggested_user_status(rec_id, status):
     if status == "accepted":
         recommendation.suggested_user_status=status
         recommendation.save()
-    elif status == "rejected":
+    elif status == "rejected" or status == "cancelled":
         recommendation.user_status=status
         recommendation.save()
     else:

@@ -1,7 +1,7 @@
 <template>
     <md-layout md-flex="100">
         <h3>{{day}}</h3>
-        <timeline-event v-for="(event, i) in events" :key="i" :event="event"></timeline-event>
+        <timeline-event v-for="(event, i) in events" :key="i" :event="event" @change="change"></timeline-event>
     </md-layout>
 </template>
 
@@ -36,6 +36,10 @@ export default class TimelineDay extends Vue {
 
     pMonths: string[] = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"];
+
+    change(id: number) {
+        this.$emit("change", id);
+    }
 
     get day() {
         if (this.date) {

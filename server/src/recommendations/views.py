@@ -136,5 +136,7 @@ def update_event_status(request):
         }, status=405)
 
     logged_in_user = UserService.logged_in_user(request)
+    post_request = loads(request.body.decode("utf-8"))
     rec_id = post_request.get("id", None)
     status = post_request.get("status", None)
+    return EventService.update_event_status(logged_in_user, rec_id, status)
