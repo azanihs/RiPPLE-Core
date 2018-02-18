@@ -20,7 +20,7 @@
             <md-button class="date"> {{ meetingTime }}</md-button>
         </md-card-header>
         <md-card-content class="fullWidth flex">
-            <label>Meeting Location:</br>Library</label>
+            <label>Meeting Location:</br>{{ location }}</label>
         </md-card-content>
     </md-card>
 </template>
@@ -110,6 +110,10 @@ export default class RecommendationPendingCard extends Vue {
 
     get user(): IUser {
         return this.recommendation.recommendedCourseUser.user;
+    }
+
+    get location(): string {
+        return this.recommendation.location;
     }
 }
 </script>

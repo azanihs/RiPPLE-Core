@@ -45,7 +45,7 @@
             </table>
         </md-layout>
         <md-layout md-flex="100">
-            <md-button class="md-raised">Create Connections</md-button>
+            <md-button class="md-raised" @click="recommendStudySessions">Recommend Study Sessions</md-button>
         </md-layout>
         <md-layout md-flex="100">
             <h3>Suggested Connections</h3>
@@ -318,6 +318,11 @@ export default class RecommendationSearch extends Vue {
     updateRecommendation(id: number, status: string, location: string | undefined) {
         RecommendationService.updateUserStatus(id, status, location)
             .then(_ => RecommendationService.findRecommendations())
+            .then(x => this.updateFindRecommendations(x));
+    }
+
+    recommendStudySessions() {
+        RecommendationService.recommendStudySessions()
             .then(x => this.updateFindRecommendations(x));
     }
 }

@@ -24,4 +24,9 @@ export default class RecommendationRepository {
         let data = { id, status };
         return apiPost(`/recommendations/recommendations/review/update/`, data);
     }
+
+    static recommendStudySessions(): Promise<IRecommendation[]> {
+        let data = { "run": true };
+        return apiPost<IRecommendation[]>(`/recommendations/recommendations/recommend/`, data);
+    }
 }

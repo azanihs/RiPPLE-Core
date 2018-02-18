@@ -22,4 +22,8 @@ export default class RecommendationService {
     static updateReviewStatus(id: number, status: string) {
         return RecommendationRepository.updateReviewStatus(id, status);
     }
+
+    static recommendStudySessions(): Promise<IRecommendation[]> {
+        return RecommendationRepository.recommendStudySessions();
+    }
 }

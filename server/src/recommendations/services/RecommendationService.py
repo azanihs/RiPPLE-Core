@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
 import pytz
+from random import randint
 
 from django.http import JsonResponse, HttpResponse
 
-from ..models import Recommendation, RecommendedTopicRole
+from ..models import Day, Time, Recommendation, RecommendedTopicRole, StudyRole
+from users.models import CourseUser
+from questions.models import Topic
 
 def get_user_recommendations(course_user, review=False):
     user_recommendations = []
@@ -20,6 +23,9 @@ def get_user_recommendations(course_user, review=False):
     for rec_top_role in recommended_topic_roles:
         course_user = rec_top_role.recommendation.suggested_course_user \
             if not review else rec_top_role.recommendation.course_user
+
+        location = "" if not review else rec_top_role.recommendation.location
+
         user_recommendation = {
             'id': rec_top_role.recommendation.id,
             'recommendedCourseUser': course_user.toJSON(),
@@ -27,7 +33,8 @@ def get_user_recommendations(course_user, review=False):
                 'topic': rec_top_role.topic.toJSON(),
                 'studyRole': rec_top_role.study_role.toJSON()
             }],
-            'eventTime': rec_top_role.recommendation.eventTimeToJSON()
+            'eventTime': rec_top_role.recommendation.eventTimeToJSON(),
+            'location': location
         }
         user_recommendations.append(user_recommendation)
     return user_recommendations
@@ -50,7 +57,8 @@ def get_pending_recommendations(course_user):
                 'topic': rec_top_role.topic.toJSON(),
                 'studyRole': rec_top_role.study_role.toJSON()
             }],
-            'eventTime': rec_top_role.recommendation.eventTimeToJSON()
+            'eventTime': rec_top_role.recommendation.eventTimeToJSON(),
+            'location': rec_top_role.recommendation.location
         }
         user_recommendations.append(user_recommendation)
     return user_recommendations
@@ -115,3 +123,97 @@ def update_recommendation_suggested_user_status(rec_id, status):
         return JsonResponse({"state": "Error", "error": "Invalid user status"})
 
     return JsonResponse({"state": "Recommendation Updated", "recommendation": Recommendation.objects.get(id=rec_id).toJSON()})
+
+def recommend_study_sessions(course_user):
+    # 1. Create new recommendations
+    create_recommendations(course_user)
+    # 2. Retrieve the recommendations
+    return get_user_recommendations(course_user)
+
+# Helper Functions
+
+def get_randomised_day_time():
+    days = Day.objects.all()
+    times = Time.objects.all()
+    random_day = Day.objects.get(pk=randint(1, len(days)))
+    random_time = Time.objects.get(pk=randint(1, len(times)))
+
+    return random_day, random_time
+
+def create_recommendations(course_user):
+    # TODO: Replace with peer algorithm
+    # 1. Get the course_users for a topic
+    course_users = CourseUser.objects.filter(course=course_user.course).exclude(id=course_user.id)
+    topics = Topic.objects.filter(course=course_user.course)
+    suggested_course_user = course_users[randint(0, len(course_users) - 1)]
+    user_status = "pending"
+    suggested_user_status = "pending"
+    topic = topics[randint(0, len(topics) - 1)]
+    location = ""
+
+    create_recommendation(
+        course_user=course_user,
+        suggested_course_user=suggested_course_user,
+        user_status=user_status,
+        suggested_user_status=suggested_user_status,
+        topic=topic,
+        location=location)
+
+
+def get_randomised_study_roles():
+    study_roles = StudyRole.objects.all()
+    if len(study_roles) == 0:
+        return None, None
+
+    user_study_role = study_roles[randint(0, len(study_roles) - 1)]
+    suggested_role_filter = "invalid"
+    if user_study_role.role == "mentor":
+        suggested_role = "mentee"
+    elif user_study_role == "mentee":
+        suggested_role = "mentor"
+    else:
+        suggested_role = "partner"
+
+    suggested_user_study_roles = StudyRole.objects.filter(role=suggested_role)
+    if len(suggested_user_study_roles) == 0:
+        return None, None
+
+    suggested_user_study_role = suggested_user_study_roles[0]
+
+    return user_study_role, suggested_user_study_role
+
+def create_recommended_topic_role(course_user, recommendation, study_role, topic):
+        RecommendedTopicRole.objects.create(
+            recommendation=recommendation,
+            course_user=course_user,
+            study_role=study_role,
+            topic=topic
+        )
+
+def create_recommendation(course_user, suggested_course_user, user_status, suggested_user_status, topic, location=""):
+
+    # Choose a random studyRole
+    user_study_role, suggested_user_study_role = get_randomised_study_roles()
+    if user_study_role is None or suggested_user_study_role is None:
+        return
+
+    # Create a common day and time
+    day, time = get_randomised_day_time()
+
+    # TODO: Add the day and time to both users
+
+    event_time = get_event_utc(day.id - 1, time.start.hour)
+
+    recommendation, created = Recommendation.objects.get_or_create(
+        course_user=course_user,
+        suggested_course_user=suggested_course_user,
+        event_time=event_time,
+        user_status=user_status,
+        suggested_user_status=suggested_user_status,
+        location=location,
+        score=0
+    )
+
+    #create the RecommededTopicRole rows for each user
+    create_recommended_topic_role(course_user, recommendation, user_study_role, topic)
+    create_recommended_topic_role(suggested_course_user, recommendation, suggested_user_study_role, topic)

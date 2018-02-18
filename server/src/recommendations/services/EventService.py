@@ -10,13 +10,19 @@ def get_week_events(course_user):
     earliest_time = datetime.utcnow().replace(tzinfo=timezone.utc)
     latest_time = (datetime.utcnow() + timedelta(days=6)).replace(tzinfo=timezone.utc)
 
-    recommendations = Recommendation.objects.filter(
-        course_user=course_user,
+    recommendations = (Recommendation.objects.filter(
+        course_user__user=course_user.user,
         user_status="accepted",
         suggested_user_status="accepted",
         event_time__gte=earliest_time,
         event_time__lte=latest_time,
-        ).order_by("event_time")
+        ) | Recommendation.objects.filter(
+            suggested_course_user__user=course_user.user,
+            user_status="accepted",
+            suggested_user_status="accepted",
+            event_time__gte=earliest_time,
+            event_time__lte=latest_time,
+        )).order_by("event_time")
 
     for recommendation in recommendations:
         rec_top_rols = RecommendedTopicRole.objects.filter(
@@ -27,10 +33,14 @@ def get_week_events(course_user):
         for rec_top_rol in rec_top_rols:
             topics.append(rec_top_rol.topic.toJSON())
 
+        user = recommendation.suggested_course_user.user \
+            if recommendation.course_user.user == course_user.user \
+            else recommendation.course_user.user
+
         event = {
             "id": recommendation.id,
             "time": recommendation.event_time,
-            "user": course_user.user.toJSON(),
+            "user": user.toJSON(),
             "topics": topics,
             "location": recommendation.location
         }

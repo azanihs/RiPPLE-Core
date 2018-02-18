@@ -140,3 +140,13 @@ def update_event_status(request):
     rec_id = post_request.get("id", None)
     status = post_request.get("status", None)
     return EventService.update_event_status(logged_in_user, rec_id, status)
+
+def recommend_study_sessions(request):
+    # Check if the request is valid
+    if request.method != "POST":
+        return JsonResponse({
+            "error": "Must use POST to this endpoint"
+        }, status=405)
+    logged_in_user = UserService.logged_in_user(request)
+    recommendations = RecommendationService.recommend_study_sessions(logged_in_user)
+    return JsonResponse({"data": recommendations})
