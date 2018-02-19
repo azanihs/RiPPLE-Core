@@ -443,9 +443,9 @@ export default class Main extends Vue {
 
         this.pCourse = newCourse;
         this.loading = true;
-        UserRepository.authenticate(newCourse.courseCode)
+        UserRepository.authenticate(newCourse.courseID)
             .then(_ => {
-                const preserveCache = !(oldCourseCode == newCourse.courseCode);
+                const preserveCache = !(oldCourseCode == newCourse.courseID);
                 Fetcher.forceUpdate(preserveCache)
                     .then(() => {
                         this.loading = false;

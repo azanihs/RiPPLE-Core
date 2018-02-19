@@ -45,7 +45,7 @@ def update(request):
     return JsonResponse(UserService.update_course(user, post_request))
 
 
-def login(request, course_code):
+def login(request, course_id):
     token = request.META.get("HTTP_AUTHORIZATION", None)
     if token != "" and token is not None:
         if not token_valid(token):
@@ -55,13 +55,12 @@ def login(request, course_code):
                 }
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_code=course_code)})
-
+        return JsonResponse({"data": generate_token(user=user_course.user, course_id=course_id)})
     return JsonResponse({"data": generate_token()})
 
-def get_user(request, course_code=None):
-    if course_code != "":
-        return JsonResponse({"data": get_user(course_code)})
+def get_user(request, course_id=None):
+    if course_id != "":
+        return JsonResponse({"data": get_user(course_id)})
 
     return JsonResponse({"error": "Course not provided"})
 

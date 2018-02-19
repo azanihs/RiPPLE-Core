@@ -166,7 +166,7 @@ export default class QuestionSearch extends mixin(responsiveMixin, Vue) {
                 value: "responses"
             }]
         }, {
-            name: "Topics",
+            name: "Filter Topics",
             id: "filterTopics",
             type: "multiselect",
             options: this.topics.map(topic => ({
@@ -174,7 +174,7 @@ export default class QuestionSearch extends mixin(responsiveMixin, Vue) {
                 value: topic.id
             }))
         }, {
-            name: "Questions",
+            name: "Filter Questions",
             id: "filterField",
             type: "select",
             options: [{
@@ -186,10 +186,10 @@ export default class QuestionSearch extends mixin(responsiveMixin, Vue) {
             }, {
                 name: "Answered Questions",
                 value: "answered"
-            }, {
+            }/*, {
                 name: "Room for Improvement",
                 value: "improve"
-            }]
+            }*/]
         }, {
             name: "Search",
             id: "query",

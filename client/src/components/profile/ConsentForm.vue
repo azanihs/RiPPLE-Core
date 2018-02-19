@@ -2,7 +2,7 @@
     <md-layout md-flex="100" md-gutter>
         <md-layout md-flex="100" class="consentForm" md-gutter>
             <md-card class="card">
-                <h2>Consent form for {{ courseCode }}:</h2>
+                <h2>Consent form for {{ course.courseCode }} - {{ course.courseSem }}:</h2>
                 <md-layout md-flex="100">
                     <div v-html="consentForm.content"></div>
                 </md-layout>
@@ -31,7 +31,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, p } from "av-ts";
 
-import { IConsentForm } from "../../interfaces/models";
+import { IConsentForm, ICourse } from "../../interfaces/models";
 
 @Component()
 export default class ConsentForm extends Vue {
@@ -40,7 +40,7 @@ export default class ConsentForm extends Vue {
         required: true
     });
 
-    @Prop courseCode = p<string>({
+    @Prop course = p<ICourse>({
         required: true
     });
 

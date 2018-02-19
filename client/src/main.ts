@@ -23,11 +23,11 @@ Vue.material.registerTheme("spinner", {
 // Fetch User token from server
 new Promise(resolve => {
     const token = getParameterByName("token", window.location.href);
-    const courseCode = getParameterByName("course_code", window.location.href);
-    if (token && courseCode) {
+    const courseID = getParameterByName("course_id", window.location.href);
+    if (token && courseID) {
         // UserRepository.setCurrentCourse(courseCode);
         UserRepository.setCurrentToken(token);
-        resolve(UserRepository.authenticate(courseCode));
+        resolve(UserRepository.authenticate(courseID));
     } else {
         resolve(UserRepository.authenticate());
     }

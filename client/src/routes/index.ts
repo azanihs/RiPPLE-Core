@@ -37,7 +37,7 @@ const routes = [{
     props: (x: any) => ({
         path: x.name,
         token: x.query.token,
-        initCourseCode: x.query.course_code
+        initCourseCode: x.query.course_id
     }),
     children: [{
         path: "/question/id/:id",

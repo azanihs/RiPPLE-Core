@@ -2,7 +2,7 @@
     <md-layout md-flex="100">
         <md-layout md-flex="100">
             <md-card>
-                <h2>Administration Page for: {{ pCourseCode }}</h2>
+                <h2>Administration Page for: {{ pCourse.courseCode }} {{ pCourse.courseName }} - {{ pCourse.courseSem }}</h2>
                 <!-- <md-input-container>
                     <label>Teaching Start: {{ this.teachingStart }}</label>
                     <date-picker v-model="teachingStart"></date-picker>
@@ -11,12 +11,24 @@
                     <label>Teaching End: {{ this.teachingEnd }}</label>
                     <date-picker v-model="teachingEnd"></date-picker>
                 </md-input-container> -->
+                <md-input-container v-model="courseCode">
+                    <label>Course Code</label>
+                    <md-input v-model="courseCode"></md-input>
+                </md-input-container>
+                <md-input-container v-model="courseName">
+                    <label>Course Name</label>
+                    <md-input v-model="courseName"></md-input>
+                </md-input-container>
+                <md-input-container v-model="courseSem">
+                    <label>Course Semester</label>
+                    <md-input v-model="courseSem"></md-input>
+                </md-input-container>
                 <md-chips v-model="editableTopics"
                     @change="topicsEdited"
                     md-input-placeholder="Course Topics">
                 </md-chips>
                 <md-button class="md-fab md-primary"
-                    @click="openDialog()">
+                    @click="saveCourseInformation()">
                     <md-icon>save</md-icon>
                 </md-button>
             </md-card>
@@ -34,19 +46,16 @@
         <md-dialog ref="course_create_modal"
             :md-click-outside-to-close="false"
             :md-esc-to-close="false">
-            <md-dialog-title>Create new course</md-dialog-title>
-            <md-dialog-content>
-                <p v-if="courseIsAvailable">Your course: {{courseCode}} does not appear to exist.</p>
-                <p v-else>Updating course: {{courseCode}}</p>
-            </md-dialog-content>
+            <md-dialog-title v-if="courseIsAvailable">Edit Course Topics for {{pCourse.courseCode}}</md-dialog-title>
+            <md-dialog-title v-else>Create new course: {{pCourse.courseCode}}</md-dialog-title>
             <md-dialog-content>
                 <span>{{networkError}}</span>
                 <form>
-                    <md-input-container>
+                    <!--<md-input-container>
                         <label>Course Code</label>
-                        <md-input v-model="courseCode"></md-input>
+                        <md-input v-model="courseCode" disabled></md-input>
                     </md-input-container>
-                    <!-- <md-input-container>
+                    <md-input-container>
                         <label>Teaching Start: {{this.teachingStart}}</label>
                         <date-picker v-model="teachingStart"></date-picker>
                     </md-input-container>
@@ -54,6 +63,18 @@
                         <label>Teaching End: {{this.teachingEnd}}</label>
                         <date-picker v-model="teachingEnd"></date-picker>
                     </md-input-container> -->
+                    <md-input-container v-model="courseCode">
+                        <label>Course Code</label>
+                        <md-input v-model="courseCode"></md-input>
+                    </md-input-container>
+                    <md-input-container v-model="courseName">
+                        <label>Course Name</label>
+                        <md-input v-model="courseName"></md-input>
+                    </md-input-container>
+                    <md-input-container v-model="courseSem">
+                        <label>Course Semester</label>
+                        <md-input v-model="courseSem"></md-input>
+                    </md-input-container>
                     <md-chips v-model="editableTopics"
                         @change="topicsEdited"
                         md-input-placeholder="Course Topics">
@@ -109,13 +130,17 @@ interface IConstructTopic {
 })
 export default class AdminView extends Vue {
     pTopics: ITopic[] = [];
-    pCourseCode = "";
-
+    
     teachingStart: string | undefined = "0";
     teachingEnd: string | undefined = "0";
 
     pUser: IUser | undefined = undefined;
-    pCourse: ICourse| undefined = undefined;
+    pCourse: ICourse = {
+        courseID: "",
+        courseCode: "",
+        courseName: "",
+        courseSem: ""
+    };
     pCsvString: string = "";
     networkError: string = "";
 
@@ -126,8 +151,6 @@ export default class AdminView extends Vue {
 
         this.pUser = courseUser.user;
         this.pCourse = courseUser.course;
-
-        this.pCourseCode = this.pCourse.courseCode;
 
         if (this.pCourse.available === false) {
             this.openDialog();
@@ -181,7 +204,27 @@ export default class AdminView extends Vue {
     }
 
     get courseCode() {
-        return this.pCourseCode;
+        return this.pCourse!.courseCode;
+    }
+
+    get courseName() {
+        return this.pCourse!.courseName;
+    }
+
+    get courseSem() {
+        return this.pCourse!.courseSem;
+    }
+
+    set courseCode(newCode: string) {
+        this.pCourse!.courseCode = newCode;
+    }
+
+    set courseName(newName: string) {
+        this.pCourse!.courseName = newName;
+    }
+
+    set courseSem(newSem: string) {
+        this.pCourse!.courseSem = newSem;
     }
 
     get courseIsAvailable() {
@@ -219,11 +262,14 @@ export default class AdminView extends Vue {
         if (this.pCourse == undefined) {
             return;
         }
+        console.log(this.pCourse);
 
         UserService.updateCourse({
             course: {
-                courseCode: this.pCourseCode,
+                courseID: this.pCourse.courseID,
+                courseCode: this.pCourse.courseCode,
                 courseName: this.pCourse.courseName,
+                courseSem: this.pCourse.courseSem,
                 start: localToUTC(this.teachingStart),
                 end: localToUTC(this.teachingEnd),
                 available: true
@@ -234,6 +280,11 @@ export default class AdminView extends Vue {
             if (x.error !== undefined) {
                 this.networkError = x.error;
             } else {
+                addEventsToQueue([{
+                    name: "Data Updated",
+                    description: "Course Topics Updated",
+                    icon: "check"
+                }]);
                 this.updateCourseUser(x);
                 this.closeDialog();
             }
@@ -287,7 +338,7 @@ export default class AdminView extends Vue {
         const _a = document.createElement("a");
         _a.target = "_blank";
         _a.href = uri;
-        _a.download = this.pCourseCode + "_ripple_export_" + Date.now() + ".csv";
+        _a.download = this.pCourse!.courseCode + "_ripple_export_" + Date.now() + ".csv";
         _a.style.opacity = "0";
 
         // Add the anchor tag to the DOM and programmatically click it

@@ -26,8 +26,8 @@ def make_token_string():
 
 
 @transaction.atomic
-def generate_token(user=None, course_code=None):
-    if course_code is None and user is None:
+def generate_token(user=None, course_id=None):
+    if course_id is None and user is None:
         # Get random user to requester
         count = CourseUser.objects.count()
         random_index = random.randint(0, count - 1)
@@ -36,7 +36,7 @@ def generate_token(user=None, course_code=None):
         # User has access to course
         try:
             course_user = CourseUser.objects.get(
-                user=user, course=Course.objects.get(course_code=course_code))
+                user=user, course=Course.objects.get(course_id=course_id))
         except CourseUser.DoesNotExist:
             # User does not have access to it
             return ""
@@ -47,7 +47,7 @@ def generate_token(user=None, course_code=None):
 
     return {
         "token": new_token.payload,
-        "courseCode": new_token.user.course.course_code
+        "courseID": new_token.user.course.course_id
     }
 
 
@@ -55,14 +55,14 @@ def token_to_user_course(token):
     return Token.objects.get(payload=token).user
 
 
-def get_user(course_code):
-    if (Course.objects.filter(course_code=course_code).count() > 0):
-        course_id = Course.objects.get(course_code=course_code).pk
+def get_user(course_id):
+    if (Course.objects.filter(course_id=course_id).count() > 0):
+        course_id = Course.objects.get(course_id=course_id).pk
     else:
         return {"error": "Course does not exist"}
     count = CourseUser.objects.filter(course_id=course_id).count()
     random_index = random.randint(0, count - 1)
-    course_user = CourseUser.objects.filter(course_id=Course.objects.get(course_code=course_code))[random_index]
+    course_user = CourseUser.objects.filter(course_id=Course.objects.get(course_id=course_id))[random_index]
     
     token = make_token_string()
     new_token = Token(payload=token, user=course_user)
@@ -70,5 +70,5 @@ def get_user(course_code):
 
     return {
         "token": new_token.payload,
-        "courseCode": new_token.user.course.course_code
+        "courseID": new_token.user.course.course_id
     }

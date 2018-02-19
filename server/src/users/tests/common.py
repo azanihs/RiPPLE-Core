@@ -11,8 +11,10 @@ from users.models import User, Role, Course, CourseUser
 
 class BootstrapTestCase(TestCase):
     def _bootstrap_courses(self, id):
-        return Course.objects.create(course_code="test_course_" + str(id),
+        return Course.objects.create(course_id="test_course_" + str(id),
             course_name="course_name_" + str(id),
+            course_code="course_name_" + str(id),
+            course_sem="semester_" + str(2),
             start=datetime.fromtimestamp(int(100), timezone.utc),
             end=datetime.fromtimestamp(int(100), timezone.utc),
             available=True)

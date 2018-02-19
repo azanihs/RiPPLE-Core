@@ -6,19 +6,9 @@ from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.conf import settings
 
-from ripple.util.util import is_number, merge_url_parts, is_administrator
+from ripple.util.util import is_number, merge_url_parts, is_administrator, get_root_path
 from users.services import UserService
 from questions.services import QuestionService, SearchService, AuthorService
-
-def get_root_path(request):
-    def _format(x):
-        if len(x) == 0: return x
-        return (x + "/") if x[-1] != "/" else x
-
-    return merge_url_parts([
-        _format("//" + request.get_host()),
-        _format("static")
-    ])
 
 def validate_request(request):
     if request.method != 'POST':

@@ -7,8 +7,11 @@ from django.db import models
 _epoch = datetime.utcfromtimestamp(0).replace(tzinfo=timezone.utc)
 
 class Course(models.Model):
-    course_code = models.CharField(max_length=30, primary_key=True)
-    course_name = models.CharField(max_length=30)
+    course_id = models.CharField(max_length=30, primary_key=True)
+    course_name = models.CharField(max_length=60)
+    course_code = models.CharField(max_length=30)
+    course_sem = models.CharField(max_length=30)
+
     available = models.BooleanField(default=False)
 
     start = models.DateTimeField(null=True)
@@ -19,8 +22,10 @@ class Course(models.Model):
 
     def toJSON(self):
         return {
+            "courseID": self.course_id,
             "courseCode": self.course_code,
             "courseName": self.course_name,
+            "courseSem": self.course_sem,
             "available": self.available,
             "start": (self.start.replace(tzinfo=timezone.utc) - _epoch).total_seconds() if self.start else None,
             "end": (self.end.replace(tzinfo=timezone.utc) - _epoch).total_seconds() if self.end else None

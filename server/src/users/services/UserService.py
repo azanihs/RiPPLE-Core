@@ -69,21 +69,30 @@ def update_course(course_user, new_data):
             return {"error":
                 "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
-    course_code = course_information.get("courseCode", None)
-    if course_code is None:
+    course_id = course_information.get("courseID", None)
+    if course_id is None:
         return {"error": "Missing course code"}
 
-    if course_user.course.course_code != course_code:
+    if course_user.course.course_id != course_id:
         return {"error": "Course not found"}
 
     if not util.is_administrator(course_user):
         return {"error": "User does not have administrative permission for current context"}
 
+    code = course_information.get("courseCode", None)
+    name = course_information.get("courseName", None)
+    sem = course_information.get("courseSem", None)
     start = course_information.get("start", None)
     end = course_information.get("end", None)
     available = course_information.get("available", None)
 
     course = course_user.course
+    if code is not None:
+        course.course_code = code
+    if name is not None:
+        course.course_name = name
+    if sem is not None:
+        course.course_sem = sem
     if start is not None:
         if str(start).isdigit():
             course.start = datetime.fromtimestamp(int(start), timezone.utc)
@@ -106,12 +115,12 @@ def update_course(course_user, new_data):
         topic_name = topic.get("name", None)
         existing_topic = None
         try:
-            existing_topic = Topic.objects.get(name=topic_name)
+            existing_topic = Topic.objects.get(name=topic_name, id__in=course.topic_set.all())
         except Topic.DoesNotExist:
             pass
 
         if not existing_topic:
-            new_topic = Topic.objects.create(name=topic_name)
+            (new_topic, created) = Topic.objects.get_or_create(name=topic_name)
             new_topic.course.add(course)
             new_topics.append(new_topic)
         else:
@@ -164,14 +173,18 @@ def aggregate_competencies(user, compare_type):
 
 def insert_course_if_not_exists(course, user):
     if course is None or course.get("course_name", None) is None \
-            or course.get("course_code", None) is None:
+            or course.get("course_id", None) is None:
         return {"error": "Invalid Course Provided"}
 
     try:
-        course = Course.objects.get(course_code=course.get("course_code"))
+        course = Course.objects.get(course_id=course.get("course_id"))
         created = False
     except Course.DoesNotExist:
-        course = Course.objects.create(course_code=course.get("course_code"), course_name=course.get("course_name"))
+        course = Course.objects.create(
+            course_id=course.get("course_id"), 
+            course_name=course.get("course_name"),
+            course_code=course.get("course_code"),
+            course_sem=course.get("course_sem"))
         created = True
 
     if created:
@@ -196,7 +209,7 @@ def insert_course_if_not_exists(course, user):
             e.save()
 
         form = ConsentForm (
-            content="Default consent form",
+            content=util.get_default_consent_form(),
             author=course_user
         )
         form.save()
@@ -204,7 +217,7 @@ def insert_course_if_not_exists(course, user):
     return course
 
 
-def insert_user_if_not_exists(user):
+def insert_user_if_not_exists(user, root_path):
     if user is None or user.get("user_id", None) is None:
         return {"error": "Invalid User Provided"}
     try:
@@ -212,7 +225,9 @@ def insert_user_if_not_exists(user):
     except User.DoesNotExist:
         if user.get("first_name", None) is None or user.get("last_name", None) is None:
             return {"error": "Invalid User Provided"}
-        return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image="")
+
+        default_image_path = root_path + settings.RUNTIME_CONFIGURATION["default_user_image"]
+        return User.objects.create(user_id=user.get("user_id"), first_name=user.get("first_name"), last_name=user.get("last_name"), image=default_image_path)
 
 
 def insert_course_user_if_not_exists(course, user):
