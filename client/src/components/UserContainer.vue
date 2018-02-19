@@ -11,7 +11,7 @@
             <option v-for="enrolledCourse in courses"
                 :key="enrolledCourse.courseCode"
                 :value="enrolledCourse">
-                {{enrolledCourse.courseCode}}
+                {{enrolledCourse.courseCode}} - {{enrolledCourse.courseSem}}
             </option>
         </select>
     </div>

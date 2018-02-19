@@ -201,7 +201,7 @@ class QuestionTestCase(BootstrapTestCase):
 
         response_index = 2
         for user_response in QuestionResponse.objects.all():
-            self.assertEqual(user_response.user.user_id, response_index)
+            self.assertEqual(user_response.user_id, response_index)
             self.assertEqual(user_response.response_id, response_index - 1)
             response_index += 1
 

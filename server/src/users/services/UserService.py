@@ -69,21 +69,30 @@ def update_course(course_user, new_data):
             return {"error":
                 "Topics must be JSON representations of Topics with, at minimum, attribute 'name'"}
 
-    course_code = course_information.get("courseCode", None)
-    if course_code is None:
+    course_id = course_information.get("courseID", None)
+    if course_id is None:
         return {"error": "Missing course code"}
 
-    if course_user.course.course_code != course_code:
+    if course_user.course.course_id != course_id:
         return {"error": "Course not found"}
 
     if not util.is_administrator(course_user):
         return {"error": "User does not have administrative permission for current context"}
 
+    code = course_information.get("courseCode", None)
+    name = course_information.get("courseName", None)
+    sem = course_information.get("courseSem", None)
     start = course_information.get("start", None)
     end = course_information.get("end", None)
     available = course_information.get("available", None)
 
     course = course_user.course
+    if code is not None:
+        course.course_code = code
+    if name is not None:
+        course.course_name = name
+    if sem is not None:
+        course.course_sem = sem
     if start is not None:
         if str(start).isdigit():
             course.start = datetime.fromtimestamp(int(start), timezone.utc)
@@ -164,14 +173,18 @@ def aggregate_competencies(user, compare_type):
 
 def insert_course_if_not_exists(course, user):
     if course is None or course.get("course_name", None) is None \
-            or course.get("course_code", None) is None:
+            or course.get("course_id", None) is None:
         return {"error": "Invalid Course Provided"}
 
     try:
-        course = Course.objects.get(course_code=course.get("course_code"))
+        course = Course.objects.get(course_id=course.get("course_id"))
         created = False
     except Course.DoesNotExist:
-        course = Course.objects.create(course_code=course.get("course_code"), course_name=course.get("course_name"))
+        course = Course.objects.create(
+            course_id=course.get("course_id"), 
+            course_name=course.get("course_name"),
+            course_code=course.get("course_code"),
+            course_sem=course.get("course_sem"))
         created = True
 
     if created:

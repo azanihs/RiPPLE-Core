@@ -105,8 +105,10 @@ export interface IUser {
 };
 
 export interface ICourse {
+    courseID: string,
     courseCode: string,
     courseName: string,
+    courseSem: string,
     start?: number,
     end?: number,
     available?: boolean

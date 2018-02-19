@@ -23,10 +23,9 @@ def index(request):
         course = request_to_course(lti_params, user)
         course_user = create_course_user(course, user, lti_params)
         # Get token
-        token = generate_token(user, course.course_code)
+        token = generate_token(user, course.course_id)
         # Redirect to application
         url = settings.LTI["REDIRECT_URL"] + \
             "/#/?token=" + token.get("token") + \
-            "&course_code=" + course.course_code
-
+            "&course_id=" + course.course_id
         return redirect(url)

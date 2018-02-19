@@ -238,7 +238,7 @@ class Command(BaseCommand):
             sys.exit(1)
 
         course_names = options["name"]
-        course_codes = options["course"]
+        course_ids = options["course"]
         course_files = options["file"]
         host = options["host"]
 
@@ -301,14 +301,17 @@ class Command(BaseCommand):
 
         courses = []
         for i in range(0,len(course_names)):
-            courses.append({"courseCode": course_codes[i], "courseName": course_names[i], "courseFile": course_files[i]})
+            courses.append({"courseID": course_ids[i], "courseName": course_names[i], "courseCode": course_names[i], 
+                "courseSem": "Semester " + str(randint(1,2)), "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
                  for user_id in range(50)]
 
         all_courses = [UserService.insert_course_if_not_exists({
+            "course_id": x["courseID"],
             "course_code": x["courseCode"],
-            "course_name": x["courseName"]}, users[0]) for x in courses]
+            "course_name": x["courseName"],
+            "course_sem": x["courseSem"]}, users[0]) for x in courses]
 
         for i in range(0,len(all_courses)):
             print("Populating Course: " + all_courses[i].course_code)

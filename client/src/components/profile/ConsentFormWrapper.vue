@@ -1,6 +1,6 @@
 <template>
     <md-layout md-flex="100" md-gutter>
-        <consent-form class="hoistAboveOverlay" v-if="consentForm" @change="updateUserConsent" :consentForm="consentForm" :courseCode="courseCode" :response="response"></consent-form>
+        <consent-form class="hoistAboveOverlay" v-if="consentForm" @change="updateUserConsent" :consentForm="consentForm" :course="course" :response="response"></consent-form>
         <div v-if="response === undefined" class="overlay"></div>
     </md-layout>
 </template>
@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle } from "av-ts";
-import { IConsentForm, ICourseUser } from "../../interfaces/models";
+import { IConsentForm, ICourseUser, ICourse } from "../../interfaces/models";
 
 import { addEventsToQueue } from "../../util";
 
@@ -43,6 +43,7 @@ export default class ConsentFormWrapper extends Vue {
     pCourseCode: string | undefined = undefined;
     pResponse: boolean | undefined = undefined;
     pConsentForm: IConsentForm | undefined = undefined;
+    pCourse: ICourse | undefined = undefined;
 
     updateUserConsent(newConsent: boolean) {
         this.updateConsentResponse(newConsent);
@@ -58,6 +59,7 @@ export default class ConsentFormWrapper extends Vue {
     }
 
     updateCourseUser(user: ICourseUser) {
+        this.pCourse = user.course;
         this.pCourseCode = user.course.courseCode;
         this.pCourseUser = user;
     }
@@ -102,6 +104,9 @@ export default class ConsentFormWrapper extends Vue {
     }
     get response() {
         return this.pResponse;
+    }
+    get course() {
+        return this.pCourse;
     }
 }
 </script>

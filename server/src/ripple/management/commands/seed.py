@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         course_seeder = CourseSeedCommand(self)
         base_path = os.path.abspath(json_path)
-        course_codes = []
+        course_ids = []
         course_names = []
         file_names = []
 
@@ -28,8 +28,8 @@ class Command(BaseCommand):
                 continue
 
             name = file_name.split(".")[0]
-            course_codes.append(name)
+            course_ids.append(name)
             course_names.append(name)
             file_names.append(os.path.join(base_path, file_name))
 
-        return course_seeder.handle(args, name=course_names, course=course_codes, file=file_names, host=host)
+        return course_seeder.handle(args, name=course_names, course=course_ids, file=file_names, host=host)

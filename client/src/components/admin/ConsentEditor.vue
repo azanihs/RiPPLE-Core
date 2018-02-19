@@ -4,7 +4,7 @@
             <md-card v-if="consentForm" class="heading">
                 <md-tabs md-fixed class="md-transparent">
                     <md-tab id="edit_tab" md-label="Edit">
-                        <h2>Edit consent form for {{ courseCode }}</h2>
+                        <h2>Edit consent form for {{ courseCode }} - {{ course.courseSem }}</h2>
                         <p v-if="hasPrevAuthor">Last edited by: {{ pPreviousAuthor }}</p>
                         <p class="warn" v-if="oldConsentFormContent === ''">Your course does not have a consent form active</p>
                         <p class="warn" v-else-if="hasUnsavedChanges">You have unsaved changes</p>
@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { Vue, Component, Lifecycle, Mixin as mixin } from "av-ts";
-import { ICourseUser, IConsentForm } from "../../interfaces/models";
+import { ICourseUser, IConsentForm, ICourse } from "../../interfaces/models";
 
 import { getDefaultConsentForm, isAdmin } from "../../util";
 
@@ -73,7 +73,7 @@ import responsiveMixin from "../../responsiveMixin";
 })
 export default class ConsentEditor extends mixin(responsiveMixin, Vue) {
     pCourseCode = "";
-
+    pCourse: ICourse | undefined = undefined;
     pCourseUser: ICourseUser | undefined = undefined;
     pPreviousAuthor: string | undefined = undefined;
 
@@ -91,6 +91,7 @@ export default class ConsentEditor extends mixin(responsiveMixin, Vue) {
 
         this.pCourseCode = user.course.courseCode;
         this.pCourseUser = user;
+        this.pCourse = user.course;
     }
 
     setConsentForm(consentForm: IConsentForm | undefined) {
@@ -229,6 +230,10 @@ export default class ConsentEditor extends mixin(responsiveMixin, Vue) {
 
     get courseCode() {
         return this.pCourseCode;
+    }
+
+    get course() {
+        return this.pCourse;
     }
 }
 </script>

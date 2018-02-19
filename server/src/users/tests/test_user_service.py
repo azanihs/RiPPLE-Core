@@ -153,7 +153,7 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(UserService.update_course(course_user, {
                     "topics": topics,
                     "course": {
-                        "courseCode": "invalid code"
+                        "courseID": "invalid code"
                     }}),
                 {"error": "Course not found"})
 
@@ -161,7 +161,7 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(UserService.update_course(course_user, {
                     "topics": topics,
                     "course": {
-                        "courseCode": "test_course_1"
+                        "courseID": "test_course_1"
                     }}),
                 {"error": "User does not have administrative permission for current context"})
 
@@ -174,7 +174,7 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(UserService.update_course(course_user, {
                     "topics": topics,
                     "course": {
-                        "courseCode": "test_course_1"
+                        "courseID": "test_course_1"
                     }}),
                 {"error": "User does not have administrative permission for current context"})
 
@@ -187,7 +187,7 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(UserService.update_course(course_user, {
                     "topics": topics,
                     "course": {
-                        "courseCode": "test_course_1",
+                        "courseID": "test_course_1",
                         "start": "invalid start"
                     }}),
                 {"error": "Given start timestamp is not valid: invalid start"})
@@ -196,7 +196,7 @@ class UserTestCase(BootstrapTestCase):
         self.assertEqual(UserService.update_course(course_user, {
                     "topics": topics,
                     "course": {
-                        "courseCode": "test_course_1",
+                        "courseID": "test_course_1",
                         "start": 100,
                         "end": "invalid end"
                     }}),
@@ -206,26 +206,28 @@ class UserTestCase(BootstrapTestCase):
 
         #VALID TESTS
         self.assertEqual(UserService.update_course(course_user, {
-                    "topics": [{"name": "topicA"}],
-                    "course": {
-                        "courseCode": "test_course_1",
-                        "start": 100,
-                        "end": 100
-                    }}),
-                {"data":  {
-                    "course": {
-                        "available": True,
-                        "courseCode": "test_course_1",
-                        "courseName": "course_name_1",
-                        "end": 100,
-                        "start": 100
-                    },
-                    "roles": ["Instructor"],
-                    "user": {
-                        "image": "",
-                        "name": "u_firstname u_lastname"
-                    }
-                }})
+                "topics": [{"name": "topicA"}],
+                "course": {
+                    "courseID": "test_course_1",
+                    "start": 100,
+                    "end": 100
+                }}),
+            {"data":  {
+                "course": {
+                    "available": True,
+                    "courseCode": "course_name_1",
+                    "courseID": "test_course_1",
+                    "courseName": "course_name_1",
+                    "courseSem": "semester_2",
+                    "end": 100,
+                    "start": 100
+                },
+                "roles": ["Instructor"],
+                "user": {
+                    "image": "",
+                    "name": "u_firstname u_lastname"
+                }
+            }})
 
 
         topics = self._bootstrap_topics(course)
@@ -237,14 +239,16 @@ class UserTestCase(BootstrapTestCase):
                         {"id": 100, "name": "idNotExist"}
                     ],
                     "course": {
-                        "courseCode": "test_course_1",
+                        "courseID": "test_course_1",
                         "start": 100,
                         "end": 100
                     }}),
                 {"data": {"course": {
                     "available": True,
-                    "courseCode": "test_course_1",
+                    "courseCode": "course_name_1",
+                    "courseID": "test_course_1",
                     "courseName": "course_name_1",
+                    "courseSem": "semester_2",
                     "end": 100,
                     "start": 100
                 },
@@ -333,14 +337,14 @@ class UserTestCase(BootstrapTestCase):
                 {"error": "Invalid Course Provided"})
 
         self.assertEqual(UserService.insert_course_if_not_exists(
-                {"course_code": "test1", "course_name": "test1"}, user
-        ), Course.objects.filter(course_code="test1")[0])
+                {"course_id": "test1", "course_code": "test1", "course_name": "test1", "course_sem": "semester_1"}, user
+        ), Course.objects.filter(course_id="test1")[0])
 
-        c = Course(course_code="test2", course_name="test2")
+        c = Course(course_id="test2", course_name="test2")
         c.save()
 
         self.assertEqual(UserService.insert_course_if_not_exists(
-                {"course_code": "test2", "course_name": "test2"}, user
+                {"course_id": "test2", "course_name": "test2"}, user
         ), c)
 
     def test_insert_user_if_not_exists(self):

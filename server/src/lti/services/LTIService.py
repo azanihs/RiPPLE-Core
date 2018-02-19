@@ -38,9 +38,15 @@ def validate_lti_request(uri, method, request_payload):
 
 
 def request_to_course(lti_params, user):
+    title = lti_params.get("context_title")
+    code = title.split(']')[0][1:]
+    semester = title.split('.')[-1][1:]
+    name = ''.join(title[title.find("]")+1:].split('.')[0:-1])
     course_context = {
-        "course_code": lti_params.get("context_id"),
-        "course_name": lti_params.get("context_label")
+        "course_id": lti_params.get("context_id"),
+        "course_name": name,
+        "course_code": code,
+        "course_sem": semester
     }
 
     return insert_course_if_not_exists(course_context, user)
