@@ -127,15 +127,16 @@ h3 {
 }
 
 .tabContent {
-    margin-top: 7%;
+    margin-top: 100px;
 }
 
 
 .mainTab >>> nav {
     position: fixed;
-    width: 85%;
+    width: 82.5%;
     background-color: white !important;
-    top: 7%;
+    top: 0px;
+    margin-top:60px
 }
 
 .subTabs >>> nav {
@@ -143,6 +144,7 @@ h3 {
     width: 100%;
     background-color: transparent;
     top: 0;
+    margin-top:0;
 }
 
 .subTabs >>> .md-tabs-navigation-scroll-container {
