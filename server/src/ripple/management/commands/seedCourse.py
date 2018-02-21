@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
-from users.models import Course, User, CourseUser, Engagement, ConsentForm
+from users.models import Course, User, CourseUser, Engagement, ConsentForm, Role
 from recommendations.models import Day, Time, Availability, StudyRole, Request, Recommendation, RecommendedTopicRole
 from base64 import b64decode
 import imghdr
@@ -245,6 +245,11 @@ class Command(BaseCommand):
         host = options["host"]
 
         def populate_course(file, topics, course, users):
+            #Add an admin user for each course
+            (admin, created) = CourseUser.objects.get_or_create(user=users[0], course=course)
+            (role, created) = Role.objects.get_or_create(role = "Instructor")
+            admin.roles.add(role)
+
             all_topics = []
             for x in topics:
                 topic = Topic.objects.create(name=x)
