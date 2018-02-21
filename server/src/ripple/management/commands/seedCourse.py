@@ -446,7 +446,7 @@ class Command(BaseCommand):
         courses = []
         for i in range(0,len(course_names)):
             courses.append({"courseID": course_ids[i], "courseName": course_names[i], "courseCode": course_names[i], 
-                "courseSem": "Semester " + str(randint(1,2)), "courseFile": course_files[i]})
+                "courseSem": "Semester " + str(randint(1,2)) + " 2018", "courseFile": course_files[i]})
 
         users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
                  for user_id in range(50)]
