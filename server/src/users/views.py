@@ -46,6 +46,7 @@ def update(request):
 
 
 def login(request, course_id):
+    token = None
     if course_id != "demoAdmin":
         token = request.COOKIES.get("token", None)
     if not token: 
