@@ -28,4 +28,6 @@ def index(request):
         url = settings.LTI["REDIRECT_URL"] + \
             "/#/?token=" + token.get("token") + \
             "&course_id=" + course.course_id
-        return redirect(url)
+        response = HttpResponseRedirect(url)
+        response.set_cookie("token", token.get("token"))
+        return response
