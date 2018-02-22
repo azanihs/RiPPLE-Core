@@ -28,6 +28,8 @@ const mergeAuthHeader = (options?: RequestInit) => {
         options.headers.append("Authorization", token);
     };
 
+    options.credentials = "include";
+
     return options;
 };
 
@@ -111,5 +113,6 @@ export const apiPost = <T>(url: string, body: Object, opts?: RequestInit) => {
 };
 
 export const setToken = (newToken: string) => {
+    //document.cookie = "token="+newToken;
     token = newToken;
 };

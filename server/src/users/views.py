@@ -46,7 +46,11 @@ def update(request):
 
 
 def login(request, course_id):
-    token = request.META.get("HTTP_AUTHORIZATION", None)
+    token = None
+    if course_id != "demoAdmin":
+        token = request.COOKIES.get("token", None)
+    if not token: 
+        token = request.META.get("HTTP_AUTHORIZATION", None)
     if token != "" and token is not None:
         if not token_valid(token):
             return JsonResponse({
@@ -55,7 +59,7 @@ def login(request, course_id):
                 }
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_id=course_id)})
+        return JsonResponse({"data": generate_token(user=user_course.user, course_id=user_course.course_id)})
     return JsonResponse({"data": generate_token()})
 
 def get_user(request, course_id=None):
