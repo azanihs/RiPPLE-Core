@@ -13,7 +13,7 @@ class TokenValidator(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        token = request.META.get("HTTP_AUTHORIZATION", None)
+        token = request.COOKIES.get("token", None)
 
         def pre(x):
             return request.path == x
