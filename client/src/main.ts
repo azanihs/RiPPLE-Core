@@ -25,12 +25,15 @@ new Promise(resolve => {
     const token = getParameterByName("token", window.location.href);
     const courseID = getParameterByName("course_id", window.location.href);
     const demoAdmin = getParameterByName("demoAdmin", window.location.href);
+    const demoStudent = getParameterByName("demoStudent", window.location.href);
     if (token && courseID) {
         // UserRepository.setCurrentCourse(courseCode);
         UserRepository.setCurrentToken(token);
         resolve(UserRepository.authenticate(courseID));
     } else if (demoAdmin) {
         resolve(UserRepository.authenticate("demoAdmin"));
+    } else if (demoStudent) {
+        resolve(UserRepository.authenticate("demoStudent"));
     } else {
         resolve(UserRepository.authenticate());
     }
