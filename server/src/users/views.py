@@ -51,7 +51,7 @@ def login(request, course_id):
         token = request.COOKIES.get("token", None)
     if not token: 
         token = request.META.get("HTTP_AUTHORIZATION", None)
-    print(token)
+        
     if token != "" and token is not None:
         if not token_valid(token):
             return JsonResponse({
