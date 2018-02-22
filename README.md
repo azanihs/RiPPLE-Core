@@ -1,8 +1,10 @@
 # Recommendation in Personalised Peer Learning Environments (RiPPLE)
 
-A demo of the RiPPLE platform can be viewed at https://hkhosrav.github.io/RiPPLE-Core
+A demo of the RiPPLE platform can be viewed at the following links.
 
-The same demo of the platform from an administrator's perspective can be viewed at https://hkhosrav.github.io/RiPPLE-Core/?demoAdmin=true
+Administrator's view: https://hkhosrav.github.io/RiPPLE-Core/?demoAdmin=true
+
+Student's view: https://hkhosrav.github.io/RiPPLE-Core/?demoStudent=true
 
 Universities continue to rapidly evolve to address the needs of diverse, growing student populations, while embracing advances in pedagogy and technology. With the revolution in big data, universities are striving to utilise their rich and complex digital data on learners towards the personalisation of education.
 
