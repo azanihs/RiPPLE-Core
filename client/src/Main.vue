@@ -301,6 +301,10 @@ export default class Main extends Vue {
         required: true
     });
 
+    @Prop demoAdmin = p<boolean>({
+        default: false
+    });
+
     courseRoles: string[] = [];
     pUser: IUser | undefined = undefined;
     pCourse: ICourse| undefined = undefined;

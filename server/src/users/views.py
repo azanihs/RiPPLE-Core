@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
 from users.services import UserService
-from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
+from users.services.TokenService import token_valid, generate_token, generate_admin_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
 from rippleAchievements.engine import engine
@@ -59,10 +59,13 @@ def login(request, course_id):
                 }
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_id=user_course.course_id)})
-    return JsonResponse({"data": generate_token()})
+        return JsonResponse({"data": generate_token(user=user_course.user, course_id=course_id.course_id)})
+    if course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
+        return JsonResponse({"data": generate_admin_token()})
+    else :
+        return JsonResponse({"data": generate_token()})
 
-def get_user(request, course_id=None):
+def get_user_req(request, course_id=None):
     if course_id != "":
         return JsonResponse({"data": get_user(course_id)})
 
