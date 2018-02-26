@@ -195,7 +195,6 @@ def newSource(urls, content, host):
         if urls[i] is None:
             continue
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
-        print(util.merge_url_parts([host, urls[i]]))
 
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
