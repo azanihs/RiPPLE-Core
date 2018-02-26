@@ -16,10 +16,10 @@ if [ $# -eq 0 ]
         cp $1 $DEPLOY_PATH/.env.current
 
         cd $SOURCE_DIR
-        pip install -r requirements.txt
+        pip3 install -r requirements.txt
         cd $DEPLOY_PATH
-        python manage.py migrate
-        #python manage.py seed --dataset=/home/uqnjosep/RiPPLE-Core/migration/exportJSON --host $SERVER_HOST
+        python3 manage.py migrate
+        #python3 manage.py seed --dataset=/home/uqnjosep/RiPPLE-Core/migration/exportJSON --host $SERVER_HOST
         chown -R $APP_OWNER .
         service $SERVICE_NAME start
 fi
