@@ -10,6 +10,8 @@ if [ $# -eq 0 ]
         echo "Missing environment configuration argument"
     else
         service $SERVICE_NAME stop
+        today=`date '+%Y_%m_%d__%H_%M_%S'`
+        mv $DEPLOY_PATH/rippledb $OLD_DATA/$today-rippledb
         rm -rf $DEPLOY_PATH
         mkdir $DEPLOY_PATH
         cp -r $SOURCE_DIR/src/* $DEPLOY_PATH
