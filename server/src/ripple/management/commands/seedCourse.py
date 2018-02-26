@@ -197,6 +197,7 @@ def newSource(urls, content, host):
         if urls[i] is None:
             continue
         images[i]['src'] = util.merge_url_parts([host, urls[i]])
+        print(util.merge_url_parts([host, urls[i]]))
 
     immediate_children = soup.findChildren(recursive=False)
     return ''.join([str(x) for x in immediate_children])
@@ -448,7 +449,7 @@ class Command(BaseCommand):
             courses.append({"courseID": course_ids[i], "courseName": course_names[i], "courseCode": course_names[i], 
                 "courseSem": "Semester " + str(randint(1,2)) + " 2018", "courseFile": course_files[i]})
 
-        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
+        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image=util.merge_url_parts([host, "static/default_images/"+str(user_id)+".jpg"]))
                  for user_id in range(50)]
 
         all_courses = [UserService.insert_course_if_not_exists({
