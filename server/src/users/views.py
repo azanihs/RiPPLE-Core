@@ -59,7 +59,7 @@ def login(request, course_id):
                 }
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_id=course_id.course_id)})
+        return JsonResponse({"data": generate_token(user=user_course.user, course_id=user_course.course_id)})
     if course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
         return JsonResponse({"data": generate_admin_token()})
     else :
