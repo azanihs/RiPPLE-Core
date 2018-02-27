@@ -7,7 +7,7 @@
             <md-icon v-else-if = "!mobileMode" class="md-size-2x">edit</md-icon>
         </div>
         <h5>{{userFullName}}</h5>
-        <select v-model="currentCourse">
+        <select v-model="currentCourse" class="menuSelect">
             <option v-for="enrolledCourse in courses"
                 :key="enrolledCourse.courseCode"
                 :value="enrolledCourse">
@@ -31,6 +31,10 @@
     margin: auto;
     position: relative;
     cursor: pointer;
+}
+
+.menuSelect {
+    max-width: 90%;
 }
 
 .mobileStyle {
