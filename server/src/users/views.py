@@ -47,23 +47,30 @@ def update(request):
 
 def login(request, course_id):
     token = None
-    if course_id != "demoAdmin":
+    if course_id != "demoAdmin" and  course_id != "demoStudent":
         token = request.COOKIES.get("token", None)
     if not token: 
         token = request.META.get("HTTP_AUTHORIZATION", None)
+        
     if token != "" and token is not None:
         if not token_valid(token):
             return JsonResponse({
                 "data": {
-                    "token": token
+                    "token": "INVALID"
                 }
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_id=user_course.course_id)})
-    if course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
-        return JsonResponse({"data": generate_admin_token()})
-    else :
-        return JsonResponse({"data": generate_token()})
+        token = generate_token(user=user_course.user, course_id=user_course.course_id)
+    elif course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
+        token = generate_admin_token()
+    elif course_id == "demoStudent" and settings.ALLOW_UNAUTHENTICATED:
+        token = generate_token()
+    else:
+        token = generate_token()
+    response = JsonResponse({"data": token})
+    response.set_cookie("token", token["token"])
+    return response
+
 
 def get_user_req(request, course_id=None):
     if course_id != "":
