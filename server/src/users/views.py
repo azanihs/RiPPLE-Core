@@ -60,7 +60,6 @@ def login(request, course_id):
                 }
             })
         user_course = token_to_user_course(token)
-<<<<<<< HEAD
         token = generate_token(user=user_course.user, course_id=user_course.course_id)
     elif course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
         token = generate_admin_token()
@@ -72,13 +71,6 @@ def login(request, course_id):
     response.set_cookie("token", token["token"])
     return response
 
-=======
-        return JsonResponse({"data": generate_token(user=user_course.user, course_id=user_course.course_id)})
-    if course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
-        return JsonResponse({"data": generate_admin_token()})
-    else :
-        return JsonResponse({"data": generate_token()})
->>>>>>> origin/dev
 
 def get_user_req(request, course_id=None):
     if course_id != "":
