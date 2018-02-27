@@ -29,9 +29,7 @@ def make_token_string():
 def generate_token(user=None, course_id=None):
     if course_id is None and user is None:
         # Get random user to requester
-        count = CourseUser.objects.count()
-        random_index = random.randint(0, count - 1)
-        course_user = CourseUser.objects.all()[random_index]
+        course_user = get_random_user()
     else:
         # User has access to course
         try:
@@ -41,6 +39,14 @@ def generate_token(user=None, course_id=None):
             # User does not have access to it
             return ""
 
+    return make_token(course_user)
+
+@transaction.atomic
+def generate_admin_token():
+    course_user = get_admin_user()
+    return make_token(course_user)
+
+def make_token(course_user):
     token = make_token_string()
     new_token = Token(payload=token, user=course_user)
     new_token.save()
@@ -50,6 +56,15 @@ def generate_token(user=None, course_id=None):
         "courseID": new_token.user.course.course_id
     }
 
+def get_random_user():
+    count = CourseUser.objects.count()
+    random_index = random.randint(0, count - 1)
+    return CourseUser.objects.all()[random_index]
+
+def get_admin_user():
+    count = CourseUser.objects.filter(roles__in=['Instructor', 'TeachingAssistant']).count()
+    random_index = random.randint(0, count-1)
+    return CourseUser.objects.all()[random_index]
 
 def token_to_user_course(token):
     return Token.objects.get(payload=token).user

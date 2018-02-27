@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.core.files.base import ContentFile
 from users.services import UserService
-from users.services.TokenService import token_valid, generate_token, token_to_user_course, get_user
+from users.services.TokenService import token_valid, generate_token, generate_admin_token, token_to_user_course, get_user
 from users.models import User, Notification
 from rippleAchievements.models import Achievement
 from rippleAchievements.engine import engine
@@ -47,22 +47,32 @@ def update(request):
 
 def login(request, course_id):
     token = None
-    if course_id != "demoAdmin":
+    if course_id != "demoAdmin" and  course_id != "demoStudent":
         token = request.COOKIES.get("token", None)
     if not token: 
         token = request.META.get("HTTP_AUTHORIZATION", None)
+        
     if token != "" and token is not None:
         if not token_valid(token):
             return JsonResponse({
                 "data": {
-                    "token": token
+                    "token": "INVALID"
                 }
             })
         user_course = token_to_user_course(token)
-        return JsonResponse({"data": generate_token(user=user_course.user, course_id=user_course.course_id)})
-    return JsonResponse({"data": generate_token()})
+        token = generate_token(user=user_course.user, course_id=user_course.course_id)
+    elif course_id == "demoAdmin" and settings.ALLOW_UNAUTHENTICATED:
+        token = generate_admin_token()
+    elif course_id == "demoStudent" and settings.ALLOW_UNAUTHENTICATED:
+        token = generate_token()
+    else:
+        token = generate_token()
+    response = JsonResponse({"data": token})
+    response.set_cookie("token", token["token"])
+    return response
 
-def get_user(request, course_id=None):
+
+def get_user_req(request, course_id=None):
     if course_id != "":
         return JsonResponse({"data": get_user(course_id)})
 

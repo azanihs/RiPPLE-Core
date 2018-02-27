@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from questions.models import Topic, Question, Distractor, QuestionResponse, QuestionRating, Competency, QuestionImage,\
     ExplanationImage, DistractorImage, ReportReason
-from users.models import Course, User, CourseUser, Engagement, ConsentForm
+from users.models import Course, User, CourseUser, Engagement, ConsentForm, Role
 from recommendations.models import Day, Time, Availability, StudyRole, AvailableRole
 from base64 import b64decode
 import imghdr
@@ -243,6 +243,11 @@ class Command(BaseCommand):
         host = options["host"]
 
         def populate_course(file, topics, course, users):
+            #Add an admin user for each course
+            (admin, created) = CourseUser.objects.get_or_create(user=users[0], course=course)
+            (role, created) = Role.objects.get_or_create(role = "Instructor")
+            admin.roles.add(role)
+
             all_topics = []
             for x in topics:
                 topic = Topic.objects.create(name=x)
@@ -302,9 +307,9 @@ class Command(BaseCommand):
         courses = []
         for i in range(0,len(course_names)):
             courses.append({"courseID": course_ids[i], "courseName": course_names[i], "courseCode": course_names[i], 
-                "courseSem": "Semester " + str(randint(1,2)), "courseFile": course_files[i]})
+                "courseSem": "Semester " + str(randint(1,2)) + " 2018", "courseFile": course_files[i]})
 
-        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image="//loremflickr.com/320/240/person")
+        users = [User.objects.create(user_id=user_id, first_name=fake.first_name(), last_name=fake.last_name(), image=util.merge_url_parts([host, "static/default_images/"+str(user_id)+".jpg"]))
                  for user_id in range(50)]
 
         all_courses = [UserService.insert_course_if_not_exists({
