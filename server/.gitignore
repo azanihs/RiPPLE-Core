@@ -4,6 +4,7 @@ src/*.db
 src/*.db-journal
 src/media/*
 !src/media/default_images
+!src/media/question_photo
 htmlcov
 .coverage
 
